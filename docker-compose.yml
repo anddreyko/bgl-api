@@ -1,0 +1,64 @@
+services:
+  api:
+    build:
+      context: .docker
+      dockerfile: dev/nginx/Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    depends_on:
+      - api-php-fpm
+    ports:
+      - "${APP_EXTERNAL_PORT}:80"
+    networks:
+      bglapinet:
+        ipv4_address: "${APP_NETWORK_IP}"
+      default:
+        aliases:
+          - ${APP_HOST}
+    extra_hosts:
+      - "${APP_HOST}:${APP_NETWORK_IP}"
+    restart: on-failure
+    tty: false
+
+  api-php-fpm:
+    build:
+      context: .docker
+      dockerfile: dev/php-fpm/Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    networks:
+      bglapinet:
+        ipv4_address: ${FPM_NETWORK_IP}
+        aliases:
+          - api-php-fpm
+    extra_hosts:
+      - "${APP_HOST}:${APP_NETWORK_IP}"
+    expose:
+      - 9000
+
+  api-php-cli:
+    build:
+      context: .docker
+      dockerfile: dev/php-cli/Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    networks:
+      - bglapinet
+    extra_hosts:
+      - "${APP_HOST}:${APP_NETWORK_IP}"
+
+volumes:
+  api-postgres:
+
+networks:
+  bglapinet:
+    ipam:
+      driver: default
+      config:
+        - subnet: "${BGLNET}"
