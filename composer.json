@@ -1,0 +1,21 @@
+{
+    "name": "anddreyko/bgl-api",
+    "type": "project",
+    "authors": [
+        {
+            "name": "anddreyko"
+        }
+    ],
+    "config": {
+        "process-timeout": 0,
+        "soft-packages": true
+    },
+    "require": {
+        "php": "^8.2",
+        "slim/slim": "^4.11",
+        "slim/psr7": "^1.6"
+    },
+    "require-dev": {
+        "roave/security-advisories": "dev-master"
+    }
+}
