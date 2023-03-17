@@ -2,9 +2,32 @@ version: "3.7"
 services:
   api:
     build:
-      context: .
-    platform: linux/amd64
+      context: .docker
+      dockerfile: dev/nginx/Dockerfile
     volumes:
       - .:/app
+    depends_on:
+      - api-php-fpm
     ports:
       - "8000:80"
+
+  api-php-fpm:
+    build:
+      context: .docker
+      dockerfile: dev/php-fpm/Dockerfile
+    environment:
+      APP_ENV: dev
+      APP_DEBUG: 1
+      PHP_IDE_CONFIG: serverName=API
+    volumes:
+      - .:/app
+
+  api-php-cli:
+    build:
+      context: .docker
+      dockerfile: dev/php-cli/Dockerfile
+    environment:
+      APP_ENV: dev
+      APP_DEBUG: 1
+    volumes:
+      - .:/app

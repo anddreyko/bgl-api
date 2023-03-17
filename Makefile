@@ -15,3 +15,6 @@ docker-pull:
 
 docker-build:
 	docker-compose build
+
+docker-try-build-prod:
+	docker-compose -f docker-compose-prod.yml up -d
