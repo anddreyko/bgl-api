@@ -2,21 +2,17 @@
 
 declare(strict_types=1);
 
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\ResponseInterface;
 use Slim\Factory\AppFactory;
 
-require __DIR__ . '/../vendor/autoload.php';
+http_response_code(500);
 
-$app = AppFactory::create();
+require_once __DIR__ . '/../vendor/autoload.php';
 
-$app->get(
-    '/',
-    function (RequestInterface $request, ResponseInterface $response) {
-        $response->getBody()->write('{"content": "Hello world!"}');
+$container = require_once __DIR__ . '/../config/container.php';
 
-        return $response->withHeader('Content-Type', 'application/json');
-    }
-);
+$app = AppFactory::createFromContainer($container);
+
+(require_once __DIR__ . '/../config/middleware.php')($app, $container);
+(require_once __DIR__ . '/../config/routes.php')($app);
 
 $app->run();
