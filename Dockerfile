@@ -2,7 +2,6 @@ FROM richarvey/nginx-php-fpm:3.1.0
 
 COPY .docker/base/nginx/conf.d /etc/nginx/conf.d
 COPY .docker/base/php-fpm/conf.d /usr/local/etc/php/conf.d
-COPY . .
 
 # Image config
 ENV WEBROOT /var/www/html/web
@@ -13,6 +12,11 @@ ENV REAL_IP_HEADER 1
 
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
-RUN composer install --no-dev && rm -rf /root/.composer/cache
-
 WORKDIR /app
+
+COPY ./composer.json ./composer.lock ./
+
+RUN composer install --no-dev --prefer-dist --no-progress --no-suggest --no-scripts --optimize-autoloader \
+    && rm -rf /root/.composer/cache
+
+COPY . .
