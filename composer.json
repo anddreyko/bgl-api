@@ -24,6 +24,10 @@
         "ext-json": "*"
     },
     "require-dev": {
-        "roave/security-advisories": "dev-master"
+        "roave/security-advisories": "dev-master",
+        "overtrue/phplint": "^9.0"
+    },
+    "scripts": {
+        "lint": "phplint"
     }
 }

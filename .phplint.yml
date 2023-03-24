@@ -1,0 +1,11 @@
+path: ./
+jobs: 10
+warning: true
+cache: ./var/.phplint.cache
+cache-adapter: Filesystem
+log-json: ./var/.phplint.log.json
+extensions:
+  - php
+exclude:
+  - vendor
+  - -var
