@@ -26,11 +26,13 @@
     "require-dev": {
         "roave/security-advisories": "dev-master",
         "overtrue/phplint": "^9.0",
-        "squizlabs/php_codesniffer": "*"
+        "squizlabs/php_codesniffer": "*",
+        "vimeo/psalm": "^5.8"
     },
     "scripts": {
         "lint": "phplint",
         "cs-check": "phpcs",
-        "cs-fix": "phpcbf"
+        "cs-fix": "phpcbf",
+        "psalm": "psalm"
     }
 }

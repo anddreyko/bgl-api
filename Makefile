@@ -20,4 +20,7 @@ docker-try-build-prod:
 	docker-compose -f docker-compose-prod.yml up -d
 
 lint:
-	docker-compose run --rm api-php-cli composer lint
+	docker-compose run --rm api-php-cli composer lint && docker-compose run --rm api-php-cli composer cs-check
+
+analyze:
+	docker-compose run --rm api-php-cli composer psalm
