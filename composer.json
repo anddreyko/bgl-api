@@ -11,6 +11,11 @@
             "App\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
     "config": {
         "process-timeout": 0,
         "soft-packages": true
@@ -28,13 +33,17 @@
         "overtrue/phplint": "^9.0",
         "squizlabs/php_codesniffer": "*",
         "vimeo/psalm": "^5.8",
-        "phpstan/phpstan": "^1.10"
+        "phpstan/phpstan": "^1.10",
+        "codeception/codeception": "^5.0",
+        "codeception/module-phpbrowser": "*",
+        "codeception/module-asserts": "*"
     },
     "scripts": {
         "lint": "phplint",
         "cs-check": "phpcs",
         "cs-fix": "phpcbf",
         "psalm": "psalm",
-        "phpstan": "phpstan"
+        "phpstan": "phpstan",
+        "test": "codecept run"
     }
 }

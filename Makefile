@@ -24,3 +24,15 @@ lint:
 
 analyze:
 	docker-compose run --rm api-php-cli composer psalm && docker-compose run --rm api-php-cli composer phpstan
+
+test:
+	docker-compose run --rm api-php-cli composer test
+
+test-coverage: test-coverage-clear
+	docker-compose run --rm api-php-cli composer test-coverage
+
+test-coverage-clear:
+	docker-compose run --rm api-php-cli sh -c 'rm -rf var/.tests/*'
+
+check: lint \
+	analyze test
