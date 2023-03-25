@@ -6,7 +6,7 @@ return array_merge_recursive(
     ...array_map(
         static function (string $file): array {
             /**
-             * @var array $config
+             * @var mixed[] $config
              * @psalm-suppress UnresolvableInclude
              */
             $config = require_once $file;

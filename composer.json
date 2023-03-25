@@ -27,12 +27,14 @@
         "roave/security-advisories": "dev-master",
         "overtrue/phplint": "^9.0",
         "squizlabs/php_codesniffer": "*",
-        "vimeo/psalm": "^5.8"
+        "vimeo/psalm": "^5.8",
+        "phpstan/phpstan": "^1.10"
     },
     "scripts": {
         "lint": "phplint",
         "cs-check": "phpcs",
         "cs-fix": "phpcbf",
-        "psalm": "psalm"
+        "psalm": "psalm",
+        "phpstan": "phpstan"
     }
 }
