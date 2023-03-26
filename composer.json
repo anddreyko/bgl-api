@@ -26,7 +26,9 @@
         "slim/slim": "^4.11",
         "slim/psr7": "^1.6",
         "php-di/php-di": "^7.0",
-        "ext-json": "*"
+        "ext-json": "*",
+        "doctrine/orm": "^2.14",
+        "laminas/laminas-config-aggregator": "^1.13"
     },
     "require-dev": {
         "roave/security-advisories": "dev-master",

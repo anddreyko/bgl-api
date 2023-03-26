@@ -2,17 +2,10 @@
 
 declare(strict_types=1);
 
-return array_merge_recursive(
-    ...array_map(
-        static function (string $file): array {
-            /**
-             * @var mixed[] $config
-             * @psalm-suppress UnresolvableInclude
-             */
-            $config = require_once $file;
+use Laminas\ConfigAggregator\ConfigAggregator;
+use Laminas\ConfigAggregator\PhpFileProvider;
 
-            return $config;
-        },
-        glob(__DIR__ . '/base/*.php') ?: []
-    )
-);
+return (new ConfigAggregator([
+    new PhpFileProvider(__DIR__ . '/base/*.php'),
+    new PhpFileProvider(__DIR__ . '/' . (getenv('APP_ENV') ?: 'prod') . '/*.php'),
+]))->getMergedConfig();
