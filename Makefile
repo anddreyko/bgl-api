@@ -1,5 +1,5 @@
 init: docker-down-clear \
-	docker-pull docker-build docker-up
+	docker-pull docker-build docker-up test-acceptance-fast
 
 docker-up:
 	docker-compose up -d
@@ -16,23 +16,44 @@ docker-pull:
 docker-build:
 	docker-compose build
 
-docker-try-build-prod:
-	docker-compose -f docker-compose-prod.yml up -d
+docker-try-build-prod: docker-down-clear
+	docker-compose -f docker-compose-prod.yml up -d && make test-acceptance-fast
 
-lint:
-	docker-compose run --rm api-php-cli composer lint && docker-compose run --rm api-php-cli composer cs-check
+check: lint analyze test
 
-analyze:
-	docker-compose run --rm api-php-cli composer psalm && docker-compose run --rm api-php-cli composer phpstan
+lint: php-lint cs-check
+
+analyze: php-stan psalm
+
+php-lint:
+	docker-compose run --rm api-php-cli composer lint
+
+cs-check:
+	docker-compose run --rm api-php-cli composer cs-check
+
+psalm:
+	docker-compose run --rm api-php-cli composer psalm
+
+php-stan:
+	docker-compose run --rm api-php-cli composer phpstan
 
 test:
 	docker-compose run --rm api-php-cli composer test
 
+test-acceptance:
+	docker-compose run --rm api-php-cli composer test -- Acceptance
+
+test-acceptance-fast:
+	docker-compose run --rm api-php-cli composer test -- StartUp
+
+test-unit:
+	docker-compose run --rm api-php-cli composer test -- Unit
+
 test-coverage: test-coverage-clear
-	docker-compose run --rm api-php-cli composer test-coverage
+	docker-compose run --rm api-php-cli composer test -- Unit --coverage --coverage-html
 
 test-coverage-clear:
 	docker-compose run --rm api-php-cli sh -c 'rm -rf var/.tests/*'
 
-check: lint \
-	analyze test
+var-all:
+	docker-compose run --rm api-php-cli sh -c 'chmod 777 var'
