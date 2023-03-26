@@ -1,5 +1,6 @@
 init: docker-down-clear \
-	docker-pull docker-build docker-up test-acceptance-fast
+	docker-pull docker-build docker-up \
+	console-symlink-create test-start-up
 
 docker-up:
 	docker-compose up -d
@@ -43,7 +44,7 @@ test:
 test-acceptance:
 	docker-compose run --rm api-php-cli composer test -- Acceptance
 
-test-acceptance-fast:
+test-start-up:
 	docker-compose run --rm api-php-cli composer test -- StartUp
 
 test-unit:
@@ -57,3 +58,9 @@ test-coverage-clear:
 
 var-all:
 	docker-compose run --rm api-php-cli sh -c 'chmod 777 var'
+
+console-symlink-create: console-symlink-clear
+	docker-compose run --rm api-php-cli ln -s ./console/app.php ./app
+
+console-symlink-clear:
+	docker-compose run --rm api-php-cli rm -f ./app
