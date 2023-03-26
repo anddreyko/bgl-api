@@ -17,7 +17,7 @@ services:
       dockerfile: dev/php-fpm/Dockerfile
     environment:
       APP_ENV: dev
-      APP_DEBUG: 1
+      APP_DEBUG: ${APP_DEBUG}
       PHP_IDE_CONFIG: serverName=API
     volumes:
       - .:/app
@@ -29,6 +29,10 @@ services:
     environment:
       APP_ENV: dev
       APP_DEBUG: 1
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
     volumes:
       - .:/app
 
@@ -41,7 +45,7 @@ services:
     volumes:
       - api-postgres:/var/lib/postgresql/data
     ports:
-      - "54321:5432"
+      - "5432:5432"
 
 volumes:
   api-postgres:

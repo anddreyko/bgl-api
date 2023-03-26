@@ -27,6 +27,7 @@
         "slim/psr7": "^1.6",
         "php-di/php-di": "^7.0",
         "ext-json": "*",
+        "ext-pdo": "*",
         "doctrine/orm": "^2.14",
         "laminas/laminas-config-aggregator": "^1.13"
     },
