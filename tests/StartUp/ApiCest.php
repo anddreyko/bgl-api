@@ -10,6 +10,5 @@ class ApiCest
     {
         $I->amOnPage('/');
         $I->seeResponseCodeIs(200);
-        $I->haveHttpHeader('Content-Type', 'application/json');
     }
 }

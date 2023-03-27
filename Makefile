@@ -35,6 +35,9 @@ cs-check:
 psalm:
 	docker-compose run --rm api-php-cli composer psalm
 
+psalm-alter:
+	docker-compose run --rm api-php-cli composer psalm --alter --issues=MissingParamType --dry-run
+
 php-stan:
 	docker-compose run --rm api-php-cli composer phpstan
 
@@ -64,3 +67,6 @@ console-symlink-create: console-symlink-clear
 
 console-symlink-clear:
 	docker-compose run --rm api-php-cli rm -f ./app
+
+generate-api:
+	docker-compose run api-php-cli ./vendor/bin/openapi ./src -o web/assets/openapi.json -f json

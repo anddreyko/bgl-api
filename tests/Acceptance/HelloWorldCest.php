@@ -8,9 +8,9 @@ class HelloWorldCest
 {
     public function testTry(AcceptanceTester $I): void
     {
-        $I->amOnPage('/');
+        $I->amOnPage('/v1/hello-world');
         $I->seeResponseCodeIs(200);
         $I->haveHttpHeader('Content-Type', 'application/json');
-        $I->see('{"content":"Hello world!"}');
+        $I->see('{"data":"Hello world!","result":true}');
     }
 }

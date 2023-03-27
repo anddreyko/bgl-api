@@ -29,7 +29,8 @@
         "laminas/laminas-config-aggregator": "^1.13",
         "php-di/php-di": "^7.0",
         "slim/psr7": "^1.6",
-        "slim/slim": "^4.11"
+        "slim/slim": "^4.11",
+        "zircote/swagger-php": "^4.7"
     },
     "require-dev": {
         "codeception/codeception": "^5.0",

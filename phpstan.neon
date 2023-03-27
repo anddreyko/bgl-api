@@ -5,3 +5,7 @@ parameters:
 		- console
 		- src
 		- web
+	excludePaths:
+		- web/assets
+	fileExtensions:
+		- php

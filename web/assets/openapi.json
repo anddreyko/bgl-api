@@ -1,0 +1,36 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "BoarGameLog API",
+        "version": "1"
+    },
+    "paths": {
+        "/v1/hello-world": {
+            "get": {
+                "operationId": "c0997e5338501b653875406e37144233",
+                "responses": {
+                    "200": {
+                        "description": "Hello world"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Response": {
+                "properties": {
+                    "data": {
+                        "description": "The content.",
+                        "type": "string"
+                    },
+                    "result": {
+                        "description": "The status of response.",
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    }
+}

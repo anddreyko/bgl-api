@@ -12,4 +12,6 @@
     <file>console</file>
     <file>src</file>
     <file>web</file>
+
+    <exclude-pattern>web/assets</exclude-pattern>
 </ruleset>
