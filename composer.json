@@ -18,28 +18,28 @@
     },
     "config": {
         "process-timeout": 0,
-        "soft-packages": true
+        "soft-packages": true,
+        "sort-packages": true
     },
     "require": {
         "php": "^8.2",
-        "symfony/console": "^6.0",
-        "slim/slim": "^4.11",
-        "slim/psr7": "^1.6",
-        "php-di/php-di": "^7.0",
         "ext-json": "*",
         "ext-pdo": "*",
         "doctrine/orm": "^2.14",
-        "laminas/laminas-config-aggregator": "^1.13"
+        "laminas/laminas-config-aggregator": "^1.13",
+        "php-di/php-di": "^7.0",
+        "slim/psr7": "^1.6",
+        "slim/slim": "^4.11"
     },
     "require-dev": {
-        "roave/security-advisories": "dev-master",
-        "overtrue/phplint": "^9.0",
-        "squizlabs/php_codesniffer": "*",
-        "vimeo/psalm": "^5.8",
-        "phpstan/phpstan": "^1.10",
         "codeception/codeception": "^5.0",
+        "codeception/module-asserts": "*",
         "codeception/module-phpbrowser": "*",
-        "codeception/module-asserts": "*"
+        "overtrue/phplint": "^9.0",
+        "phpstan/phpstan": "^1.10",
+        "roave/security-advisories": "dev-master",
+        "squizlabs/php_codesniffer": "*",
+        "vimeo/psalm": "^5.8"
     },
     "scripts": {
         "lint": "phplint",
