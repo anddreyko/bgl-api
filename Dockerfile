@@ -1,10 +1,10 @@
 FROM richarvey/nginx-php-fpm:3.1.0
 
-COPY .docker/base/nginx/conf.d /etc/nginx/conf.d
+COPY .docker/base/nginx/conf.d /etc/nginx/sites-available
 COPY .docker/base/php-fpm/conf.d /usr/local/etc/php/conf.d
 
 # Image config
-ENV WEBROOT /var/www/html/web
+ENV WEBROOT /app/web
 ENV PHP_ERRORS_STDERR 0
 ENV ERRORS 0
 ENV RUN_SCRIPTS 1

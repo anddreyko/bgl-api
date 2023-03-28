@@ -1,6 +1,6 @@
 init: docker-down-clear \
 	docker-pull docker-build docker-up \
-	console-symlink-create test-start-up
+	console-symlink-create test-start-up test-hello-world
 
 docker-up:
 	docker-compose up -d
@@ -17,8 +17,13 @@ docker-pull:
 docker-build:
 	docker-compose build
 
-docker-try-build-prod: docker-down-clear
-	docker-compose -f docker-compose-prod.yml up -d && make test-acceptance-fast
+docker-try-build-prod: docker-down-clear-prod docker-up-prod test-start-up test-hello-world
+
+docker-down-clear-prod:
+	COMPOSE_PROJECT_NAME=bgl-prod docker-compose down -v --remove-orphans
+
+docker-up-prod:
+	COMPOSE_PROJECT_NAME=bgl-prod docker-compose -f docker-compose-prod.yml up -d
 
 check: lint analyze test
 
@@ -49,6 +54,9 @@ test-acceptance:
 
 test-start-up:
 	docker-compose run --rm api-php-cli composer test -- StartUp
+
+test-hello-world:
+	docker-compose run --rm api-php-cli composer test -- tests/Acceptance/HelloWorldCest.php
 
 test-unit:
 	docker-compose run --rm api-php-cli composer test -- Unit
