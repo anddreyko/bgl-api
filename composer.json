@@ -28,6 +28,7 @@
         "doctrine/orm": "^2.14",
         "laminas/laminas-config-aggregator": "^1.13",
         "php-di/php-di": "^7.0",
+        "ramsey/uuid": "^4.7",
         "slim/psr7": "^1.6",
         "slim/slim": "^4.11",
         "zircote/swagger-php": "^4.7"

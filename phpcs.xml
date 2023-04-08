@@ -14,4 +14,9 @@
     <file>web</file>
 
     <exclude-pattern>web/assets</exclude-pattern>
+
+    <!-- remove this rule after resolve the issue: https://github.com/squizlabs/PHP_CodeSniffer/pull/3728 -->
+    <rule ref="PSR1.Files.SideEffects">
+        <exclude-pattern>src/*\.php</exclude-pattern>
+    </rule>
 </ruleset>

@@ -16,7 +16,7 @@ class HttpHelperTest extends Unit
 {
     private ResponseFactoryInterface $factory;
 
-    protected function _before()
+    protected function _before(): void
     {
         $this->factory = new ResponseFactory();
         parent::_before();
