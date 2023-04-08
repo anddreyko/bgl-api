@@ -13,7 +13,7 @@ use App\Auth\ValueObjects\Token;
 /**
  * @see \Tests\Unit\Auth\Entities\UserTest
  */
-final readonly class User
+final class User
 {
     public function __construct(
         private Id $id,
@@ -63,5 +63,13 @@ final readonly class User
     public function isWait(): bool
     {
         return $this->status->isWait();
+    }
+
+    public function setStatus(UserStatusEnum $status): self
+    {
+        $user = clone $this;
+        $user->status = $status;
+
+        return $user;
     }
 }

@@ -34,7 +34,7 @@ final class Token
         return $this->expires;
     }
 
-    public function check(string $value): bool
+    public function validate(string $value): bool
     {
         try {
             $this->eq($value);

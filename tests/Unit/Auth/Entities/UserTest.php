@@ -85,4 +85,10 @@ class UserTest extends Unit
     {
         $this->assertTrue($this->user->isWait());
     }
+
+    public function testSettingStatus(): void
+    {
+        $user = $this->user->setStatus(UserStatusEnum::Active);
+        $this->assertEquals(UserStatusEnum::Active, $user->getStatus());
+    }
 }

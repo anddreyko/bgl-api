@@ -15,12 +15,10 @@ class TokenTest extends Unit
     private \DateTimeImmutable $now;
     private \DateTimeImmutable $expires;
 
-    protected function _setUp(): void
+    public function setUp(): void
     {
         $this->now = new \DateTimeImmutable();
         $this->expires = $this->now->add(new \DateInterval('PT1H'));
-
-        parent::_setUp();
     }
 
     public function testNilUuid(): void
@@ -49,27 +47,34 @@ class TokenTest extends Unit
         new Token('not-uuid', $this->expires);
     }
 
-    public function testCheck(): void
+    public function testValidate(): void
     {
         $token = new Token('00000000-0000-0000-0000-000000000000', $this->expires);
-        $this->assertTrue($token->check('00000000-0000-0000-0000-000000000000'));
+        $this->assertTrue($token->validate('00000000-0000-0000-0000-000000000000'));
     }
 
-    public function testCheckNotEqValue(): void
+    public function testValidateNotEqValue(): void
     {
         $token = new Token('00000000-0000-0000-0000-000000000000', $this->expires);
-        $this->assertFalse($token->check('00000000-0000-0000-0000-000000000001'));
+        $this->assertFalse($token->validate('00000000-0000-0000-0000-000000000001'));
     }
 
-    public function testCheckExpired(): void
+    public function testValidateExpired(): void
     {
         $token = new Token('00000000-0000-0000-0000-000000000000', $this->now);
-        $this->assertFalse($token->check('00000000-0000-0000-0000-000000000000'));
+        $this->assertFalse($token->validate('00000000-0000-0000-0000-000000000000'));
     }
 
     public function testExpires(): void
     {
         $token = new Token('00000000-0000-0000-0000-000000000000', $this->now);
         $this->assertEquals($this->now, $token->getExpires());
+    }
+
+    public function testNotEmpty(): void
+    {
+        $token = new Token('00000000-0000-0000-0000-000000000000', $this->now);
+
+        $this->assertFalse($token->isEmpty());
     }
 }
