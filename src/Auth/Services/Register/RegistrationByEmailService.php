@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Auth\Services;
+namespace App\Auth\Services\Register;
 
 use App\Auth\Entities\User;
-use App\Auth\Enums\UserStatusEnum;
 use App\Auth\Forms\RegistrationByEmailForm;
 use App\Auth\Helpers\FlushHelper;
 use App\Auth\Helpers\PasswordHashHelper;
@@ -15,7 +14,7 @@ use App\Auth\Repositories\UserRepository;
 use App\Auth\ValueObjects\Email;
 use App\Auth\ValueObjects\Id;
 
-final readonly class RegisterByEmailService
+final readonly class RegistrationByEmailService
 {
     public function __construct(
         private UserRepository $users,
@@ -26,22 +25,21 @@ final readonly class RegisterByEmailService
     ) {
     }
 
-    public function run(RegistrationByEmailForm $form): void
+    public function handle(RegistrationByEmailForm $form): void
     {
         $email = new Email($form->email);
         if ($this->users->hasByEmail($email)) {
-            throw new \DomainException('This user already register.');
+            throw new \DomainException('User with this email has been already exist.');
         }
 
         $now = new \DateTimeImmutable();
         $this->users->add(
-            new User(
-                Id::create(),
-                $now,
-                $email,
-                $this->hasher->hash($form->password),
-                $this->tokenizer->generate($now),
-                UserStatusEnum::wait()
+            User::createByEmail(
+                id: Id::create(),
+                date: $now,
+                email: $email,
+                hash: $this->hasher->hash($form->password),
+                token: $this->tokenizer->generate($now)
             )
         );
 

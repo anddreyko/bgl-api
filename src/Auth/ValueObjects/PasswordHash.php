@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Auth\ValueObjects;
 
+use App\Auth\Exceptions\IncorrectPasswordException;
 use Webmozart\Assert\Assert;
 
 /**
@@ -14,7 +15,11 @@ final class PasswordHash
     public function __construct(private string $value)
     {
         $value = trim($value);
-        Assert::notEmpty($value);
+        try {
+            Assert::notEmpty($value);
+        } catch (\Exception $exception) {
+            throw new IncorrectPasswordException($exception->getMessage(), (int)$exception->getCode(), $exception);
+        }
 
         $this->value = $value;
     }

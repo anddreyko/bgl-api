@@ -15,14 +15,29 @@ use App\Auth\ValueObjects\Token;
  */
 final class User
 {
-    public function __construct(
-        private Id $id,
-        private \DateTimeImmutable $date,
-        private Email $email,
-        private PasswordHash $hash,
-        private ?Token $token,
-        private UserStatusEnum $status = UserStatusEnum::Active,
+    private ?PasswordHash $hash = null;
+    private ?Token $token = null;
+
+    private function __construct(
+        private readonly Id $id,
+        private readonly \DateTimeImmutable $date,
+        private readonly Email $email,
+        private UserStatusEnum $status,
     ) {
+    }
+
+    public static function createByEmail(
+        Id $id,
+        \DateTimeImmutable $date,
+        Email $email,
+        PasswordHash $hash,
+        Token $token
+    ): self {
+        $user = new self($id, $date, $email, UserStatusEnum::Wait);
+        $user->hash = $hash;
+        $user->token = $token;
+
+        return $user;
     }
 
     public function getId(): Id
@@ -40,7 +55,7 @@ final class User
         return $this->email;
     }
 
-    public function getHash(): PasswordHash
+    public function getHash(): ?PasswordHash
     {
         return $this->hash;
     }
@@ -55,6 +70,13 @@ final class User
         return $this->status;
     }
 
+    public function setStatus(UserStatusEnum $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
     public function isActive(): bool
     {
         return $this->status->isActive();
@@ -63,13 +85,5 @@ final class User
     public function isWait(): bool
     {
         return $this->status->isWait();
-    }
-
-    public function setStatus(UserStatusEnum $status): self
-    {
-        $user = clone $this;
-        $user->status = $status;
-
-        return $user;
     }
 }

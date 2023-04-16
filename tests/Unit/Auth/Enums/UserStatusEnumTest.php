@@ -14,13 +14,13 @@ class UserStatusEnumTest extends Unit
 {
     public function testIsWait(): void
     {
-        $status = UserStatusEnum::wait();
+        $status = UserStatusEnum::Wait;
         $this->assertTrue($status->isWait());
     }
 
     public function testIsActive(): void
     {
-        $status = UserStatusEnum::active();
+        $status = UserStatusEnum::Active;
         $this->assertTrue($status->isActive());
     }
 }

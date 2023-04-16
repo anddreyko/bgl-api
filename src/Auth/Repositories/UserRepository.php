@@ -5,27 +5,25 @@ declare(strict_types=1);
 namespace App\Auth\Repositories;
 
 use App\Auth\Entities\User;
-use App\Auth\Enums\UserStatusEnum;
 use App\Auth\ValueObjects\Email;
+use App\Auth\ValueObjects\Id;
+use App\Auth\ValueObjects\Token;
 
-final class UserRepository
+interface UserRepository
 {
-    public function add(User $user): void
-    {
-    }
+    public function add(User $user): void;
 
-    public function hasByEmail(Email $email): bool
-    {
-        return true;
-    }
+    public function hasByEmail(Email $email): bool;
 
-    public function findByToken(string $token): ?User
-    {
-        return null;
-    }
+    public function findByToken(string $token): ?User;
 
-    public function activateUser(User $user): void
-    {
-        $this->add($user->setStatus(UserStatusEnum::Active));
-    }
+    public function findByEmail(Email $email): ?User;
+
+    public function setToken(User $user, Token $token): void;
+
+    public function activateUser(User $user): void;
+
+    public function getById(Id $id): User;
+
+    public function updatePassword(User $user, callable $passwordHashing): bool;
 }

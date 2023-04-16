@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Auth\ValueObjects;
 
+use App\Auth\Exceptions\IncorrectEmailException;
 use Webmozart\Assert\Assert;
 
 /**
@@ -13,9 +14,13 @@ final class Email
 {
     public function __construct(private string $value)
     {
-        $value = trim($value);
-        Assert::notEmpty($value);
-        Assert::email($value);
+        try {
+            $value = trim($value);
+            Assert::notEmpty($value);
+            Assert::email($value);
+        } catch (\Exception $exception) {
+            throw new IncorrectEmailException($exception->getMessage(), (int)$exception->getCode(), $exception);
+        }
 
         $this->value = \mb_strtolower($value);
     }

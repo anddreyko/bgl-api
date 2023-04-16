@@ -17,7 +17,7 @@ use Codeception\Test\Unit;
  */
 class UserTest extends Unit
 {
-    private ?User $user = null;
+    private User $user;
     private Id $id;
     private \DateTimeImmutable $date;
     private PasswordHash $hash;
@@ -32,15 +32,14 @@ class UserTest extends Unit
         $this->email = new Email('test@mail.test');
         $this->hash = new PasswordHash('secret');
         $this->token = Token::create(new \DateTimeImmutable());
-        $this->status = UserStatusEnum::wait();
+        $this->status = UserStatusEnum::Wait;
 
-        $this->user = new User(
+        $this->user = User::createByEmail(
             id: $this->id,
             date: $this->date,
             email: $this->email,
             hash: $this->hash,
-            token: $this->token,
-            status: $this->status
+            token: $this->token
         );
 
         parent::_setUp();
