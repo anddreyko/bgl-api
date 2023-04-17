@@ -1,6 +1,8 @@
 init: docker-down-clear \
 	docker-pull docker-build docker-up \
-	console-symlink-create test-start-up test-hello-world
+	console-symlink-create \
+	test-start-up test-hello-world \
+	wait-db migrate  validate-schema load-fixtures
 
 docker-up:
 	docker-compose up -d
@@ -25,7 +27,7 @@ docker-down-clear-prod:
 docker-up-prod:
 	COMPOSE_PROJECT_NAME=bgl-prod docker-compose -f docker-compose-prod.yml up -d
 
-check: lint analyze test
+check: lint analyze test validate-schema
 
 lint: php-lint cs-check
 
@@ -78,3 +80,18 @@ console-symlink-clear:
 
 generate-api:
 	docker-compose run api-php-cli ./vendor/bin/openapi ./src -o web/assets/openapi.json -f json
+
+wait-db:
+	docker-compose run api-php-cli /usr/local/bin/wait-for-it.sh db-postgres:5432
+
+validate-schema:
+	docker-compose run api-php-cli php app orm:validate-schema
+
+migrate:
+	docker-compose run api-php-cli php app migrations:migrate --no-interaction
+
+migrate-generate:
+	docker-compose run api-php-cli php app migrations:generate --no-interaction
+
+load-fixtures:
+	docker-compose run api-php-cli php app fixtures:load

@@ -4,16 +4,31 @@ declare(strict_types=1);
 
 namespace App\Auth\ValueObjects;
 
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\Embeddable;
 use Ramsey\Uuid\Uuid;
 use Webmozart\Assert\Assert;
 
 /**
  * @see \Tests\Unit\Auth\ValueObjects\TokenTest
  */
+#[Embeddable]
 final class Token
 {
-    public function __construct(private string $value, private readonly \DateTimeImmutable $expires)
-    {
+    /** @var string */
+    #[Column(type: 'string', nullable: true)]
+    private $value;
+    /** @var \DateTimeImmutable */
+    #[Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    private $expires;
+
+    public function __construct(
+        string $value,
+        \DateTimeImmutable $expires
+    ) {
+        $this->expires = $expires;
+        $this->value = $value;
         $value = trim($value);
         Assert::uuid($value);
         $this->value = \mb_strtolower($value);
@@ -32,6 +47,11 @@ final class Token
     public function getExpires(): \DateTimeImmutable
     {
         return $this->expires;
+    }
+
+    public function isEmpty(): bool
+    {
+        return empty($this->value);
     }
 
     public function validate(string $value): bool

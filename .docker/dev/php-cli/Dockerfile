@@ -17,6 +17,9 @@ RUN mv $PHP_INI_DIR/php.ini-development $PHP_INI_DIR/php.ini
 
 COPY dev/php/conf.d /usr/local/etc/php/conf.d
 
+COPY base/wait-for-it.sh /usr/local/bin/wait-for-it.sh
+RUN chmod 555 /usr/local/bin/wait-for-it.sh
+
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/bin --filename=composer --quiet \

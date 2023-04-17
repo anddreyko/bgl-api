@@ -25,8 +25,7 @@ final readonly class UpdatePasswordService
             throw new \DomainException('Token is incorrect or expired');
         }
 
-        // Callback is need, because hashing password is very mighty.
-        $this->users->updatePassword($user, fn() => $this->hasher->hash($form->password));
+        $this->users->setPasswordHash($user, $this->hasher->hash($form->password));
 
         $this->flusher->flush();
     }
