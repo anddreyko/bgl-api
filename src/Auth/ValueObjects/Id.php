@@ -19,6 +19,11 @@ final class Id
         $this->value = \mb_strtolower($value);
     }
 
+    public function __toString(): string
+    {
+        return $this->getValue();
+    }
+
     public static function create(): self
     {
         return new self(Uuid::uuid4()->toString());

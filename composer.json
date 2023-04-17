@@ -8,7 +8,8 @@
     ],
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
+            "App\\": "src/",
+            "Migrations\\": "migrations/"
         }
     },
     "autoload-dev": {
@@ -25,6 +26,7 @@
         "php": "^8.2",
         "ext-json": "*",
         "ext-pdo": "*",
+        "doctrine/migrations": "^3.6",
         "doctrine/orm": "^2.14",
         "laminas/laminas-config-aggregator": "^1.13",
         "php-di/php-di": "^7.0",
@@ -37,6 +39,7 @@
         "codeception/codeception": "^5.0",
         "codeception/module-asserts": "*",
         "codeception/module-phpbrowser": "*",
+        "doctrine/data-fixtures": "^1.6",
         "overtrue/phplint": "^9.0",
         "phpstan/phpstan": "^1.10",
         "roave/security-advisories": "dev-master",

@@ -5,23 +5,39 @@ declare(strict_types=1);
 namespace App\Auth\Entities;
 
 use App\Auth\Enums\UserStatusEnum;
+use App\Auth\Types\EmailType;
+use App\Auth\Types\IdType;
+use App\Auth\Types\PasswordHashType;
+use App\Auth\Types\StatusType;
 use App\Auth\ValueObjects\Email;
 use App\Auth\ValueObjects\Id;
 use App\Auth\ValueObjects\PasswordHash;
 use App\Auth\ValueObjects\Token;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @see \Tests\Unit\Auth\Entities\UserTest
  */
+#[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
+#[ORM\Table(name: 'auth_user')]
 final class User
 {
+    #[ORM\Column(type: PasswordHashType::NAME, nullable: true)]
     private ?PasswordHash $hash = null;
+    #[ORM\Embedded(class: Token::class)]
     private ?Token $token = null;
 
     private function __construct(
+        #[ORM\Column(type: IdType::NAME)]
+        #[ORM\Id]
         private readonly Id $id,
+        #[ORM\Column(type: Types::DATE_IMMUTABLE)]
         private readonly \DateTimeImmutable $date,
+        #[ORM\Column(type: EmailType::NAME, unique: true)]
         private readonly Email $email,
+        #[ORM\Column(type: StatusType::NAME)]
         private UserStatusEnum $status,
     ) {
     }
@@ -60,9 +76,19 @@ final class User
         return $this->hash;
     }
 
+    public function setHash(PasswordHash $hash): void
+    {
+        $this->hash = $hash;
+    }
+
     public function getToken(): ?Token
     {
         return $this->token;
+    }
+
+    public function setToken(Token $token): void
+    {
+        $this->token = $token;
     }
 
     public function getStatus(): UserStatusEnum
@@ -85,5 +111,13 @@ final class User
     public function isWait(): bool
     {
         return $this->status->isWait();
+    }
+
+    #[ORM\PostLoad]
+    public function postload(): void
+    {
+        if ($this->token && $this->token->isEmpty()) {
+            $this->token = null;
+        }
     }
 }
