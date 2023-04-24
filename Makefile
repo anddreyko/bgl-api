@@ -73,7 +73,7 @@ var-all:
 	docker-compose run --rm api-php-cli sh -c 'chmod 777 var'
 
 console-symlink-create: console-symlink-clear
-	docker-compose run --rm api-php-cli ln -s ./console/app.php ./app
+	docker-compose run --rm api-php-cli ln -s ./cli/app.php ./app
 
 console-symlink-clear:
 	docker-compose run --rm api-php-cli rm -f ./app
