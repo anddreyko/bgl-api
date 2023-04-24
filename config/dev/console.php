@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Console\FixturesLoadCommand;
+use Commands\FixturesLoadCommand;
+use Commands\MailerCheckCommand;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\Console\Command\SchemaTool;
-use Doctrine\ORM\Tools\Console\Command\SchemaTool\DropCommand;
 use Psr\Container\ContainerInterface;
 
 return [
@@ -36,8 +35,7 @@ return [
             Doctrine\ORM\Tools\Console\Command\InfoCommand::class,
             Doctrine\ORM\Tools\Console\Command\MappingDescribeCommand::class,
 
-            DropCommand::class,
-            SchemaTool\DropCommand::class,
+            Doctrine\ORM\Tools\Console\Command\SchemaTool\DropCommand::class,
 
             Doctrine\Migrations\Tools\Console\Command\CurrentCommand::class,
             Doctrine\Migrations\Tools\Console\Command\DiffCommand::class,
@@ -49,6 +47,7 @@ return [
             Doctrine\Migrations\Tools\Console\Command\VersionCommand::class,
 
             FixturesLoadCommand::class,
+            MailerCheckCommand::class,
         ],
         'fixture_paths' => [
             __DIR__ . '/../../src/Auth/Fixtures',
