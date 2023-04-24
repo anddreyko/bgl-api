@@ -8,7 +8,8 @@
 >
     <projectFiles>
         <directory name="config"/>
-        <directory name="console"/>
+        <directory name="cli"/>
+        <directory name="commands"/>
         <directory name="src"/>
         <directory name="web"/>
         <ignoreFiles>

@@ -9,7 +9,8 @@
     </rule>
 
     <file>config</file>
-    <file>console</file>
+    <file>cli</file>
+    <file>commands</file>
     <file>src</file>
     <file>web</file>
 
