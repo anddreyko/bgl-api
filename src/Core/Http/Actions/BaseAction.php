@@ -2,20 +2,21 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Actions\V1;
+namespace App\Core\Http\Actions;
 
-use App\Http\Entities\Response;
-use App\Http\HttpHelper;
+use App\Core\Http\Entities\Response;
+use App\Core\Http\Helpers\HttpHelper;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
 /**
- * @OA\Info(
+ * @OpenApi\Annotations\Info(
  *     title="BoarGameLog API",
  *     version="1"
  * )
+ * @see \Tests\Unit\Core\Http\Actions\BaseActionTest
  */
 abstract class BaseAction implements RequestHandlerInterface
 {

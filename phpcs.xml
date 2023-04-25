@@ -8,8 +8,9 @@
         <type>warning</type>
     </rule>
 
-    <file>config</file>
+    <file>actions</file>
     <file>cli</file>
+    <file>config</file>
     <file>commands</file>
     <file>src</file>
     <file>web</file>
@@ -19,5 +20,6 @@
     <!-- remove this rule after resolve the issue: https://github.com/squizlabs/PHP_CodeSniffer/pull/3728 -->
     <rule ref="PSR1.Files.SideEffects">
         <exclude-pattern>src/*\.php</exclude-pattern>
+        <exclude-pattern>actions/*\.php</exclude-pattern>
     </rule>
 </ruleset>

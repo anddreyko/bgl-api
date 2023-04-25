@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Actions\V1;
+namespace Actions\V1;
 
-use App\Http\Entities\Response;
+use App\Core\Http\Actions\BaseAction;
+use App\Core\Http\Entities\Response;
 
-class HelloWorldAction extends BaseAction
+final class HelloWorldAction extends BaseAction
 {
     /**
-     * @OA\Get(
+     * @OpenApi\Annotations\Get(
      *     path="/v1/hello-world",
      *     @OA\Response(
      *         response="200",
