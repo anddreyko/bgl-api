@@ -7,8 +7,9 @@
     findUnusedBaselineEntry="true"
 >
     <projectFiles>
-        <directory name="config"/>
+        <directory name="actions"/>
         <directory name="cli"/>
+        <directory name="config"/>
         <directory name="commands"/>
         <directory name="src"/>
         <directory name="web"/>

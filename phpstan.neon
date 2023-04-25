@@ -1,8 +1,9 @@
 parameters:
 	level: 6
 	paths:
-		- config
+		- actions
 		- cli
+		- config
 		- commands
 		- src
 		- web

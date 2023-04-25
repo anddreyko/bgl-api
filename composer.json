@@ -9,6 +9,7 @@
     "autoload": {
         "psr-4": {
             "App\\": "src/",
+            "Actions\\": "actions/",
             "Commands\\": "commands/",
             "Migrations\\": "migrations/"
         }
