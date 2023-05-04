@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Base\Repository;
+namespace App\Core\Database\Repositories;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 
+/**
+ * @see \Tests\Unit\Core\Database\Repositories\DbRepositoryTest
+ */
 abstract class DbRepository
 {
     /** @var EntityRepository<object> */
@@ -14,7 +17,7 @@ abstract class DbRepository
 
     public function __construct(private readonly EntityManagerInterface $em)
     {
-        $this->repository = $this->em->getRepository(static::getClass());
+        $this->repository = $this->em->getRepository($this->getClass());
     }
 
     /**
