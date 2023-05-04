@@ -36,6 +36,8 @@
         "ramsey/uuid": "^4.7",
         "slim/psr7": "^1.6",
         "slim/slim": "^4.11",
+        "symfony/mailer": "^6.2",
+        "twig/twig": "^3.5",
         "zircote/swagger-php": "^4.7"
     },
     "require-dev": {

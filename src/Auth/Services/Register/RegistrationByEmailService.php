@@ -8,11 +8,13 @@ use App\Auth\Entities\User;
 use App\Auth\Forms\RegistrationByEmailForm;
 use App\Auth\Helpers\FlushHelper;
 use App\Auth\Helpers\PasswordHashHelper;
-use App\Auth\Helpers\SendMailHelper;
 use App\Auth\Helpers\TokenizerHelper;
+use App\Auth\Renders\ConfirmEmailRender;
 use App\Auth\Repositories\UserRepository;
 use App\Auth\ValueObjects\Email;
 use App\Auth\ValueObjects\Id;
+use App\Core\Mail\Builders\MessageBuilder;
+use App\Core\Mail\Services\MailSenderService;
 
 final readonly class RegistrationByEmailService
 {
@@ -21,7 +23,7 @@ final readonly class RegistrationByEmailService
         private PasswordHashHelper $hasher,
         private TokenizerHelper $tokenizer,
         private FlushHelper $flusher,
-        private SendMailHelper $sender,
+        private MailSenderService $sender,
     ) {
     }
 
@@ -33,17 +35,25 @@ final readonly class RegistrationByEmailService
         }
 
         $now = new \DateTimeImmutable();
+        $token = $this->tokenizer->generate($now);
         $this->users->add(
             User::createByEmail(
                 id: Id::create(),
                 date: $now,
                 email: $email,
                 hash: $this->hasher->hash($form->password),
-                token: $this->tokenizer->generate($now)
+                token: $token
             )
         );
 
+        $render = new ConfirmEmailRender($token);
+
         $this->flusher->flush();
-        $this->sender->send();
+        $this->sender->send(
+            MessageBuilder::create()
+                ->from('noreply@4records.bg')
+                ->to($email->getValue()),
+            $render
+        );
     }
 }
