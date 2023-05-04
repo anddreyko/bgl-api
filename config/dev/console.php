@@ -50,7 +50,7 @@ return [
             MailerCheckCommand::class,
         ],
         'fixture_paths' => [
-            __DIR__ . '/../../src/Auth/Fixtures',
+            __DIR__ . '/../../fixtures',
         ],
     ],
 ];
