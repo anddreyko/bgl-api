@@ -6,10 +6,11 @@ namespace App\Auth\Services\ResetPassword;
 
 use App\Auth\Forms\SendTokenForm;
 use App\Auth\Helpers\FlushHelper;
-use App\Auth\Helpers\SendMailHelper;
 use App\Auth\Helpers\TokenizerHelper;
 use App\Auth\Repositories\UserRepository;
 use App\Auth\ValueObjects\Email;
+use App\Core\Mail\Builders\MessageBuilder;
+use App\Core\Mail\Services\MailSenderService;
 
 final readonly class SendTokenService
 {
@@ -17,7 +18,7 @@ final readonly class SendTokenService
         private UserRepository $users,
         private TokenizerHelper $tokenizer,
         private FlushHelper $flusher,
-        private SendMailHelper $sender
+        private MailSenderService $sender
     ) {
     }
 
@@ -36,6 +37,6 @@ final readonly class SendTokenService
 
         $this->flusher->flush();
 
-        $this->sender->send();
+        $this->sender->send(MessageBuilder::create());
     }
 }

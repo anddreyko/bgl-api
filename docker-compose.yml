@@ -33,6 +33,9 @@ services:
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
+      MAILER_DSN: ${MAILER_DSN}
+      MAIL_NOREPLY: ${MAIL_NOREPLY}
+      FRONTEND_URL: ${FRONTEND_URL}
     volumes:
       - .:/app
 
@@ -46,6 +49,11 @@ services:
       - api-postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
+  mailer:
+    image: mailhog/mailhog
+    ports:
+      - "8025:8025"
 
 volumes:
   api-postgres:
