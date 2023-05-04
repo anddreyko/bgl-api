@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Entities;
+namespace App\Core\Http\Entities;
 
 /**
- * @OA\Schema()
+ * @OpenApi\Annotations\Schema()
  */
 class Response
 {
@@ -13,7 +13,7 @@ class Response
      * The content.
      *
      * @var string
-     * @OA\Property()
+     * @OpenApi\Annotations\Property()
      */
     public string $data;
 
@@ -21,7 +21,7 @@ class Response
      * The status of response.
      *
      * @var bool
-     * @OA\Property()
+     * @OpenApi\Annotations\Property()
      */
     public bool $result = true;
 
