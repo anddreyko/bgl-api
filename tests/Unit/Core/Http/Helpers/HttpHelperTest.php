@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Http;
+namespace Tests\Unit\Core\Http\Helpers;
 
-use App\Http\HttpHelper;
+use App\Core\Http\Helpers\HttpHelper;
 use Codeception\Test\Unit;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Slim\Psr7\Factory\ResponseFactory;
 
 /**
- * @covers \App\Http\HttpHelper
+ * @covers \App\Core\Http\Helpers\HttpHelper
  */
 class HttpHelperTest extends Unit
 {
