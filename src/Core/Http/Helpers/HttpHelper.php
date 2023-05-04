@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Http;
+namespace App\Core\Http\Helpers;
 
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * @see \Tests\Unit\Core\Http\Helpers\HttpHelperTest
+ */
 class HttpHelper
 {
     public static function json(ResponseInterface $response, mixed $content): ResponseInterface
