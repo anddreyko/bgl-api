@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Auth\Fixtures;
+namespace Fixtures;
 
 use App\Auth\Entities\User;
 use App\Auth\Repositories\UserRepository;
@@ -10,7 +10,7 @@ use App\Auth\ValueObjects\Email;
 use App\Auth\ValueObjects\Id;
 use App\Auth\ValueObjects\PasswordHash;
 use App\Auth\ValueObjects\Token;
-use App\Base\Fixtures\DbFixture;
+use App\Core\Database\Fixtures\DbFixture;
 use Doctrine\ORM\EntityManagerInterface;
 use Ramsey\Uuid\Uuid;
 
