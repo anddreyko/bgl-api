@@ -10,7 +10,7 @@ use App\Auth\ValueObjects\Email;
 use App\Auth\ValueObjects\Id;
 use App\Auth\ValueObjects\PasswordHash;
 use App\Auth\ValueObjects\Token;
-use App\Base\Repository\DbRepository;
+use App\Core\Database\Repositories\DbRepository;
 
 final class UserRepository extends DbRepository
 {
