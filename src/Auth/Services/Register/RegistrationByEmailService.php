@@ -16,6 +16,9 @@ use App\Auth\ValueObjects\Id;
 use App\Core\Mail\Builders\MessageBuilder;
 use App\Core\Mail\Services\MailSenderService;
 
+/**
+ * @see \Tests\Unit\Auth\Services\Register\RegistrationByEmailServiceTest
+ */
 final readonly class RegistrationByEmailService
 {
     public function __construct(
@@ -46,14 +49,12 @@ final readonly class RegistrationByEmailService
             )
         );
 
-        $render = new ConfirmEmailRender($token);
-
         $this->flusher->flush();
         $this->sender->send(
             MessageBuilder::create()
-                ->from('noreply@4records.bg')
+                ->from(getenv('MAIL_NOREPLY') ?: '')
                 ->to($email->getValue()),
-            $render
+            new ConfirmEmailRender($token)
         );
     }
 }
