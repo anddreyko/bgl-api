@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Fixtures;
 
 use App\Auth\Entities\User;
-use App\Auth\Repositories\UserRepository;
+use App\Auth\Repositories\DbUserRepository;
 use App\Auth\ValueObjects\Email;
 use App\Auth\ValueObjects\Id;
 use App\Auth\ValueObjects\PasswordHash;
@@ -20,7 +20,7 @@ final class UserFixture extends DbFixture
 
     public function fixture(EntityManagerInterface $manager): void
     {
-        $users = new UserRepository($manager);
+        $users = new DbUserRepository($manager);
 
         $date = new \DateTimeImmutable();
         $user = User::createByEmail(
