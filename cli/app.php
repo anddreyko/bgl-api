@@ -15,6 +15,10 @@ use Symfony\Component\Console\Application;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+if (getenv('SENTRY_DSN')) {
+    Sentry\init(['dsn' => getenv('SENTRY_DSN')]);
+}
+
 /**
  * @var Container $container
  * @psalm-suppress UnnecessaryVarAnnotation
@@ -22,6 +26,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $container = require_once __DIR__ . '/../config/container.php';
 
 $app = new Application('Console');
+if (getenv('SENTRY_DSN')) {
+    $app->setCatchExceptions(false);
+}
 
 $configuration = new Configuration();
 

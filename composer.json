@@ -23,7 +23,10 @@
     "config": {
         "process-timeout": 0,
         "soft-packages": true,
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": false
+        }
     },
     "require": {
         "php": "^8.2",
@@ -32,8 +35,10 @@
         "doctrine/migrations": "^3.6",
         "doctrine/orm": "^2.14",
         "laminas/laminas-config-aggregator": "^1.13",
+        "monolog/monolog": "^3.3",
         "php-di/php-di": "^7.0",
         "ramsey/uuid": "^4.7",
+        "sentry/sdk": "^3.3",
         "slim/psr7": "^1.6",
         "slim/slim": "^4.11",
         "symfony/mailer": "^6.2",
