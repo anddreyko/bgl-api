@@ -49,6 +49,7 @@
         "codeception/codeception": "^5.0",
         "codeception/module-asserts": "*",
         "codeception/module-phpbrowser": "*",
+        "codeception/module-rest": "^3.3",
         "doctrine/data-fixtures": "^1.6",
         "overtrue/phplint": "^9.0",
         "phpstan/phpstan": "^1.10",

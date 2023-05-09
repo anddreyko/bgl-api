@@ -54,6 +54,9 @@ test:
 test-acceptance:
 	docker-compose run --rm api-php-cli composer test -- Acceptance
 
+test-api:
+	docker-compose run --rm api-php-cli composer test -- Api
+
 test-start-up:
 	docker-compose run --rm api-php-cli composer test -- StartUp
 
