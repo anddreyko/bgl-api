@@ -21,15 +21,15 @@ final class Version20230419095420 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(
-            'CREATE TABLE auth_user (id UUID NOT NULL, hash VARCHAR(255) DEFAULT NULL, date DATE NOT NULL, email VARCHAR(255) NOT NULL, status VARCHAR(255) CHECK(status IN (\'active\', \'wait\')) NOT NULL, token_value VARCHAR(255) DEFAULT NULL, token_expires DATE DEFAULT NULL, PRIMARY KEY(id))'
+            'CREATE TABLE auth_user (id UUID NOT NULL, hash VARCHAR(255) DEFAULT NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, email VARCHAR(255) NOT NULL, status VARCHAR(255) CHECK(status IN (\'active\', \'wait\')) NOT NULL, token_value VARCHAR(255) DEFAULT NULL, token_expires TIMESTAMP DEFAULT NULL, PRIMARY KEY(id))'
         );
         $this->addSql('CREATE UNIQUE INDEX UNIQ_A3B536FDE7927C74 ON auth_user (email)');
         $this->addSql('COMMENT ON COLUMN auth_user.id IS \'(DC2Type:id)\'');
         $this->addSql('COMMENT ON COLUMN auth_user.hash IS \'(DC2Type:password_hash)\'');
-        $this->addSql('COMMENT ON COLUMN auth_user.date IS \'(DC2Type:date_immutable)\'');
+        $this->addSql('COMMENT ON COLUMN auth_user.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN auth_user.email IS \'(DC2Type:email)\'');
         $this->addSql('COMMENT ON COLUMN auth_user.status IS \'(DC2Type:user_status)\'');
-        $this->addSql('COMMENT ON COLUMN auth_user.token_expires IS \'(DC2Type:date_immutable)\'');
+        $this->addSql('COMMENT ON COLUMN auth_user.token_expires IS \'(DC2Type:datetime_immutable)\'');
     }
 
     public function down(Schema $schema): void

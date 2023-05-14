@@ -36,7 +36,7 @@ class UserTest extends Unit
 
         $this->user = User::createByEmail(
             id: $this->id,
-            date: $this->date,
+            createdAt: $this->date,
             email: $this->email,
             hash: $this->hash,
             token: $this->token
@@ -52,7 +52,7 @@ class UserTest extends Unit
 
     public function testDate(): void
     {
-        $this->assertEquals($this->date->getTimestamp(), $this->user->getDate()->getTimestamp());
+        $this->assertEquals($this->date->getTimestamp(), $this->user->getCreatedAt()->getTimestamp());
     }
 
     public function testEmail(): void
