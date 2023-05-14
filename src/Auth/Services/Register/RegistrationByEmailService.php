@@ -42,7 +42,7 @@ final readonly class RegistrationByEmailService
         $this->users->add(
             User::createByEmail(
                 id: Id::create(),
-                date: $now,
+                createdAt: $now,
                 email: $email,
                 hash: $this->hasher->hash($form->password),
                 token: $token

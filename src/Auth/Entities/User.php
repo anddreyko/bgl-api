@@ -33,8 +33,8 @@ final class User
         #[ORM\Column(type: IdType::NAME)]
         #[ORM\Id]
         private readonly Id $id,
-        #[ORM\Column(type: Types::DATE_IMMUTABLE)]
-        private readonly \DateTimeImmutable $date,
+        #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ["default" => 'CURRENT_TIMESTAMP'])]
+        private readonly \DateTimeImmutable $createdAt,
         #[ORM\Column(type: EmailType::NAME, unique: true)]
         private readonly Email $email,
         #[ORM\Column(type: StatusType::NAME)]
@@ -44,12 +44,12 @@ final class User
 
     public static function createByEmail(
         Id $id,
-        \DateTimeImmutable $date,
+        \DateTimeImmutable $createdAt,
         Email $email,
         PasswordHash $hash,
         Token $token
     ): self {
-        $user = new self($id, $date, $email, UserStatusEnum::Wait);
+        $user = new self($id, $createdAt, $email, UserStatusEnum::Wait);
         $user->hash = $hash;
         $user->token = $token;
 
@@ -61,9 +61,9 @@ final class User
         return $this->id;
     }
 
-    public function getDate(): \DateTimeImmutable
+    public function getCreatedAt(): \DateTimeImmutable
     {
-        return $this->date;
+        return $this->createdAt;
     }
 
     public function getEmail(): Email
