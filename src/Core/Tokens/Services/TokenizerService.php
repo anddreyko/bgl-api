@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Auth\Helpers;
+namespace App\Core\Tokens\Services;
 
 use App\Auth\ValueObjects\Token;
 
-final readonly class TokenizerHelper
+/**
+ * @see \Tests\Unit\Core\Tokens\Services\TokenizerServiceTest
+ */
+final readonly class TokenizerService
 {
     public function __construct(private \DateInterval $duration)
     {

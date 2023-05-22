@@ -8,13 +8,13 @@ use App\Auth\Entities\User;
 use App\Auth\Forms\RegistrationByEmailForm;
 use App\Auth\Helpers\FlushHelper;
 use App\Auth\Helpers\PasswordHashHelper;
-use App\Auth\Helpers\TokenizerHelper;
 use App\Auth\Renders\ConfirmEmailRender;
 use App\Auth\Repositories\UserRepository;
 use App\Auth\ValueObjects\Email;
 use App\Auth\ValueObjects\Id;
 use App\Core\Mail\Builders\MessageBuilder;
 use App\Core\Mail\Services\MailSenderService;
+use App\Core\Tokens\Services\TokenizerService;
 
 /**
  * @see \Tests\Unit\Auth\Services\Register\RegistrationByEmailServiceTest
@@ -24,7 +24,7 @@ final readonly class RegistrationByEmailService
     public function __construct(
         private UserRepository $users,
         private PasswordHashHelper $hasher,
-        private TokenizerHelper $tokenizer,
+        private TokenizerService $tokenizer,
         private FlushHelper $flusher,
         private MailSenderService $sender,
     ) {

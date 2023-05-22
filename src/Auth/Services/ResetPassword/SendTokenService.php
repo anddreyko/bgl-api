@@ -6,17 +6,17 @@ namespace App\Auth\Services\ResetPassword;
 
 use App\Auth\Forms\SendTokenForm;
 use App\Auth\Helpers\FlushHelper;
-use App\Auth\Helpers\TokenizerHelper;
 use App\Auth\Repositories\UserRepository;
 use App\Auth\ValueObjects\Email;
 use App\Core\Mail\Builders\MessageBuilder;
 use App\Core\Mail\Services\MailSenderService;
+use App\Core\Tokens\Services\TokenizerService;
 
 final readonly class SendTokenService
 {
     public function __construct(
         private UserRepository $users,
-        private TokenizerHelper $tokenizer,
+        private TokenizerService $tokenizer,
         private FlushHelper $flusher,
         private MailSenderService $sender
     ) {
