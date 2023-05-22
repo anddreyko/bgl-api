@@ -19,6 +19,13 @@ services:
       APP_ENV: dev
       APP_DEBUG: ${APP_DEBUG}
       PHP_IDE_CONFIG: serverName=API
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      MAILER_DSN: ${MAILER_DSN}
+      MAIL_NOREPLY: ${MAIL_NOREPLY}
+      FRONTEND_URL: ${FRONTEND_URL}
     volumes:
       - .:/app
 
