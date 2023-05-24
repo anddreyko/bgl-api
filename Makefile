@@ -49,19 +49,26 @@ php-stan:
 	docker-compose run --rm api-php-cli composer phpstan
 
 test:
-	docker-compose run --rm api-php-cli composer test
+	docker-compose run --rm api-php-cli composer test && \
+	make load-fixtures
 
 test-acceptance:
-	docker-compose run --rm api-php-cli composer test -- Acceptance
+	docker-compose run --rm api-php-cli composer test -- Acceptance && \
+	make load-fixtures
 
 test-api:
-	docker-compose run --rm api-php-cli composer test -- Api
+	docker-compose run --rm api-php-cli composer test -- Api && \
+	make load-fixtures
 
 test-start-up:
 	docker-compose run --rm api-php-cli composer test -- StartUp
 
 test-hello-world:
 	docker-compose run --rm api-php-cli composer test -- tests/Acceptance/HelloWorldCest.php
+
+test-auth-register:
+	docker-compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/SignUpCest.php && \
+	make load-fixtures
 
 test-unit:
 	docker-compose run --rm api-php-cli composer test -- Unit

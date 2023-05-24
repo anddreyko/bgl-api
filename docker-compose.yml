@@ -26,6 +26,7 @@ services:
       MAILER_DSN: ${MAILER_DSN}
       MAIL_NOREPLY: ${MAIL_NOREPLY}
       FRONTEND_URL: ${FRONTEND_URL}
+      MAILER_URL: ${MAILER_URL}
     volumes:
       - .:/app
 
@@ -43,6 +44,7 @@ services:
       MAILER_DSN: ${MAILER_DSN}
       MAIL_NOREPLY: ${MAIL_NOREPLY}
       FRONTEND_URL: ${FRONTEND_URL}
+      MAILER_URL: ${MAILER_URL}
     volumes:
       - .:/app
 
