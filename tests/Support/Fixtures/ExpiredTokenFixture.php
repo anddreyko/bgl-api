@@ -13,10 +13,9 @@ use App\Auth\ValueObjects\Token;
 use App\Core\Database\Fixtures\DbFixture;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class ExistedUserFixture extends DbFixture
+final class ExpiredTokenFixture extends DbFixture
 {
-    private const UUID = '22222222-2222-2222-2222-222222222222';
-    public const EMAIL = 'existed-user@app.test';
+    public const UUID = '00000000-0000-0000-0000-000000000000';
 
     public function fixture(EntityManagerInterface $manager): void
     {
@@ -26,9 +25,9 @@ final class ExistedUserFixture extends DbFixture
         $user = User::createByEmail(
             new Id(self::UUID),
             $date,
-            new Email(self::EMAIL),
+            new Email('expired-token@app.test'),
             new PasswordHash(self::UUID),
-            Token::create($date->modify('+1 day'))
+            new Token(self::UUID, $date->modify('-1 day'))
         );
 
         $users->add($user);

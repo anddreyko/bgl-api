@@ -56,6 +56,10 @@ test-acceptance:
 	docker-compose run --rm api-php-cli composer test -- Acceptance && \
 	make load-fixtures
 
+test-seed:
+	docker-compose run --rm api-php-cli composer test -- Api --seed 2014723595 && \
+	make load-fixtures
+
 test-api:
 	docker-compose run --rm api-php-cli composer test -- Api && \
 	make load-fixtures
@@ -68,6 +72,10 @@ test-hello-world:
 
 test-auth-register:
 	docker-compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/SignUpCest.php && \
+	make load-fixtures
+
+test-auth-confirm-email:
+	docker-compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/ConfirmEmailCest.php && \
 	make load-fixtures
 
 test-unit:
