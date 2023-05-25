@@ -17,6 +17,8 @@ final class ExistedUserFixture extends DbFixture
 {
     private const UUID = '22222222-2222-2222-2222-222222222222';
     public const EMAIL = 'existed-user@app.test';
+    public const PASS = 'password';
+    private const HASH = '$argon2i$v=19$m=65536,t=4,p=1$aWpLR3FaMFVYZGlUODJXWg$8gmO8pfngi1MxYWCcMSMuf/yyI/mrIlvPevYyjUHkG4';
 
     public function fixture(EntityManagerInterface $manager): void
     {
@@ -27,7 +29,7 @@ final class ExistedUserFixture extends DbFixture
             new Id(self::UUID),
             $date,
             new Email(self::EMAIL),
-            new PasswordHash(self::UUID),
+            new PasswordHash(self::HASH),
             Token::create($date->modify('+1 day'))
         );
 

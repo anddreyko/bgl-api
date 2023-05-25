@@ -12,10 +12,10 @@ class Response
     /**
      * The content.
      *
-     * @var string
+     * @var mixed
      * @OpenApi\Annotations\Property()
      */
-    public string $data;
+    public mixed $data;
 
     /**
      * The status of response.
@@ -25,7 +25,7 @@ class Response
      */
     public bool $result = true;
 
-    public function __construct(string $data, bool $result = true)
+    public function __construct(mixed $data, bool $result = true)
     {
         $this->result = $result;
         $this->data = $data;
