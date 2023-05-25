@@ -26,6 +26,9 @@ final readonly class PasswordHashHelper
 
     public function validate(string $value, PasswordHash $hash): bool
     {
+        $value = trim($value);
+        Assert::notEmpty($value);
+
         return password_verify($value, $hash->getValue());
     }
 }
