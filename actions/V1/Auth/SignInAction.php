@@ -8,11 +8,9 @@ use App\Auth\Forms\IdentificationForm;
 use App\Auth\Services\IdentificationService;
 use App\Core\Http\Actions\BaseAction;
 use App\Core\Http\Entities\Response;
-use App\Core\Http\Enums\HttpCodesEnum;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Slim\Exception\HttpException;
 
 /**
  * @see \Tests\Api\V1\Auth\SignInCest
@@ -28,24 +26,12 @@ final class SignInAction extends BaseAction
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        try {
-            $this->service->handle(
-                new IdentificationForm(
-                    (string)($request->getQueryParams()['email'] ?? ''),
-                    (string)($request->getQueryParams()['password'] ?? ''),
-                )
-            );
-        } catch (\Exception $exception) {
-            $exception = new HttpException(
-                $request,
-                $exception->getMessage(),
-                (int)($exception->getCode() ?: HttpCodesEnum::InternalServerError->value),
-                $exception
-            );
-            $exception->setTitle($exception->getMessage() ?: 'Unexpected error');
-
-            throw $exception;
-        }
+        $this->service->handle(
+            new IdentificationForm(
+                $request->getQueryParams()['email'] ?? '',
+                $request->getQueryParams()['password'] ?? ''
+            )
+        );
 
         return parent::handle($request);
     }

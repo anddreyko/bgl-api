@@ -12,6 +12,6 @@ class NotFoundCest
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet('/not-found');
         $I->seeResponseCodeIs(404);
-        $I->seeResponseContainsJson(['message' => '404 Not Found']);
+        $I->seeResponseContainsJson(['message' => 'Not found.']);
     }
 }
