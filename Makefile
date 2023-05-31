@@ -70,15 +70,19 @@ test-start-up:
 test-hello-world:
 	docker-compose run --rm api-php-cli composer test -- tests/Acceptance/HelloWorldCest.php
 
-test-auth-register:
+test-api-not-found:
+	docker-compose run --rm api-php-cli composer test -- tests/Api/NotFoundCest.php && \
+	make load-fixtures
+
+test-api-auth-register:
 	docker-compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/SignUpCest.php && \
 	make load-fixtures
 
-test-auth-confirm-email:
+test-api-auth-confirm-email:
 	docker-compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/ConfirmEmailCest.php && \
 	make load-fixtures
 
-test-auth-login:
+test-api-auth-login:
 	docker-compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/SignInCest.php && \
 	make load-fixtures
 
@@ -105,7 +109,7 @@ console-symlink-clear:
 	docker-compose run --rm api-php-cli rm -f ./app
 
 generate-api:
-	docker-compose run api-php-cli ./vendor/bin/openapi ./src -o web/assets/openapi.json -f json
+	docker-compose run api-php-cli ./vendor/bin/openapi . -o web/assets/openapi.json -f json -e vendor -e tests -e .docker -e var -e templates -e cli -e web -e config -e fixtures
 
 wait-db:
 	docker-compose run api-php-cli /usr/local/bin/wait-for-it.sh db-postgres:5432
