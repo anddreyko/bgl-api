@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Auth\Services\Register;
 
+use App\Auth\Exceptions\ExpiredTokenException;
+use App\Auth\Exceptions\IncorrectTokenException;
 use App\Auth\Forms\ConfirmationEmailForm;
 use App\Auth\Helpers\FlushHelper;
 use App\Auth\Repositories\UserRepository;
@@ -18,11 +20,11 @@ final readonly class ConfirmationEmailService
     {
         $user = $this->users->findByToken($form->token);
         if (!$user) {
-            throw new \DomainException('Incorrect token.');
+            throw new IncorrectTokenException();
         }
 
         if (!$user->getToken()?->validate($form->token)) {
-            throw new \DomainException('This token has been expired.');
+            throw new ExpiredTokenException();
         }
 
         $this->users->activateUser($user);

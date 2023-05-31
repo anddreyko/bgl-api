@@ -19,7 +19,7 @@ final class Email
             Assert::notEmpty($value);
             Assert::email($value);
         } catch (\Exception $exception) {
-            throw new IncorrectEmailException($exception->getMessage(), (int)$exception->getCode(), $exception);
+            throw new IncorrectEmailException($exception->getMessage(), $exception);
         }
 
         $this->value = \mb_strtolower($value);

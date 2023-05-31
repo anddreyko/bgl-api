@@ -18,7 +18,7 @@ final class PasswordHash
         try {
             Assert::notEmpty($value);
         } catch (\Exception $exception) {
-            throw new IncorrectPasswordException($exception->getMessage(), (int)$exception->getCode(), $exception);
+            throw new IncorrectPasswordException($exception->getMessage(), $exception);
         }
 
         $this->value = $value;
