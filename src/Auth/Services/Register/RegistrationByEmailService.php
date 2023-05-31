@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Auth\Services\Register;
 
 use App\Auth\Entities\User;
+use App\Auth\Exceptions\UserAlreadyExistException;
 use App\Auth\Forms\RegistrationByEmailForm;
 use App\Auth\Helpers\FlushHelper;
 use App\Auth\Helpers\PasswordHashHelper;
@@ -34,7 +35,7 @@ final readonly class RegistrationByEmailService
     {
         $email = new Email($form->email);
         if ($this->users->hasByEmail($email)) {
-            throw new \DomainException('User with this email has been already exist.');
+            throw new UserAlreadyExistException();
         }
 
         $now = new \DateTimeImmutable();
