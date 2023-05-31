@@ -82,6 +82,10 @@ test-auth-login:
 	docker-compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/SignInCest.php && \
 	make load-fixtures
 
+test-api-auth-login-success:
+	docker-compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/SignInCest.php::testSuccess && \
+	make load-fixtures
+
 test-unit:
 	docker-compose run --rm api-php-cli composer test -- Unit
 
@@ -113,6 +117,9 @@ migrate:
 	docker-compose run api-php-cli php app migrations:migrate --no-interaction
 
 migrate-generate:
+	docker-compose run api-php-cli php app migrations:diff --no-interaction
+
+migrate-generate-empty:
 	docker-compose run api-php-cli php app migrations:generate --no-interaction
 
 load-fixtures:

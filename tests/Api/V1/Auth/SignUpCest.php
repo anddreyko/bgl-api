@@ -2,6 +2,7 @@
 
 namespace Tests\Api\V1\Auth;
 
+use App\Core\Http\Enums\HttpCodesEnum;
 use Tests\Support\ApiTester;
 use Tests\Support\Fixtures\ExistedUserFixture;
 use Tests\Support\Helper\FixtureHelper;
@@ -25,7 +26,7 @@ class SignUpCest
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet('/v1/auth/register-by-email', ['password' => 'password', 'email' => 'new-user@app.test']);
-        $I->seeResponseCodeIs(200);
+        $I->seeResponseCodeIs(HttpCodesEnum::Success->value);
         $I->seeResponseContainsJson(['data' => 'Confirm the specified email', 'result' => true]);
 
         assertTrue($this->checkMails('new-user@app.test'));
@@ -38,7 +39,7 @@ class SignUpCest
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet('/v1/auth/register-by-email', ['password' => 'password', 'email' => ExistedUserFixture::EMAIL]);
-        $I->seeResponseCodeIs(500);
+        $I->seeResponseCodeIs(HttpCodesEnum::Conflict->value);
         $I->seeResponseContainsJson(['message' => 'User with this email has been already exist.']);
     }
 
@@ -47,7 +48,7 @@ class SignUpCest
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet('/v1/auth/register-by-email', ['password' => '', 'email' => 'empty-password@app.test']);
-        $I->seeResponseCodeIs(500);
+        $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(['message' => 'Expected a non-empty value. Got: ""']);
     }
 
@@ -56,7 +57,7 @@ class SignUpCest
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet('/v1/auth/register-by-email', ['email' => 'empty-password@app.test']);
-        $I->seeResponseCodeIs(500);
+        $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(['message' => 'Expected a non-empty value. Got: ""']);
     }
 
@@ -65,7 +66,7 @@ class SignUpCest
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet('/v1/auth/register-by-email', ['password' => 'password', 'email' => '']);
-        $I->seeResponseCodeIs(500);
+        $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(['message' => 'Expected a non-empty value. Got: ""']);
     }
 
@@ -74,7 +75,7 @@ class SignUpCest
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet('/v1/auth/register-by-email', ['password' => 'password']);
-        $I->seeResponseCodeIs(500);
+        $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(['message' => 'Expected a non-empty value. Got: ""']);
     }
 
@@ -83,7 +84,7 @@ class SignUpCest
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet('/v1/auth/register-by-email');
-        $I->seeResponseCodeIs(500);
+        $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(['message' => 'Expected a non-empty value. Got: ""']);
     }
 
@@ -92,7 +93,7 @@ class SignUpCest
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet('/v1/auth/register-by-email', ['password' => 'password', 'email' => 'incorrect-email']);
-        $I->seeResponseCodeIs(500);
+        $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(
             ['message' => 'Expected a value to be a valid e-mail address. Got: "incorrect-email"']
         );
