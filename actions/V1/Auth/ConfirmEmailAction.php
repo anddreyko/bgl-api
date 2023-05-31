@@ -25,9 +25,31 @@ final class ConfirmEmailAction extends BaseAction
     /**
      * @OpenApi\Annotations\Get(
      *     path="/v1/auth/confirm-email",
+     *     @OA\Parameter(
+     *          name="token",
+     *          in="query",
+     *         description="Confirmation token from email.",
+     *         required=true
+     *     ),
      *     @OA\Response(
      *         response="200",
-     *         description="Confirm email"
+     *         description="Confirm email",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response="500",
+     *         description="Internal error",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response="400",
+     *         description="Bad request",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response="409",
+     *         description="Invalid parameters",
+     *         @OA\JsonContent()
      *     )
      * )
      */

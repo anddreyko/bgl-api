@@ -5,9 +5,76 @@
         "version": "1"
     },
     "paths": {
+        "/v1/auth/confirm-email": {
+            "get": {
+                "operationId": "04f21f951e86b328a06b3aaa88b8d570",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "description": "Confirmation token from email.",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Confirm email",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request.",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Invalid parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/auth/login-by-email": {
+            "get": {
+                "operationId": "c5872cc36c3f2b4ddb0dfee5d6476be5",
+                "responses": {
+                    "200": {
+                        "description": "Logging by email"
+                    }
+                }
+            }
+        },
+        "/v1/auth/register-by-email": {
+            "get": {
+                "operationId": "2efec7f99d5430a601eaf64cd86165f0",
+                "responses": {
+                    "200": {
+                        "description": "Register by email"
+                    }
+                }
+            }
+        },
         "/v1/hello-world": {
             "get": {
-                "operationId": "c0997e5338501b653875406e37144233",
+                "operationId": "9acf41b84d44e72723f95553c3017adf",
                 "responses": {
                     "200": {
                         "description": "Hello world"
@@ -22,7 +89,7 @@
                 "properties": {
                     "data": {
                         "description": "The content.",
-                        "type": "string"
+                        "nullable": true
                     },
                     "result": {
                         "description": "The status of response.",
