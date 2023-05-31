@@ -2,6 +2,7 @@
 
 namespace Tests\Api\V1\Auth;
 
+use App\Core\Http\Enums\HttpCodesEnum;
 use Tests\Support\ApiTester;
 use Tests\Support\Fixtures\ExistedUserFixture;
 use Tests\Support\Helper\FixtureHelper;
@@ -39,9 +40,9 @@ class SignInCest
             '/v1/auth/login-by-email',
             ['password' => 'pass', 'email' => 'not-existed-user@app.test']
         );
-        $I->seeResponseCodeIs(500);
+        $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(
-            ['message' => 'Unexpected error']
+            ['message' => 'Incorrect email.']
         );
     }
 
@@ -53,7 +54,7 @@ class SignInCest
             '/v1/auth/login-by-email',
             ['password' => ExistedUserFixture::PASS]
         );
-        $I->seeResponseCodeIs(500);
+        $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(
             ['message' => 'Expected a non-empty value. Got: ""']
         );
@@ -69,7 +70,7 @@ class SignInCest
             '/v1/auth/login-by-email',
             ['email' => ExistedUserFixture::EMAIL]
         );
-        $I->seeResponseCodeIs(500);
+        $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(
             ['message' => 'Expected a non-empty value. Got: ""']
         );

@@ -9,8 +9,6 @@ use App\Auth\Services\IdentificationService;
 use App\Core\Http\Actions\BaseAction;
 use App\Core\Http\Entities\Response;
 use Psr\Http\Message\ResponseFactoryInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * @see \Tests\Api\V1\Auth\SignInCest
@@ -18,22 +16,10 @@ use Psr\Http\Message\ServerRequestInterface;
 final class SignInAction extends BaseAction
 {
     public function __construct(
-        private readonly ResponseFactoryInterface $factory,
-        private readonly IdentificationService $service
+        private readonly IdentificationService $service,
+        readonly ResponseFactoryInterface $factory
     ) {
-        parent::__construct($this->factory);
-    }
-
-    public function handle(ServerRequestInterface $request): ResponseInterface
-    {
-        $this->service->handle(
-            new IdentificationForm(
-                $request->getQueryParams()['email'] ?? '',
-                $request->getQueryParams()['password'] ?? ''
-            )
-        );
-
-        return parent::handle($request);
+        parent::__construct($factory);
     }
 
     /**
@@ -47,6 +33,10 @@ final class SignInAction extends BaseAction
      */
     public function content(): Response
     {
+        $this->service->handle(
+            new IdentificationForm((string)$this->getParam('email'), (string)$this->getParam('password'))
+        );
+
         return new Response(data: ['token_access' => 'token-access', 'token_update' => 'token-update'], result: true);
     }
 }

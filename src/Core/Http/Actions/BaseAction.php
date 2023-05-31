@@ -20,14 +20,27 @@ use Psr\Http\Server\RequestHandlerInterface;
  */
 abstract class BaseAction implements RequestHandlerInterface
 {
+    private ?ServerRequestInterface $request = null;
+
     public function __construct(private readonly ResponseFactoryInterface $factory)
     {
     }
 
+    abstract public function content(): Response;
+
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        $this->request = $request;
+
         return HttpHelper::json($this->factory->createResponse(), $this->content());
     }
 
-    abstract public function content(): Response;
+    public function getParam(string $name): mixed
+    {
+        if (!$this->request) {
+            throw new \ErrorException('Request is not initialed.');
+        }
+
+        return $this->request->getQueryParams()[$name] ?? '';
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace Tests\Api\V1\Auth;
 
+use App\Core\Http\Enums\HttpCodesEnum;
 use Tests\Support\ApiTester;
 use Tests\Support\Fixtures\ExpiredTokenFixture;
 use Tests\Support\Fixtures\NotActiveUserFixture;
@@ -21,7 +22,7 @@ class ConfirmEmailCest
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet('/v1/auth/confirm-email', ['token' => NotActiveUserFixture::UUID]);
-        $I->seeResponseCodeIs(200);
+        $I->seeResponseCodeIs(HttpCodesEnum::Success->value);
         $I->seeResponseContainsJson(['data' => 'Specified email is confirmed', 'result' => true]);
     }
 
@@ -30,7 +31,7 @@ class ConfirmEmailCest
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet('/v1/auth/confirm-email', ['token' => '33333333-3333-3333-3333-333333333333']);
-        $I->seeResponseCodeIs(500);
+        $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(['message' => 'Incorrect token.']);
     }
 
@@ -39,7 +40,7 @@ class ConfirmEmailCest
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet('/v1/auth/confirm-email');
-        $I->seeResponseCodeIs(500);
+        $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(['message' => 'Incorrect token.']);
     }
 
@@ -50,7 +51,7 @@ class ConfirmEmailCest
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet('/v1/auth/confirm-email', ['token' => ExpiredTokenFixture::UUID]);
-        $I->seeResponseCodeIs(500);
+        $I->seeResponseCodeIs(HttpCodesEnum::Conflict->value);
         $I->seeResponseContainsJson(['message' => 'This token has been expired.']);
     }
 }

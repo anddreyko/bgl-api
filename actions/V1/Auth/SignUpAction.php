@@ -9,8 +9,6 @@ use App\Auth\Services\Register\RegistrationByEmailService;
 use App\Core\Http\Actions\BaseAction;
 use App\Core\Http\Entities\Response;
 use Psr\Http\Message\ResponseFactoryInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * @see \Tests\Api\V1\Auth\SignUpCest
@@ -18,19 +16,10 @@ use Psr\Http\Message\ServerRequestInterface;
 final class SignUpAction extends BaseAction
 {
     public function __construct(
-        private readonly ResponseFactoryInterface $factory,
-        private readonly RegistrationByEmailService $service
+        private readonly RegistrationByEmailService $service,
+        readonly ResponseFactoryInterface $factory
     ) {
-        parent::__construct($this->factory);
-    }
-
-    public function handle(ServerRequestInterface $request): ResponseInterface
-    {
-        /** @var array{email?: string, password?: string} $params */
-        $params = $request->getQueryParams();
-        $this->service->handle(new RegistrationByEmailForm($params['email'] ?? '', $params['password'] ?? ''));
-
-        return parent::handle($request);
+        parent::__construct($factory);
     }
 
     /**
@@ -44,6 +33,10 @@ final class SignUpAction extends BaseAction
      */
     public function content(): Response
     {
+        $this->service->handle(
+            new RegistrationByEmailForm((string)$this->getParam('email'), (string)$this->getParam('password'))
+        );
+
         return new Response(data: 'Confirm the specified email', result: true);
     }
 }
