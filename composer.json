@@ -44,6 +44,7 @@
         "slim/psr7": "^1.6",
         "slim/slim": "^4.11",
         "symfony/mailer": "^6.2",
+        "symfony/validator": "^6.3",
         "twig/twig": "^3.5",
         "zircote/swagger-php": "^4.7"
     },

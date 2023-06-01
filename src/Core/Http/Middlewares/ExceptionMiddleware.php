@@ -6,6 +6,7 @@ namespace App\Core\Http\Middlewares;
 
 use App\Core\Exceptions\NotFoundException;
 use App\Core\Http\Enums\HttpCodesEnum;
+use App\Core\Validation\Exceptions\ValidationException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -30,6 +31,7 @@ final readonly class ExceptionMiddleware implements MiddlewareInterface
             $code = match (true) {
                 $exception instanceof HttpException => HttpCodesEnum::from($exception->getCode()),
                 $exception instanceof NotFoundException => HttpCodesEnum::NotFound,
+                $exception instanceof ValidationException => HttpCodesEnum::UnprocessableEntity,
                 $exception instanceof \InvalidArgumentException => HttpCodesEnum::BadRequest,
                 $exception instanceof \RuntimeException => HttpCodesEnum::Conflict,
                 default => HttpCodesEnum::InternalServerError

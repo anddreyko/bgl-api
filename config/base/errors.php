@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Core\Http\Renderers\JsonErrorRenderer;
 use App\Core\Logger\Handlers\LogErrorHandler;
 use App\Core\Logger\Handlers\SentryHandler;
 use DI\Container;
@@ -28,7 +29,11 @@ return [
         $logger = $container->get(LoggerInterface::class);
 
         $errors = new ErrorMiddleware($callable, $response, $config['details'], $config['log'], true);
-        $errors->setDefaultErrorHandler(new SentryHandler(new LogErrorHandler($callable, $response, $logger)));
+
+        $handler = new LogErrorHandler($callable, $response, $logger);
+        $handler->registerErrorRenderer('application/json', JsonErrorRenderer::class);
+
+        $errors->setDefaultErrorHandler(new SentryHandler($handler));
 
         return $errors;
     },
