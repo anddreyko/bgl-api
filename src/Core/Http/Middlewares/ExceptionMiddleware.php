@@ -40,14 +40,16 @@ final readonly class ExceptionMiddleware implements MiddlewareInterface
 
         $this->logger->warning($exception->getMessage(), ['exception' => $exception, 'url' => $request->getUri()]);
 
-        $exception = new HttpException(
-            $request,
-            $exception->getMessage(),
-            $code->value,
-            $exception
-        );
+        $exception = $exception instanceof HttpException
+            ? $exception
+            : new HttpException(
+                $request,
+                $exception->getMessage() ?: $code->label(),
+                $code->value,
+                $exception
+            );
 
-        $exception->setTitle($exception->getMessage() ?: $code->label());
+        $exception->setTitle($exception->getMessage());
 
         throw $exception;
     }
