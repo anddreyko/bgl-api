@@ -35,13 +35,13 @@ class ConfirmEmailCest
         $I->seeResponseContainsJson(['message' => 'Incorrect token.']);
     }
 
-    public function testUnspecifiedFound(ApiTester $I): void
+    public function testUnspecifiedParameters(ApiTester $I): void
     {
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet('/v1/auth/confirm-email');
-        $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
-        $I->seeResponseContainsJson(['message' => 'Incorrect token.']);
+        $I->seeResponseCodeIs(HttpCodesEnum::UnprocessableEntity->value);
+        $I->seeResponseContainsJson(['message' => HttpCodesEnum::UnprocessableEntity->label()]);
     }
 
     public function testExpiredToken(ApiTester $I): void

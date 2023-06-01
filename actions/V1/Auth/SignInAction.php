@@ -9,6 +9,7 @@ use App\Auth\Services\IdentificationService;
 use App\Core\Http\Actions\BaseAction;
 use App\Core\Http\Entities\Response;
 use Psr\Http\Message\ResponseFactoryInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @see \Tests\Api\V1\Auth\SignInCest
@@ -17,6 +18,7 @@ final class SignInAction extends BaseAction
 {
     public function __construct(
         private readonly IdentificationService $service,
+        private readonly ValidatorInterface $validator,
         readonly ResponseFactoryInterface $factory
     ) {
         parent::__construct($factory);
@@ -33,9 +35,10 @@ final class SignInAction extends BaseAction
      */
     public function content(): Response
     {
-        $this->service->handle(
-            new IdentificationForm((string)$this->getParam('email'), (string)$this->getParam('password'))
-        );
+        $form = new IdentificationForm((string)$this->getParam('email'), (string)$this->getParam('password'));
+        $this->validator->validate($form);
+
+        $this->service->handle($form);
 
         return new Response(data: ['token_access' => 'token-access', 'token_update' => 'token-update'], result: true);
     }

@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace App\Auth\Forms;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+
 final readonly class ConfirmationEmailForm
 {
-    public function __construct(public string $token)
-    {
+    public function __construct(
+        #[NotBlank]
+        public string $token
+    ) {
     }
 }

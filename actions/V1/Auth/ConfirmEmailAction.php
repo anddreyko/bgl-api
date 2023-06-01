@@ -8,15 +8,17 @@ use App\Auth\Forms\ConfirmationEmailForm;
 use App\Auth\Services\Register\ConfirmationEmailService;
 use App\Core\Http\Actions\BaseAction;
 use App\Core\Http\Entities\Response;
+use App\Core\Validation\Services\ValidationService;
 use Psr\Http\Message\ResponseFactoryInterface;
 
 /**
- * @see \Tests\Api\V1\Auth\SignUpCest
+ * @see \Tests\Api\V1\Auth\ConfirmEmailCest
  */
 final class ConfirmEmailAction extends BaseAction
 {
     public function __construct(
         private readonly ConfirmationEmailService $service,
+        private readonly ValidationService $validator,
         readonly ResponseFactoryInterface $factory
     ) {
         parent::__construct($factory);
@@ -50,12 +52,20 @@ final class ConfirmEmailAction extends BaseAction
      *         response="409",
      *         description="Invalid parameters",
      *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response="422",
+     *         description="Invalid parameters",
+     *         @OA\JsonContent()
      *     )
      * )
      */
     public function content(): Response
     {
-        $this->service->handle(new ConfirmationEmailForm((string)$this->getParam('token')));
+        $form = new ConfirmationEmailForm((string)$this->getParam('token'));
+        $this->validator->validate($form);
+
+        $this->service->handle($form);
 
         return new Response(data: 'Specified email is confirmed', result: true);
     }
