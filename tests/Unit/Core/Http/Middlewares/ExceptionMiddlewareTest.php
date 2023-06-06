@@ -7,24 +7,40 @@ namespace Tests\Unit\Core\Http\Middlewares;
 use App\Core\Exceptions\NotFoundException;
 use App\Core\Http\Enums\HttpCodesEnum;
 use App\Core\Http\Middlewares\ExceptionMiddleware;
+use App\Core\Localization\Services\TranslatorService;
 use Codeception\Stub\Expected;
 use Codeception\Test\Unit;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 use Slim\Exception\HttpException;
 use Slim\Psr7\Factory\ServerRequestFactory;
+use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\Translator;
 
 /**
  * @covers \App\Core\Http\Middlewares\ExceptionMiddleware
  */
 final class ExceptionMiddlewareTest extends Unit
 {
+    private ?ExceptionMiddleware $middleware = null;
+    private Translator $translator;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->translator = new Translator('en');
+        $this->translator->addLoader('array', new ArrayLoader());
+        $this->translator->addResource('array', ['Some exception.' => 'Какое-то исключение.'], 'ru', 'exceptions');
+
+        $this->middleware = new ExceptionMiddleware(
+            $this->makeEmpty(LoggerInterface::class, ['warning' => Expected::once()]),
+            new TranslatorService($this->translator)
+        );
+    }
+
     public function testHttpException(): void
     {
-        $logger = $this->makeEmpty(LoggerInterface::class, ['warning' => Expected::once()]);
-
-        $middleware = new ExceptionMiddleware($logger);
-
         $request = (new ServerRequestFactory())->createServerRequest('POST', 'http://app.test');
 
         $handler = $this->createStub(RequestHandlerInterface::class);
@@ -33,15 +49,25 @@ final class ExceptionMiddlewareTest extends Unit
 
         $this->expectExceptionMessage('Some exception.');
         $this->expectExceptionCode(HttpCodesEnum::BadRequest->value);
-        $middleware->process($request, $handler);
+        $this->middleware->process($request, $handler);
+    }
+
+    public function testLocalizationException(): void
+    {
+        $this->translator->setLocale('ru');
+
+        $request = (new ServerRequestFactory())->createServerRequest('POST', 'http://app.test');
+
+        $handler = $this->createStub(RequestHandlerInterface::class);
+        $handler->method('handle')
+            ->willThrowException(new \Exception('Some exception.'));
+
+        $this->expectExceptionMessage('Какое-то исключение.');
+        $this->middleware->process($request, $handler);
     }
 
     public function testNotFoundException(): void
     {
-        $logger = $this->makeEmpty(LoggerInterface::class, ['warning' => Expected::once()]);
-
-        $middleware = new ExceptionMiddleware($logger);
-
         $request = (new ServerRequestFactory())->createServerRequest('POST', 'http://app.test');
 
         $handler = $this->createStub(RequestHandlerInterface::class);
@@ -50,15 +76,11 @@ final class ExceptionMiddlewareTest extends Unit
 
         $this->expectExceptionMessage('Some exception.');
         $this->expectExceptionCode(HttpCodesEnum::NotFound->value);
-        $middleware->process($request, $handler);
+        $this->middleware->process($request, $handler);
     }
 
     public function testDomainException(): void
     {
-        $logger = $this->makeEmpty(LoggerInterface::class, ['warning' => Expected::once()]);
-
-        $middleware = new ExceptionMiddleware($logger);
-
         $request = (new ServerRequestFactory())->createServerRequest('POST', 'http://app.test');
 
         $handler = $this->createStub(RequestHandlerInterface::class);
@@ -67,15 +89,11 @@ final class ExceptionMiddlewareTest extends Unit
 
         $this->expectExceptionMessage('Some exception.');
         $this->expectExceptionCode(HttpCodesEnum::InternalServerError->value);
-        $middleware->process($request, $handler);
+        $this->middleware->process($request, $handler);
     }
 
     public function testLogicException(): void
     {
-        $logger = $this->makeEmpty(LoggerInterface::class, ['warning' => Expected::once()]);
-
-        $middleware = new ExceptionMiddleware($logger);
-
         $request = (new ServerRequestFactory())->createServerRequest('POST', 'http://app.test');
 
         $handler = $this->createStub(RequestHandlerInterface::class);
@@ -84,15 +102,11 @@ final class ExceptionMiddlewareTest extends Unit
 
         $this->expectExceptionMessage('Some exception.');
         $this->expectExceptionCode(HttpCodesEnum::InternalServerError->value);
-        $middleware->process($request, $handler);
+        $this->middleware->process($request, $handler);
     }
 
     public function testException(): void
     {
-        $logger = $this->makeEmpty(LoggerInterface::class, ['warning' => Expected::once()]);
-
-        $middleware = new ExceptionMiddleware($logger);
-
         $request = (new ServerRequestFactory())->createServerRequest('POST', 'http://app.test');
 
         $handler = $this->createStub(RequestHandlerInterface::class);
@@ -101,15 +115,11 @@ final class ExceptionMiddlewareTest extends Unit
 
         $this->expectExceptionMessage('Some exception.');
         $this->expectExceptionCode(HttpCodesEnum::InternalServerError->value);
-        $middleware->process($request, $handler);
+        $this->middleware->process($request, $handler);
     }
 
     public function testRuntimeException(): void
     {
-        $logger = $this->makeEmpty(LoggerInterface::class, ['warning' => Expected::once()]);
-
-        $middleware = new ExceptionMiddleware($logger);
-
         $request = (new ServerRequestFactory())->createServerRequest('POST', 'http://app.test');
 
         $handler = $this->createStub(RequestHandlerInterface::class);
@@ -118,15 +128,11 @@ final class ExceptionMiddlewareTest extends Unit
 
         $this->expectExceptionMessage('Some exception.');
         $this->expectExceptionCode(HttpCodesEnum::Conflict->value);
-        $middleware->process($request, $handler);
+        $this->middleware->process($request, $handler);
     }
 
     public function testInvalidArgumentException(): void
     {
-        $logger = $this->makeEmpty(LoggerInterface::class, ['warning' => Expected::once()]);
-
-        $middleware = new ExceptionMiddleware($logger);
-
         $request = (new ServerRequestFactory())->createServerRequest('POST', 'http://app.test');
 
         $handler = $this->createStub(RequestHandlerInterface::class);
@@ -135,6 +141,6 @@ final class ExceptionMiddlewareTest extends Unit
 
         $this->expectExceptionMessage('Some exception.');
         $this->expectExceptionCode(HttpCodesEnum::BadRequest->value);
-        $middleware->process($request, $handler);
+        $this->middleware->process($request, $handler);
     }
 }

@@ -6,9 +6,19 @@ namespace Actions\V1;
 
 use App\Core\Http\Actions\BaseAction;
 use App\Core\Http\Entities\Response;
+use App\Core\Localization\Services\TranslatorService;
+use Psr\Http\Message\ResponseFactoryInterface;
 
+/**
+ * @see \Tests\Acceptance\HelloWorldCest
+ */
 final class HelloWorldAction extends BaseAction
 {
+    public function __construct(private readonly TranslatorService $translator, ResponseFactoryInterface $factory)
+    {
+        parent::__construct($factory);
+    }
+
     /**
      * @OpenApi\Annotations\Get(
      *     path="/v1/hello-world",
@@ -20,6 +30,6 @@ final class HelloWorldAction extends BaseAction
      */
     public function content(): Response
     {
-        return new Response(data: 'Hello world!', result: true);
+        return new Response(data: $this->translator->trans(id: 'Hello world!', domain: 'hello-world'), result: true);
     }
 }
