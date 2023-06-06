@@ -8,6 +8,8 @@ return static function (Slim\App $app) {
     $app->add(App\Core\Http\Middlewares\ExceptionMiddleware::class);
     $app->add(App\Core\Http\Middlewares\EmptyFilesMiddleware::class);
     $app->add(App\Core\Http\Middlewares\TrimMiddleware::class);
+    $app->add(App\Core\Http\Middlewares\TranslatorMiddleware::class);
+    $app->add(App\Core\Http\Middlewares\LocaleMiddleware::class);
     $app->addBodyParsingMiddleware();
     $app->add(ErrorMiddleware::class);
 };

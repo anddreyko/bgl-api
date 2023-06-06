@@ -6,6 +6,7 @@ namespace App\Core\Http\Middlewares;
 
 use App\Core\Exceptions\NotFoundException;
 use App\Core\Http\Enums\HttpCodesEnum;
+use App\Core\Localization\Services\TranslatorService;
 use App\Core\Validation\Exceptions\ValidationException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -19,7 +20,7 @@ use Slim\Exception\HttpException;
  */
 final readonly class ExceptionMiddleware implements MiddlewareInterface
 {
-    public function __construct(private LoggerInterface $logger)
+    public function __construct(private LoggerInterface $logger, private TranslatorService $translator)
     {
     }
 
@@ -40,14 +41,12 @@ final readonly class ExceptionMiddleware implements MiddlewareInterface
 
         $this->logger->warning($exception->getMessage(), ['exception' => $exception, 'url' => $request->getUri()]);
 
-        $exception = $exception instanceof HttpException
-            ? $exception
-            : new HttpException(
-                $request,
-                $exception->getMessage() ?: $code->label(),
-                $code->value,
-                $exception
-            );
+        $exception = new HttpException(
+            $request,
+            $this->translator->trans(id: $exception->getMessage() ?: $code->label(), domain: 'exceptions'),
+            $code->value,
+            $exception
+        );
 
         $exception->setTitle($exception->getMessage());
 
