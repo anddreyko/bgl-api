@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 final class SignUpAction extends BaseAction
 {
     public function __construct(
-        private readonly RegistrationByEmailService $service,
+        private readonly RegistrationByEmailService $registrationService,
         private readonly ValidatorInterface $validator,
         readonly ResponseFactoryInterface $factory
     ) {
@@ -38,7 +38,7 @@ final class SignUpAction extends BaseAction
         $form = new RegistrationByEmailForm((string)$this->getParam('email'), (string)$this->getParam('password'));
         $this->validator->validate($form);
 
-        $this->service->handle($form);
+        $this->registrationService->handle($form);
 
         return new Response(data: 'Confirm the specified email', result: true);
     }

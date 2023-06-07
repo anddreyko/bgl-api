@@ -23,7 +23,7 @@ class SignInCest
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet(
-            '/v1/auth/login-by-email',
+            '/v1/auth/sign-in-by-email',
             ['password' => ExistedUserFixture::PASS, 'email' => ExistedUserFixture::EMAIL]
         );
         $I->seeResponseCodeIs(200);
@@ -37,7 +37,7 @@ class SignInCest
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet(
-            '/v1/auth/login-by-email',
+            '/v1/auth/sign-in-by-email',
             ['password' => 'pass', 'email' => 'not-existed-user@app.test']
         );
         $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
@@ -51,7 +51,7 @@ class SignInCest
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet(
-            '/v1/auth/login-by-email',
+            '/v1/auth/sign-in-by-email',
             ['password' => ExistedUserFixture::PASS]
         );
         $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
@@ -67,7 +67,7 @@ class SignInCest
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet(
-            '/v1/auth/login-by-email',
+            '/v1/auth/sign-in-by-email',
             ['email' => ExistedUserFixture::EMAIL]
         );
         $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);

@@ -25,7 +25,7 @@ class SignUpCest
 
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
-        $I->sendGet('/v1/auth/register-by-email', ['password' => 'password', 'email' => 'new-user@app.test']);
+        $I->sendGet('/v1/auth/sign-up-by-email', ['password' => 'password', 'email' => 'new-user@app.test']);
         $I->seeResponseCodeIs(HttpCodesEnum::Success->value);
         $I->seeResponseContainsJson(['data' => 'Confirm the specified email', 'result' => true]);
 
@@ -38,7 +38,7 @@ class SignUpCest
 
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
-        $I->sendGet('/v1/auth/register-by-email', ['password' => 'password', 'email' => ExistedUserFixture::EMAIL]);
+        $I->sendGet('/v1/auth/sign-up-by-email', ['password' => 'password', 'email' => ExistedUserFixture::EMAIL]);
         $I->seeResponseCodeIs(HttpCodesEnum::Conflict->value);
         $I->seeResponseContainsJson(['message' => 'User with this email has been already exist.']);
     }
@@ -47,7 +47,7 @@ class SignUpCest
     {
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
-        $I->sendGet('/v1/auth/register-by-email', ['password' => '', 'email' => 'empty-password@app.test']);
+        $I->sendGet('/v1/auth/sign-up-by-email', ['password' => '', 'email' => 'empty-password@app.test']);
         $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(['message' => 'Expected a non-empty value. Got: ""']);
     }
@@ -56,7 +56,7 @@ class SignUpCest
     {
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
-        $I->sendGet('/v1/auth/register-by-email', ['email' => 'empty-password@app.test']);
+        $I->sendGet('/v1/auth/sign-up-by-email', ['email' => 'empty-password@app.test']);
         $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(['message' => 'Expected a non-empty value. Got: ""']);
     }
@@ -65,7 +65,7 @@ class SignUpCest
     {
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
-        $I->sendGet('/v1/auth/register-by-email', ['password' => 'password', 'email' => '']);
+        $I->sendGet('/v1/auth/sign-up-by-email', ['password' => 'password', 'email' => '']);
         $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(['message' => 'Expected a non-empty value. Got: ""']);
     }
@@ -74,7 +74,7 @@ class SignUpCest
     {
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
-        $I->sendGet('/v1/auth/register-by-email', ['password' => 'password']);
+        $I->sendGet('/v1/auth/sign-up-by-email', ['password' => 'password']);
         $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(['message' => 'Expected a non-empty value. Got: ""']);
     }
@@ -83,7 +83,7 @@ class SignUpCest
     {
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
-        $I->sendGet('/v1/auth/register-by-email');
+        $I->sendGet('/v1/auth/sign-up-by-email');
         $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(['message' => 'Expected a non-empty value. Got: ""']);
     }
@@ -92,7 +92,7 @@ class SignUpCest
     {
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
-        $I->sendGet('/v1/auth/register-by-email', ['password' => 'password', 'email' => 'incorrect-email']);
+        $I->sendGet('/v1/auth/sign-up-by-email', ['password' => 'password', 'email' => 'incorrect-email']);
         $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(
             ['message' => 'Expected a value to be a valid e-mail address. Got: "incorrect-email"']
