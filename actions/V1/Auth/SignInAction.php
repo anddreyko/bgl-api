@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 final class SignInAction extends BaseAction
 {
     public function __construct(
-        private readonly IdentificationService $service,
+        private readonly IdentificationService $authenticationService,
         private readonly ValidatorInterface $validator,
         readonly ResponseFactoryInterface $factory
     ) {
@@ -38,7 +38,7 @@ final class SignInAction extends BaseAction
         $form = new IdentificationForm((string)$this->getParam('email'), (string)$this->getParam('password'));
         $this->validator->validate($form);
 
-        $this->service->handle($form);
+        $this->authenticationService->handle($form);
 
         return new Response(data: ['token_access' => 'token-access', 'token_update' => 'token-update'], result: true);
     }

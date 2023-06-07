@@ -17,7 +17,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 final class ConfirmEmailAction extends BaseAction
 {
     public function __construct(
-        private readonly ConfirmationEmailService $service,
+        private readonly ConfirmationEmailService $confirmationService,
         private readonly ValidationService $validator,
         readonly ResponseFactoryInterface $factory
     ) {
@@ -65,7 +65,7 @@ final class ConfirmEmailAction extends BaseAction
         $form = new ConfirmationEmailForm((string)$this->getParam('token'));
         $this->validator->validate($form);
 
-        $this->service->handle($form);
+        $this->confirmationService->handle($form);
 
         return new Response(data: 'Specified email is confirmed', result: true);
     }
