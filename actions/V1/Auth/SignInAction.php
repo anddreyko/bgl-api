@@ -38,8 +38,6 @@ final class SignInAction extends BaseAction
         $form = new IdentificationForm((string)$this->getParam('email'), (string)$this->getParam('password'));
         $this->validator->validate($form);
 
-        $this->authenticationService->handle($form);
-
-        return new Response(data: ['token_access' => 'token-access', 'token_update' => 'token-update'], result: true);
+        return new Response(data: ['token_access' => $this->authenticationService->handle($form)], result: true);
     }
 }
