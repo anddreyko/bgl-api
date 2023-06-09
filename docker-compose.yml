@@ -27,6 +27,7 @@ services:
       MAIL_NOREPLY: ${MAIL_NOREPLY}
       FRONTEND_URL: ${FRONTEND_URL}
       MAILER_URL: ${MAILER_URL}
+      JWT_KEY: ${JWT_KEY}
     volumes:
       - .:/app
 
@@ -45,6 +46,7 @@ services:
       MAIL_NOREPLY: ${MAIL_NOREPLY}
       FRONTEND_URL: ${FRONTEND_URL}
       MAILER_URL: ${MAILER_URL}
+      JWT_KEY: ${JWT_KEY}
     volumes:
       - .:/app
 

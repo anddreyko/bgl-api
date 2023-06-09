@@ -4,6 +4,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      JWT_KEY: ${JWT_KEY}
     volumes:
       - .:/app
     ports:
