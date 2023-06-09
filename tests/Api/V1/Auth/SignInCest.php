@@ -26,10 +26,10 @@ class SignInCest
             '/v1/auth/sign-in-by-email',
             ['password' => ExistedUserFixture::PASS, 'email' => ExistedUserFixture::EMAIL]
         );
-        $I->seeResponseCodeIs(200);
-        $I->seeResponseContainsJson(
-            ['data' => ['token_access' => 'token-access', 'token_update' => 'token-update'], 'result' => true]
-        );
+        $I->seeResponseCodeIs(HttpCodesEnum::Success->value);
+        $I->seeResponseContainsJson(['data' => [], 'result' => true]);
+        $I->seeResponseContains('token_access');
+        $I->seeResponseContains('.');
     }
 
     public function testNotExistUser(ApiTester $I): void
@@ -42,7 +42,7 @@ class SignInCest
         );
         $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(
-            ['message' => 'Incorrect email.']
+            ['message' => 'Incorrect email or password.']
         );
     }
 
