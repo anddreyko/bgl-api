@@ -190,6 +190,7 @@ return [
             App\Auth\Types\IdType::NAME => App\Auth\Types\IdType::class,
             App\Auth\Types\PasswordHashType::NAME => App\Auth\Types\PasswordHashType::class,
             App\Auth\Types\StatusType::NAME => App\Auth\Types\StatusType::class,
+            App\Auth\Types\WebTokenType::NAME => App\Auth\Types\WebTokenType::class,
         ],
     ],
 ];
