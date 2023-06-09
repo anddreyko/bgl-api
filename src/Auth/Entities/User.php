@@ -13,6 +13,9 @@ use App\Auth\ValueObjects\Email;
 use App\Auth\ValueObjects\Id;
 use App\Auth\ValueObjects\PasswordHash;
 use App\Auth\ValueObjects\Token;
+use App\Auth\ValueObjects\WebToken;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -28,6 +31,8 @@ final class User
     private ?PasswordHash $hash = null;
     #[ORM\Embedded(class: Token::class)]
     private ?Token $token = null;
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserAccessToken::class, cascade: ['all'], orphanRemoval: true)]
+    private Collection $accessTokens;
 
     private function __construct(
         #[ORM\Column(type: IdType::NAME)]
@@ -40,6 +45,7 @@ final class User
         #[ORM\Column(type: StatusType::NAME)]
         private UserStatusEnum $status,
     ) {
+        $this->accessTokens = new ArrayCollection();
     }
 
     public static function createByEmail(
@@ -111,6 +117,21 @@ final class User
     public function isWait(): bool
     {
         return $this->status->isWait();
+    }
+
+    public function setAccessTokens(UserAccessToken $token): void
+    {
+        $this->accessTokens->add($token);
+    }
+
+    /**
+     * @return WebToken[]
+     */
+    public function getAccessTokens(): array
+    {
+        return $this->accessTokens
+            ->map(static fn(UserAccessToken $token) => $token->getToken())
+            ->toArray();
     }
 
     #[ORM\PostLoad]
