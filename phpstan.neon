@@ -11,3 +11,4 @@ parameters:
 		- web/assets
 	fileExtensions:
 		- php
+	checkGenericClassInNonGenericObjectType: false
