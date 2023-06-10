@@ -18,10 +18,10 @@ final class Token
 {
     /** @var string */
     #[Column(type: 'string', nullable: true)]
-    private $value;
+    private string $value;
     /** @var \DateTimeImmutable */
     #[Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    private $expires;
+    private \DateTimeImmutable $expires;
 
     public function __construct(
         string $value,

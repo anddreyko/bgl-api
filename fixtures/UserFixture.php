@@ -16,7 +16,7 @@ use Ramsey\Uuid\Uuid;
 
 final class UserFixture extends DbFixture
 {
-    private const HASH = '123';
+    private const HASH = Uuid::NIL;
 
     public function fixture(EntityManagerInterface $manager): void
     {
@@ -24,14 +24,20 @@ final class UserFixture extends DbFixture
 
         $date = new \DateTimeImmutable();
         $user = User::createByEmail(
-            new Id(Uuid::NIL),
-            $date,
-            new Email('admin@4records.com'),
-            new PasswordHash(self::HASH),
-            Token::create($date->modify('+1 day'))
+            id: new Id(Uuid::NIL),
+            email: new Email('admin@4records.com'),
+            hash: new PasswordHash(self::HASH),
+            token: Token::create($date->modify('+1 day')),
+            createdAt: $date
         );
-
         $users->activateUser($user);
+
+        $user = User::createByEmail(
+            id: new Id(Uuid::NAMESPACE_X500),
+            email: new Email('waiting@4records.com'),
+            hash: new PasswordHash(self::HASH),
+        );
+        $users->persist($user);
 
         $manager->flush();
     }

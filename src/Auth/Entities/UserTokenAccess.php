@@ -9,22 +9,20 @@ use App\Auth\ValueObjects\WebToken;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(readOnly: true)]
-#[ORM\Table(name: 'auth_user_access_token', uniqueConstraints: [
-    new ORM\UniqueConstraint(columns: ['user_id', 'token']),
-])]
-final readonly class UserAccessToken
+#[ORM\Entity]
+#[ORM\Table(name: 'auth_user_access', uniqueConstraints: [new ORM\UniqueConstraint(columns: ['user_id', 'token'])])]
+final readonly class UserTokenAccess
 {
     public function __construct(
         #[ORM\Id]
-        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'accessTokens')]
+        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'tokenAccess')]
         #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
         private User $user,
         #[ORM\Id]
         #[ORM\Column(type: WebTokenType::NAME, unique: true)]
         private WebToken $token,
-        #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ["default" => 'CURRENT_TIMESTAMP'])]
-        private \DateTimeImmutable $createdAt,
+        #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
+        private \DateTimeImmutable $createdAt = new \DateTimeImmutable(),
     ) {
     }
 

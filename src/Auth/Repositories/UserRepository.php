@@ -9,6 +9,7 @@ use App\Auth\ValueObjects\Email;
 use App\Auth\ValueObjects\Id;
 use App\Auth\ValueObjects\PasswordHash;
 use App\Auth\ValueObjects\Token;
+use App\Auth\ValueObjects\WebToken;
 
 interface UserRepository
 {
@@ -27,4 +28,6 @@ interface UserRepository
     public function getById(Id $id): User;
 
     public function setPasswordHash(User $user, PasswordHash $hash): void;
+
+    public function addAccessToken(User $user, WebToken $access): void;
 }

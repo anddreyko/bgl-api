@@ -34,7 +34,9 @@ final class JsonWebTokenizerServiceTest extends Unit
     {
         $this->assertEquals(
             self::CORRECT_TOKEN,
-            $this->service->encode(payload: self::CORRECT_PAYLOAD, expire: self::INTERVAL, issuedAt: $this->dateTime)
+            $this->service
+                ->encode(payload: self::CORRECT_PAYLOAD, expire: self::INTERVAL, issuedAt: $this->dateTime)
+                ->getValue()
         );
     }
 
@@ -53,6 +55,6 @@ final class JsonWebTokenizerServiceTest extends Unit
     public function testExpired(): void
     {
         $this->expectException(ExpiredException::class);
-        $this->service->decode($this->service->encode(payload: [], expire: '-1 hour'));
+        $this->service->decode($this->service->encode(payload: [], expire: '-1 hour')->getValue());
     }
 }

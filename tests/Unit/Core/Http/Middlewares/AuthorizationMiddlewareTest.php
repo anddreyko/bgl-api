@@ -35,13 +35,13 @@ final class AuthorizationMiddlewareTest extends Unit
     public function testSuccessAuth(): void
     {
         $auth = new JsonWebTokenizerService($this->make(JWT::class), new Key('some-key', 'HS512'));
-        $token = $auth->encode(payload: ['user' => Uuid::NIL], issuedAt: new \DateTimeImmutable());
+        $token = $auth->encode(payload: ['user' => Uuid::NIL], issuedAt: new \DateTimeImmutable())->getValue();
         $user = User::createByEmail(
             id: new Id(Uuid::NIL),
-            createdAt: new \DateTimeImmutable(),
             email: new Email('auth@app.test'),
             hash: new PasswordHash(Uuid::NIL),
-            token: new Token(Uuid::NIL, new \DateTimeImmutable())
+            token: new Token(Uuid::NIL, new \DateTimeImmutable()),
+            createdAt: new \DateTimeImmutable()
         );
         $authorizationService = new AuthorizationService(
             $auth,

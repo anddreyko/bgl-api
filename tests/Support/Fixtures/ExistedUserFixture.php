@@ -26,11 +26,11 @@ final class ExistedUserFixture extends DbFixture
 
         $date = new \DateTimeImmutable();
         $user = User::createByEmail(
-            new Id(self::UUID),
-            $date,
-            new Email(self::EMAIL),
-            new PasswordHash(self::HASH),
-            Token::create($date->modify('+1 day'))
+            id: new Id(self::UUID),
+            email: new Email(self::EMAIL),
+            hash: new PasswordHash(self::HASH),
+            token: Token::create($date->modify('+1 day')),
+            createdAt: $date
         );
 
         $users->add($user);

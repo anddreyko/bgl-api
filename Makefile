@@ -82,6 +82,10 @@ test-api-auth-confirm-email:
 	docker-compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/ConfirmEmailCest.php && \
 	make load-fixtures
 
+test-api-auth-confirm-email-success:
+	docker-compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/ConfirmEmailCest.php::testSuccess && \
+	make load-fixtures
+
 test-api-auth-login:
 	docker-compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/SignInCest.php && \
 	make load-fixtures

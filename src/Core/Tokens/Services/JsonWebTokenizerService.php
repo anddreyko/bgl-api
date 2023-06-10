@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core\Tokens\Services;
 
+use App\Auth\ValueObjects\WebToken;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
@@ -31,13 +32,13 @@ final readonly class JsonWebTokenizerService
      * @param string $expire
      * @param \DateTimeImmutable $issuedAt
      *
-     * @return string
+     * @return WebToken
      */
     public function encode(
         array $payload,
         string $expire = '+30 minutes',
         \DateTimeImmutable $issuedAt = new \DateTimeImmutable()
-    ): string {
+    ): WebToken {
         if (!isset($payload['iat'])) {
             $payload['iat'] = $issuedAt->getTimestamp();
         }
@@ -51,6 +52,6 @@ final readonly class JsonWebTokenizerService
             }
         }
 
-        return $this->token->encode($payload, $this->key->getKeyMaterial(), $this->key->getAlgorithm());
+        return new WebToken($this->token->encode($payload, $this->key->getKeyMaterial(), $this->key->getAlgorithm()));
     }
 }

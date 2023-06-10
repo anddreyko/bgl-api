@@ -10,6 +10,7 @@ use App\Auth\ValueObjects\Email;
 use App\Auth\ValueObjects\Id;
 use App\Auth\ValueObjects\PasswordHash;
 use App\Auth\ValueObjects\Token;
+use App\Auth\ValueObjects\WebToken;
 use App\Core\Database\Repositories\DbRepository;
 
 final class DbUserRepository extends DbRepository implements UserRepository
@@ -31,7 +32,7 @@ final class DbUserRepository extends DbRepository implements UserRepository
 
     public function findByToken(string $token): ?User
     {
-        $user = $this->findOneBy(['token.value' => $token]);
+        $user = $this->findOneBy(['tokenConfirm' => $token]);
         if ($user instanceof User) {
             return $user;
         }
@@ -51,7 +52,7 @@ final class DbUserRepository extends DbRepository implements UserRepository
 
     public function setToken(User $user, Token $token): void
     {
-        $user->setToken($token);
+        $user->setTokenConfirm($token);
         $this->persist($user);
     }
 
@@ -74,6 +75,12 @@ final class DbUserRepository extends DbRepository implements UserRepository
     public function setPasswordHash(User $user, PasswordHash $hash): void
     {
         $user->setHash($hash);
+        $this->persist($user);
+    }
+
+    public function addAccessToken(User $user, WebToken $access): void
+    {
+        $user->setTokenAccess($access);
         $this->persist($user);
     }
 }
