@@ -16,7 +16,8 @@ use Ramsey\Uuid\Uuid;
 
 final class UserFixture extends DbFixture
 {
-    private const HASH = Uuid::NIL;
+    private const ID = Uuid::NIL;
+    private const HASH = '$argon2i$v=19$m=65536,t=4,p=1$bWp5QW1ZeDhjcHRsSWQ1Zw$0jG3SjHyjHeS4lWsa66lGNnMDxq5/MFdZG2FRs2r4S4';
 
     public function fixture(EntityManagerInterface $manager): void
     {
