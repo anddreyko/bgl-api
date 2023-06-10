@@ -7,6 +7,9 @@ namespace App\Auth\Entities;
 use App\Auth\ValueObjects\Token;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @see \Tests\Unit\Auth\Entities\UserTokenConfirmTest
+ */
 #[ORM\Entity]
 #[ORM\Table(name: 'auth_user_confirm', uniqueConstraints: [new ORM\UniqueConstraint(columns: ['user_id'])])]
 final readonly class UserTokenConfirm

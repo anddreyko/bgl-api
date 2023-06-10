@@ -9,6 +9,9 @@ use App\Auth\ValueObjects\WebToken;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * @see \Tests\Unit\Auth\Entities\UserTokenAccessTest
+ */
 #[ORM\Entity]
 #[ORM\Table(name: 'auth_user_access', uniqueConstraints: [new ORM\UniqueConstraint(columns: ['user_id', 'token'])])]
 final readonly class UserTokenAccess
