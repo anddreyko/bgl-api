@@ -10,6 +10,7 @@ use App\Auth\ValueObjects\Email;
 use App\Auth\ValueObjects\Id;
 use App\Auth\ValueObjects\PasswordHash;
 use App\Auth\ValueObjects\Token;
+use App\Auth\ValueObjects\WebToken;
 use Codeception\Test\Unit;
 
 /**
@@ -24,6 +25,8 @@ class UserTest extends Unit
     private Email $email;
     private Token $token;
     private UserStatusEnum $status;
+    private WebToken $access1;
+    private WebToken $access2;
 
     protected function _setUp(): void
     {
@@ -33,14 +36,18 @@ class UserTest extends Unit
         $this->hash = new PasswordHash('secret');
         $this->token = Token::create(new \DateTimeImmutable());
         $this->status = UserStatusEnum::Wait;
+        $this->access1 = new WebToken('access-1');
+        $this->access2 = new WebToken('access-2');
 
         $this->user = User::createByEmail(
             id: $this->id,
-            createdAt: $this->date,
             email: $this->email,
             hash: $this->hash,
-            token: $this->token
+            token: $this->token,
+            createdAt: $this->date
         );
+        $this->user->setTokenAccess($this->access1);
+        $this->user->setTokenAccess($this->access2);
 
         parent::_setUp();
     }
@@ -67,7 +74,7 @@ class UserTest extends Unit
 
     public function testToken(): void
     {
-        $this->assertEquals($this->token->getValue(), $this->user->getToken()->getValue());
+        $this->assertEquals($this->token->getValue(), $this->user->getTokenConfirm()->getValue());
     }
 
     public function testStatus(): void
@@ -89,5 +96,10 @@ class UserTest extends Unit
     {
         $user = $this->user->setStatus(UserStatusEnum::Active);
         $this->assertEquals(UserStatusEnum::Active, $user->getStatus());
+    }
+
+    public function testAccessToken(): void
+    {
+        $this->assertEquals([$this->access1, $this->access2], $this->user->getTokenAccess());
     }
 }

@@ -23,11 +23,11 @@ final class NotActiveUserFixture extends DbFixture
 
         $date = new \DateTimeImmutable();
         $user = User::createByEmail(
-            new Id(self::UUID),
-            $date,
-            new Email('new-user@app.test'),
-            new PasswordHash(self::UUID),
-            new Token(self::UUID, $date->modify('+1 day'))
+            id: new Id(self::UUID),
+            email: new Email('new-user@app.test'),
+            hash: new PasswordHash(self::UUID),
+            token: new Token(self::UUID, $date->modify('+1 day')),
+            createdAt: $date
         );
 
         $users->add($user);

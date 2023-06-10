@@ -8,6 +8,7 @@ use App\Auth\Exceptions\IdentificationException;
 use App\Auth\Exceptions\IncorrectEmailException;
 use App\Auth\Exceptions\IncorrectPasswordException;
 use App\Auth\Forms\IdentificationForm;
+use App\Auth\Helpers\FlushHelper;
 use App\Auth\Helpers\PasswordHashHelper;
 use App\Auth\Repositories\UserRepository;
 use App\Auth\ValueObjects\Email;
@@ -18,7 +19,8 @@ final readonly class IdentificationService
     public function __construct(
         private UserRepository $users,
         private PasswordHashHelper $hasher,
-        private JsonWebTokenizerService $webTokenizerService
+        private JsonWebTokenizerService $webTokenizerService,
+        private FlushHelper $flusher,
     ) {
     }
 
@@ -39,6 +41,12 @@ final readonly class IdentificationService
             throw new IdentificationException(previous: new IncorrectPasswordException());
         }
 
-        return $this->webTokenizerService->encode(['user' => $user->getId()]);
+        $access = $this->webTokenizerService->encode(['user' => $user->getId()]);
+
+        $this->users->addAccessToken($user, $access);
+
+        $this->flusher->flush();
+
+        return $access->getValue();
     }
 }

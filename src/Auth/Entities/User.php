@@ -25,39 +25,39 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Table(name: 'auth_user')]
-final class User
+class User
 {
-    #[ORM\Column(type: PasswordHashType::NAME, nullable: true)]
-    private ?PasswordHash $hash = null;
-    #[ORM\Embedded(class: Token::class)]
-    private ?Token $token = null;
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserAccessToken::class, cascade: ['all'], orphanRemoval: true)]
-    private Collection $accessTokens;
-
     private function __construct(
         #[ORM\Column(type: IdType::NAME)]
         #[ORM\Id]
-        private readonly Id $id,
-        #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ["default" => 'CURRENT_TIMESTAMP'])]
-        private readonly \DateTimeImmutable $createdAt,
+        private Id $id,
         #[ORM\Column(type: EmailType::NAME, unique: true)]
-        private readonly Email $email,
+        private Email $email,
+        #[ORM\Column(type: PasswordHashType::NAME, nullable: false)]
+        private PasswordHash $hash,
         #[ORM\Column(type: StatusType::NAME)]
-        private UserStatusEnum $status,
+        private UserStatusEnum $status = UserStatusEnum::Wait,
+        #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ["default" => 'CURRENT_TIMESTAMP'])]
+        private \DateTimeImmutable $createdAt = new \DateTimeImmutable(),
+        #[ORM\OneToOne(mappedBy: 'user', targetEntity: UserTokenConfirm::class, cascade: ['all'], orphanRemoval: true)]
+        private ?UserTokenConfirm $tokenConfirm = null,
+        #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserTokenAccess::class, cascade: ['all'], orphanRemoval: true)]
+        private Collection $tokenAccess = new ArrayCollection(),
     ) {
-        $this->accessTokens = new ArrayCollection();
     }
 
     public static function createByEmail(
         Id $id,
-        \DateTimeImmutable $createdAt,
         Email $email,
         PasswordHash $hash,
-        Token $token
+        ?Token $token = null,
+        \DateTimeImmutable $createdAt = new \DateTimeImmutable()
     ): self {
-        $user = new self($id, $createdAt, $email, UserStatusEnum::Wait);
-        $user->hash = $hash;
-        $user->token = $token;
+        $user = new self(id: $id, email: $email, hash: $hash, createdAt: $createdAt);
+
+        if ($token) {
+            $user->setTokenConfirm($token);
+        }
 
         return $user;
     }
@@ -87,14 +87,16 @@ final class User
         $this->hash = $hash;
     }
 
-    public function getToken(): ?Token
+    public function getTokenConfirm(): ?Token
     {
-        return $this->token;
+        $token = $this->tokenConfirm?->getToken();
+
+        return $token && !$token->isEmpty() ? $token : null;
     }
 
-    public function setToken(Token $token): void
+    public function setTokenConfirm(Token $tokenConfirm): void
     {
-        $this->token = $token;
+        $this->tokenConfirm = new UserTokenConfirm($this, $tokenConfirm);
     }
 
     public function getStatus(): UserStatusEnum
@@ -119,26 +121,20 @@ final class User
         return $this->status->isWait();
     }
 
-    public function setAccessTokens(UserAccessToken $token): void
+    public function setTokenAccess(WebToken $token): self
     {
-        $this->accessTokens->add($token);
+        $this->tokenAccess->add(new UserTokenAccess($this, $token));
+
+        return $this;
     }
 
     /**
      * @return WebToken[]
      */
-    public function getAccessTokens(): array
+    public function getTokenAccess(): array
     {
-        return $this->accessTokens
-            ->map(static fn(UserAccessToken $token) => $token->getToken())
+        return $this->tokenAccess
+            ->map(static fn(UserTokenAccess $token) => $token->getToken())
             ->toArray();
-    }
-
-    #[ORM\PostLoad]
-    public function postload(): void
-    {
-        if ($this->token && $this->token->isEmpty()) {
-            $this->token = null;
-        }
     }
 }

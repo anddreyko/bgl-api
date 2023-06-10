@@ -12,15 +12,19 @@ use Webmozart\Assert\Assert;
 #[Embeddable]
 final class WebToken
 {
-    /** @var string */
-    #[Column(type: Types::STRING, nullable: true)]
-    private $value;
+    #[Column(type: Types::STRING, nullable: false)]
+    private string $value;
 
     public function __construct(string $value)
     {
         $value = trim($value);
         Assert::notEmpty($value);
         $this->value = trim($value);
+    }
+
+    public function __toString(): string
+    {
+        return $this->getValue();
     }
 
     public function getValue(): string
