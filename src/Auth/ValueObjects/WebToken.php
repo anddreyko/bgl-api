@@ -9,6 +9,9 @@ use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Embeddable;
 use Webmozart\Assert\Assert;
 
+/**
+ * @see \Tests\Unit\Auth\ValueObjects\WebTokenTest
+ */
 #[Embeddable]
 final class WebToken
 {
