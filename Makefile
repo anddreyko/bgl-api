@@ -94,6 +94,14 @@ test-api-auth-login-success:
 	docker-compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/SignInCest.php::testSuccess && \
 	make load-fixtures
 
+test-api-auth-sign-out:
+	docker-compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/SignOutCest.php && \
+	make load-fixtures
+
+test-api-user-info:
+	docker-compose run --rm api-php-cli composer test -- tests/Api/V1/User/InfoCest.php && \
+	make load-fixtures
+
 test-unit:
 	docker-compose run --rm api-php-cli composer test -- Unit
 

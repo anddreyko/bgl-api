@@ -7,14 +7,14 @@ namespace App\Auth\Services;
 use App\Auth\Exceptions\IdentificationException;
 use App\Auth\Exceptions\IncorrectEmailException;
 use App\Auth\Exceptions\IncorrectPasswordException;
-use App\Auth\Forms\IdentificationForm;
+use App\Auth\Forms\LogInForm;
 use App\Auth\Helpers\FlushHelper;
 use App\Auth\Helpers\PasswordHashHelper;
 use App\Auth\Repositories\UserRepository;
 use App\Auth\ValueObjects\Email;
 use App\Core\Tokens\Services\JsonWebTokenizerService;
 
-final readonly class IdentificationService
+final readonly class LogInService
 {
     public function __construct(
         private UserRepository $users,
@@ -24,7 +24,7 @@ final readonly class IdentificationService
     ) {
     }
 
-    public function handle(IdentificationForm $form): string
+    public function handle(LogInForm $form): string
     {
         $email = new Email($form->email);
         $user = $this->users->findByEmail($email);

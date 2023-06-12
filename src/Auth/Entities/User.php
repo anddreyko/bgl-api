@@ -137,4 +137,9 @@ class User
             ->map(static fn(UserTokenAccess $token) => $token->getToken())
             ->toArray();
     }
+
+    public function removeTokenAccess(int | string $key): void
+    {
+        $this->tokenAccess->remove($key);
+    }
 }

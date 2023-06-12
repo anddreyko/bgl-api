@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core\Http\Middlewares;
 
+use App\Auth\ValueObjects\WebToken;
 use App\Core\Http\Services\AuthorizationService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,8 +18,9 @@ use Slim\Routing\RouteContext;
  */
 final readonly class AuthorizationMiddleware implements MiddlewareInterface
 {
-    public const ATTRIBUTE_ACCESSED = 'accessed';
-    public const ATTRIBUTE_IDENTITY = 'identity';
+    public const ATTRIBUTE_ACCESSED = self::class . '::accessed';
+    public const ATTRIBUTE_IDENTITY = self::class . '::identity';
+    public const ATTRIBUTE_TOKEN = self::class . '::token';
 
     public function __construct(private AuthorizationService $authorizationService)
     {
@@ -35,10 +37,11 @@ final readonly class AuthorizationMiddleware implements MiddlewareInterface
                 throw new HttpUnauthorizedException($request);
             }
 
-            $request = $request->withAttribute(
-                self::ATTRIBUTE_IDENTITY,
-                $this->authorizationService->handle(trim($result[1]))
-            );
+            $token = new WebToken($result[1]);
+
+            $request = $request
+                ->withAttribute(self::ATTRIBUTE_IDENTITY, $this->authorizationService->handle(token: $token))
+                ->withAttribute(self::ATTRIBUTE_TOKEN, $token);
         }
 
         return $handler->handle($request);

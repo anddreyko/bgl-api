@@ -12,6 +12,7 @@ use App\Auth\ValueObjects\PasswordHash;
 use App\Auth\ValueObjects\Token;
 use App\Auth\ValueObjects\WebToken;
 use App\Core\Database\Repositories\DbRepository;
+use App\Core\Exceptions\NotFoundException;
 
 final class DbUserRepository extends DbRepository implements UserRepository
 {
@@ -66,7 +67,7 @@ final class DbUserRepository extends DbRepository implements UserRepository
     {
         $user = $this->findOneBy(['id' => $id->getValue()]);
         if (!($user instanceof User)) {
-            throw new \DomainException("User #{$id->getValue()} not found.");
+            throw new NotFoundException("User #{$id->getValue()} not found.");
         }
 
         return $user;
@@ -82,5 +83,27 @@ final class DbUserRepository extends DbRepository implements UserRepository
     {
         $user->setTokenAccess($access);
         $this->persist($user);
+    }
+
+    public function deleteAccessToken(User $user, WebToken $access): void
+    {
+        foreach ($user->getTokenAccess() as $key => $tokenAccess) {
+            if ($tokenAccess->getValue() === $access->getValue()) {
+                $user->removeTokenAccess($key);
+            }
+        }
+
+        $this->persist($user);
+    }
+
+    public function hasTokenAccess(User $user, WebToken $access): bool
+    {
+        foreach ($user->getTokenAccess() as $tokenAccess) {
+            if ($tokenAccess->getValue() === $access->getValue()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
