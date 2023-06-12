@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Actions\V1\Auth;
 
-use App\Auth\Forms\IdentificationForm;
-use App\Auth\Services\IdentificationService;
+use App\Auth\Forms\LogInForm;
+use App\Auth\Services\LogInService;
 use App\Core\Http\Actions\BaseAction;
 use App\Core\Http\Entities\Response;
-use Psr\Http\Message\ResponseFactoryInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -16,14 +15,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 final class SignInAction extends BaseAction
 {
-    public function __construct(
-        private readonly IdentificationService $authenticationService,
-        private readonly ValidatorInterface $validator,
-        readonly ResponseFactoryInterface $factory
-    ) {
-        parent::__construct($factory);
-    }
-
     /**
      * @OpenApi\Annotations\Get(
      *     path="/v1/auth/sign-in-by-email",
@@ -68,9 +59,14 @@ final class SignInAction extends BaseAction
      */
     public function content(): Response
     {
-        $form = new IdentificationForm((string)$this->getParam('email'), (string)$this->getParam('password'));
-        $this->validator->validate($form);
+        $form = new LogInForm((string)$this->getParam('email'), (string)$this->getParam('password'));
+        /** @var ValidatorInterface $validator */
+        $validator = $this->getContainer(ValidatorInterface::class);
+        $validator->validate($form);
 
-        return new Response(data: ['token_access' => $this->authenticationService->handle($form)], result: true);
+        /** @var LogInService $authenticationService */
+        $authenticationService = $this->getContainer(LogInService::class);
+
+        return new Response(data: ['token_access' => $authenticationService->handle($form)], result: true);
     }
 }

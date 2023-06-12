@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core\Tokens\Services;
 
+use App\Auth\ValueObjects\WebToken;
 use App\Core\Tokens\Services\JsonWebTokenizerService;
 use Codeception\Test\Unit;
 use Firebase\JWT\ExpiredException;
-use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
 /**
@@ -24,7 +24,7 @@ final class JsonWebTokenizerServiceTest extends Unit
 
     protected function setUp(): void
     {
-        $this->service = new JsonWebTokenizerService(new JWT(), new Key('some-key', 'HS512'));
+        $this->service = new JsonWebTokenizerService(new Key('some-key', 'HS512'));
         $this->dateTime = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2023-01-01 00:00:00');
 
         parent::setUp();
@@ -48,13 +48,13 @@ final class JsonWebTokenizerServiceTest extends Unit
                 'nbf' => $this->dateTime->getTimestamp(),
                 'exp' => $this->dateTime->modify(self::INTERVAL)->getTimestamp(),
             ],
-            $this->service->decode(self::CORRECT_TOKEN)
+            $this->service->decode(new WebToken(self::CORRECT_TOKEN))
         );
     }
 
     public function testExpired(): void
     {
         $this->expectException(ExpiredException::class);
-        $this->service->decode($this->service->encode(payload: [], expire: '-1 hour')->getValue());
+        $this->service->decode(new WebToken($this->service->encode(payload: [], expire: '-1 hour')->getValue()));
     }
 }

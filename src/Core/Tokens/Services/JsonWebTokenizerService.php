@@ -13,18 +13,18 @@ use Firebase\JWT\Key;
  */
 final readonly class JsonWebTokenizerService
 {
-    public function __construct(private JWT $token, private Key $key)
+    public function __construct(private Key $key, private JWT $token = new JWT())
     {
     }
 
     /**
-     * @param string $token
+     * @param WebToken $token
      *
      * @return array<array-key, mixed>
      */
-    public function decode(string $token): array
+    public function decode(WebToken $token): array
     {
-        return (array)$this->token->decode($token, $this->key);
+        return (array)$this->token->decode($token->getValue(), $this->key);
     }
 
     /**

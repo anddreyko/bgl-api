@@ -8,7 +8,6 @@ use App\Auth\Forms\RegistrationByEmailForm;
 use App\Auth\Services\Register\RegistrationByEmailService;
 use App\Core\Http\Actions\BaseAction;
 use App\Core\Http\Entities\Response;
-use Psr\Http\Message\ResponseFactoryInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -16,14 +15,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 final class SignUpAction extends BaseAction
 {
-    public function __construct(
-        private readonly RegistrationByEmailService $registrationService,
-        private readonly ValidatorInterface $validator,
-        readonly ResponseFactoryInterface $factory
-    ) {
-        parent::__construct($factory);
-    }
-
     /**
      * @OpenApi\Annotations\Get(
      *     path="/v1/auth/register-by-email",
@@ -36,9 +27,14 @@ final class SignUpAction extends BaseAction
     public function content(): Response
     {
         $form = new RegistrationByEmailForm((string)$this->getParam('email'), (string)$this->getParam('password'));
-        $this->validator->validate($form);
 
-        $this->registrationService->handle($form);
+        /** @var ValidatorInterface $validator */
+        $validator = $this->getContainer(ValidatorInterface::class);
+        $validator->validate($form);
+
+        /** @var RegistrationByEmailService $registrationService */
+        $registrationService = $this->getContainer(RegistrationByEmailService::class);
+        $registrationService->handle($form);
 
         return new Response(data: 'Confirm the specified email', result: true);
     }

@@ -7,7 +7,7 @@ namespace App\Auth\Forms;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
 
-class IdentificationForm
+class LogInForm
 {
     public function __construct(
         #[Email]

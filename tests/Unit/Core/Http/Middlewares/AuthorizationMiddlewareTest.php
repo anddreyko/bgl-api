@@ -9,12 +9,11 @@ use App\Auth\Repositories\UserRepository;
 use App\Auth\ValueObjects\Email;
 use App\Auth\ValueObjects\Id;
 use App\Auth\ValueObjects\PasswordHash;
-use App\Auth\ValueObjects\Token;
+use App\Auth\ValueObjects\WebToken;
 use App\Core\Http\Middlewares\AuthorizationMiddleware;
 use App\Core\Http\Services\AuthorizationService;
 use App\Core\Tokens\Services\JsonWebTokenizerService;
 use Codeception\Test\Unit;
-use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -34,18 +33,25 @@ final class AuthorizationMiddlewareTest extends Unit
 {
     public function testSuccessAuth(): void
     {
-        $auth = new JsonWebTokenizerService($this->make(JWT::class), new Key('some-key', 'HS512'));
-        $token = $auth->encode(payload: ['user' => Uuid::NIL], issuedAt: new \DateTimeImmutable())->getValue();
+        $auth = new JsonWebTokenizerService(new Key('some-key', 'HS512'));
+        $token = $auth->encode(payload: ['user' => Uuid::NIL]);
         $user = User::createByEmail(
             id: new Id(Uuid::NIL),
             email: new Email('auth@app.test'),
             hash: new PasswordHash(Uuid::NIL),
-            token: new Token(Uuid::NIL, new \DateTimeImmutable()),
             createdAt: new \DateTimeImmutable()
         );
+        $user->setTokenAccess($token);
         $authorizationService = new AuthorizationService(
             $auth,
-            $this->makeEmpty(UserRepository::class, ['getById' => $user])
+            $this->makeEmpty(
+                UserRepository::class,
+                [
+                    'getById' => $user,
+                    'hasTokenAccess' => fn(User $user, WebToken $token) => current($user->getTokenAccess())
+                            ->getValue() === $token->getValue(),
+                ]
+            )
         );
 
         $middleware = new AuthorizationMiddleware($authorizationService);
@@ -54,7 +60,7 @@ final class AuthorizationMiddlewareTest extends Unit
             ->withAttribute(RouteContext::ROUTE, $this->makeEmpty(RouteInterface::class))
             ->withAttribute(RouteContext::ROUTE_PARSER, $this->makeEmpty(RouteParserInterface::class))
             ->withAttribute(RouteContext::ROUTING_RESULTS, $this->makeEmpty(RoutingResults::class))
-            ->withHeader('Authorization', "Bearer $token");
+            ->withHeader('Authorization', "Bearer {$token->getValue()}");
 
         $handler = $this->makeEmpty(
             RequestHandlerInterface::class,
@@ -73,7 +79,7 @@ final class AuthorizationMiddlewareTest extends Unit
     public function testAllowWithoutAuth(): void
     {
         $authorizationService = new AuthorizationService(
-            new JsonWebTokenizerService($this->make(JWT::class), $this->make(Key::class)),
+            new JsonWebTokenizerService($this->make(Key::class)),
             $this->makeEmpty(UserRepository::class)
         );
 
@@ -107,7 +113,7 @@ final class AuthorizationMiddlewareTest extends Unit
     public function testUnauthorizedException(): void
     {
         $authorizationService = new AuthorizationService(
-            new JsonWebTokenizerService($this->make(JWT::class), $this->make(Key::class)),
+            new JsonWebTokenizerService($this->make(Key::class)),
             $this->makeEmpty(UserRepository::class)
         );
 
@@ -127,7 +133,7 @@ final class AuthorizationMiddlewareTest extends Unit
     public function testEmptyBearer(): void
     {
         $authorizationService = new AuthorizationService(
-            new JsonWebTokenizerService($this->make(JWT::class), $this->make(Key::class)),
+            new JsonWebTokenizerService($this->make(Key::class)),
             $this->makeEmpty(UserRepository::class)
         );
 
@@ -148,7 +154,7 @@ final class AuthorizationMiddlewareTest extends Unit
     public function testIncorrectBearer(): void
     {
         $authorizationService = new AuthorizationService(
-            new JsonWebTokenizerService($this->make(JWT::class), $this->make(Key::class)),
+            new JsonWebTokenizerService($this->make(Key::class)),
             $this->makeEmpty(UserRepository::class)
         );
 
