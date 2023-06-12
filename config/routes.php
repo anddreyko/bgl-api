@@ -24,7 +24,7 @@ return static function (Slim\App $app) {
         });
 
         $group->group('/user', function (RouteCollectorProxyInterface $group) {
-            $group->get('/info', Actions\V1\User\InfoAction::class);
+            $group->get('[/{id}]', Actions\V1\User\InfoAction::class);
         });
     });
 };

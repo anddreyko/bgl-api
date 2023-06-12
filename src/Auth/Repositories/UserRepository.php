@@ -30,4 +30,8 @@ interface UserRepository
     public function setPasswordHash(User $user, PasswordHash $hash): void;
 
     public function addAccessToken(User $user, WebToken $access): void;
+
+    public function deleteAccessToken(User $user, WebToken $access): void;
+
+    public function hasTokenAccess(User $user, WebToken $access): bool;
 }

@@ -65,6 +65,6 @@ abstract class BaseAction
 
     public function getAttribute(string $name): mixed
     {
-        return $this->request->getAttribute($name);
+        return $this->request?->getAttribute($name);
     }
 }

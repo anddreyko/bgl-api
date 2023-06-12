@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Core\Http\Middlewares;
 
 use App\Core\Exceptions\NotFoundException;
+use App\Core\Exceptions\UnauthorizedException;
 use App\Core\Http\Enums\HttpCodesEnum;
 use App\Core\Localization\Services\TranslatorService;
 use App\Core\Validation\Exceptions\ValidationException;
@@ -33,6 +34,7 @@ final readonly class ExceptionMiddleware implements MiddlewareInterface
                 $exception instanceof HttpException => HttpCodesEnum::from($exception->getCode()),
                 $exception instanceof NotFoundException => HttpCodesEnum::NotFound,
                 $exception instanceof ValidationException => HttpCodesEnum::UnprocessableEntity,
+                $exception instanceof UnauthorizedException => HttpCodesEnum::Unauthorized,
                 $exception instanceof \InvalidArgumentException => HttpCodesEnum::BadRequest,
                 $exception instanceof \RuntimeException => HttpCodesEnum::Conflict,
                 default => HttpCodesEnum::InternalServerError
