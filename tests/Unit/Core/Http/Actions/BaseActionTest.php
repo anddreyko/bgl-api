@@ -9,25 +9,42 @@ use App\Core\Http\Entities\Response;
 use Codeception\Stub\Expected;
 use Codeception\Test\Unit;
 use GuzzleHttp\Psr7\HttpFactory;
-use GuzzleHttp\Psr7\ServerRequest;
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * @covers \App\Core\Http\Actions\BaseAction
  */
 final class BaseActionTest extends Unit
 {
-    public function testHandle(): void
+    public function testInvoke(): void
     {
         $content = new Response('content');
-        $response = new HttpFactory();
+        $container = $this->makeEmpty(
+            ContainerInterface::class,
+            ['get' => static fn(string $id) => ['content' => $content][$id]]
+        );
 
         $action = $this->construct(
             BaseAction::class,
-            ['factory' => $response],
+            ['container' => $container],
             ['content' => Expected::once($content)]
         );
-        $request = $this->createStub(ServerRequest::class);
+        $request = $this->makeEmpty(
+            ServerRequestInterface::class,
+            ['getQueryParams' => static fn() => ['param-1' => 'test']]
+        );
+        $response = (new HttpFactory())->createResponse();
 
-        $this->assertEquals(json_encode($content, JSON_THROW_ON_ERROR), $action->handle($request)->getBody());
+        $this->assertEquals(
+            json_encode($content, JSON_THROW_ON_ERROR),
+            $action->__invoke($request, $response, ['foo' => 'bar'])->getBody()
+        );
+
+        $this->assertEquals('bar', $action->getArgs('foo'));
+
+        $this->assertEquals('test', $action->getParam('param-1'));
+
+        $this->assertEquals($content, $action->getContainer('content'));
     }
 }

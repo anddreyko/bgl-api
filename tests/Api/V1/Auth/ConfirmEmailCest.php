@@ -9,7 +9,7 @@ use Tests\Support\Fixtures\NotActiveUserFixture;
 use Tests\Support\Helper\FixtureHelper;
 
 /**
- * @covers \Actions\V1\Auth\SignUpAction
+ * @covers \Actions\V1\Auth\ConfirmEmailAction
  */
 class ConfirmEmailCest
 {
@@ -21,7 +21,8 @@ class ConfirmEmailCest
 
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
-        $I->sendGet('/v1/auth/confirm-by-email', ['token' => NotActiveUserFixture::UUID]);
+        $I->sendGet('/v1/auth/confirm-by-email/' . NotActiveUserFixture::UUID);
+
         $I->seeResponseCodeIs(HttpCodesEnum::Success->value);
         $I->seeResponseContainsJson(['data' => 'Specified email is confirmed', 'result' => true]);
     }
@@ -30,7 +31,8 @@ class ConfirmEmailCest
     {
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
-        $I->sendGet('/v1/auth/confirm-by-email', ['token' => '33333333-3333-3333-3333-333333333333']);
+        $I->sendGet('/v1/auth/confirm-by-email/33333333-3333-3333-3333-333333333333');
+
         $I->seeResponseCodeIs(HttpCodesEnum::BadRequest->value);
         $I->seeResponseContainsJson(['message' => 'Incorrect token.']);
     }
@@ -40,6 +42,7 @@ class ConfirmEmailCest
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
         $I->sendGet('/v1/auth/confirm-by-email');
+
         $I->seeResponseCodeIs(HttpCodesEnum::UnprocessableEntity->value);
         $I->seeResponseContainsJson(['message' => HttpCodesEnum::UnprocessableEntity->label()]);
     }
@@ -50,7 +53,8 @@ class ConfirmEmailCest
 
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
-        $I->sendGet('/v1/auth/confirm-by-email', ['token' => ExpiredTokenFixture::UUID]);
+        $I->sendGet('/v1/auth/confirm-by-email/' . ExpiredTokenFixture::UUID);
+
         $I->seeResponseCodeIs(HttpCodesEnum::Conflict->value);
         $I->seeResponseContainsJson(['message' => 'This token has been expired.']);
     }

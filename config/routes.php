@@ -15,7 +15,7 @@ return static function (Slim\App $app) {
         $group->group('/auth', function (RouteCollectorProxyInterface $group) {
             $group->get('/sign-up-by-email', Actions\V1\Auth\SignUpAction::class)
                 ->setArgument(App\Core\Http\Middlewares\AuthorizationMiddleware::ATTRIBUTE_ACCESSED, '1');
-            $group->get('/confirm-by-email', Actions\V1\Auth\ConfirmEmailAction::class)
+            $group->get('/confirm-by-email[/{token}]', Actions\V1\Auth\ConfirmEmailAction::class)
                 ->setArgument(App\Core\Http\Middlewares\AuthorizationMiddleware::ATTRIBUTE_ACCESSED, '1');
             $group->get('/sign-in-by-email', Actions\V1\Auth\SignInAction::class)
                 ->setArgument(App\Core\Http\Middlewares\AuthorizationMiddleware::ATTRIBUTE_ACCESSED, '1');

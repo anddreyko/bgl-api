@@ -16,14 +16,21 @@ trait FixtureHelper
     private static ?App $app = null;
     private static ?ContainerInterface $container = null;
 
-    private function loadFixture(?string $fixture = null): void
+    private function loadFixture(string | array $fixtures = []): void
     {
         $container = $this->container();
         $loader = new Loader();
 
-        if ($fixture) {
-            $fixture = $container->get($fixture);
-            $loader->addFixture($fixture);
+        if ($fixtures) {
+            if (is_array($fixtures)) {
+                foreach ($fixtures as $fixture) {
+                    $fixture = $container->get($fixture);
+                    $loader->addFixture($fixture);
+                }
+            } else {
+                $fixtures = $container->get($fixtures);
+                $loader->addFixture($fixtures);
+            }
         }
 
         $em = $container->get(EntityManagerInterface::class);
