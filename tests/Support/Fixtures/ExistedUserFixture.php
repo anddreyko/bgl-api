@@ -39,7 +39,7 @@ final class ExistedUserFixture extends DbFixture
             createdAt: $date
         );
 
-        self::$token = (new JsonWebTokenizerService(new Key(getenv('JWT_KEY'), 'HS512')))
+        self::$token = (new JsonWebTokenizerService(new Key(getenv('JWT_KEY'), getenv('JWT_ALGO'))))
             ->encode(['user' => self::UUID]);
         $user->setTokenAccess(self::$token);
 
