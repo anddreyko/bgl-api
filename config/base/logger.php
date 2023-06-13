@@ -34,7 +34,7 @@ return [
     },
 
     'logger' => [
-        'level' => getenv('APP_DEBUG') ? Level::Debug : Level::Info,
+        'level' => env('APP_DEBUG') ? Level::Debug : Level::Info,
         'std' => true,
         'file' => null,
     ],

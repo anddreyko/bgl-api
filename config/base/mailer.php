@@ -19,6 +19,6 @@ return [
     },
 
     'mailer' => [
-        'sftp' => getenv('MAILER_DSN'),
+        'sftp' => env('MAILER_DSN'),
     ],
 ];

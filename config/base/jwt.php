@@ -14,7 +14,7 @@ return [
     },
 
     'jwt' => [
-        'key' => getenv('JWT_KEY'),
-        'algo' => getenv('JWT_ALGO'),
+        'key' => env('JWT_KEY'),
+        'algo' => env('JWT_ALGO'),
     ],
 ];

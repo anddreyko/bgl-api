@@ -39,7 +39,7 @@ final class ExpiredTokenUserFixture extends DbFixture
             createdAt: $date
         );
 
-        self::$token = (new JsonWebTokenizerService(new Key(getenv('JWT_KEY'), getenv('JWT_ALGO'))))
+        self::$token = (new JsonWebTokenizerService(new Key(env('JWT_KEY'), env('JWT_ALGO'))))
             ->encode(payload: ['user' => self::UUID], expire: '-30 minutes');
         $user->setTokenAccess(self::$token);
 

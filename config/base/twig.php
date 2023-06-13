@@ -45,7 +45,7 @@ return [
     },
 
     'twig' => [
-        'debug' => (bool)getenv('APP_DEBUG'),
+        'debug' => (bool)env('APP_DEBUG'),
         'templates_path' => [__DIR__ . '/../../templates'],
         'cache_path' => __DIR__ . '/../../var/cache/twig',
         'extensions' => [

@@ -39,7 +39,7 @@ return [
     },
 
     'errors' => [
-        'details' => (bool)getenv('APP_DEBUG'),
+        'details' => (bool)env('APP_DEBUG'),
         'log' => true,
     ],
 ];

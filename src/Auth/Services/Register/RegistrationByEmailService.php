@@ -53,7 +53,7 @@ final readonly class RegistrationByEmailService
         $this->flusher->flush();
         $this->sender->send(
             MessageBuilder::create()
-                ->from(getenv('MAIL_NOREPLY') ?: '')
+                ->from((string)env('MAIL_NOREPLY', ''))
                 ->to($email->getValue()),
             new ConfirmEmailRender($token)
         );
