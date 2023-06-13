@@ -40,11 +40,11 @@ final class TwoSessionsUserFixture extends DbFixture
             createdAt: $date
         );
 
-        self::$token1 = (new JsonWebTokenizerService(new Key(getenv('JWT_KEY'), getenv('JWT_ALGO'))))
+        self::$token1 = (new JsonWebTokenizerService(new Key(env('JWT_KEY'), env('JWT_ALGO'))))
             ->encode(payload: ['user' => self::UUID], issuedAt: $date);
         $user->setTokenAccess(self::$token1);
 
-        self::$token2 = (new JsonWebTokenizerService(new Key(getenv('JWT_KEY'), getenv('JWT_ALGO'))))
+        self::$token2 = (new JsonWebTokenizerService(new Key(env('JWT_KEY'), env('JWT_ALGO'))))
             ->encode(payload: ['user' => self::UUID], expire: '+29 minutes', issuedAt: $date);
         $user->setTokenAccess(self::$token2);
 

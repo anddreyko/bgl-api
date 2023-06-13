@@ -12,7 +12,7 @@ final class MailerClient
 
     public function __construct()
     {
-        $this->client = new Client(['base_uri' => getenv('MAILER_URL')]);
+        $this->client = new Client(['base_uri' => env('MAILER_URL')]);
     }
 
     public function delete(): void

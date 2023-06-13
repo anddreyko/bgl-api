@@ -31,7 +31,7 @@ final class MailerCheckCommand extends Command
 
         $this->mailer->send(
             MessageBuilder::create()
-                ->from(getenv('MAIL_NOREPLY', true) ?: '')
+                ->from((string)env('MAIL_NOREPLY', ''))
                 ->to('you@example.com'),
             new ConfirmEmailRender(Token::create(new \DateTimeImmutable()))
         );
