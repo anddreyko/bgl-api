@@ -121,12 +121,63 @@
                 }
             }
         },
-        "/v1/auth/register-by-email": {
+        "/v1/auth/sign-up-by-email": {
             "get": {
-                "operationId": "2efec7f99d5430a601eaf64cd86165f0",
+                "operationId": "ff40d2abd5770011bea050f55dfcf6f1",
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "query",
+                        "description": "User's email.",
+                        "required": true
+                    },
+                    {
+                        "name": "password",
+                        "in": "query",
+                        "description": "User's password.",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "Register by email"
+                        "description": "Register by email",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Invalid parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Invalid parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
                     }
                 }
             }

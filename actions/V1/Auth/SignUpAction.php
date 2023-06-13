@@ -17,10 +17,43 @@ final class SignUpAction extends BaseAction
 {
     /**
      * @OpenApi\Annotations\Get(
-     *     path="/v1/auth/register-by-email",
+     *     path="/v1/auth/sign-up-by-email",
+     *     @OA\Parameter(
+     *         name="email",
+     *         in="query",
+     *         description="User's email.",
+     *         required=true
+     *     ),
+     *     @OA\Parameter(
+     *         name="password",
+     *         in="query",
+     *         description="User's password.",
+     *         required=true
+     *     ),
      *     @OA\Response(
      *         response="200",
-     *         description="Register by email"
+     *         description="Register by email",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response="500",
+     *         description="Internal error",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response="400",
+     *         description="Bad request",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response="409",
+     *         description="Invalid parameters",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response="422",
+     *         description="Invalid parameters",
+     *         @OA\JsonContent()
      *     )
      * )
      */
