@@ -24,7 +24,7 @@ final class JsonWebTokenizerServiceTest extends Unit
 
     protected function setUp(): void
     {
-        $this->service = new JsonWebTokenizerService(new Key('some-key', 'HS512'));
+        $this->service = new JsonWebTokenizerService(new Key('some-key', getenv('JWT_ALGO')));
         $this->dateTime = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2023-01-01 00:00:00');
 
         parent::setUp();

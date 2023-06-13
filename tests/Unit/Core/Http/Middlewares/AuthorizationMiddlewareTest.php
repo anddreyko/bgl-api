@@ -33,7 +33,7 @@ final class AuthorizationMiddlewareTest extends Unit
 {
     public function testSuccessAuth(): void
     {
-        $auth = new JsonWebTokenizerService(new Key('some-key', 'HS512'));
+        $auth = new JsonWebTokenizerService(new Key('some-key', getenv('JWT_ALGO')));
         $token = $auth->encode(payload: ['user' => Uuid::NIL]);
         $user = User::createByEmail(
             id: new Id(Uuid::NIL),
