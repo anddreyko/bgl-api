@@ -48,6 +48,7 @@
         "sentry/sdk": "^3.3",
         "slim/psr7": "^1.6",
         "slim/slim": "^4.11",
+        "symfony/cache": "^6.3",
         "symfony/config": "^6.3",
         "symfony/mailer": "^6.2",
         "symfony/translation": "^6.3",
