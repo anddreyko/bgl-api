@@ -13,8 +13,9 @@ return [
         /**
          * @var array{
          *     templates_path:string[],
-         *     cache_path:string,
+         *     cache_path: string,
          *     debug: bool,
+         *     enabled_cache: bool,
          *     extensions: array<class-string<Twig\Extension\ExtensionInterface>>
          * } $config
          */
@@ -24,7 +25,7 @@ return [
         $environment = new Environment(
             $loader,
             [
-                'cache' => $config['debug'] ? false : $config['cache_path'],
+                'cache' => $config['enabled_cache'] ? $config['cache_path'] : false,
                 'debug' => $config['debug'],
                 'strict_variables' => $config['debug'],
                 'auto_reload' => $config['debug'],
@@ -46,6 +47,7 @@ return [
 
     'twig' => [
         'debug' => (bool)env('APP_DEBUG'),
+        'enabled_cache' => (bool)env('TWIG_ENABLE_CACHE'),
         'templates_path' => [__DIR__ . '/../../templates'],
         'cache_path' => __DIR__ . '/../../var/cache/twig',
         'extensions' => [
