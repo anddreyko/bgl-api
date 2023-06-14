@@ -17,6 +17,7 @@ services:
       MAILER_URL: ${MAILER_URL}
       JWT_KEY: ${JWT_KEY}
       JWT_ALGO: ${JWT_ALGO}
+      TWIG_ENABLE_CACHE: ${TWIG_ENABLE_CACHE}
     volumes:
       - .:/app
     ports:
