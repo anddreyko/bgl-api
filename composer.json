@@ -50,6 +50,7 @@
         "slim/slim": "^4.11",
         "symfony/cache": "^6.3",
         "symfony/config": "^6.3",
+        "symfony/google-mailer": "^6.3",
         "symfony/mailer": "^6.2",
         "symfony/translation": "^6.3",
         "symfony/validator": "^6.3",
