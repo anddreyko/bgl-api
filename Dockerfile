@@ -3,6 +3,8 @@ FROM richarvey/nginx-php-fpm:3.1.0
 
 RUN --mount=type=secret,id=_env,dst=/etc/secrets/.env cat /etc/secrets/.env
 
+USER ${USER}
+
 COPY .docker/base/nginx/conf.d /etc/nginx/sites-available
 COPY .docker/base/php-fpm/conf.d /usr/local/etc/php/conf.d
 
@@ -24,3 +26,5 @@ RUN composer install --no-dev --prefer-dist --no-progress --no-suggest --no-scri
     && rm -rf /root/.composer/cache
 
 COPY . .
+
+RUN mkdir -p ./var && chown -R www-data:www-data ./var && chmod 777 ./var -R
