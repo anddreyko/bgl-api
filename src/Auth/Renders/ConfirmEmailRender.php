@@ -24,7 +24,7 @@ final readonly class ConfirmEmailRender implements BaseRender
     public function params(): array
     {
         return [
-            'confirm_link' => 'http://localhost:8000/v1/auth/confirm-email?token=' . $this->token->getValue(),
+            'confirm_link' => (string)env('FRONTEND_URL') . '/v1/auth/confirm-by-email/' . $this->token->getValue(),
             'title' => $this->subject(),
         ];
     }

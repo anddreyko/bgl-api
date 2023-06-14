@@ -17,10 +17,10 @@ final class ConfirmEmailAction extends BaseAction
 {
     /**
      * @OpenApi\Annotations\Get(
-     *     path="/v1/auth/confirm-email",
+     *     path="/v1/auth/confirm-by-email/{token}",
      *     @OA\Parameter(
-     *          name="token",
-     *          in="query",
+     *         name="token",
+     *         in="path",
      *         description="Confirmation token from email.",
      *         required=true
      *     ),

@@ -5,13 +5,13 @@
         "version": "1"
     },
     "paths": {
-        "/v1/auth/confirm-email": {
+        "/v1/auth/confirm-by-email/{token}": {
             "get": {
-                "operationId": "04f21f951e86b328a06b3aaa88b8d570",
+                "operationId": "47116e88c92988ffd58cf5390596548a",
                 "parameters": [
                     {
                         "name": "token",
-                        "in": "query",
+                        "in": "path",
                         "description": "Confirmation token from email.",
                         "required": true
                     }
