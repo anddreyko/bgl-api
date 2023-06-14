@@ -23,6 +23,7 @@ return [
          *     metadata_dirs: string[],
          *     dev_mode: bool,
          *     proxy_dir: string,
+         *     proxy_generate?: 0|1|2|3|4|bool,
          *     types: array<string, class-string<Doctrine\DBAL\Types\Type>>,
          *     subscribers: string[],
          *     connection: array{
@@ -140,6 +141,10 @@ return [
 
         $config->setNamingStrategy(new UnderscoreNamingStrategy());
 
+        if (isset($settings['proxy_generate'])) {
+            $config->setAutoGenerateProxyClasses($settings['proxy_generate']);
+        }
+
         foreach ($settings['types'] as $name => $class) {
             if (!Type::hasType($name)) {
                 Type::addType($name, $class);
@@ -173,6 +178,7 @@ return [
         'dev_mode' => false,
         'cache_dir' => __DIR__ . '/../../var/cache/doctrine/cache',
         'proxy_dir' => __DIR__ . '/../../var/cache/doctrine/proxy',
+        'proxy_generate' => null,
         'connection' => [
             'driver' => 'pdo_pgsql',
             'host' => env('DB_HOST'),
