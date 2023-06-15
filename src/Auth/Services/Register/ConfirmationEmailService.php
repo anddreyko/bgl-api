@@ -22,16 +22,20 @@ final readonly class ConfirmationEmailService
 
     public function handle(ConfirmationEmailForm $form): void
     {
-        $user = $this->tokens->findUser($form->token);
-        if (!$user) {
+        $tokenConfirm = $this->tokens->findUser($form->token);
+        if (!$tokenConfirm) {
             throw new IncorrectTokenException();
         }
 
-        if (!$user->getTokenConfirm()?->validate($form->token)) {
+        $token = $tokenConfirm->getToken();
+        $user = $tokenConfirm->getUser();
+        if ($token->isExpire()) {
+            $this->users->deleteSuccessToken($user, $token);
             throw new ExpiredTokenException();
         }
 
         $this->users->activateUser($user);
+        $this->users->deleteSuccessTokens($user);
 
         $this->flusher->flush();
     }

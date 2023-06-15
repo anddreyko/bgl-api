@@ -13,7 +13,14 @@ use Doctrine\ORM\Mapping as ORM;
  * @see \Tests\Unit\Auth\Entities\UserTokenAccessTest
  */
 #[ORM\Entity]
-#[ORM\Table(name: 'auth_user_access', uniqueConstraints: [new ORM\UniqueConstraint(columns: ['user_id', 'token'])])]
+#[ORM\Table(
+    name: 'auth_user_access',
+    uniqueConstraints: [
+        new ORM\UniqueConstraint(name: 'uidx__user_id__token', columns: ['user_id', 'token']),
+        new ORM\UniqueConstraint(name: 'idx__user_id', columns: ['user_id']),
+        new ORM\UniqueConstraint(name: 'idx__token', columns: ['token']),
+    ]
+)]
 final readonly class UserTokenAccess
 {
     public function __construct(

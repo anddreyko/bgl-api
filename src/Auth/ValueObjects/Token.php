@@ -7,6 +7,7 @@ namespace App\Auth\ValueObjects;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Embeddable;
+use Doctrine\ORM\Mapping\Id;
 use Ramsey\Uuid\Uuid;
 use Webmozart\Assert\Assert;
 
@@ -17,6 +18,7 @@ use Webmozart\Assert\Assert;
 final class Token
 {
     /** @var string */
+    #[Id]
     #[Column(type: 'string', nullable: true)]
     private string $value;
     /** @var \DateTimeImmutable */
@@ -58,7 +60,7 @@ final class Token
     {
         try {
             $this->eq($value);
-            $this->isExpire();
+            $this->expires();
         } catch (\Exception) {
             return false;
         }
@@ -71,7 +73,18 @@ final class Token
         Assert::eq($value, $this->value);
     }
 
-    private function isExpire(): void
+    public function isExpire(): bool
+    {
+        try {
+            Assert::lessThan(time(), $this->expires->getTimestamp());
+        } catch (\Exception) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function expires(): void
     {
         Assert::lessThan(time(), $this->expires->getTimestamp());
     }
