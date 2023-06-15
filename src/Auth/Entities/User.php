@@ -28,8 +28,8 @@ use Doctrine\ORM\Mapping as ORM;
 class User
 {
     private function __construct(
-        #[ORM\Column(type: IdType::NAME)]
         #[ORM\Id]
+        #[ORM\Column(type: IdType::NAME)]
         private Id $id,
         #[ORM\Column(type: EmailType::NAME, unique: true)]
         private Email $email,
@@ -39,8 +39,8 @@ class User
         private UserStatusEnum $status = UserStatusEnum::Wait,
         #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ["default" => 'CURRENT_TIMESTAMP'])]
         private \DateTimeImmutable $createdAt = new \DateTimeImmutable(),
-        #[ORM\OneToOne(mappedBy: 'user', targetEntity: UserTokenConfirm::class, cascade: ['all'], orphanRemoval: true)]
-        private ?UserTokenConfirm $tokenConfirm = null,
+        #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserTokenConfirm::class, cascade: ['all'], orphanRemoval: true)]
+        private Collection $tokenConfirm = new ArrayCollection(),
         #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserTokenAccess::class, cascade: ['all'], orphanRemoval: true)]
         private Collection $tokenAccess = new ArrayCollection(),
     ) {
@@ -50,7 +50,7 @@ class User
         Id $id,
         Email $email,
         PasswordHash $hash,
-        ?Token $token = null,
+        Token $token = null,
         \DateTimeImmutable $createdAt = new \DateTimeImmutable()
     ): self {
         $user = new self(id: $id, email: $email, hash: $hash, createdAt: $createdAt);
@@ -87,16 +87,28 @@ class User
         $this->hash = $hash;
     }
 
-    public function getTokenConfirm(): ?Token
+    /**
+     * @return Token[]
+     */
+    public function getTokenConfirm(): array
     {
-        $token = $this->tokenConfirm?->getToken();
-
-        return $token && !$token->isEmpty() ? $token : null;
+        return $this->tokenConfirm
+            ->map(static fn(UserTokenConfirm $token) => $token->getToken())
+            ->toArray();
     }
 
     public function setTokenConfirm(Token $tokenConfirm): void
     {
-        $this->tokenConfirm = new UserTokenConfirm($this, $tokenConfirm);
+        $this->tokenConfirm->add(new UserTokenConfirm($this, $tokenConfirm));
+    }
+
+    public function removeTokenConfirm(?Token $token = null): void
+    {
+        if ($token) {
+            $this->tokenConfirm->removeElement($token);
+        } else {
+            $this->tokenConfirm->clear();
+        }
     }
 
     public function getStatus(): UserStatusEnum

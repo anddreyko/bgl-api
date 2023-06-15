@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Auth\Repositories;
 
-use App\Auth\Entities\User;
 use App\Auth\Entities\UserTokenConfirm;
 use App\Core\Database\Repositories\DbRepository;
 
@@ -15,10 +14,10 @@ class TokenConfirmRepository extends DbRepository
         return UserTokenConfirm::class;
     }
 
-    public function findUser(string $value): ?User
+    public function findUser(string $value): ?UserTokenConfirm
     {
         $token = $this->findOneBy(['token.value' => $value]);
 
-        return $token instanceof UserTokenConfirm ? $token->getUser() : null;
+        return $token instanceof UserTokenConfirm ? $token : null;
     }
 }

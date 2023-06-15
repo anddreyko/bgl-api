@@ -11,15 +11,21 @@ use Doctrine\ORM\Mapping as ORM;
  * @see \Tests\Unit\Auth\Entities\UserTokenConfirmTest
  */
 #[ORM\Entity]
-#[ORM\Table(name: 'auth_user_confirm', uniqueConstraints: [new ORM\UniqueConstraint(columns: ['user_id'])])]
+#[ORM\Table(
+    name: 'auth_user_confirm',
+    uniqueConstraints: [
+        new ORM\UniqueConstraint(name: 'uidx__user_id__token_value', columns: ['user_id', 'token_value']),
+        new ORM\UniqueConstraint(name: 'idx__user_id', columns: ['user_id']),
+        new ORM\UniqueConstraint(name: 'idx__token_value', columns: ['token_value']),
+    ]
+)]
 final readonly class UserTokenConfirm
 {
     public function __construct(
         #[ORM\Id]
-        #[ORM\OneToOne(inversedBy: 'tokenConfirm', targetEntity: User::class)]
+        #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'tokenConfirm')]
         #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
         private User $user,
-        #[ORM\Id]
         #[ORM\Embedded(class: Token::class)]
         private Token $token,
     ) {

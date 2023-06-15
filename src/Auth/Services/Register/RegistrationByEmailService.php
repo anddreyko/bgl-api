@@ -17,9 +17,6 @@ use App\Core\Mail\Builders\MessageBuilder;
 use App\Core\Mail\Services\MailSenderService;
 use App\Core\Tokens\Services\TokenizerService;
 
-/**
- * @see \Tests\Unit\Auth\Services\Register\RegistrationByEmailServiceTest
- */
 final readonly class RegistrationByEmailService
 {
     public function __construct(
@@ -34,21 +31,28 @@ final readonly class RegistrationByEmailService
     public function handle(RegistrationByEmailForm $form): void
     {
         $email = new Email($form->email);
-        if ($this->users->hasByEmail($email)) {
+        $user = $this->users->findByEmail($email);
+        if ($user && $user->isActive()) {
             throw new UserAlreadyExistException();
         }
 
         $now = new \DateTimeImmutable();
         $token = $this->tokenizer->generate($now);
-        $this->users->add(
-            User::createByEmail(
-                id: Id::create(),
-                email: $email,
-                hash: $this->hasher->hash($form->password),
-                token: $token,
-                createdAt: $now
-            )
-        );
+
+        if ($user) {
+            $this->users->deleteSuccessTokens($user);
+            $this->users->setToken($user, $token);
+        } else {
+            $this->users->add(
+                User::createByEmail(
+                    id: Id::create(),
+                    email: $email,
+                    hash: $this->hasher->hash($form->password),
+                    token: $token,
+                    createdAt: $now
+                )
+            );
+        }
 
         $this->sender->send(
             MessageBuilder::create()

@@ -74,9 +74,12 @@ test-api-not-found:
 	docker-compose run --rm api-php-cli composer test -- tests/Api/NotFoundCest.php && \
 	make load-fixtures
 
-test-api-auth-register:
+test-api-auth-sign-up:
 	docker-compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/SignUpCest.php && \
 	make load-fixtures
+
+test-api-auth-sign-up-expired-token:
+	docker-compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/SignUpCest.php::testExpireToken
 
 test-api-auth-confirm-email:
 	docker-compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/ConfirmEmailCest.php && \

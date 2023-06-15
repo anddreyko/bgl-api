@@ -57,6 +57,18 @@ final class DbUserRepository extends DbRepository implements UserRepository
         $this->persist($user);
     }
 
+    public function deleteSuccessToken(User $user, Token $token): void
+    {
+        $user->removeTokenConfirm($token);
+        $this->persist($user);
+    }
+
+    public function deleteSuccessTokens(User $user): void
+    {
+        $user->removeTokenConfirm();
+        $this->persist($user);
+    }
+
     public function activateUser(User $user): void
     {
         $user->setStatus(UserStatusEnum::Active);

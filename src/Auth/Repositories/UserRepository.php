@@ -23,6 +23,10 @@ interface UserRepository
 
     public function setToken(User $user, Token $token): void;
 
+    public function deleteSuccessToken(User $user, Token $token): void;
+
+    public function deleteSuccessTokens(User $user): void;
+
     public function activateUser(User $user): void;
 
     public function getById(Id $id): User;
