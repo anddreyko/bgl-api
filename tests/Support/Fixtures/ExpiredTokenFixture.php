@@ -12,10 +12,11 @@ use App\Auth\ValueObjects\PasswordHash;
 use App\Auth\ValueObjects\Token;
 use App\Core\Database\Fixtures\DbFixture;
 use Doctrine\ORM\EntityManagerInterface;
+use Ramsey\Uuid\Uuid;
 
 final class ExpiredTokenFixture extends DbFixture
 {
-    public const UUID = '00000000-0000-0000-0000-000000000000';
+    public const UUID = Uuid::NIL;
 
     public function fixture(EntityManagerInterface $manager): void
     {
