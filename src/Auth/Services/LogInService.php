@@ -41,7 +41,7 @@ final readonly class LogInService
             throw new IdentificationException(previous: new IncorrectPasswordException());
         }
 
-        $access = $this->webTokenizerService->encode(['user' => $user->getId()]);
+        $access = $this->webTokenizerService->encode(['user' => $user->getId()->getValue()], expire: '+2 days');
 
         $this->users->addAccessToken($user, $access);
 
