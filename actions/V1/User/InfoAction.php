@@ -9,12 +9,60 @@ use App\Auth\ValueObjects\Id;
 use App\Core\Exceptions\NotFoundException;
 use App\Core\Http\Actions\BaseAction;
 use App\Core\Http\Entities\Response;
+use OpenApi\Annotations as OA;
 
 /**
  * @see \Tests\Api\V1\User\InfoCest
  */
 final class InfoAction extends BaseAction
 {
+    /**
+     * @OpenApi\Annotations\Get(
+     *     path="/v1/user/{id}",
+     *     security={"bearerAuth":{}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="User's id.",
+     *         required=true
+     *     ),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Get information about this user.",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response="500",
+     *         description="Internal error",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response="400",
+     *         description="Bad request",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response="401",
+     *         description="Unauthorized",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response="404",
+     *         description="Not found",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response="409",
+     *         description="Invalid parameters",
+     *         @OA\JsonContent()
+     *     ),
+     *     @OA\Response(
+     *         response="422",
+     *         description="Invalid parameters",
+     *         @OA\JsonContent()
+     *     )
+     * )
+     */
     public function content(): Response
     {
         try {

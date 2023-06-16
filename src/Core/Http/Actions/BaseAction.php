@@ -6,6 +6,7 @@ namespace App\Core\Http\Actions;
 
 use App\Core\Http\Entities\Response;
 use App\Core\Http\Helpers\HttpHelper;
+use OpenApi\Annotations as OA;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -15,6 +16,14 @@ use Psr\Http\Message\ServerRequestInterface;
  *     title="BoarGameLog API",
  *     version="1"
  * )
+ * @OA\SecurityScheme(
+ *     securityScheme="bearerAuth",
+ *     in="header",
+ *     name="bearerAuth",
+ *     type="http",
+ *     scheme="bearer",
+ *     bearerFormat="JWT",
+ * ),
  * @see \Tests\Unit\Core\Http\Actions\BaseActionTest
  */
 abstract class BaseAction
