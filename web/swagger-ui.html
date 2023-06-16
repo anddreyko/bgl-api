@@ -1,46 +1,19 @@
+<!-- HTML for static distribution bundle build -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Swagger UI</title>
-    <link href="/assets/swagger-ui.css?1" rel="stylesheet" type="text/css">
-    <style>
-        html {
-            box-sizing: border-box;
-            overflow-y: scroll;
-        }
-
-        *,
-        *:before,
-        *:after {
-            box-sizing: inherit;
-        }
-
-        body {
-            margin: 0;
-            background: #fafafa;
-        }
-    </style>
+    <link href="assets/swagger-ui.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/index.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+    <link href="assets/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png"/>
 </head>
 
 <body>
 <div id="swagger-ui"></div>
-<script src="/assets/swagger-preset.3.12.1.js"></script>
-<script src="/assets/swagger-bundle.3.12.1.js"></script>
-<script>
-    window.onload = function () {
-        window.ui = SwaggerUIBundle({
-            url: window.location.protocol + '//' + window.location.hostname + ':' + window.location.port +
-                '/assets/openapi.json',
-            dom_id: '#swagger-ui',
-            deepLinking: true,
-            presets: [
-                SwaggerUIBundle.presets.apis,
-                SwaggerUIStandalonePreset,
-            ],
-            layout: 'StandaloneLayout',
-        })
-    }
-</script>
+<script charset="UTF-8" src="assets/swagger-ui-bundle.js"></script>
+<script charset="UTF-8" src="assets/swagger-ui-standalone-preset.js"></script>
+<script charset="UTF-8" src="assets/swagger-initializer.js"></script>
 </body>
 </html>
