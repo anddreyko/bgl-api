@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Core\Http\Middlewares;
 
+use App\Auth\Services\AuthorizationService;
 use App\Auth\ValueObjects\WebToken;
-use App\Core\Http\Services\AuthorizationService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;

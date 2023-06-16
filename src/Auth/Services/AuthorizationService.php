@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Core\Http\Services;
+namespace App\Auth\Services;
 
 use App\Auth\Entities\User;
 use App\Auth\Exceptions\IncorrectTokenException;

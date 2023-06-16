@@ -6,12 +6,12 @@ namespace Tests\Unit\Core\Http\Middlewares;
 
 use App\Auth\Entities\User;
 use App\Auth\Repositories\UserRepository;
+use App\Auth\Services\AuthorizationService;
 use App\Auth\ValueObjects\Email;
 use App\Auth\ValueObjects\Id;
 use App\Auth\ValueObjects\PasswordHash;
 use App\Auth\ValueObjects\WebToken;
 use App\Core\Http\Middlewares\AuthorizationMiddleware;
-use App\Core\Http\Services\AuthorizationService;
 use App\Core\Tokens\Services\JsonWebTokenizerService;
 use Codeception\Test\Unit;
 use Firebase\JWT\Key;
