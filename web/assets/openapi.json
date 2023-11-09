@@ -208,7 +208,10 @@
                         "description": "Get information about this user.",
                         "content": {
                             "application/json": {
-                                "schema": {}
+                                "schema": {
+                                    "type": "object",
+                                    "oneOf": []
+                                }
                             }
                         }
                     },
@@ -271,6 +274,20 @@
     },
     "components": {
         "schemas": {
+            "User": {
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "Response": {
                 "properties": {
                     "data": {
