@@ -17,7 +17,7 @@ use OpenApi\Annotations as OA;
 final class InfoAction extends BaseAction
 {
     /**
-     * @OpenApi\Annotations\Get(
+     * @OA\Get(
      *     path="/v1/user/{id}",
      *     security={"bearerAuth":{}},
      *     @OA\Parameter(
@@ -29,6 +29,7 @@ final class InfoAction extends BaseAction
      *     @OA\Response(
      *         response="200",
      *         description="Get information about this user.",
+     *         @OA\Schema(type="User"),
      *         @OA\JsonContent()
      *     ),
      *     @OA\Response(

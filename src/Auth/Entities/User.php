@@ -18,9 +18,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use OpenApi\Annotations as OA;
 
 /**
  * @see \Tests\Unit\Auth\Entities\UserTest
+ * @OA\Schema()
  */
 #[ORM\Entity]
 #[ORM\HasLifecycleCallbacks]
@@ -28,13 +30,16 @@ use Doctrine\ORM\Mapping as ORM;
 class User
 {
     private function __construct(
+        /** @OA\Property(type="string") */
         #[ORM\Id]
         #[ORM\Column(type: IdType::NAME)]
         private Id $id,
+        /** @OA\Property(type="string") */
         #[ORM\Column(type: EmailType::NAME, unique: true)]
         private Email $email,
         #[ORM\Column(type: PasswordHashType::NAME, nullable: false)]
         private PasswordHash $hash,
+        /** @OA\Property(type="string") */
         #[ORM\Column(type: StatusType::NAME)]
         private UserStatusEnum $status = UserStatusEnum::Wait,
         #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ["default" => 'CURRENT_TIMESTAMP'])]
