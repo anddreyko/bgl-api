@@ -1,6 +1,8 @@
 {
     "name": "anddreyko/bgl-api",
     "type": "project",
+    "description": "API-gateway backend for project BordGameLog / For records.",
+    "license": "proprietary",
     "authors": [
         {
             "name": "anddreyko"
