@@ -22,10 +22,10 @@ docker-build:
 docker-try-build-prod: docker-down-clear-prod docker-up-prod test-start-up test-hello-world
 
 docker-down-clear-prod:
-	COMPOSE_PROJECT_NAME=bgl-prod docker-compose down -v --remove-orphans
+	docker-compose down -v --remove-orphans
 
 docker-up-prod:
-	COMPOSE_PROJECT_NAME=bgl-prod docker-compose -f docker-compose-prod.yml up -d
+	docker-compose -f docker-compose-prod.yml up -d
 
 check: lint analyze test validate-schema
 
