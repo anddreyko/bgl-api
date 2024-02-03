@@ -1,6 +1,6 @@
 version: "3.7"
 services:
-  api:
+  api-prod:
     build:
       context: .
       dockerfile: Dockerfile
@@ -21,4 +21,21 @@ services:
     volumes:
       - .:/app
     ports:
-      - "8000:80"
+      - "${APP_EXTERNAL_PORT}:80"
+    networks:
+      bglapinet:
+        ipv4_address: "${APP_NETWORK_IP_PROD}"
+      default:
+        aliases:
+          - ${APP_HOST_PROD}
+    extra_hosts:
+      - "${APP_HOST_PROD}:${APP_NETWORK_IP_PROD}"
+    restart: on-failure
+    tty: false
+
+networks:
+  bglapinet:
+    ipam:
+      driver: default
+      config:
+        - subnet: "${BGLNET}"
