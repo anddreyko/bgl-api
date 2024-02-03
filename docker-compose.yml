@@ -9,7 +9,22 @@ services:
     depends_on:
       - api-php-fpm
     ports:
-      - "${APP_EXTERNAL_PORT}:${APP_HTTP_PORT}"
+      - "${APP_EXTERNAL_PORT}:80"
+    networks:
+      bglapinet:
+        ipv4_address: "${APP_NETWORK_IP}"
+      default:
+        aliases:
+          - ${APP_HOST}
+    links:
+      - db-postgres:db
+      - mailer
+    extra_hosts:
+      - "db:${DB_NETWORK_IP}"
+      - "mailer:${MAILER_NETWORK_IP}"
+      - "${APP_HOST}:${APP_NETWORK_IP}"
+    restart: on-failure
+    tty: false
 
   api-php-fpm:
     build:
@@ -32,6 +47,20 @@ services:
       TWIG_ENABLE_CACHE: ${TWIG_ENABLE_CACHE}
     volumes:
       - .:/app
+    networks:
+      bglapinet:
+        ipv4_address: ${FPM_NETWORK_IP}
+        aliases:
+          - api-php-fpm
+    links:
+      - db-postgres:db
+      - mailer
+    extra_hosts:
+      - "db:${DB_NETWORK_IP}"
+      - "mailer:${MAILER_NETWORK_IP}"
+      - "${APP_HOST}:${APP_NETWORK_IP}"
+    expose:
+      - 9000
 
   api-php-cli:
     build:
@@ -53,6 +82,15 @@ services:
       TWIG_ENABLE_CACHE: ${TWIG_ENABLE_CACHE}
     volumes:
       - .:/app
+    networks:
+      - bglapinet
+    links:
+      - db-postgres:db
+      - mailer
+    extra_hosts:
+      - "db:${DB_NETWORK_IP}"
+      - "mailer:${MAILER_NETWORK_IP}"
+      - "${APP_HOST}:${APP_NETWORK_IP}"
 
   db-postgres:
     image: postgres:15.2-alpine
@@ -64,11 +102,33 @@ services:
       - api-postgres:/var/lib/postgresql/data
     ports:
       - "${DB_EXTERNAL_PORT}:${DB_PORT}"
+    logging:
+      driver: json-file
+      options:
+        max-size: "128m"
+        max-file: "10"
+    networks:
+      bglapinet:
+        ipv4_address: "${DB_NETWORK_IP}"
+        aliases:
+          - db
+    extra_hosts:
+      - "db:${DB_NETWORK_IP}"
+    restart: on-failure
 
   mailer:
     image: mailhog/mailhog
     ports:
       - "${MAILER_EXTERNAL_PORT}:${MAILER_HTTP_PORT}"
+    networks:
+      - bglapinet
 
 volumes:
   api-postgres:
+
+networks:
+  bglapinet:
+    ipam:
+      driver: default
+      config:
+        - subnet: "${BGLNET}"
