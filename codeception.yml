@@ -5,7 +5,7 @@ paths:
   output: var/.tests
   support: tests/Support
   data: tests/Support/Data
-  envs: tests/_envs
+  envs: tests/Support/_envs
 actor_suffix: Tester
 extensions:
   enabled:
@@ -26,3 +26,6 @@ coverage:
 env:
   APP_ENV: test
   APP_DEBUG: 1
+
+params:
+  - .env

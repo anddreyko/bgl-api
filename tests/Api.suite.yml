@@ -3,7 +3,7 @@ suite_namespace: Tests\Api
 modules:
   enabled:
     - REST:
-        url: http://api.bgl.local
+        url: '%APP_URL%'
         depends: PhpBrowser
         part: Json
 step_decorators:

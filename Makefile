@@ -19,7 +19,7 @@ docker-pull:
 docker-build:
 	docker-compose build
 
-docker-try-build-prod: docker-down-clear-prod docker-up-prod test-start-up test-hello-world
+docker-try-build-prod: docker-down-clear-prod docker-up-prod test-hello-world-prod
 
 docker-down-clear-prod:
 	docker-compose down -v --remove-orphans
@@ -27,7 +27,7 @@ docker-down-clear-prod:
 docker-up-prod:
 	docker-compose -f docker-compose-prod.yml up -d
 
-check: lint analyze test validate-schema
+check: lint analyze test-clean test-build test validate-schema
 
 lint: php-lint cs-check
 
@@ -48,6 +48,12 @@ psalm-alter:
 php-stan:
 	docker-compose run --rm api-php-cli composer phpstan
 
+test-clean:
+	docker-compose run --rm api-php-cli ./vendor/bin/codecept clean
+
+test-build:
+	docker-compose run --rm api-php-cli ./vendor/bin/codecept build
+
 test:
 	docker-compose run --rm api-php-cli composer test && \
 	make load-fixtures
@@ -66,6 +72,11 @@ test-api:
 
 test-start-up:
 	docker-compose run --rm api-php-cli composer test -- StartUp
+
+test-start-up-prod:
+	docker-compose run --rm api-php-cli ./vendor/bin/codecept clean && \
+	docker-compose run --rm api-php-cli ./vendor/bin/codecept build && \
+	docker-compose run --rm api-php-cli ./vendor/bin/codecept run --env=prod -- StartUp
 
 test-hello-world:
 	docker-compose run --rm api-php-cli composer test -- tests/Acceptance/HelloWorldCest.php
@@ -143,3 +154,6 @@ migrate-generate-empty:
 
 load-fixtures:
 	docker-compose run api-php-cli php app fixtures:load
+
+env:
+	docker-compose run api-php-cli php vendor/bin/codecept g:env prod

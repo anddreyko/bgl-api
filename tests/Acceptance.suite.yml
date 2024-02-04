@@ -8,7 +8,7 @@ actor: AcceptanceTester
 modules:
   enabled:
     - PhpBrowser:
-        url: http://api.bgl.local
+        url: '%APP_URL%'
         curl:
           CURLOPT_RETURNTRANSFER: true
 # add Codeception\Step\Retry trait to AcceptanceTester to enable retries

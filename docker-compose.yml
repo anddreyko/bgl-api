@@ -123,6 +123,41 @@ services:
     networks:
       - bglapinet
 
+  api-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      APP_ENV: prod
+      APP_DEBUG: false
+      DB_HOST: ${DB_HOST}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      MAILER_DSN: ${MAILER_DSN}
+      MAIL_NOREPLY: ${MAIL_NOREPLY}
+      FRONTEND_URL: ${FRONTEND_URL}
+      MAILER_URL: ${MAILER_URL}
+      JWT_KEY: ${JWT_KEY}
+      JWT_ALGO: ${JWT_ALGO}
+      TWIG_ENABLE_CACHE: ${TWIG_ENABLE_CACHE}
+    volumes:
+      - .:/app
+    ports:
+      - "${APP_EXTERNAL_PORT_PROD}:81"
+    networks:
+      bglapinet:
+        ipv4_address: "${APP_NETWORK_IP_PROD}"
+      default:
+        aliases:
+          - ${APP_HOST_PROD}
+    extra_hosts:
+      - "${APP_HOST_PROD}:${APP_NETWORK_IP_PROD}"
+    restart: on-failure
+    tty: false
+    depends_on:
+      - api
+
 volumes:
   api-postgres:
 

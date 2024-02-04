@@ -1,17 +1,11 @@
-# Codeception Test Suite Configuration
-#
-# Suite for acceptance tests.
-# Perform tests in browser using the WebDriver or PhpBrowser.
-# If you need both WebDriver and PHPBrowser tests - create a separate suite.
-
 actor: AcceptanceTester
+suite_namespace: Tests\StartUp
 modules:
   enabled:
     - PhpBrowser:
-        url: http://api.bgl.local
+        url: '%APP_URL%'
         curl:
           CURLOPT_RETURNTRANSFER: true
-# add Codeception\Step\Retry trait to AcceptanceTester to enable retries
 step_decorators:
   - Codeception\Step\ConditionalAssertion
   - Codeception\Step\TryTo
