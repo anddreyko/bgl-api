@@ -93,7 +93,7 @@ services:
       - "${APP_HOST}:${APP_NETWORK_IP}"
 
   db-postgres:
-    image: postgres:15.2-alpine
+    image: postgres:16.2-alpine
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
