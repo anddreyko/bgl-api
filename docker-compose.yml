@@ -4,6 +4,8 @@ services:
     build:
       context: .docker
       dockerfile: dev/nginx/Dockerfile
+    env_file:
+      - .env
     volumes:
       - .:/app
     depends_on:
@@ -30,21 +32,8 @@ services:
     build:
       context: .docker
       dockerfile: dev/php-fpm/Dockerfile
-    environment:
-      APP_ENV: dev
-      APP_DEBUG: ${APP_DEBUG}
-      PHP_IDE_CONFIG: serverName=API
-      DB_HOST: ${DB_HOST}
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASS: ${DB_PASS}
-      MAILER_DSN: ${MAILER_DSN}
-      MAIL_NOREPLY: ${MAIL_NOREPLY}
-      FRONTEND_URL: ${FRONTEND_URL}
-      MAILER_URL: ${MAILER_URL}
-      JWT_KEY: ${JWT_KEY}
-      JWT_ALGO: ${JWT_ALGO}
-      TWIG_ENABLE_CACHE: ${TWIG_ENABLE_CACHE}
+    env_file:
+      - .env
     volumes:
       - .:/app
     networks:
@@ -66,20 +55,8 @@ services:
     build:
       context: .docker
       dockerfile: dev/php-cli/Dockerfile
-    environment:
-      APP_ENV: dev
-      APP_DEBUG: 1
-      DB_HOST: ${DB_HOST}
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASS: ${DB_PASS}
-      MAILER_DSN: ${MAILER_DSN}
-      MAIL_NOREPLY: ${MAIL_NOREPLY}
-      FRONTEND_URL: ${FRONTEND_URL}
-      MAILER_URL: ${MAILER_URL}
-      JWT_KEY: ${JWT_KEY}
-      JWT_ALGO: ${JWT_ALGO}
-      TWIG_ENABLE_CACHE: ${TWIG_ENABLE_CACHE}
+    env_file:
+      - .env
     volumes:
       - .:/app
     networks:
@@ -94,6 +71,8 @@ services:
 
   db-postgres:
     image: postgres:16.2-alpine
+    env_file:
+      - .env
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -118,6 +97,8 @@ services:
 
   mailer:
     image: mailhog/mailhog
+    env_file:
+      - .env
     ports:
       - "${MAILER_EXTERNAL_PORT}:${MAILER_HTTP_PORT}"
     networks:
@@ -132,20 +113,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - .env
     environment:
       APP_ENV: prod
       APP_DEBUG: false
-      DB_HOST: ${DB_HOST}
-      DB_NAME: ${DB_NAME}
-      DB_USER: ${DB_USER}
-      DB_PASS: ${DB_PASS}
-      MAILER_DSN: ${MAILER_DSN}
-      MAIL_NOREPLY: ${MAIL_NOREPLY}
-      FRONTEND_URL: ${FRONTEND_URL}
-      MAILER_URL: ${MAILER_URL}
-      JWT_KEY: ${JWT_KEY}
-      JWT_ALGO: ${JWT_ALGO}
-      TWIG_ENABLE_CACHE: ${TWIG_ENABLE_CACHE}
     volumes:
       - .:/app
     ports:
