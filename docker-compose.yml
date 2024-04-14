@@ -121,7 +121,12 @@ services:
     ports:
       - "${MAILER_EXTERNAL_PORT}:${MAILER_HTTP_PORT}"
     networks:
-      - bglapinet
+      bglapinet:
+        ipv4_address: "${MAILER_NETWORK_IP}"
+        aliases:
+          - mailer
+    extra_hosts:
+      - "mailer:${MAILER_NETWORK_IP}"
 
   api-prod:
     build:
