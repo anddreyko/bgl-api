@@ -22,7 +22,7 @@ class SignInCest
 
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
-        $I->sendGet(
+        $I->sendPost(
             '/v1/auth/sign-in-by-email',
             ['password' => ExistedUserFixture::PASS, 'email' => ExistedUserFixture::EMAIL]
         );
@@ -36,7 +36,7 @@ class SignInCest
     {
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
-        $I->sendGet(
+        $I->sendPost(
             '/v1/auth/sign-in-by-email',
             ['password' => 'pass', 'email' => 'not-existed-user@app.test']
         );
@@ -50,7 +50,7 @@ class SignInCest
     {
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
-        $I->sendGet(
+        $I->sendPost(
             '/v1/auth/sign-in-by-email',
             ['password' => ExistedUserFixture::PASS]
         );
@@ -66,7 +66,7 @@ class SignInCest
 
         $I->haveHttpHeader('Accept', 'application/json');
         $I->haveHttpHeader('Content-Type', 'application/json');
-        $I->sendGet(
+        $I->sendPost(
             '/v1/auth/sign-in-by-email',
             ['email' => ExistedUserFixture::EMAIL]
         );

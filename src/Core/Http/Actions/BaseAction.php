@@ -64,7 +64,7 @@ abstract class BaseAction
 
     public function getParam(string $name): mixed
     {
-        return $this->request?->getQueryParams()[$name] ?? '';
+        return $this->request?->getQueryParams()[$name] ?? $this->request?->getParsedBody()[$name] ?? '';
     }
 
     public function getArgs(string $name): string

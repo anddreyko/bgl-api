@@ -16,17 +16,17 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 final class SignInAction extends BaseAction
 {
     /**
-     * @OpenApi\Annotations\Get(
+     * @OpenApi\Annotations\Post(
      *     path="/v1/auth/sign-in-by-email",
      *     @OA\Parameter(
      *         name="email",
-     *         in="query",
+     *         in="body",
      *         description="User's email.",
      *         required=true
      *     ),
      *     @OA\Parameter(
      *         name="password",
-     *         in="query",
+     *         in="body",
      *         description="User's password.",
      *         required=true
      *     ),
