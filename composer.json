@@ -1,6 +1,6 @@
 {
     "name": "anddreyko/bgl-api",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "type": "project",
     "description": "API-gateway backend for project BordGameLog / For records.",
     "license": "proprietary",
@@ -17,12 +17,12 @@
             "App\\": "src/",
             "Actions\\": "actions/",
             "Commands\\": "commands/",
-            "Fixtures\\": "fixtures/",
             "Migrations\\": "migrations/"
         }
     },
     "autoload-dev": {
         "psr-4": {
+            "Fixtures\\": "fixtures/",
             "Tests\\": "tests/"
         }
     },
@@ -35,7 +35,7 @@
         }
     },
     "require": {
-        "php": "^8.2",
+        "php": ">=8.3",
         "ext-json": "*",
         "ext-pdo": "*",
         "composer": "*",

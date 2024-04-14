@@ -1,5 +1,5 @@
 # syntax = docker/dockerfile:1.2
-FROM richarvey/nginx-php-fpm:3.1.0
+FROM richarvey/nginx-php-fpm:3.1.6
 
 #RUN --mount=type=secret,id=_env,dst=/etc/secrets/.env cat /etc/secrets/.env
 
