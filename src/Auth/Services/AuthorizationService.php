@@ -7,9 +7,9 @@ namespace App\Auth\Services;
 use App\Auth\Entities\User;
 use App\Auth\Exceptions\IncorrectTokenException;
 use App\Auth\Repositories\UserRepository;
-use App\Auth\ValueObjects\Id;
 use App\Auth\ValueObjects\WebToken;
 use App\Core\Tokens\Services\JsonWebTokenizerService;
+use App\Core\ValueObjects\Id;
 
 final readonly class AuthorizationService
 {

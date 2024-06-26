@@ -6,10 +6,10 @@ namespace Tests\Unit\Auth\Entities;
 
 use App\Auth\Entities\User;
 use App\Auth\Entities\UserTokenConfirm;
-use App\Auth\ValueObjects\Email;
-use App\Auth\ValueObjects\Id;
 use App\Auth\ValueObjects\PasswordHash;
 use App\Auth\ValueObjects\Token;
+use App\Core\ValueObjects\Email;
+use App\Core\ValueObjects\Id;
 use Codeception\Test\Unit;
 
 /**

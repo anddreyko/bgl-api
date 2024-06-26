@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Auth\Repositories;
 
 use App\Auth\Entities\User;
-use App\Auth\ValueObjects\Email;
-use App\Auth\ValueObjects\Id;
 use App\Auth\ValueObjects\PasswordHash;
 use App\Auth\ValueObjects\Token;
 use App\Auth\ValueObjects\WebToken;
+use App\Core\ValueObjects\Email;
+use App\Core\ValueObjects\Id;
 
 interface UserRepository
 {

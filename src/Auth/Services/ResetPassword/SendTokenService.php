@@ -7,10 +7,10 @@ namespace App\Auth\Services\ResetPassword;
 use App\Auth\Forms\SendTokenForm;
 use App\Auth\Helpers\FlushHelper;
 use App\Auth\Repositories\UserRepository;
-use App\Auth\ValueObjects\Email;
 use App\Core\Mail\Builders\MessageBuilder;
 use App\Core\Mail\Services\MailSenderService;
 use App\Core\Tokens\Services\TokenizerService;
+use App\Core\ValueObjects\Email;
 
 final readonly class SendTokenService
 {

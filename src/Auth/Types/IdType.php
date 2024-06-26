@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Auth\Types;
 
-use App\Auth\ValueObjects\Id;
+use App\Core\ValueObjects\Id;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\GuidType;
 

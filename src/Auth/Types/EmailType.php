@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Auth\Types;
 
-use App\Auth\ValueObjects\Email;
+use App\Core\ValueObjects\Email;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\StringType;
 

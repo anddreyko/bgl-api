@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Actions\V1\User;
 
 use App\Auth\Repositories\UserRepository;
-use App\Auth\ValueObjects\Id;
 use App\Core\Exceptions\NotFoundException;
 use App\Core\Http\Actions\BaseAction;
 use App\Core\Http\Entities\Response;
+use App\Core\ValueObjects\Id;
 use OpenApi\Annotations as OA;
 
 /**

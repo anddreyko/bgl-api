@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Auth\ValueObjects;
 
-use App\Auth\ValueObjects\Email;
+use App\Core\ValueObjects\Email;
 use Codeception\Test\Unit;
 
 /**
- * @covers \App\Auth\ValueObjects\Email
+ * @covers \App\Core\ValueObjects\Email
  */
 class EmailTest extends Unit
 {

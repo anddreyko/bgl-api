@@ -11,11 +11,11 @@ use App\Auth\Helpers\FlushHelper;
 use App\Auth\Helpers\PasswordHashHelper;
 use App\Auth\Renders\ConfirmEmailRender;
 use App\Auth\Repositories\UserRepository;
-use App\Auth\ValueObjects\Email;
-use App\Auth\ValueObjects\Id;
 use App\Core\Mail\Builders\MessageBuilder;
 use App\Core\Mail\Services\MailSenderService;
 use App\Core\Tokens\Services\TokenizerService;
+use App\Core\ValueObjects\Email;
+use App\Core\ValueObjects\Id;
 
 final readonly class RegistrationByEmailService
 {
