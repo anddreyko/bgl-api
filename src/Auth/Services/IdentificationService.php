@@ -9,7 +9,7 @@ use App\Auth\Exceptions\IncorrectPasswordException;
 use App\Auth\Forms\IdentificationForm;
 use App\Auth\Helpers\PasswordHashHelper;
 use App\Auth\Repositories\UserRepository;
-use App\Auth\ValueObjects\Email;
+use App\Core\ValueObjects\Email;
 
 final readonly class IdentificationService
 {

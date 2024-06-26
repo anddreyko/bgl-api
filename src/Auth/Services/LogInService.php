@@ -11,8 +11,8 @@ use App\Auth\Forms\LogInForm;
 use App\Auth\Helpers\FlushHelper;
 use App\Auth\Helpers\PasswordHashHelper;
 use App\Auth\Repositories\UserRepository;
-use App\Auth\ValueObjects\Email;
 use App\Core\Tokens\Services\JsonWebTokenizerService;
+use App\Core\ValueObjects\Email;
 
 final readonly class LogInService
 {

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Auth\ValueObjects;
 
-use App\Auth\ValueObjects\Id;
+use App\Core\ValueObjects\Id;
 use Codeception\Test\Unit;
 
 /**
- * @covers \App\Auth\ValueObjects\Id
+ * @covers \App\Core\ValueObjects\Id
  */
 class IdTest extends Unit
 {

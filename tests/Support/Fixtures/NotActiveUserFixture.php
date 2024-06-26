@@ -6,11 +6,11 @@ namespace Tests\Support\Fixtures;
 
 use App\Auth\Entities\User;
 use App\Auth\Repositories\DbUserRepository as UserRepository;
-use App\Auth\ValueObjects\Email;
-use App\Auth\ValueObjects\Id;
 use App\Auth\ValueObjects\PasswordHash;
 use App\Auth\ValueObjects\Token;
 use App\Core\Database\Fixtures\DbFixture;
+use App\Core\ValueObjects\Email;
+use App\Core\ValueObjects\Id;
 use Doctrine\ORM\EntityManagerInterface;
 
 final class NotActiveUserFixture extends DbFixture

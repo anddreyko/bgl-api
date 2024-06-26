@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Auth\ValueObjects;
+namespace App\Core\ValueObjects;
 
 use App\Auth\Exceptions\IncorrectEmailException;
 use Webmozart\Assert\Assert;
