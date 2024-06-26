@@ -23,6 +23,15 @@ return static function (Slim\App $app) {
             $group->post('/refresh', Actions\V1\Auth\RefreshAction::class);
         });
 
+        $group->group('/records', function (RouteCollectorProxyInterface $group) {
+            $group->group('/sessions', function (RouteCollectorProxyInterface $group) {
+                $group->post('', Actions\V1\Records\OpenSessionAction::class)
+                    ->setArgument(App\Core\Http\Middlewares\AuthorizationMiddleware::ATTRIBUTE_ACCESSED, '1');
+                $group->patch('[/{id}]', Actions\V1\Records\CloseSessionAction::class)
+                    ->setArgument(App\Core\Http\Middlewares\AuthorizationMiddleware::ATTRIBUTE_ACCESSED, '1');
+            });
+        });
+
         $group->group('/user', function (RouteCollectorProxyInterface $group) {
             $group->get('[/{id}]', Actions\V1\User\InfoAction::class);
         });
