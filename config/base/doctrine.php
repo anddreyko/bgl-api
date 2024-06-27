@@ -183,6 +183,7 @@ return [
             'driver' => 'pdo_pgsql',
             'host' => env('DB_HOST'),
             'user' => env('DB_USER'),
+            'port' => env('DB_PORT'),
             'password' => env('DB_PASS'),
             'dbname' => env('DB_NAME'),
             'charset' => 'utf-8',
