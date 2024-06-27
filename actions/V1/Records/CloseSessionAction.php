@@ -20,7 +20,43 @@ final class CloseSessionAction extends BaseAction
         $repository = $this->getContainer(SessionRepository::class);
         $session = $repository->getOneById(new Id($id));
 
-        $session->setFinishedAt(new \DateTimeImmutable());
+        $started = $this->getParam('started_at');
+        $startedAt = null;
+        if (!empty($started)) {
+            try {
+                $startedAt = new \DateTimeImmutable($started);
+            } catch (\Exception) {
+            }
+        }
+        if ($startedAt) {
+            $session->setStartedAt($startedAt);
+        }
+
+        $finished = $this->getParam('finished_at');
+        $finishedAt = null;
+        if (!empty($finished)) {
+            try {
+                $finishedAt = new \DateTimeImmutable($finished);
+            } catch (\Exception) {
+            }
+            if ($finishedAt < $session->getStartedAt()) {
+                throw new \LogicException(
+                    "Incorrect time: start {$session->getStartedAt()->format('Y-m-d H:i:s')}," .
+                    " finish {$finishedAt->format('Y-m-d H:i:s')}"
+                );
+            }
+        }
+
+        if (!$finishedAt) {
+            $interval = $this->getParam('interval');
+            $finishedAt = is_numeric($interval)
+                ? $session->getStartedAt()->modify("+ $interval min")
+                : new \DateTimeImmutable();
+        }
+
+        if ($finishedAt) {
+            $session->setFinishedAt($finishedAt);
+        }
         $repository->persist($session);
 
         /** @var FlushHelper $flusher */
