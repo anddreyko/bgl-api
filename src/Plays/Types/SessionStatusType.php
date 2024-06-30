@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Records\Types;
+namespace App\Plays\Types;
 
-use App\Records\Enums\SessionStatus;
+use App\Plays\Enums\SessionStatus;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\IntegerType;
 

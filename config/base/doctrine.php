@@ -191,7 +191,7 @@ return [
         'subscribers' => [],
         'metadata_dirs' => [
             __DIR__ . '/../../src/Auth/Entities',
-            __DIR__ . '/../../src/Records/Entities',
+            __DIR__ . '/../../src/Plays/Entities',
         ],
         'types' => [
             App\Auth\Types\EmailType::NAME => App\Auth\Types\EmailType::class,
@@ -199,8 +199,8 @@ return [
             App\Auth\Types\PasswordHashType::NAME => App\Auth\Types\PasswordHashType::class,
             App\Auth\Types\StatusType::NAME => App\Auth\Types\StatusType::class,
             App\Auth\Types\WebTokenType::NAME => App\Auth\Types\WebTokenType::class,
-            App\Records\Types\IdType::NAME => App\Records\Types\IdType::class,
-            App\Records\Types\SessionStatusType::NAME => App\Records\Types\SessionStatusType::class,
+            \App\Plays\Types\IdType::NAME => \App\Plays\Types\IdType::class,
+            \App\Plays\Types\SessionStatusType::NAME => \App\Plays\Types\SessionStatusType::class,
         ],
     ],
 ];

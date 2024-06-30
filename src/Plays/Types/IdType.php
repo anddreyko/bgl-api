@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Records\Types;
+namespace App\Plays\Types;
 
 use App\Core\ValueObjects\Id;
 use Doctrine\DBAL\Platforms\AbstractPlatform;

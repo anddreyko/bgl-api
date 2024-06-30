@@ -25,9 +25,9 @@ return static function (Slim\App $app) {
 
         $group->group('/records', function (RouteCollectorProxyInterface $group) {
             $group->group('/sessions', function (RouteCollectorProxyInterface $group) {
-                $group->post('', Actions\V1\Records\OpenSessionAction::class)
+                $group->post('', Actions\V1\Plays\OpenSessionAction::class)
                     ->setArgument(App\Core\Http\Middlewares\AuthorizationMiddleware::ATTRIBUTE_ACCESSED, '1');
-                $group->patch('[/{id}]', Actions\V1\Records\CloseSessionAction::class)
+                $group->patch('[/{id}]', Actions\V1\Plays\CloseSessionAction::class)
                     ->setArgument(App\Core\Http\Middlewares\AuthorizationMiddleware::ATTRIBUTE_ACCESSED, '1');
             });
         });
