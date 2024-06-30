@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Records\Enums;
+namespace App\Plays\Enums;
 
 enum SessionStatus: int
 {

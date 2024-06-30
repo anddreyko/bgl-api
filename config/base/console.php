@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Commands\HelloCommand;
-
 return [
     'console' => [
         'commands' => [
@@ -15,7 +13,7 @@ return [
             Doctrine\Migrations\Tools\Console\Command\StatusCommand::class,
             Doctrine\Migrations\Tools\Console\Command\UpToDateCommand::class,
 
-            HelloCommand::class,
+            Commands\HelloCommand::class,
         ],
     ],
 ];

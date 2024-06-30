@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Actions\V1\Records;
+namespace Actions\V1\Plays;
 
 use App\Auth\Helpers\FlushHelper;
 use App\Core\Http\Actions\BaseAction;
 use App\Core\Http\Entities\Response;
 use App\Core\ValueObjects\Id;
-use App\Records\Entities\Session;
-use App\Records\Repositories\SessionRepository;
+use App\Plays\Entities\Session;
+use App\Plays\Repositories\SessionRepository;
 
 final class OpenSessionAction extends BaseAction
 {

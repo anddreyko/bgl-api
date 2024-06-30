@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Records\Entities;
+namespace App\Plays\Entities;
 
 use App\Core\ValueObjects\Id;
-use App\Records\Enums\SessionStatus;
-use App\Records\Types\IdType;
-use App\Records\Types\SessionStatusType;
+use App\Plays\Enums\SessionStatus;
+use App\Plays\Types\IdType;
+use App\Plays\Types\SessionStatusType;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 

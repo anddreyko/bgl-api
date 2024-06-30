@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Records\Repositories;
+namespace App\Plays\Repositories;
 
 use App\Core\Database\Repositories\DbRepository;
 use App\Core\Exceptions\NotFoundException;
 use App\Core\ValueObjects\Id;
-use App\Records\Entities\Session;
+use App\Plays\Entities\Session;
 
 final class SessionRepository extends DbRepository
 {
