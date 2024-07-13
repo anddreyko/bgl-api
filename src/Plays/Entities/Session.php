@@ -20,6 +20,8 @@ final class Session
         #[ORM\Id]
         #[ORM\Column(type: IdType::NAME)]
         private Id $id,
+        #[ORM\Column(type: Types::STRING, options: ["default" => ''])]
+        private string $name,
         #[ORM\Column(type: SessionStatusType::NAME)]
         private SessionStatus $status = SessionStatus::Draft,
         #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ["default" => 'CURRENT_TIMESTAMP'])]
@@ -86,6 +88,26 @@ final class Session
     public function setId(Id $id): Session
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Session
+     */
+    public function setName(string $name): Session
+    {
+        $this->name = $name;
 
         return $this;
     }
