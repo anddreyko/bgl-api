@@ -17,9 +17,25 @@ final class OpenSessionAction extends BaseAction
     {
         $id = Id::create();
 
+        $started = $this->getParam('started_at');
+        $startedAt = null;
+        if (!empty($started)) {
+            try {
+                $startedAt = new \DateTimeImmutable($started);
+            } catch (\Exception) {
+            }
+        }
+        $startedAt ??= new \DateTimeImmutable();
+
         /** @var SessionRepository $repository */
         $repository = $this->getContainer(SessionRepository::class);
-        $repository->create(new Session($id));
+        $repository->create(
+            new Session(
+                id: $id,
+                name: $this->getParam('name') ?: 'Session at ' . $startedAt->format('d.m.Y H:i'),
+                startedAt: $startedAt->setTimezone(new \DateTimeZone('UTC'))
+            )
+        );
 
         /** @var FlushHelper $flusher */
         $flusher = $this->getContainer(FlushHelper::class);
