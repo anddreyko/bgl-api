@@ -36,7 +36,8 @@ final class CloseSessionAction extends BaseAction
         $finishedAt = null;
         if (!empty($finished)) {
             try {
-                $finishedAt = new \DateTimeImmutable($finished);
+                $finishedAt = (new \DateTimeImmutable($finished))
+                    ->setTimezone(new \DateTimeZone('UTC'));
             } catch (\Exception) {
             }
             if ($finishedAt < $session->getStartedAt()) {
