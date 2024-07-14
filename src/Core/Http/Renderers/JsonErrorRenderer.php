@@ -24,7 +24,11 @@ final class JsonErrorRenderer extends AbstractErrorRenderer
          *     errors?: string[]
          * } $error
          */
-        $error = ['message' => $this->getErrorTitle($exception), 'result' => false];
+        $error = [
+            'message' => $this->getErrorTitle($exception),
+            'result' => false,
+            'code' => $exception->getPrevious()?->getCode() ?? $exception->getCode(),
+        ];
 
         if ($displayErrorDetails) {
             $error['exception'] = [];
