@@ -25,9 +25,18 @@ class Response
      */
     public bool $result = true;
 
-    public function __construct(mixed $data, bool $result = true)
+    /**
+     * The internal code of error.
+     *
+     * @var int|null
+     * @OpenApi\Annotations\Property()
+     */
+    public ?int $code = null;
+
+    public function __construct(mixed $data, bool $result = true, ?int $code = null)
     {
         $this->result = $result;
         $this->data = $data;
+        $this->code = $code;
     }
 }
