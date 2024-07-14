@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace App\Auth\Exceptions;
 
-class IncorrectEmailException extends \InvalidArgumentException
+use App\Auth\Enums\CodeExceptionEnum;
+
+final class IncorrectEmailException extends \InvalidArgumentException
 {
     public function __construct(
-        string $message = 'Incorrect email.',
+        ?string $message = null,
         ?\Throwable $previous = null
     ) {
-        parent::__construct($message, 0, $previous);
+        parent::__construct(
+            message: $message ?? CodeExceptionEnum::NotExistEmail->message(),
+            code: CodeExceptionEnum::NotExistEmail->value,
+            previous: $previous
+        );
     }
 }
