@@ -11,6 +11,8 @@ return static function (Slim\App $app) {
     $app->group('/v1', function (RouteCollectorProxyInterface $group) {
         $group->get('/hello-world', Actions\V1\HelloWorldAction::class)
             ->setArgument(App\Core\Http\Middlewares\AuthorizationMiddleware::ATTRIBUTE_ACCESSED, '1');
+        $group->get('/ping', Actions\V1\PingAction::class)
+            ->setArgument(App\Core\Http\Middlewares\AuthorizationMiddleware::ATTRIBUTE_ACCESSED, '1');
 
         $group->group('/auth', function (RouteCollectorProxyInterface $group) {
             $group->post('/sign-up-by-email', Actions\V1\Auth\SignUpAction::class)
