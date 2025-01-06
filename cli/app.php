@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 declare(strict_types=1);
@@ -22,7 +23,7 @@ if (env('SENTRY_DSN')) {
  * @var Container $container
  * @psalm-suppress UnnecessaryVarAnnotation
  */
-$container = require_once __DIR__ . '/../config/container.php';
+$container = require __DIR__ . '/../config/container.php';
 
 $app = new Application('Console');
 if (env('SENTRY_DSN')) {
