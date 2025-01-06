@@ -8,4 +8,4 @@ extensions:
   - php
 exclude:
   - vendor
-  - -var
+  - var
