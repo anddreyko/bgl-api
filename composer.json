@@ -30,6 +30,9 @@
         "process-timeout": 0,
         "soft-packages": true,
         "sort-packages": true,
+        "bump-after-update": true,
+        "apcu-autoloader": true,
+        "optimize-autoloader": true,
         "allow-plugins": {
             "php-http/discovery": false
         }
