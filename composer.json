@@ -84,6 +84,12 @@
         "cs-fix": "phpcbf",
         "psalm": "psalm",
         "phpstan": "phpstan",
-        "test": "codecept run"
+        "test": "codecept run",
+        "test:all": [
+            "codecept run Unit",
+            "codecept run StartUp",
+            "codecept run Acceptance",
+            "codecept run Api"
+        ]
     }
 }

@@ -55,7 +55,7 @@ test-build:
 	docker compose run --rm api-php-cli ./vendor/bin/codecept build
 
 test:
-	docker compose run --rm api-php-cli composer test && \
+	docker compose run --rm api-php-cli composer test:all && \
 	make load-fixtures
 
 test-acceptance:
