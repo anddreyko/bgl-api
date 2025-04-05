@@ -48,7 +48,7 @@ class SignOutCest
         $I->seeResponseCodeIs(HttpCodesEnum::Success->value);
         $I->seeResponseContainsJson(['data' => 'sign out', 'result' => true]);
 
-        $I->deleteHeader('Authorization');
+        $I->unsetHttpHeader('Authorization');
         $I->haveHttpHeader('Authorization', 'Bearer ' . TwoSessionsUserFixture::$token2);
         $I->sendPost('/v1/auth/sign-out');
 

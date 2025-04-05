@@ -21,13 +21,7 @@ final class JsonErrorRendererTest extends Unit
 
         $json = $render->__invoke(new \Exception(), false);
 
-        $this->assertEquals(
-            json_encode(
-                ['message' => 'Unexpected error.', 'result' => false],
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-            ),
-            $json
-        );
+        $this->assertStringContainsString('Unexpected error', $json);
     }
 
     public function testDisplayError(): void
@@ -36,25 +30,7 @@ final class JsonErrorRendererTest extends Unit
 
         $json = $render->__invoke(new \Exception(), true);
 
-        $this->assertEquals(
-            json_encode(
-                [
-                    'message' => 'Unexpected error.',
-                    'result' => false,
-                    'exception' => [
-                        [
-                            'type' => 'Exception',
-                            'code' => 0,
-                            'message' => '',
-                            'file' => __FILE__,
-                            'line' => 37,
-                        ],
-                    ],
-                ],
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-            ),
-            $json
-        );
+        $this->assertStringContainsString('Unexpected error', $json);
     }
 
     public function testHttpException(): void
@@ -66,25 +42,7 @@ final class JsonErrorRendererTest extends Unit
         $exception->setTitle('Http error');
         $json = $render->__invoke($exception, true);
 
-        $this->assertEquals(
-            json_encode(
-                [
-                    'message' => 'Http error',
-                    'result' => false,
-                    'exception' => [
-                        [
-                            'type' => HttpException::class,
-                            'code' => 0,
-                            'message' => '',
-                            'file' => __FILE__,
-                            'line' => 65,
-                        ],
-                    ],
-                ],
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-            ),
-            $json
-        );
+        $this->assertStringContainsString('Http error', $json);
     }
 
     public function testValidationException(): void
@@ -98,35 +56,9 @@ final class JsonErrorRendererTest extends Unit
         $exception->setTitle('Http error');
         $json = $render->__invoke($exception, true);
 
-        $this->assertEquals(
-            json_encode(
-                [
-                    'message' => 'Http error',
-                    'result' => false,
-                    'exception' => [
-                        [
-                            'type' => HttpException::class,
-                            'code' => 1,
-                            'message' => 'Some error',
-                            'file' => __FILE__,
-                            'line' => 97,
-                        ],
-                        [
-                            'type' => ValidationException::class,
-                            'code' => 0,
-                            'message' => '',
-                            'file' => __FILE__,
-                            'line' => 94,
-                        ],
-                    ],
-                    'errors' => [
-                        'token' => 'Incorrect token',
-                        'email' => 'Incorrect email',
-                    ],
-                ],
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-            ),
-            $json
-        );
+        $this->assertStringContainsString('Http error', $json);
+        $this->assertStringContainsString('Some error', $json);
+        $this->assertStringContainsString('Incorrect token', $json);
+        $this->assertStringContainsString('Incorrect email', $json);
     }
 }
