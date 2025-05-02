@@ -15,6 +15,12 @@ use App\Core\Validation\Services\ValidationService;
  */
 final class ConfirmEmailAction extends BaseAction
 {
+    public function __construct(
+        private readonly ConfirmationEmailService $confirmationService,
+        private readonly ValidationService $validator
+    ) {
+    }
+
     /**
      * @OpenApi\Annotations\Get(
      *     path="/v1/auth/confirm-by-email/{token}",
@@ -54,13 +60,9 @@ final class ConfirmEmailAction extends BaseAction
     public function content(): Response
     {
         $form = new ConfirmationEmailForm($this->getArgs('token'));
-        /** @var ValidationService $validator */
-        $validator = $this->getContainer(ValidationService::class);
-        $validator->validate($form);
+        $this->validator->validate($form);
 
-        /** @var ConfirmationEmailService $confirmationService */
-        $confirmationService = $this->getContainer(ConfirmationEmailService::class);
-        $confirmationService->handle($form);
+        $this->confirmationService->handle($form);
 
         return new Response(data: 'Specified email is confirmed', result: true);
     }

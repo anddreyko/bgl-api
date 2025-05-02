@@ -13,6 +13,12 @@ use App\Plays\Repositories\SessionRepository;
 
 final class OpenSessionAction extends BaseAction
 {
+    public function __construct(
+        private readonly SessionRepository $repository,
+        private readonly FlushHelper $flusher,
+    ) {
+    }
+
     public function content(): Response
     {
         $id = Id::create();
@@ -27,9 +33,7 @@ final class OpenSessionAction extends BaseAction
         }
         $startedAt ??= new \DateTimeImmutable();
 
-        /** @var SessionRepository $repository */
-        $repository = $this->getContainer(SessionRepository::class);
-        $repository->create(
+        $this->repository->create(
             new Session(
                 id: $id,
                 name: $this->getParam('name') ?: 'Session at ' . $startedAt->format('d.m.Y H:i'),
@@ -37,9 +41,7 @@ final class OpenSessionAction extends BaseAction
             )
         );
 
-        /** @var FlushHelper $flusher */
-        $flusher = $this->getContainer(FlushHelper::class);
-        $flusher->flush();
+        $this->flusher->flush();
 
         return new Response(['session_id' => $id->getValue()]);
     }

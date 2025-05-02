@@ -12,13 +12,17 @@ use App\Plays\Repositories\SessionRepository;
 
 final class CloseSessionAction extends BaseAction
 {
+    public function __construct(
+        private readonly SessionRepository $repository,
+        private readonly FlushHelper $flusher
+    ) {
+    }
+
     public function content(): Response
     {
         $id = $this->getArgs('id');
 
-        /** @var SessionRepository $repository */
-        $repository = $this->getContainer(SessionRepository::class);
-        $session = $repository->getOneById(new Id($id));
+        $session = $this->repository->getOneById(new Id($id));
 
         $started = $this->getParam('started_at');
         $startedAt = null;
@@ -58,11 +62,9 @@ final class CloseSessionAction extends BaseAction
         if ($finishedAt) {
             $session->setFinishedAt($finishedAt);
         }
-        $repository->persist($session);
+        $this->repository->persist($session);
 
-        /** @var FlushHelper $flusher */
-        $flusher = $this->getContainer(FlushHelper::class);
-        $flusher->flush();
+        $this->flusher->flush();
 
         return new Response(
             [
