@@ -13,6 +13,11 @@ use App\Core\Localization\Services\TranslatorService;
  */
 final class HelloWorldAction extends BaseAction
 {
+    public function __construct(
+        private readonly TranslatorService $translator
+    ) {
+    }
+
     /**
      * @OpenApi\Annotations\Get(
      *     path="/v1/hello-world",
@@ -24,9 +29,6 @@ final class HelloWorldAction extends BaseAction
      */
     public function content(): Response
     {
-        /** @var TranslatorService $translator */
-        $translator = $this->getContainer(TranslatorService::class);
-
-        return new Response(data: $translator->trans(id: 'Hello world!', domain: 'hello-world'), result: true);
+        return new Response(data: $this->translator->trans(id: 'Hello world!', domain: 'hello-world'), result: true);
     }
 }

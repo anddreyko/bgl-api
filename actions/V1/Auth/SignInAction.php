@@ -15,6 +15,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 final class SignInAction extends BaseAction
 {
+    public function __construct(
+        private readonly ValidatorInterface $validator,
+        private readonly LogInService $authenticationService,
+    ) {
+    }
+
     /**
      * @OpenApi\Annotations\Post(
      *     path="/v1/auth/sign-in-by-email",
@@ -60,13 +66,8 @@ final class SignInAction extends BaseAction
     public function content(): Response
     {
         $form = new LogInForm((string)$this->getParam('email'), (string)$this->getParam('password'));
-        /** @var ValidatorInterface $validator */
-        $validator = $this->getContainer(ValidatorInterface::class);
-        $validator->validate($form);
+        $this->validator->validate($form);
 
-        /** @var LogInService $authenticationService */
-        $authenticationService = $this->getContainer(LogInService::class);
-
-        return new Response(data: ['token_access' => $authenticationService->handle($form)], result: true);
+        return new Response(data: ['token_access' => $this->authenticationService->handle($form)], result: true);
     }
 }

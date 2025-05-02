@@ -15,6 +15,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 final class SignUpAction extends BaseAction
 {
+    public function __construct(
+        private readonly ValidatorInterface $validator,
+        private readonly RegistrationByEmailService $registrationService
+    ) {
+    }
+
     /**
      * @OpenApi\Annotations\Post(
      *     path="/v1/auth/sign-up-by-email",
@@ -61,13 +67,9 @@ final class SignUpAction extends BaseAction
     {
         $form = new RegistrationByEmailForm((string)$this->getParam('email'), (string)$this->getParam('password'));
 
-        /** @var ValidatorInterface $validator */
-        $validator = $this->getContainer(ValidatorInterface::class);
-        $validator->validate($form);
+        $this->validator->validate($form);
 
-        /** @var RegistrationByEmailService $registrationService */
-        $registrationService = $this->getContainer(RegistrationByEmailService::class);
-        $registrationService->handle($form);
+        $this->registrationService->handle($form);
 
         return new Response(data: 'Confirm the specified email', result: true);
     }

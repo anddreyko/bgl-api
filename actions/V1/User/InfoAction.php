@@ -16,6 +16,11 @@ use OpenApi\Annotations as OA;
  */
 final class InfoAction extends BaseAction
 {
+    public function __construct(
+        private readonly UserRepository $users,
+    ) {
+    }
+
     /**
      * @OA\Get(
      *     path="/v1/user/{id}",
@@ -72,10 +77,7 @@ final class InfoAction extends BaseAction
             throw new NotFoundException(previous: $exception);
         }
 
-        /** @var UserRepository $users */
-        $users = $this->getContainer(UserRepository::class);
-
-        $user = $users->getById($id);
+        $user = $this->users->getById($id);
 
         return new Response(
             data: [

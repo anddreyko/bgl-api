@@ -18,6 +18,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 final class SignOutAction extends BaseAction
 {
+    public function __construct(
+        private readonly SignOutService $service,
+        private readonly ValidatorInterface $validator,
+    ) {
+    }
+
     public function content(): Response
     {
         /** @var User $identity */
@@ -26,14 +32,9 @@ final class SignOutAction extends BaseAction
         $token = $this->getAttribute(AuthorizationMiddleware::ATTRIBUTE_TOKEN);
 
         $form = new SignOutForm($identity, $token);
+        $this->validator->validate($form);
 
-        /** @var ValidatorInterface $validator */
-        $validator = $this->getContainer(ValidatorInterface::class);
-        $validator->validate($form);
-
-        /** @var SignOutService $service */
-        $service = $this->getContainer(SignOutService::class);
-        $service->handle($form);
+        $this->service->handle($form);
 
         return new Response(data: 'sign out', result: true);
     }

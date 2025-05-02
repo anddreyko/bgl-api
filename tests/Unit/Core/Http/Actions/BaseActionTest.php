@@ -9,7 +9,6 @@ use App\Core\Http\Entities\Response;
 use Codeception\Stub\Expected;
 use Codeception\Test\Unit;
 use GuzzleHttp\Psr7\HttpFactory;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -20,15 +19,10 @@ final class BaseActionTest extends Unit
     public function testInvoke(): void
     {
         $content = new Response('content');
-        $container = $this->makeEmpty(
-            ContainerInterface::class,
-            ['get' => static fn(string $id) => ['content' => $content][$id]]
-        );
 
-        $action = $this->construct(
+        $action = $this->make(
             BaseAction::class,
-            ['container' => $container],
-            ['content' => Expected::once($content)]
+            ['content' => Expected::atLeastOnce($content)]
         );
         $request = $this->makeEmpty(
             ServerRequestInterface::class,
@@ -45,6 +39,6 @@ final class BaseActionTest extends Unit
 
         $this->assertEquals('test', $action->getParam('param-1'));
 
-        $this->assertEquals($content, $action->getContainer('content'));
+        $this->assertEquals($content, $action->content());
     }
 }

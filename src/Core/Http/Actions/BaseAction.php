@@ -7,7 +7,6 @@ namespace App\Core\Http\Actions;
 use App\Core\Http\Entities\Response;
 use App\Core\Http\Helpers\HttpHelper;
 use OpenApi\Annotations as OA;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -32,10 +31,6 @@ abstract class BaseAction
     /** @var mixed[] */
     private array $args = [];
 
-    public function __construct(private readonly ContainerInterface $container)
-    {
-    }
-
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
@@ -56,11 +51,6 @@ abstract class BaseAction
     }
 
     abstract public function content(): Response;
-
-    public function getContainer(string $id): mixed
-    {
-        return $this->container->get(id: $id);
-    }
 
     public function getParam(string $name): mixed
     {
