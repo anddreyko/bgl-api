@@ -27,7 +27,7 @@ docker-down-clear-prod:
 docker-up-prod:
 	docker compose -f docker-compose-prod.yml up -d
 
-check: lint analyze test-clean test-build test validate-schema
+check: lint deptrac analyze test-clean test-build test validate-schema
 
 lint: php-lint cs-check
 
@@ -38,6 +38,9 @@ php-lint:
 
 cs-check:
 	docker compose run --rm api-php-cli composer cs-check
+
+deptrac:
+	docker compose run --rm api-php-cli composer deptrac:check
 
 psalm:
 	docker compose run --rm api-php-cli composer psalm:check
