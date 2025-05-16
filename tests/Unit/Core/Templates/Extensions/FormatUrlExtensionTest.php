@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core\Templates\Extensions;
 
-use App\Core\Http\ValueObjects\Url;
-use App\Core\Template\Extensions\FormatUrlExtension;
+use App\Core\Components\Http\ValueObjects\Url;
+use App\Core\Components\Template\Extensions\FormatUrlExtension;
 use Codeception\Test\Unit;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
 /**
- * @covers \App\Core\Template\Extensions\FormatUrlExtension
+ * @covers \App\Core\Components\Template\Extensions\FormatUrlExtension
  */
 final class FormatUrlExtensionTest extends Unit
 {

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Actions\V1\Auth;
 
-use App\Auth\Forms\RegistrationByEmailForm;
-use App\Auth\Services\Register\RegistrationByEmailService;
-use App\Core\Http\Actions\BaseAction;
-use App\Core\Http\Entities\Response;
+use Actions\BaseAction;
+use App\Contexts\Auth\Forms\RegistrationByEmailForm;
+use App\Contexts\Auth\Services\Register\RegistrationByEmailService;
+use App\Core\Components\Http\Entities\Response;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core\Http\Renderers;
 
-use App\Core\Http\Renderers\JsonErrorRenderer;
-use App\Core\Validation\Exceptions\ValidationException;
+use App\Core\Components\Http\Renderers\JsonErrorRenderer;
+use App\Core\Components\Validation\ValidationException;
 use Codeception\Test\Unit;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Exception\HttpException;
 
 /**
- * @covers \App\Core\Http\Renderers\JsonErrorRenderer
+ * @covers \App\Core\Components\Http\Renderers\JsonErrorRenderer
  */
 final class JsonErrorRendererTest extends Unit
 {

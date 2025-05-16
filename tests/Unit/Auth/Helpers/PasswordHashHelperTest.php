@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Auth\Helpers;
 
-use App\Auth\Helpers\PasswordHashHelper;
+use App\Core\Components\Security\PasswordHasher;
 use Codeception\Test\Unit;
 
 /**
- * @covers \App\Auth\Helpers\PasswordHashHelper
+ * @covers \App\Core\Components\Security\PasswordHasher
  */
 class PasswordHashHelperTest extends Unit
 {
-    private PasswordHashHelper $hasher;
+    private PasswordHasher $hasher;
 
     protected function _setUp()
     {
-        $this->hasher = new PasswordHashHelper(16);
+        $this->hasher = new PasswordHasher(16);
 
         parent::_setUp();
     }

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Actions\V1;
 
-use App\Core\Http\Actions\BaseAction;
-use App\Core\Http\Entities\Response;
-use App\Core\Localization\Services\TranslatorService;
+use Actions\BaseAction;
+use App\Core\Components\Http\Entities\Response;
+use App\Core\Components\Localization\Translator;
 
 /**
  * @see \Tests\Acceptance\HelloWorldCest
@@ -14,7 +14,7 @@ use App\Core\Localization\Services\TranslatorService;
 final class HelloWorldAction extends BaseAction
 {
     public function __construct(
-        private readonly TranslatorService $translator
+        private readonly Translator $translator
     ) {
     }
 

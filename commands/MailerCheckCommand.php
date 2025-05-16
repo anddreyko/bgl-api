@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Commands;
 
-use App\Auth\Renders\ConfirmEmailRender;
-use App\Auth\ValueObjects\Token;
-use App\Core\Mail\Builders\MessageBuilder;
-use App\Core\Mail\Services\MailSenderService;
+use App\Contexts\Auth\Renders\ConfirmEmailRender;
+use App\Core\Components\Mail\Builders\MessageBuilder;
+use App\Core\Components\Mail\MailSender;
+use App\Core\ValueObjects\Token;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class MailerCheckCommand extends Command
 {
-    public function __construct(private readonly MailSenderService $mailer, string $name = null)
+    public function __construct(private readonly MailSender $mailer, string $name = null)
     {
         parent::__construct($name);
     }

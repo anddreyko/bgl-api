@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Actions\V1\Auth;
 
-use App\Auth\Entities\User;
-use App\Auth\Forms\SignOutForm;
-use App\Auth\Services\SignOutService;
-use App\Auth\ValueObjects\WebToken;
-use App\Core\Http\Actions\BaseAction;
-use App\Core\Http\Entities\Response;
-use App\Core\Http\Middlewares\AuthorizationMiddleware;
+use Actions\BaseAction;
+use App\Application\Middlewares\AuthorizationMiddleware;
+use App\Contexts\Auth\Entities\User;
+use App\Contexts\Auth\Forms\SignOutForm;
+use App\Contexts\Auth\Services\SignOutService;
+use App\Core\Components\Http\Entities\Response;
+use App\Core\ValueObjects\WebToken;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**

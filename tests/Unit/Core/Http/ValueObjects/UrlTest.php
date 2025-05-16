@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core\Http\ValueObjects;
 
-use App\Core\Http\ValueObjects\Url;
+use App\Core\Components\Http\ValueObjects\Url;
 use Codeception\Test\Unit;
 use PHPUnit\Framework\ExpectationFailedException;
 
 /**
- * @covers \App\Core\Http\ValueObjects\Url
+ * @covers \App\Core\Components\Http\ValueObjects\Url
  */
 class UrlTest extends Unit
 {

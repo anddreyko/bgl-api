@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core\Http\Enums;
 
-use App\Core\Http\Enums\HttpCodesEnum;
+use App\Core\Components\Http\Enums\HttpCodesEnum;
 use Codeception\Test\Unit;
 
 /**
- * @covers \App\Core\Http\Enums\HttpCodesEnum
+ * @covers \App\Core\Components\Http\Enums\HttpCodesEnum
  */
 class HttpCodesEnumTest extends Unit
 {

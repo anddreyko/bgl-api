@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Actions\V1\Auth;
 
-use App\Auth\Forms\ConfirmationEmailForm;
-use App\Auth\Services\Register\ConfirmationEmailService;
-use App\Core\Http\Actions\BaseAction;
-use App\Core\Http\Entities\Response;
-use App\Core\Validation\Services\ValidationService;
+use Actions\BaseAction;
+use App\Contexts\Auth\Forms\ConfirmationEmailForm;
+use App\Contexts\Auth\Services\Register\ConfirmationEmailService;
+use App\Core\Components\Http\Entities\Response;
+use App\Core\Components\Validation\Validator;
 
 /**
  * @see \Tests\Api\V1\Auth\ConfirmEmailCest
@@ -17,7 +17,7 @@ final class ConfirmEmailAction extends BaseAction
 {
     public function __construct(
         private readonly ConfirmationEmailService $confirmationService,
-        private readonly ValidationService $validator
+        private readonly Validator $validator
     ) {
     }
 

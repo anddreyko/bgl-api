@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Auth\Enums;
 
-use App\Auth\Enums\UserStatusEnum;
+use App\Contexts\Auth\Enums\UserStatusEnum;
 use Codeception\Test\Unit;
 
 /**
- * @covers \App\Auth\Enums\UserStatusEnum
+ * @covers \App\Contexts\Auth\Enums\UserStatusEnum
  */
 class UserStatusEnumTest extends Unit
 {

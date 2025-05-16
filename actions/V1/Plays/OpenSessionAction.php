@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Actions\V1\Plays;
 
-use App\Auth\Helpers\FlushHelper;
-use App\Core\Http\Actions\BaseAction;
-use App\Core\Http\Entities\Response;
+use Actions\BaseAction;
+use App\Contexts\Plays\Entities\Session;
+use App\Contexts\Plays\Repositories\SessionRepository;
+use App\Core\Components\Database\Flusher;
+use App\Core\Components\Http\Entities\Response;
 use App\Core\ValueObjects\Id;
-use App\Plays\Entities\Session;
-use App\Plays\Repositories\SessionRepository;
 
 final class OpenSessionAction extends BaseAction
 {
     public function __construct(
         private readonly SessionRepository $repository,
-        private readonly FlushHelper $flusher,
+        private readonly Flusher $flusher,
     ) {
     }
 

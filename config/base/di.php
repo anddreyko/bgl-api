@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use App\Auth\Repositories\DbUserRepository;
-use App\Auth\Repositories\UserRepository;
+use App\Contexts\Auth\Repositories\DbUserRepository;
+use App\Contexts\Auth\Repositories\UserRepository;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Slim\Psr7\Factory\ResponseFactory;
 

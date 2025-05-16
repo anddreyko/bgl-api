@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Actions\V1\Auth;
 
-use App\Auth\Forms\LogInForm;
-use App\Auth\Services\LogInService;
-use App\Core\Http\Actions\BaseAction;
-use App\Core\Http\Entities\Response;
+use Actions\BaseAction;
+use App\Contexts\Auth\Forms\LogInForm;
+use App\Contexts\Auth\Services\LogInService;
+use App\Core\Components\Http\Entities\Response;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core\Mail\Builders;
 
-use App\Core\Mail\Builders\MessageBuilder;
+use App\Core\Components\Mail\Builders\MessageBuilder;
 use Codeception\Test\Unit;
 
 /**
- * @covers \App\Core\Mail\Builders\MessageBuilder
+ * @covers \App\Core\Components\Mail\Builders\MessageBuilder
  */
 final class MessageBuilderTest extends Unit
 {
