@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Fixtures;
 
-use App\Auth\Entities\User;
-use App\Auth\Repositories\DbUserRepository;
-use App\Auth\ValueObjects\PasswordHash;
-use App\Auth\ValueObjects\Token;
-use App\Core\Database\Fixtures\DbFixture;
-use App\Core\Tokens\Services\JsonWebTokenizerService;
 use App\Core\ValueObjects\Email;
 use App\Core\ValueObjects\Id;
+use App\Core\ValueObjects\PasswordHash;
+use App\Core\ValueObjects\Token;
+use App\Domain\Auth\Entities\User;
+use App\Domain\Auth\Repositories\DbUserRepository;
+use App\Infrastructure\Database\Fixtures\DbFixture;
+use App\Infrastructure\Tokens\JsonWebTokenizer;
 use Doctrine\ORM\EntityManagerInterface;
 use Firebase\JWT\Key;
 use Ramsey\Uuid\Uuid;
@@ -24,7 +24,7 @@ final class UserFixture extends DbFixture
     public function fixture(EntityManagerInterface $manager): void
     {
         $users = new DbUserRepository($manager);
-        $webTokens = new JsonWebTokenizerService(new Key((string)env('JWT_KEY'), env('JWT_ALGO')));
+        $webTokens = new JsonWebTokenizer(new Key((string)env('JWT_KEY'), env('JWT_ALGO')));
 
         $date = new \DateTimeImmutable();
         $user = User::createByEmail(

@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Auth\Entities;
 
-use App\Auth\Entities\User;
-use App\Auth\Enums\UserStatusEnum;
-use App\Auth\ValueObjects\PasswordHash;
-use App\Auth\ValueObjects\Token;
-use App\Auth\ValueObjects\WebToken;
 use App\Core\ValueObjects\Email;
 use App\Core\ValueObjects\Id;
+use App\Core\ValueObjects\PasswordHash;
+use App\Core\ValueObjects\Token;
+use App\Core\ValueObjects\WebToken;
+use App\Domain\Auth\Entities\User;
+use App\Domain\Auth\Enums\UserStatusEnum;
 use Codeception\Test\Unit;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * @covers \App\Auth\Entities\User
+ * @covers \App\Domain\Auth\Entities\User
  */
 class UserTest extends Unit
 {

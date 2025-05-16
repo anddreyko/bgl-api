@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Auth\ValueObjects;
 
-use App\Auth\ValueObjects\PasswordHash;
+use App\Core\ValueObjects\PasswordHash;
 use Codeception\Test\Unit;
 
 /**
- * @covers \App\Auth\ValueObjects\PasswordHash
+ * @covers \App\Core\ValueObjects\PasswordHash
  */
 class PasswordHashTest extends Unit
 {

@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Tests\Support\Fixtures;
 
-use App\Auth\Entities\User;
-use App\Auth\Enums\UserStatusEnum;
-use App\Auth\Repositories\DbUserRepository as UserRepository;
-use App\Auth\ValueObjects\PasswordHash;
-use App\Auth\ValueObjects\Token;
-use App\Auth\ValueObjects\WebToken;
-use App\Core\Database\Fixtures\DbFixture;
-use App\Core\Tokens\Services\JsonWebTokenizerService;
 use App\Core\ValueObjects\Email;
 use App\Core\ValueObjects\Id;
+use App\Core\ValueObjects\PasswordHash;
+use App\Core\ValueObjects\Token;
+use App\Core\ValueObjects\WebToken;
+use App\Domain\Auth\Entities\User;
+use App\Domain\Auth\Enums\UserStatusEnum;
+use App\Domain\Auth\Repositories\DbUserRepository as UserRepository;
+use App\Infrastructure\Database\Fixtures\DbFixture;
+use App\Infrastructure\Tokens\JsonWebTokenizer;
 use Doctrine\ORM\EntityManagerInterface;
 use Firebase\JWT\Key;
 
@@ -39,7 +39,7 @@ final class ExpiredTokenUserFixture extends DbFixture
             createdAt: $date
         );
 
-        self::$token = (new JsonWebTokenizerService(new Key(env('JWT_KEY'), env('JWT_ALGO'))))
+        self::$token = (new JsonWebTokenizer(new Key(env('JWT_KEY'), env('JWT_ALGO'))))
             ->encode(payload: ['user' => self::UUID], expire: '-30 minutes');
         $user->setTokenAccess(self::$token);
 

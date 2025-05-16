@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core\Database\Fixtures;
 
-use App\Core\Database\Fixtures\DbFixture;
+use App\Infrastructure\Database\Fixtures\DbFixture;
 use Codeception\Stub\Expected;
 use Codeception\Test\Unit;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 
 /**
- * @covers \App\Core\Database\Fixtures\DbFixture
+ * @covers \App\Infrastructure\Database\Fixtures\DbFixture
  */
 final class DbFixtureTest extends Unit
 {

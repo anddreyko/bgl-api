@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Auth\ValueObjects;
 
-use App\Auth\ValueObjects\WebToken;
+use App\Core\ValueObjects\WebToken;
 use Codeception\Test\Unit;
 
 /**
- * @covers \App\Auth\ValueObjects\WebToken
+ * @covers \App\Core\ValueObjects\WebToken
  */
 class WebTokenTest extends Unit
 {

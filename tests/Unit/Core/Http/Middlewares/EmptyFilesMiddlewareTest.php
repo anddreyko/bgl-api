@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core\Http\Middlewares;
 
-use App\Core\Http\Middlewares\EmptyFilesMiddleware;
+use App\Application\Middleware\EmptyFilesMiddleware;
 use Codeception\Test\Unit;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -14,7 +14,7 @@ use Slim\Psr7\Factory\StreamFactory;
 use Slim\Psr7\Factory\UploadedFileFactory;
 
 /**
- * @covers \App\Core\Http\Middlewares\EmptyFilesMiddleware
+ * @covers \App\Application\Middleware\EmptyFilesMiddleware
  */
 final class EmptyFilesMiddlewareTest extends Unit
 {

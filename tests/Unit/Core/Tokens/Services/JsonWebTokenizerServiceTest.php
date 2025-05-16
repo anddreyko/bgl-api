@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core\Tokens\Services;
 
-use App\Auth\ValueObjects\WebToken;
-use App\Core\Tokens\Services\JsonWebTokenizerService;
+use App\Core\ValueObjects\WebToken;
+use App\Infrastructure\Tokens\JsonWebTokenizer;
 use Codeception\Test\Unit;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\Key;
 
 /**
- * @covers JsonWebTokenizerService
+ * @covers JsonWebTokenizer
  */
 final class JsonWebTokenizerServiceTest extends Unit
 {
@@ -19,12 +19,12 @@ final class JsonWebTokenizerServiceTest extends Unit
     private const CORRECT_PAYLOAD = ['user' => 123];
     private const INTERVAL = '+100 years';
 
-    private JsonWebTokenizerService $service;
+    private JsonWebTokenizer $service;
     private \DateTimeImmutable $dateTime;
 
     protected function setUp(): void
     {
-        $this->service = new JsonWebTokenizerService(new Key('some-key', env('JWT_ALGO')));
+        $this->service = new JsonWebTokenizer(new Key('some-key', env('JWT_ALGO')));
         $this->dateTime = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2023-01-01 00:00:00');
 
         parent::setUp();

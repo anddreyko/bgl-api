@@ -2,7 +2,7 @@
 
 namespace Tests\Api\V1\Auth;
 
-use App\Core\Http\Enums\HttpCodesEnum;
+use App\Infrastructure\Http\Enums\HttpCodesEnum;
 use Tests\Support\ApiTester;
 use Tests\Support\Fixtures\ExistedUserFixture;
 use Tests\Support\Fixtures\ExpiredTokenFixture;
@@ -10,7 +10,7 @@ use Tests\Support\Fixtures\NotActiveUserFixture;
 use Tests\Support\Helper\FixtureHelper;
 
 /**
- * @covers \Actions\V1\Auth\ConfirmEmailAction
+ * @covers \App\Presentation\Web\V1\Auth\ConfirmEmailAction
  */
 class ConfirmEmailCest
 {
