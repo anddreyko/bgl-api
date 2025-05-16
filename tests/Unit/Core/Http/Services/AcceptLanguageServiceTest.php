@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core\Http\Services;
 
-use App\Core\Http\Services\AcceptLanguageService;
+use App\Infrastructure\Http\LanguageAcceptor;
 use Codeception\Test\Unit;
 use Kudashevs\AcceptLanguage\AcceptLanguage;
 
 /**
- * @covers \App\Core\Http\Services\AcceptLanguageService
+ * @covers \App\Infrastructure\Http\LanguageAcceptor
  */
 final class AcceptLanguageServiceTest extends Unit
 {
-    private AcceptLanguageService $service;
+    private LanguageAcceptor $service;
 
     protected function setUp(): void
     {
-        $this->service = new AcceptLanguageService(
+        $this->service = new LanguageAcceptor(
             new AcceptLanguage([
                 'default_language' => 'en',
                 'accepted_languages' => ['en', 'de'],

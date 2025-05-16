@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core\Http\Middlewares;
 
-use App\Core\Http\Middlewares\TranslatorMiddleware;
-use App\Core\Localization\Services\TranslatorService;
+use App\Application\Middleware\TranslatorMiddleware;
+use App\Infrastructure\Localization\Translator;
 use Codeception\Stub\Expected;
 use Codeception\Test\Unit;
 use Psr\Http\Message\ResponseInterface;
@@ -13,13 +13,13 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Slim\Psr7\Factory\ServerRequestFactory;
 
 /**
- * @covers \App\Core\Http\Middlewares\TranslatorMiddleware
+ * @covers \App\Application\Middleware\TranslatorMiddleware
  */
 final class TranslatorMiddlewareTest extends Unit
 {
     public function testSuccess(): void
     {
-        $service = $this->makeEmpty(TranslatorService::class, ['setLocale' => Expected::once()]);
+        $service = $this->makeEmpty(Translator::class, ['setLocale' => Expected::once()]);
         $middleware = new TranslatorMiddleware($service);
 
         $request = (new ServerRequestFactory())->createServerRequest('POST', 'http://app.test')
@@ -35,7 +35,7 @@ final class TranslatorMiddlewareTest extends Unit
 
     public function testNotSetLocale(): void
     {
-        $service = $this->makeEmpty(TranslatorService::class, ['setLocale' => Expected::never()]);
+        $service = $this->makeEmpty(Translator::class, ['setLocale' => Expected::never()]);
         $middleware = new TranslatorMiddleware($service);
 
         $request = (new ServerRequestFactory())->createServerRequest('POST', 'http://app.test')

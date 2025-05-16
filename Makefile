@@ -59,19 +59,19 @@ test:
 	make load-fixtures
 
 test-acceptance:
-	docker compose run --rm api-php-cli composer test -- Acceptance && \
+	docker compose run --rm api-php-cli composer test:accept && \
 	make load-fixtures
 
 test-seed:
-	docker compose run --rm api-php-cli composer test -- Api --seed 2014723595 && \
+	docker compose run --rm api-php-cli composer tes:api -- --seed 2014723595 && \
 	make load-fixtures
 
 test-api:
-	docker compose run --rm api-php-cli composer test -- Api && \
+	docker compose run --rm api-php-cli composer test:api && \
 	make load-fixtures
 
 test-start-up:
-	docker compose run --rm api-php-cli composer test -- StartUp
+	docker compose run --rm api-php-cli composer test:startup
 
 test-start-up-prod:
 	docker compose run --rm api-php-cli ./vendor/bin/codecept clean && \
@@ -79,48 +79,48 @@ test-start-up-prod:
 	docker compose run --rm api-php-cli ./vendor/bin/codecept run --env=prod -- StartUp
 
 test-hello-world:
-	docker compose run --rm api-php-cli composer test -- tests/Acceptance/HelloWorldCest.php
+	docker compose run --rm api-php-cli composer test:accept
 
 test-api-not-found:
-	docker compose run --rm api-php-cli composer test -- tests/Api/NotFoundCest.php && \
+	docker compose run --rm api-php-cli composer test:api -- tests/Api/NotFoundCest.php && \
 	make load-fixtures
 
 test-api-auth-sign-up:
-	docker compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/SignUpCest.php && \
+	docker compose run --rm api-php-cli composer test:api -- tests/Api/V1/Auth/SignUpCest.php && \
 	make load-fixtures
 
 test-api-auth-sign-up-expired-token:
-	docker compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/SignUpCest.php::testExpireToken
+	docker compose run --rm api-php-cli composer test:api -- tests/Api/V1/Auth/SignUpCest.php::testExpireToken
 
 test-api-auth-confirm-email:
-	docker compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/ConfirmEmailCest.php && \
+	docker compose run --rm api-php-cli composer test:api -- tests/Api/V1/Auth/ConfirmEmailCest.php && \
 	make load-fixtures
 
 test-api-auth-confirm-email-success:
-	docker compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/ConfirmEmailCest.php::testSuccess && \
+	docker compose run --rm api-php-cli composer test:api -- tests/Api/V1/Auth/ConfirmEmailCest.php::testSuccess && \
 	make load-fixtures
 
 test-api-auth-login:
-	docker compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/SignInCest.php && \
+	docker compose run --rm api-php-cli composer test:api -- tests/Api/V1/Auth/SignInCest.php && \
 	make load-fixtures
 
 test-api-auth-login-success:
-	docker compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/SignInCest.php::testSuccess && \
+	docker compose run --rm api-php-cli composer test:api -- tests/Api/V1/Auth/SignInCest.php::testSuccess && \
 	make load-fixtures
 
 test-api-auth-sign-out:
-	docker compose run --rm api-php-cli composer test -- tests/Api/V1/Auth/SignOutCest.php && \
+	docker compose run --rm api-php-cli composer test:api -- tests/Api/V1/Auth/SignOutCest.php && \
 	make load-fixtures
 
 test-api-user-info:
-	docker compose run --rm api-php-cli composer test -- tests/Api/V1/User/InfoCest.php && \
+	docker compose run --rm api-php-cli composer test:api -- tests/Api/V1/User/InfoCest.php && \
 	make load-fixtures
 
 test-unit:
-	docker compose run --rm api-php-cli composer test -- Unit
+	docker compose run --rm api-php-cli composer test:unit
 
 test-coverage: test-coverage-clear
-	docker compose run --rm api-php-cli composer test -- Unit --coverage --coverage-html
+	docker compose run --rm api-php-cli composer test:unit --coverage --coverage-html
 
 test-coverage-clear:
 	docker compose run --rm api-php-cli sh -c 'rm -rf var/.tests/*'

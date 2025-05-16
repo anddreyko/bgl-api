@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core\Http\Actions;
 
-use App\Core\Http\Actions\BaseAction;
-use App\Core\Http\Entities\Response;
+use App\Infrastructure\Http\Entities\Response;
+use App\Presentation\Web\BaseAction;
 use Codeception\Stub\Expected;
 use Codeception\Test\Unit;
 use GuzzleHttp\Psr7\HttpFactory;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * @covers \App\Core\Http\Actions\BaseAction
+ * @covers \App\Presentation\Web\BaseAction
  */
 final class BaseActionTest extends Unit
 {

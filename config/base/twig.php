@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Core\Template\Extensions\FormatUrlExtension;
+use App\Infrastructure\Template\Extensions\FormatUrlExtension;
 use Psr\Container\ContainerInterface;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;

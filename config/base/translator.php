@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-use App\Core\Http\Services\AcceptLanguageService;
-use App\Core\Localization\Services\TranslatorService;
+use App\Infrastructure\Http\LanguageAcceptor;
+use App\Infrastructure\Localization\Translator;
 use Kudashevs\AcceptLanguage\AcceptLanguage;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Translation\Loader\PhpFileLoader;
 use Symfony\Component\Translation\Loader\XliffFileLoader;
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\Translator as SymfonyTranslator;
 
 return [
-    TranslatorService::class => static function (ContainerInterface $container) {
+    Translator::class => static function (ContainerInterface $container) {
         /** @var array{lang: string, resources: string[][]} $config */
         $config = $container->get('translator');
 
-        $translator = new Translator($config['lang']);
+        $translator = new SymfonyTranslator($config['lang']);
         $translator->addLoader('php', new PhpFileLoader());
         $translator->addLoader('xlf', new XliffFileLoader());
 
@@ -23,14 +23,14 @@ return [
             $translator->addResource(...$resource);
         }
 
-        return new TranslatorService($translator);
+        return new Translator($translator);
     },
 
-    AcceptLanguageService::class => static function (ContainerInterface $container) {
+    LanguageAcceptor::class => static function (ContainerInterface $container) {
         /** @var array{lang: string, accepted_lang: string[], two_letter_only: bool, exact_match_only: bool} $config */
         $config = $container->get('translator');
 
-        return new AcceptLanguageService(
+        return new LanguageAcceptor(
             new AcceptLanguage(
                 [
                     'default_language' => $config['lang'],

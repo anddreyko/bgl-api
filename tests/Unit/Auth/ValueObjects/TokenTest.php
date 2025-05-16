@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Auth\ValueObjects;
 
-use App\Auth\ValueObjects\Token;
+use App\Core\ValueObjects\Token;
 use Codeception\Test\Unit;
 
 /**
- * @covers \App\Auth\ValueObjects\Token
+ * @covers \App\Core\ValueObjects\Token
  */
 class TokenTest extends Unit
 {

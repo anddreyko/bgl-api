@@ -2,7 +2,7 @@
 
 namespace Tests\Api\V1\User;
 
-use App\Core\Http\Enums\HttpCodesEnum;
+use App\Infrastructure\Http\Enums\HttpCodesEnum;
 use Tests\Support\ApiTester;
 use Tests\Support\Fixtures\ExistedUserFixture;
 use Tests\Support\Fixtures\ExpiredTokenUserFixture;
@@ -10,7 +10,7 @@ use Tests\Support\Fixtures\OtherUserFixture;
 use Tests\Support\Helper\FixtureHelper;
 
 /**
- * @covers \Actions\V1\User\InfoAction
+ * @covers \App\Presentation\Web\V1\User\InfoAction
  */
 class InfoCest
 {

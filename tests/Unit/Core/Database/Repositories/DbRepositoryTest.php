@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core\Database\Repositories;
 
-use App\Core\Database\Repositories\DbRepository;
+use App\Infrastructure\Database\Repositories\DbRepository;
 use Codeception\Stub\Expected;
 use Codeception\Test\Unit;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 
 /**
- * @covers \App\Core\Database\Repositories\DbRepository
+ * @covers \App\Infrastructure\Database\Repositories\DbRepository
  */
 final class DbRepositoryTest extends Unit
 {

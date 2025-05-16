@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-use App\Core\Tokens\Services\TokenizerService;
+use App\Infrastructure\Tokens\Tokenizer;
 use Psr\Container\ContainerInterface;
 
 return [
-    TokenizerService::class => static function (ContainerInterface $container): TokenizerService {
+    Tokenizer::class => static function (ContainerInterface $container): Tokenizer {
         /** @var array{tokenize_timeout:string} $config */
         $config = $container->get('auth');
 
-        return new TokenizerService(new DateInterval($config['tokenize_timeout']));
+        return new Tokenizer(new DateInterval($config['tokenize_timeout']));
     },
 
     'auth' => [

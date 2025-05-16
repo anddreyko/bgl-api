@@ -2,14 +2,14 @@
 
 namespace Tests\Api\V1\Auth;
 
-use App\Core\Http\Enums\HttpCodesEnum;
+use App\Infrastructure\Http\Enums\HttpCodesEnum;
 use Tests\Support\ApiTester;
 use Tests\Support\Fixtures\ExistedUserFixture;
 use Tests\Support\Helper\FixtureHelper;
 use Tests\Support\Helper\MailerHelper;
 
 /**
- * @covers \Actions\V1\Auth\SignInAction
+ * @covers \App\Presentation\Web\V1\Auth\SignInAction
  */
 class SignInCest
 {

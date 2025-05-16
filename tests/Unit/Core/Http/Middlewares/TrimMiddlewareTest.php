@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core\Http\Middlewares;
 
-use App\Core\Http\Middlewares\TrimMiddleware;
+use App\Application\Middleware\TrimMiddleware;
 use Codeception\Test\Unit;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -12,7 +12,7 @@ use Slim\Psr7\Factory\ResponseFactory;
 use Slim\Psr7\Factory\ServerRequestFactory;
 
 /**
- * @covers \App\Core\Http\Middlewares\TrimMiddleware
+ * @covers \App\Application\Middleware\TrimMiddleware
  */
 final class TrimMiddlewareTest extends Unit
 {

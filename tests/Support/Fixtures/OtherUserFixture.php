@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Support\Fixtures;
 
-use App\Auth\Entities\User;
-use App\Auth\Enums\UserStatusEnum;
-use App\Auth\Repositories\DbUserRepository as UserRepository;
-use App\Auth\ValueObjects\PasswordHash;
-use App\Auth\ValueObjects\Token;
-use App\Core\Database\Fixtures\DbFixture;
 use App\Core\ValueObjects\Email;
 use App\Core\ValueObjects\Id;
+use App\Core\ValueObjects\PasswordHash;
+use App\Core\ValueObjects\Token;
+use App\Domain\Auth\Entities\User;
+use App\Domain\Auth\Enums\UserStatusEnum;
+use App\Domain\Auth\Repositories\DbUserRepository as UserRepository;
+use App\Infrastructure\Database\Fixtures\DbFixture;
 use Doctrine\ORM\EntityManagerInterface;
 
 final class OtherUserFixture extends DbFixture

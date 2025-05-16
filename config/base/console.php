@@ -13,7 +13,7 @@ return [
             Doctrine\Migrations\Tools\Console\Command\StatusCommand::class,
             Doctrine\Migrations\Tools\Console\Command\UpToDateCommand::class,
 
-            Commands\HelloCommand::class,
+            \App\Presentation\Cli\HelloCommand::class,
         ],
     ],
 ];

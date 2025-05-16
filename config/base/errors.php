@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use App\Core\Http\Renderers\JsonErrorRenderer;
-use App\Core\Logger\Handlers\LogErrorHandler;
-use App\Core\Logger\Handlers\SentryHandler;
+use App\Application\Handlers\LogErrorHandler;
+use App\Application\Handlers\SentryHandler;
+use App\Infrastructure\Http\Renderers\JsonErrorRenderer;
 use DI\Container;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Log\LoggerInterface;

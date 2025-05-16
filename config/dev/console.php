@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Commands\FixturesLoadCommand;
-use Commands\MailerCheckCommand;
+use App\Presentation\Cli\FixturesLoadCommand;
+use App\Presentation\Cli\MailerCheckCommand;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
 

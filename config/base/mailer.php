@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-use App\Core\Mail\Services\MailSenderService;
-use App\Core\Template\Services\RenderTemplateService;
+use App\Infrastructure\Mail\MailSender;
+use App\Infrastructure\Template\TemplateRenderer;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
 
 return [
-    MailSenderService::class => static function (ContainerInterface $container) {
+    MailSender::class => static function (ContainerInterface $container) {
         /** @var array{ sftp: string } $config */
         $config = $container->get('mailer');
-        /** @var RenderTemplateService $renderer */
-        $renderer = $container->get(RenderTemplateService::class);
+        /** @var TemplateRenderer $renderer */
+        $renderer = $container->get(TemplateRenderer::class);
 
-        return new MailSenderService($renderer, new Mailer(Transport::fromDsn($config['sftp'])));
+        return new MailSender($renderer, new Mailer(Transport::fromDsn($config['sftp'])));
     },
 
     'mailer' => [

@@ -2,7 +2,7 @@
 
 namespace Tests\Api\V1\Auth;
 
-use App\Core\Http\Enums\HttpCodesEnum;
+use App\Infrastructure\Http\Enums\HttpCodesEnum;
 use Tests\Support\ApiTester;
 use Tests\Support\Fixtures\ExistedUserFixture;
 use Tests\Support\Fixtures\NotActiveUserFixture;
@@ -12,7 +12,7 @@ use Tests\Support\Helper\MailerHelper;
 use function PHPUnit\Framework\assertTrue;
 
 /**
- * @covers \Actions\V1\Auth\SignUpAction
+ * @covers \App\Presentation\Web\V1\Auth\SignUpAction
  */
 class SignUpCest
 {

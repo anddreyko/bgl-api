@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core\Http\Middlewares;
 
+use App\Application\Middleware\ExceptionMiddleware;
 use App\Core\Exceptions\NotFoundException;
-use App\Core\Http\Enums\HttpCodesEnum;
-use App\Core\Http\Middlewares\ExceptionMiddleware;
-use App\Core\Localization\Services\TranslatorService;
+use App\Infrastructure\Http\Enums\HttpCodesEnum;
+use App\Infrastructure\Localization\Translator;
 use Codeception\Stub\Expected;
 use Codeception\Test\Unit;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -15,27 +15,27 @@ use Psr\Log\LoggerInterface;
 use Slim\Exception\HttpException;
 use Slim\Psr7\Factory\ServerRequestFactory;
 use Symfony\Component\Translation\Loader\ArrayLoader;
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\Translator as SymfonyTranslator;
 
 /**
- * @covers \App\Core\Http\Middlewares\ExceptionMiddleware
+ * @covers \App\Application\Middleware\ExceptionMiddleware
  */
 final class ExceptionMiddlewareTest extends Unit
 {
     private ?ExceptionMiddleware $middleware = null;
-    private Translator $translator;
+    private SymfonyTranslator $translator;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->translator = new Translator('en');
+        $this->translator = new SymfonyTranslator('en');
         $this->translator->addLoader('array', new ArrayLoader());
         $this->translator->addResource('array', ['Some exception.' => 'Какое-то исключение.'], 'ru', 'exceptions');
 
         $this->middleware = new ExceptionMiddleware(
             $this->makeEmpty(LoggerInterface::class, ['warning' => Expected::once()]),
-            new TranslatorService($this->translator)
+            new Translator($this->translator)
         );
     }
 

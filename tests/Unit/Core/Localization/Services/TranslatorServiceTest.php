@@ -4,28 +4,28 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Core\Localization\Services;
 
-use App\Core\Localization\Services\TranslatorService;
+use App\Infrastructure\Localization\Translator;
 use Codeception\Test\Unit;
 use Symfony\Component\Translation\Loader\ArrayLoader;
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\Translator as SymfonyTranslator;
 
 /**
- * @covers \App\Core\Localization\Services\TranslatorService
+ * @covers \App\Infrastructure\Localization\Translator
  */
 final class TranslatorServiceTest extends Unit
 {
     private const DE_HELLO_WORLD_TRANS = ['Hello world!' => 'Hallo Welt!'];
     private const DE_HELLO_WORLD_DOMAIN = 'hello-world';
 
-    private TranslatorService $service;
+    private Translator $service;
 
     protected function setUp(): void
     {
-        $translator = new Translator('en');
+        $translator = new SymfonyTranslator('en');
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', self::DE_HELLO_WORLD_TRANS, 'de', self::DE_HELLO_WORLD_DOMAIN);
 
-        $this->service = new TranslatorService($translator);
+        $this->service = new Translator($translator);
 
         parent::setUp();
     }
