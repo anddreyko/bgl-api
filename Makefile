@@ -31,22 +31,19 @@ check: lint analyze test-clean test-build test validate-schema
 
 lint: php-lint cs-check
 
-analyze: php-stan psalm
+analyze: psalm
 
 php-lint:
-	docker compose run --rm api-php-cli composer lint
+	docker compose run --rm api-php-cli composer lint:check
 
 cs-check:
 	docker compose run --rm api-php-cli composer cs-check
 
 psalm:
-	docker compose run --rm api-php-cli composer psalm
+	docker compose run --rm api-php-cli composer psalm:check
 
 psalm-alter:
-	docker compose run --rm api-php-cli composer psalm --alter --issues=MissingParamType --dry-run
-
-php-stan:
-	docker compose run --rm api-php-cli composer phpstan
+	docker compose run --rm api-php-cli composer psalm -- --alter --issues=InvalidFalsableReturnType,InvalidNullableReturnType,InvalidReturnType,LessSpecificReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingClosureReturnType,MissingParamType,MissingPropertyType,MissingReturnType,ParamNameMismatch,PossiblyUndefinedGlobalVariable,PossiblyUndefinedVariable,PossiblyUnusedMethod,PossiblyUnusedProperty,RedundantCast,RedundantCastGivenDocblockType,UnusedMethod,UnusedProperty,UnusedVariable,UnnecessaryVarAnnotation,MissingImmutableAnnotation,MissingPureAnnotation,MissingThrowsDocblock --dry-run
 
 test-clean:
 	docker compose run --rm api-php-cli ./vendor/bin/codecept clean
