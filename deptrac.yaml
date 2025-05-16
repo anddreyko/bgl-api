@@ -1,0 +1,39 @@
+deptrac:
+  paths:
+    - ./src
+  layers:
+    - name: Core
+      collectors:
+        - type: directory
+          value: src/Core/.*
+    - name: Auth
+      collectors:
+        - type: directory
+          value: src/Domain/Auth/.*
+    - name: Plays
+      collectors:
+        - type: directory
+          value: src/Domain/Plays/.*
+    - name: Application
+      collectors:
+        - type: directory
+          value: src/Application/.*
+    - name: Presentation
+      collectors:
+        - type: directory
+          value: src/Presentation/.*
+  ruleset:
+    Presentation:
+      - Application
+      - Auth
+      - Plays
+      - Core
+    Application:
+      - Auth
+      - Plays
+      - Core
+    Auth:
+      - Core
+    Plays:
+      - Core
+    Core: ~
