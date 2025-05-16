@@ -1,4 +1,6 @@
 /.env
 /vendor
+/vendor-bin/**/vendor/
+/vendor-bin/**/composer.lock binary
 /var
 /app

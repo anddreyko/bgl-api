@@ -1,11 +1,13 @@
-path: ./
+path: .
 jobs: 10
 warning: true
-cache: ./var/.phplint.cache
+cache-dir: var/.phplint.cache
 cache-adapter: Filesystem
-log-json: ./var/.phplint.log.json
+cache-ttl: 1296000
+log-json: var/.phplint.log.json
 extensions:
   - php
 exclude:
   - vendor
+  - vendor-bin
   - var
