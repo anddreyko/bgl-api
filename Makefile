@@ -39,6 +39,9 @@ php-lint:
 cs-check:
 	docker compose run --rm api-php-cli composer cs-check
 
+deptrac:
+	docker compose run --rm api-php-cli composer deptrac -- analyse --config-file=deptrac.yaml --cache-file=var/.deptrac.cache
+
 psalm:
 	docker compose run --rm api-php-cli composer psalm
 

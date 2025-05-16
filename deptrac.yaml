@@ -1,0 +1,51 @@
+deptrac:
+  paths:
+    - ./src
+    - ./actions
+    - ./commands
+  layers:
+    - name: Core
+      collectors:
+        - type: directory
+          value: src/Core/.*
+    - name: Auth
+      collectors:
+        - type: directory
+          value: src/Contexts/Auth/.*
+    - name: Plays
+      collectors:
+        - type: directory
+          value: src/Contexts/Plays/.*
+    - name: Application
+      collectors:
+        - type: directory
+          value: src/Application/.*
+    - name: Actions
+      collectors:
+        - type: directory
+          value: actions/.*
+    - name: Commands
+      collectors:
+        - type: directory
+          value: commands/.*
+  ruleset:
+    Actions:
+      - Actions
+      - Application
+      - Auth
+      - Plays
+      - Core
+    Commands:
+      - Application
+      - Auth
+      - Plays
+      - Core
+    Application:
+      - Auth
+      - Plays
+      - Core
+    Auth:
+      - Core
+    Plays:
+      - Core
+    Core: ~
