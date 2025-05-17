@@ -1,5 +1,7 @@
 # BoardGameLog
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/anddreyko/bgl-api)
+
 BGL is an API designed for **4Records** — a project dedicated to tracking and managing tabletop gaming sessions. It
 provides structured data handling for recording game sessions, player statistics, and other relevant details.
 
