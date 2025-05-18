@@ -28,7 +28,12 @@ final readonly class AuthorizationMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if (!RouteContext::fromRequest($request)->getRoute()?->getArgument(self::ATTRIBUTE_ACCESSED)) {
+        $accessed = RouteContext::fromRequest($request)->getRoute()?->getArgument(self::ATTRIBUTE_ACCESSED);
+        if (is_string($accessed)) {
+            $accessed = trim($accessed);
+        }
+
+        if (null === $accessed || '' === $accessed) {
             if (preg_match('/.*Bearer(.+)/i', $request->getHeaderLine('Authorization'), $result) === false) {
                 throw new HttpUnauthorizedException($request);
             }

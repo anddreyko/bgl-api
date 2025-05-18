@@ -42,6 +42,7 @@ final class FixturesLoadCommand extends Command
 
         $executor = new ORMExecutor($this->em, new ORMPurger());
 
+        /** @psalm-suppress InternalMethod */
         $executor->setLogger(
             static function (string $message) use ($output) {
                 $output->writeln($message);

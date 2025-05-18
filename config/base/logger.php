@@ -26,7 +26,7 @@ return [
             $logger->pushHandler(new StreamHandler('php://stderr', $level));
         }
 
-        if (!empty($config['file'])) {
+        if (isset($config['file'])) {
             $logger->pushHandler(new StreamHandler($config['file'], $level));
         }
 
@@ -34,7 +34,7 @@ return [
     },
 
     'logger' => [
-        'level' => env('APP_DEBUG') ? Level::Debug : Level::Info,
+        'level' => (bool)env('APP_DEBUG') ? Level::Debug : Level::Info,
         'std' => true,
         'file' => null,
     ],
