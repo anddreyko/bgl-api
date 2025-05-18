@@ -89,6 +89,8 @@
         "psalm": "vendor-bin/psalm/vendor/bin/psalm",
         "psalm:check": "@psalm --no-progress --no-diff --threads=1",
         "psalm:clean": "@psalm --clear-cache",
+        "rector": "vendor-bin/rector/vendor/bin/rector",
+        "rector:check": "@rector process --no-progress-bar",
         "test": "codecept",
         "test:unit": "@test run Unit",
         "test:startup": "@test run StartUp",
