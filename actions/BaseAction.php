@@ -28,6 +28,7 @@ use Psr\Http\Message\ServerRequestInterface;
 abstract class BaseAction
 {
     public ?ServerRequestInterface $request = null;
+
     /** @var mixed[] */
     private array $args = [];
 

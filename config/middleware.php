@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-return static function (Slim\App $app) {
+return static function (Slim\App $app): void {
     $app->add(\App\Application\Middlewares\EmptyFilesMiddleware::class);
     $app->add(\App\Application\Middlewares\TrimMiddleware::class);
     $app->addBodyParsingMiddleware();

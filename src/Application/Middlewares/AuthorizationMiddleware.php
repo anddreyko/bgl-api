@@ -19,7 +19,9 @@ use Slim\Routing\RouteContext;
 final readonly class AuthorizationMiddleware implements MiddlewareInterface
 {
     public const ATTRIBUTE_ACCESSED = self::class . '::accessed';
+
     public const ATTRIBUTE_IDENTITY = self::class . '::identity';
+
     public const ATTRIBUTE_TOKEN = self::class . '::token';
 
     public function __construct(private AuthorizationService $authorizationService)
