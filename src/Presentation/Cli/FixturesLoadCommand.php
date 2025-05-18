@@ -44,7 +44,7 @@ final class FixturesLoadCommand extends Command
 
         /** @psalm-suppress InternalMethod */
         $executor->setLogger(
-            static function (string $message) use ($output) {
+            static function (string $message) use ($output): void {
                 $output->writeln($message);
             }
         );

@@ -37,6 +37,7 @@ final class CloseSessionAction extends BaseAction
             } catch (\Exception) {
             }
         }
+
         if ($startedAt) {
             $session->setStartedAt($startedAt);
         }
@@ -54,6 +55,7 @@ final class CloseSessionAction extends BaseAction
                     ->setTimezone(new \DateTimeZone('UTC'));
             } catch (\Exception) {
             }
+
             if ($finishedAt instanceof \DateTimeImmutable && $finishedAt < $session->getStartedAt()) {
                 throw new \LogicException(
                     "Incorrect time: start {$session->getStartedAt()->format('Y-m-d H:i:s')}," .
@@ -73,6 +75,7 @@ final class CloseSessionAction extends BaseAction
         if ($finishedAt) {
             $session->setFinishedAt($finishedAt);
         }
+
         $this->repository->persist($session);
 
         $this->flusher->flush();

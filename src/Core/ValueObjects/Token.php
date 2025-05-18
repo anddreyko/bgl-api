@@ -19,8 +19,9 @@ final class Token
 {
     /** @var string */
     #[Id]
-    #[Column(type: 'string', nullable: true)]
+    #[Column(type: \Doctrine\DBAL\Types\Types::STRING, nullable: true)]
     private string $value;
+
     /** @var \DateTimeImmutable */
     #[Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private \DateTimeImmutable $expires;

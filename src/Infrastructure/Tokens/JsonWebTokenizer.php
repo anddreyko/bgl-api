@@ -42,9 +42,11 @@ final readonly class JsonWebTokenizer
         if (!isset($payload['iat'])) {
             $payload['iat'] = $issuedAt->getTimestamp();
         }
+
         if (!isset($payload['nbf'])) {
             $payload['nbf'] = $issuedAt->getTimestamp();
         }
+
         if (!isset($payload['exp'])) {
             $expireAt = $issuedAt->modify($expire);
             if ($expireAt) {

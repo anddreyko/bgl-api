@@ -11,18 +11,25 @@ class Url
 {
     /** @var string|null Протокол. */
     public ?string $scheme = null;
+
     /** @var string|null Домен. */
     public ?string $host = null;
+
     /** @var int|null Порт. */
     public ?int $port = null;
+
     /** @var string|null Имя пользователя. */
     public ?string $user = null;
+
     /** @var string|null Пароль пользователя. */
     public ?string $pass = null;
+
     /** @var string|null Относительный путь. */
     public ?string $path = null;
+
     /** @var string|null Строка GET-параметров. */
     public ?string $query = null;
+
     /** @var string|null Якорь. */
     public ?string $fragment = null;
 
@@ -102,6 +109,7 @@ class Url
             if (!property_exists(self::class, $key)) {
                 continue;
             }
+
             if ($key === 'query' && is_array($value)) {
                 $value = http_build_query($value);
             }
