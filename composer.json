@@ -73,7 +73,7 @@
         "codeception/module-phpbrowser": ">=3.0.1",
         "codeception/module-rest": "^3.4.1",
         "doctrine/data-fixtures": "^1.8.1",
-        "roave/security-advisories": "dev-master"
+        "roave/security-advisories": "dev-latest"
     },
     "scripts": {
         "bin": "echo 'bin not installed'",
