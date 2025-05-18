@@ -28,6 +28,7 @@ final class OpenSessionAction extends BaseAction
         if (is_string($started)) {
             $started = trim($started);
         }
+
         $startedAt = null;
         if (null !== $started && '' !== $started) {
             try {
@@ -35,6 +36,7 @@ final class OpenSessionAction extends BaseAction
             } catch (\Exception) {
             }
         }
+
         $startedAt ??= new \DateTimeImmutable();
 
         $this->repository->create(
