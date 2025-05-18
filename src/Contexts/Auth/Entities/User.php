@@ -44,8 +44,10 @@ class User
         private UserStatusEnum $status = UserStatusEnum::Wait,
         #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ["default" => 'CURRENT_TIMESTAMP'])]
         private \DateTimeImmutable $createdAt = new \DateTimeImmutable(),
+        /** @var Collection<int, UserTokenConfirm> */
         #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserTokenConfirm::class, cascade: ['all'], orphanRemoval: true)]
         private Collection $tokenConfirm = new ArrayCollection(),
+        /** @var Collection<int, UserTokenAccess> */
         #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserTokenAccess::class, cascade: ['all'], orphanRemoval: true)]
         private Collection $tokenAccess = new ArrayCollection(),
     ) {
@@ -60,7 +62,7 @@ class User
     ): self {
         $user = new self(id: $id, email: $email, hash: $hash, createdAt: $createdAt);
 
-        if ($token) {
+        if ($token instanceof Token) {
             $user->setTokenConfirm($token);
         }
 
@@ -98,7 +100,7 @@ class User
     public function getTokenConfirm(): array
     {
         return $this->tokenConfirm
-            ->map(static fn(UserTokenConfirm $token) => $token->getToken())
+            ->map(static fn(UserTokenConfirm $token): Token => $token->getToken())
             ->toArray();
     }
 
@@ -109,8 +111,8 @@ class User
 
     public function removeTokenConfirm(?Token $token = null): void
     {
-        if ($token) {
-            $this->tokenConfirm->removeElement($token);
+        if ($token instanceof Token) {
+            $this->tokenConfirm->removeElement(new UserTokenConfirm($this, $token));
         } else {
             $this->tokenConfirm->clear();
         }
@@ -151,12 +153,12 @@ class User
     public function getTokenAccess(): array
     {
         return $this->tokenAccess
-            ->map(static fn(UserTokenAccess $token) => $token->getToken())
+            ->map(static fn(UserTokenAccess $token): WebToken => $token->getToken())
             ->toArray();
     }
 
-    public function removeTokenAccess(int | string $key): void
+    public function removeTokenAccess(int|string $key): void
     {
-        $this->tokenAccess->remove($key);
+        $this->tokenAccess->remove((int)$key);
     }
 }

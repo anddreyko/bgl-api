@@ -23,9 +23,13 @@ final class OpenSessionAction extends BaseAction
     {
         $id = Id::create();
 
+        /** @var ?string $started */
         $started = $this->getParam('started_at');
+        if (is_string($started)) {
+            $started = trim($started);
+        }
         $startedAt = null;
-        if (!empty($started)) {
+        if (null !== $started && '' !== $started) {
             try {
                 $startedAt = new \DateTimeImmutable($started);
             } catch (\Exception) {
@@ -36,7 +40,7 @@ final class OpenSessionAction extends BaseAction
         $this->repository->create(
             new Session(
                 id: $id,
-                name: $this->getParam('name') ?: 'Session at ' . $startedAt->format('d.m.Y H:i'),
+                name: (string)$this->getParam('name') ?: 'Session at ' . $startedAt->format('d.m.Y H:i'),
                 startedAt: $startedAt->setTimezone(new \DateTimeZone('UTC'))
             )
         );
