@@ -27,7 +27,7 @@ docker-down-clear-prod:
 docker-up-prod:
 	docker compose -f docker-compose-prod.yml up -d
 
-check: lint deptrac analyze test-clean test-build test validate-schema
+check: lint deptrac rector analyze test-clean test-build test validate-schema
 
 lint: php-lint cs-check
 
@@ -47,6 +47,9 @@ psalm:
 
 psalm-alter:
 	docker compose run --rm api-php-cli composer psalm -- --alter --issues=InvalidFalsableReturnType,InvalidNullableReturnType,InvalidReturnType,LessSpecificReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingClosureReturnType,MissingParamType,MissingPropertyType,MissingReturnType,ParamNameMismatch,PossiblyUndefinedGlobalVariable,PossiblyUndefinedVariable,PossiblyUnusedMethod,PossiblyUnusedProperty,RedundantCast,RedundantCastGivenDocblockType,UnusedMethod,UnusedProperty,UnusedVariable,UnnecessaryVarAnnotation,MissingImmutableAnnotation,MissingPureAnnotation,MissingThrowsDocblock --dry-run
+
+rector:
+	docker compose run --rm api-php-cli composer rector:check
 
 test-clean:
 	docker compose run --rm api-php-cli ./vendor/bin/codecept clean
