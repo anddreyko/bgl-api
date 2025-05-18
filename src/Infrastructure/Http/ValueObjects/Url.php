@@ -180,7 +180,7 @@ class Url
      */
     public function getParsedQuery(): array
     {
-        if (!empty($this->query)) {
+        if (is_string($this->query)) {
             parse_str($this->query, $parsedQuery);
         } else {
             $parsedQuery = [];

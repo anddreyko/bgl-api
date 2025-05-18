@@ -24,9 +24,14 @@ final class CloseSessionAction extends BaseAction
 
         $session = $this->repository->getOneById(new Id($id));
 
+        /** @var string|null $started */
         $started = $this->getParam('started_at');
+        if (is_string($started)) {
+            $started = trim($started);
+        }
+
         $startedAt = null;
-        if (!empty($started)) {
+        if (null !== $started && '' !== $started) {
             try {
                 $startedAt = new \DateTimeImmutable($started);
             } catch (\Exception) {
@@ -36,15 +41,20 @@ final class CloseSessionAction extends BaseAction
             $session->setStartedAt($startedAt);
         }
 
+        /** @var string|null $finished */
         $finished = $this->getParam('finished_at');
+        if (is_string($finished)) {
+            $finished = trim($finished);
+        }
+
         $finishedAt = null;
-        if (!empty($finished)) {
+        if (null !== $finished && '' !== $finished) {
             try {
                 $finishedAt = (new \DateTimeImmutable($finished))
                     ->setTimezone(new \DateTimeZone('UTC'));
             } catch (\Exception) {
             }
-            if ($finishedAt < $session->getStartedAt()) {
+            if ($finishedAt instanceof \DateTimeImmutable && $finishedAt < $session->getStartedAt()) {
                 throw new \LogicException(
                     "Incorrect time: start {$session->getStartedAt()->format('Y-m-d H:i:s')}," .
                     " finish {$finishedAt->format('Y-m-d H:i:s')}"
@@ -53,6 +63,7 @@ final class CloseSessionAction extends BaseAction
         }
 
         if (!$finishedAt) {
+            /** @var ?int $interval */
             $interval = $this->getParam('interval');
             $finishedAt = is_numeric($interval)
                 ? $session->getStartedAt()->modify("+ $interval min")

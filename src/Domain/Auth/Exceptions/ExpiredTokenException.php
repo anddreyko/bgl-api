@@ -10,6 +10,6 @@ final class ExpiredTokenException extends \RuntimeException
         string $message = 'This token has been expired.',
         ?\Throwable $previous = null
     ) {
-        parent::__construct(message: $message, code: $previous?->getCode() ?? 0, previous: $previous);
+        parent::__construct(message: $message, code: (int)$previous?->getCode(), previous: $previous);
     }
 }

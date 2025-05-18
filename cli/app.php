@@ -15,8 +15,11 @@ use Symfony\Component\Console\Application;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-if (env('SENTRY_DSN')) {
-    Sentry\init(['dsn' => env('SENTRY_DSN')]);
+
+/** @var ?string $sentry */
+$sentry = env('SENTRY_DSN');
+if (null !== $sentry) {
+    Sentry\init(['dsn' => $sentry]);
 }
 
 /**
@@ -26,7 +29,7 @@ if (env('SENTRY_DSN')) {
 $container = require __DIR__ . '/../config/container.php';
 
 $app = new Application('Console');
-if (env('SENTRY_DSN')) {
+if (null !== $sentry) {
     $app->setCatchExceptions(false);
 }
 
