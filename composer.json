@@ -51,7 +51,7 @@
         "monolog/monolog": "^3.9",
         "php-di/php-di": "^7.0.9",
         "ramsey/uuid": "^4.7.6",
-        "sentry/sdk": "^3.6",
+        "sentry/sentry": "^4.11",
         "slim/psr7": "^1.7",
         "slim/slim": "^4.14",
         "symfony/cache": "^6.4.20",
