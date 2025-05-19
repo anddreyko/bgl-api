@@ -10,6 +10,7 @@ actor_suffix: Tester
 extensions:
   enabled:
     - Codeception\Extension\RunFailed
+    - Tests\Support\Extensions\DgBypassFinalsExtension
 
 settings:
   shuffle: true
