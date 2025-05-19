@@ -82,6 +82,7 @@
         "codeception/module-phpbrowser": ">=3.0.1",
         "codeception/module-rest": "^3.4.1",
         "codeception/stub": "^4.1",
+        "dg/bypass-finals": "^1.9",
         "doctrine/data-fixtures": "^1.8.1",
         "guzzlehttp/guzzle": "^7.9",
         "guzzlehttp/psr7": "^2.7",
