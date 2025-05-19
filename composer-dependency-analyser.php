@@ -12,16 +12,19 @@ return $config
     ->addPathToScan(__DIR__ . '/helpers', isDev: false)
     ->addPathToScan(__DIR__ . '/migrations', isDev: false)
     ->addPathToScan(__DIR__ . '/src', isDev: false)
+    ->addPathToScan(__DIR__ . '/templates', isDev: false)
     ->addPathToScan(__DIR__ . '/translations', isDev: false)
     ->addPathToScan(__DIR__ . '/web', isDev: false)
-    ->addPathToExclude(__DIR__ . '/fixtures')
-    ->addPathToExclude(__DIR__ . '/tests')
+    ->addPathToScan(__DIR__ . '/fixtures', isDev: true)
+    ->addPathToScan(__DIR__ . '/tests', isDev: true)
+    # ->addPathToExclude(__DIR__ . '/tests/Support/_generated')
     ->disableComposerAutoloadPathScan() // disable automatic scan of autoload & autoload-dev paths from composer.json
     ->setFileExtensions(['php']) // applies only to directory scanning, not directly listed files
 
     //// Ignoring errors
     ->ignoreErrors([ErrorType::DEV_DEPENDENCY_IN_PROD])
-    ->ignoreErrorsOnPackage('zircote/swagger-php', [ErrorType::UNUSED_DEPENDENCY])
+    ->ignoreErrorsOnPackage('symfony/config', [ErrorType::UNUSED_DEPENDENCY])
+    ->ignoreErrorsOnPackage('phpunit/phpunit', [ErrorType::SHADOW_DEPENDENCY])
     # ->ignoreErrorsOnPackage('roave/security-advisories', [ErrorType::UNUSED_DEPENDENCY])
     # ->ignoreErrorsOnPath(__DIR__ . '/cache/DIC.php', [ErrorType::SHADOW_DEPENDENCY])
     # ->ignoreErrorsOnPackage('symfony/polyfill-php73', [ErrorType::UNUSED_DEPENDENCY])

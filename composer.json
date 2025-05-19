@@ -40,31 +40,40 @@
     "require": {
         "php": ">=8.2.7",
         "ext-json": "*",
-        "ext-pdo": "*",
+        "ext-mbstring": "*",
         "composer": "*",
+        "doctrine/collections": "^2.3",
+        "doctrine/dbal": "^3.9",
+        "doctrine/event-manager": "^2.0",
         "doctrine/migrations": "^3.9",
         "doctrine/orm": "^2.20.2",
+        "doctrine/persistence": "^3.4",
         "firebase/php-jwt": "^6.11",
-        "guzzlehttp/guzzle": "^7.9.3",
         "kudashevs/accept-language": "^3.5",
         "laminas/laminas-config-aggregator": "^1.18",
         "monolog/monolog": "^3.9",
         "php-di/php-di": "^7.0.9",
+        "psr/container": "^2.0",
+        "psr/http-factory": "^1.1",
+        "psr/http-message": "^2.0",
+        "psr/http-server-handler": "^1.0",
+        "psr/http-server-middleware": "^1.0",
+        "psr/log": "^3.0",
         "ramsey/uuid": "^4.7.6",
         "sentry/sentry": "^4.11",
         "slim/psr7": "^1.7",
         "slim/slim": "^4.14",
         "symfony/cache": "^6.4.20",
-        "symfony/config": "^6.4.14",
-        "symfony/dotenv": "^6.4.16",
-        "symfony/google-mailer": "^6.4.13",
+        "symfony/config": "^7.2",
+        "symfony/console": "^7.2",
         "symfony/mailer": "^6.4.18",
+        "symfony/mime": "^7.2",
         "symfony/translation": "^6.4.19",
+        "symfony/translation-contracts": "^3.5",
         "symfony/validator": "^6.4.20",
         "twig/twig": "^3.20",
         "vlucas/phpdotenv": "^3.6.10",
-        "webmozart/assert": "^1.11",
-        "zircote/swagger-php": "^4.11.1"
+        "webmozart/assert": "^1.11"
     },
     "require-dev": {
         "bamarni/composer-bin-plugin": "^1.8",
@@ -72,8 +81,12 @@
         "codeception/module-asserts": ">=3",
         "codeception/module-phpbrowser": ">=3.0.1",
         "codeception/module-rest": "^3.4.1",
+        "codeception/stub": "^4.1",
         "doctrine/data-fixtures": "^1.8.1",
-        "roave/security-advisories": "dev-latest"
+        "guzzlehttp/guzzle": "^7.9",
+        "guzzlehttp/psr7": "^2.7",
+        "roave/security-advisories": "dev-latest",
+        "symfony/dotenv": "^7.2"
     },
     "scripts": {
         "bin": "echo 'bin not installed'",
@@ -103,7 +116,8 @@
             "@test:startup",
             "@test:accept",
             "@test:api"
-        ]
+        ],
+        "openapi": "vendor-bin/openapi/bin/openapi"
     },
     "extra": {
         "bamarni-bin": {
