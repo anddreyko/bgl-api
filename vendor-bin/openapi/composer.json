@@ -1,0 +1,5 @@
+{
+    "require-dev": {
+        "zircote/swagger-php": "^4.11.1"
+    }
+}
