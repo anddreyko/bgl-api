@@ -84,6 +84,7 @@
         "lint:check": "@lint -c .phplint.yml",
         "cs-check": "vendor-bin/codesniffer/vendor/bin/phpcs",
         "cs-fix": "vendor-bin/codesniffer/vendor/bin/phpcbf",
+        "composer-dependency": "vendor-bin/composer-dependency/vendor/bin/composer-dependency-analyser",
         "deptrac": "vendor-bin/deptrac/vendor/bin/deptrac",
         "deptrac:check": "@deptrac analyse --config-file=deptrac.yaml --cache-file=var/.deptrac.cache --no-progress",
         "psalm": "vendor-bin/psalm/vendor/bin/psalm",
