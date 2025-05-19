@@ -27,7 +27,7 @@ docker-down-clear-prod:
 docker-up-prod:
 	docker compose -f docker-compose-prod.yml up -d
 
-check: lint deptrac rector analyze test-clean test-build test validate-schema
+check: lint deptrac rector composer-dependency analyze test-clean test-build test validate-schema
 
 lint: php-lint cs-check
 
@@ -50,6 +50,9 @@ psalm-alter:
 
 rector:
 	docker compose run --rm api-php-cli composer rector:check
+
+composer-dependency:
+	docker compose run --rm api-php-cli composer composer-dependency
 
 test-clean:
 	docker compose run --rm api-php-cli ./vendor/bin/codecept clean
