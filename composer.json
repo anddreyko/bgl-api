@@ -101,6 +101,8 @@
         "composer-dependency": "vendor-bin/composer-dependency/vendor/bin/composer-dependency-analyser",
         "deptrac": "vendor-bin/deptrac/vendor/bin/deptrac",
         "deptrac:check": "@deptrac analyse --config-file=deptrac.yaml --cache-file=var/.deptrac.cache --no-progress",
+        "pdepend": "vendor-bin/pdepend/vendor/bin/pdepend",
+        "pdepend:check": "@pdepend --summary-xml=var/pdepend/pdepend.xml --jdepend-chart=var/pdepend/pdepend.svg --overview-pyramid=var/pdepend/pdepend-pyramid.svg --ignore=fixtures,tests,var,vendor,vendor-bin .",
         "psalm": "vendor-bin/psalm/vendor/bin/psalm",
         "psalm:check": "@psalm --no-progress --no-diff --threads=1",
         "psalm:clean": "@psalm --clear-cache",
