@@ -42,6 +42,9 @@ cs-check:
 deptrac:
 	docker compose run --rm api-php-cli composer deptrac:check
 
+pdepend:
+	docker compose run --rm api-php-cli composer pdepend:check
+
 psalm:
 	docker compose run --rm api-php-cli composer psalm:check
 
