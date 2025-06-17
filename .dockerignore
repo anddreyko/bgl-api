@@ -1,6 +1,6 @@
 /.idea
 /.git
 /docker-compose.yml
+/var/
 /vendor/
-/vendor-bin/**/vendor/
-/vendor-bin/**/composer.lock binary
+/vendor-bin/
