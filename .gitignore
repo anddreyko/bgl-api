@@ -1,4 +1,6 @@
 /.env
 /Makefile
 /vendor
+/vendor-bin/**/vendor/
+/vendor-bin/**/composer.lock binary
 /var
