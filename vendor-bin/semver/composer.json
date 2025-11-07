@@ -1,0 +1,5 @@
+{
+    "require-dev": {
+        "voral/version-increment": "^3.1"
+    }
+}

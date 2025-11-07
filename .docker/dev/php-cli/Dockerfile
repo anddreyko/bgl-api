@@ -11,6 +11,12 @@ RUN docker-php-ext-install opcache
 
 RUN apk add --no-cache unzip
 
+RUN apk add --no-cache git \
+    && git config --global --add safe.directory /app
+
+COPY dev/php-cli/.gitconfig /root/.gitconfig
+COPY dev/php-cli/.gitignore /root/.gitignore
+
 RUN mv $PHP_INI_DIR/php.ini-development $PHP_INI_DIR/php.ini
 
 COPY dev/php/conf.d /usr/local/etc/php/conf.d

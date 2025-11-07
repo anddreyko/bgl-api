@@ -1,5 +1,7 @@
 /.env
 /Makefile
+/.docker/dev/php-cli/.gitconfig
+/.docker/dev/php-cli/.gitignore
 /vendor
 /vendor-bin/**/vendor/
 /vendor-bin/**/composer.lock binary

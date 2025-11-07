@@ -33,7 +33,21 @@
         "bin": "echo 'bin not installed'",
         "post-install-cmd": [
             "@composer bin all install"
-        ]
+        ],
+        "vi": "vendor-bin/semver/vendor/bin/vs-version-increment",
+        "vi:major": "@semver major",
+        "vi:minor": "@semver minor",
+        "vi:patch": "@semver patch",
+        "vi:list": "@semver --list",
+        "vi:debug": "@semver --debug"
+    },
+    "scripts-descriptions": {
+        "vi": "Alias vs-version-increment, auto-detect version increment based on commit analysis",
+        "vi:major": "Increment major version and update CHANGELOG.md",
+        "vi:minor": "Increment minor version and update CHANGELOG.md",
+        "vi:patch": "Increment patch version and update CHANGELOG.md",
+        "vi:list": "Display registered commit types and scopes",
+        "vi:debug": "Preview auto-detected changes without applying them"
     },
     "extra": {
         "bamarni-bin": {
