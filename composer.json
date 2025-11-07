@@ -34,6 +34,7 @@
         "post-install-cmd": [
             "@composer bin all install"
         ],
+        "cd": "vendor-bin/composer-dependency/vendor/bin/composer-dependency-analyser",
         "vi": "vendor-bin/semver/vendor/bin/vs-version-increment",
         "vi:major": "@semver major",
         "vi:minor": "@semver minor",
@@ -42,6 +43,7 @@
         "vi:debug": "@semver --debug"
     },
     "scripts-descriptions": {
+        "cd": "Alias composer-dependency-analyser",
         "vi": "Alias vs-version-increment, auto-detect version increment based on commit analysis",
         "vi:major": "Increment major version and update CHANGELOG.md",
         "vi:minor": "Increment minor version and update CHANGELOG.md",
