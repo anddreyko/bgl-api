@@ -1,0 +1,21 @@
+{
+    "require-dev": {
+        "codeception/codeception": "^5.3",
+        "codeception/module-asserts": "^3.2",
+        "codeception/module-cli": "^2.0",
+        "codeception/module-phpbrowser": "^3.0",
+        "codeception/module-rest": "^3.4",
+        "vlucas/phpdotenv": "^5.6"
+    },
+    "config": {
+        "process-timeout": 0,
+        "soft-packages": true,
+        "sort-packages": true,
+        "bump-after-update": true,
+        "apcu-autoloader": true,
+        "optimize-autoloader": true,
+        "allow-plugins": {
+            "infection/extension-installer": true
+        }
+    }
+}

@@ -1,0 +1,9 @@
+actor: WebTester
+suite_namespace: Bgl\Tests\Web
+modules:
+  enabled:
+    - Asserts
+    - REST:
+        depends: PhpBrowser
+        part: json
+        url: '%APP_EXTERNAL_HOST%:%APP_EXTERNAL_PORT%'

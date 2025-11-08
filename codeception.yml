@@ -1,0 +1,33 @@
+namespace: Bgl\Tests
+support_namespace: Support
+paths:
+  tests: tests
+  output: var/.tests
+  support: tests/Support
+  data: tests/Support/Data
+  envs: tests/Support/Envs
+actor_suffix: Tester
+extensions:
+  enabled:
+    - Codeception\Extension\RunFailed
+
+bootstrap: bootstrap.php
+
+settings:
+  shuffle: true
+  lint: true
+  colors: true
+
+coverage:
+  enabled: true
+  include:
+    - src/*
+  show_uncovered: true
+  show_only_summary: true
+
+env:
+  APP_ENV: test
+  APP_DEBUG: true
+
+params:
+  - env

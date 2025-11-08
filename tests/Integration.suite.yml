@@ -1,0 +1,5 @@
+actor: IntegrationTester
+suite_namespace: Bgl\Tests\Integration
+modules:
+  enabled:
+    - Asserts

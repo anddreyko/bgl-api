@@ -1,0 +1,5 @@
+actor: FunctionalTester
+suite_namespace: Bgl\Tests\Functional
+modules:
+  enabled:
+    - Asserts

@@ -1,0 +1,6 @@
+actor: CliTester
+suite_namespace: Bgl\Tests\Cli
+modules:
+  enabled:
+    - Asserts
+    - Cli
