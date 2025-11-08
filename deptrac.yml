@@ -1,0 +1,52 @@
+deptrac:
+  paths:
+    - ./src
+    - ./tests
+    - ./vendor
+
+  exclude_files:
+    - '#vendor/psr/.*#'
+
+  layers:
+    - name: Core
+      collectors:
+        - type: directory
+          value: src/Core/.*
+
+    - name: Domain
+      collectors:
+        - type: directory
+          value: src/Domain/.*
+
+    - name: Application
+      collectors:
+        - type: directory
+          value: src/Application/.*
+
+    - name: Infrastructure
+      collectors:
+        - type: directory
+          value: src/Infrastructure/.*
+
+    - name: Presentation
+      collectors:
+        - type: directory
+          value: src/Presentation/.*
+
+    - name: Tests
+      collectors:
+        - type: directory
+          value: tests/.*
+
+    - name: Vendor
+      collectors:
+        - type: directory
+          value: vendor/.*
+
+  ruleset:
+    Core: [ ]
+    Domain: [ Core ]
+    Infrastructure: [ Vendor, Domain, Core ]
+    Application: [ Infrastructure, Domain, Core ]
+    Presentation: [ Vendor, Application, Domain, Core ]
+    Tests: [ Vendor, Presentation, Infrastructure, Application, Domain, Core ]

@@ -57,9 +57,14 @@
             "@lp:run",
             "@ps:run"
         ],
+        "scan:depend": [
+            "@cd",
+            "@dt:run"
+        ],
         "scan:all": [
             "@cd",
             "@scan:php",
+            "@dt:run",
             "@test:all"
         ],
         "lp": "vendor-bin/phplint/vendor/bin/phplint",
@@ -68,6 +73,8 @@
         "ps:run": "@ps --no-progress --no-diff --threads=1 -c psalm.xml",
         "ps:clean": "@ps --clear-cache -c psalm.xml",
         "cd": "vendor-bin/composer-dependency/vendor/bin/composer-dependency-analyser",
+        "dt": "vendor-bin/deptrac/vendor/bin/deptrac",
+        "dt:run": "@dt analyse --config-file=deptrac.yml --cache-file=var/.deptrac.cache --no-progress",
         "test": "APP_ENV=test vendor-bin/codeception/vendor/bin/codecept",
         "test:unit": "@test run Unit",
         "test:func": "@test run Functional",
@@ -103,6 +110,7 @@
     },
     "scripts-descriptions": {
         "scan:php": "Running all scripts with PHP code validation tools",
+        "scan:depend": "Running all scripts with dependencies validation tools",
         "scan:all": "Running all scripts with all validation tools",
         "lp": "Alias phplint",
         "lp:run": "Check by linting PHP-code",
@@ -110,6 +118,8 @@
         "ps:run": "Check by Psalm",
         "ps:clean": "Clean cache Psalm",
         "cd": "Alias composer-dependency-analyser",
+        "dt": "Alias deptrac",
+        "dt:run": "Run archutecture tests",
         "test": "Alias Codeception",
         "test:unit": "Run unit tests",
         "test:func": "Run functional tests",
