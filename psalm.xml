@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<psalm
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    errorLevel="1"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor-bin/psalm/vendor/vimeo/psalm/config.xsd"
+    findUnusedBaselineEntry="true"
+    findUnusedCode="false"
+    cacheDirectory="var/.psalm.cache"
+>
+    <projectFiles>
+        <directory name="cli"/>
+        <directory name="config"/>
+        <directory name="src"/>
+        <directory name="web"/>
+        <ignoreFiles>
+            <directory name="var"/>
+            <directory name="vendor"/>
+            <directory name="vendor-bin"/>
+        </ignoreFiles>
+    </projectFiles>
+</psalm>
