@@ -67,6 +67,8 @@
             "@dt:run",
             "@test:all"
         ],
+        "cs": "vendor-bin/phpcs/vendor/bin/phpcs",
+        "cs:fix": "vendor-bin/phpcs/vendor/bin/phpcbf",
         "lp": "vendor-bin/phplint/vendor/bin/phplint",
         "lp:run": "@lp -c .phplint.yml",
         "ps": "vendor-bin/psalm/vendor/bin/psalm",
@@ -112,6 +114,8 @@
         "scan:php": "Running all scripts with PHP code validation tools",
         "scan:depend": "Running all scripts with dependencies validation tools",
         "scan:all": "Running all scripts with all validation tools",
+        "cs": "Alias phpcs",
+        "cs:fix": "Alias phpcbf",
         "lp": "Alias phplint",
         "lp:run": "Check by linting PHP-code",
         "ps": "Alias Psalm",
