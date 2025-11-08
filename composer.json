@@ -45,6 +45,10 @@
             "Codeception\\Module\\": [
                 "vendor-bin/codeception/vendor/codeception/module-cli/src/Codeception/Module"
             ],
+            "Rector\\": [
+                "vendor-bin/rector/vendor/rector/rector/src",
+                "vendor-bin/rector/vendor/rector/rector/rules"
+            ],
             "Vasoft\\VersionIncrement\\": "vendor-bin/semver/vendor/voral/version-increment/src"
         }
     },
@@ -56,6 +60,10 @@
         "scan:php": [
             "@lp:run",
             "@ps:run"
+        ],
+        "scan:style": [
+            "@rc:run",
+            "@cs:fix"
         ],
         "scan:depend": [
             "@cd",
@@ -69,6 +77,8 @@
         ],
         "cs": "vendor-bin/phpcs/vendor/bin/phpcs",
         "cs:fix": "vendor-bin/phpcs/vendor/bin/phpcbf",
+        "rc": "vendor-bin/rector/vendor/bin/rector",
+        "rc:run": "@rc process --no-progress-bar",
         "lp": "vendor-bin/phplint/vendor/bin/phplint",
         "lp:run": "@lp -c .phplint.yml",
         "ps": "vendor-bin/psalm/vendor/bin/psalm",
@@ -112,10 +122,13 @@
     },
     "scripts-descriptions": {
         "scan:php": "Running all scripts with PHP code validation tools",
+        "scan:style": "Running clean style tools",
         "scan:depend": "Running all scripts with dependencies validation tools",
         "scan:all": "Running all scripts with all validation tools",
         "cs": "Alias phpcs",
         "cs:fix": "Alias phpcbf",
+        "rc": "Alias rector",
+        "rc:run": "Check by codestyle rector",
         "lp": "Alias phplint",
         "lp:run": "Check by linting PHP-code",
         "ps": "Alias Psalm",
