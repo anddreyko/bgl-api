@@ -3,3 +3,4 @@ suite_namespace: Bgl\Tests\Integration
 modules:
   enabled:
     - Asserts
+    - Bgl\Tests\Support\Modules\PsrLoggerModule
