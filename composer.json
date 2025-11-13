@@ -25,6 +25,7 @@
     "require": {
         "php": ">=8.4",
         "composer": "2.*",
+        "php-di/php-di": "^7.1",
         "psr/container": "^2.0"
     },
     "require-dev": {
