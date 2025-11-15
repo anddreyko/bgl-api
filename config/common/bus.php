@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Bgl\Application\Handlers;
 use Bgl\Core\Messages\Dispatcher;
 use Bgl\Core\Messages\Message;
 use Bgl\Core\Messages\MessageHandler;
@@ -28,6 +29,7 @@ return [
 
     'bus' => [
         'handlers' => [
+            [Handlers\Ping\Command::class, Handlers\Ping\Handler::class],
         ],
         'middleware' => [
         ],
