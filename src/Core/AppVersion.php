@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Core\ValueObjects;
+namespace Bgl\Core;
 
 /**
  * @see \Bgl\Tests\Unit\AppVersionCest
