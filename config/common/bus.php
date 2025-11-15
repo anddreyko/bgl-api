@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Bgl\Application\Aspects;
 use Bgl\Application\Handlers;
 use Bgl\Core\Messages\Dispatcher;
 use Bgl\Core\Messages\Message;
@@ -32,6 +33,7 @@ return [
             [Handlers\Ping\Command::class, Handlers\Ping\Handler::class],
         ],
         'middleware' => [
+            Aspects\Logging::class,
         ],
     ],
 ];
