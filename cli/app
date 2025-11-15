@@ -3,4 +3,15 @@
 
 declare(strict_types=1);
 
-echo 'Hello world!' . PHP_EOL;
+use Bgl\Application\Handlers\Ping\Command;
+use Bgl\Core\Messages\Dispatcher;
+
+include __DIR__ . '/../vendor/autoload.php';
+
+/** @var \Psr\Container\ContainerInterface $container */
+$container = require __DIR__ . '/../config/container.php';
+
+echo var_export(
+        $container->get(Dispatcher::class)->dispatch(new Command(new DateTimeImmutable())),
+        true
+    ) . PHP_EOL;
