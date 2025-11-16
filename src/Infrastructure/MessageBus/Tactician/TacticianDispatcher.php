@@ -6,6 +6,7 @@ namespace Bgl\Infrastructure\MessageBus\Tactician;
 
 use Bgl\Core\Messages\Dispatcher;
 use Bgl\Core\Messages\Envelope;
+use Bgl\Core\Messages\EnvelopeFactory;
 use Bgl\Core\Messages\Message;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Core\Messages\MessageIdGenerator;
@@ -32,6 +33,7 @@ final readonly class TacticianDispatcher implements Dispatcher
         array $handlers,
         array $middleware,
         private MessageIdGenerator $messageIdGenerator,
+        private EnvelopeFactory $envelopeFactory,
         ContainerInterface $container,
     ) {
         $container = new Container(
@@ -72,14 +74,10 @@ final readonly class TacticianDispatcher implements Dispatcher
     ): mixed {
         $messageId = $this->messageIdGenerator->generate();
 
+        /** @var Envelope<Message<TResult>> $envelope */
+        $envelope = $this->envelopeFactory->build($message, $messageId, $parent);
+
         /** @var TResult */
-        return $this->commandBus->handle(
-            new Envelope(
-                $message,
-                $messageId,
-                $parent?->messageId,
-                $parent->traceId ?? $messageId
-            )
-        );
+        return $this->commandBus->handle($envelope);
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bgl\Tests\Integration\MessageBus;
 
 use Bgl\Core\Messages\Dispatcher;
+use Bgl\Core\Messages\EnvelopeFactory;
 use Bgl\Core\Messages\MessageIdGenerator;
 use Bgl\Tests\Support\DiHelper;
 use Bgl\Tests\Support\IntegrationTester;
@@ -38,6 +39,7 @@ abstract class BaseDispatcher
                 Logging::class,
             ],
             messageIdGenerator: $container->get(MessageIdGenerator::class),
+            envelopeFactory: new EnvelopeFactory(),
             container: $container
         );
     }
