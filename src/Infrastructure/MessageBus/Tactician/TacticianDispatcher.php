@@ -8,6 +8,7 @@ use Bgl\Core\Messages\Dispatcher;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\Message;
 use Bgl\Core\Messages\MessageHandler;
+use Bgl\Core\Messages\MessageIdGenerator;
 use Bgl\Core\Messages\MessageMiddleware;
 use DI\Container;
 use League\Tactician\CommandBus;
@@ -30,6 +31,7 @@ final readonly class TacticianDispatcher implements Dispatcher
     public function __construct(
         array $handlers,
         array $middleware,
+        private MessageIdGenerator $messageIdGenerator,
         ContainerInterface $container,
     ) {
         $container = new Container(
@@ -68,7 +70,7 @@ final readonly class TacticianDispatcher implements Dispatcher
         Message $message,
         ?Envelope $parent = null
     ): mixed {
-        $messageId = (string)getenv('APP_ENV') . (string)random_int(10000000, 99999999);
+        $messageId = $this->messageIdGenerator->generate();
 
         /** @var TResult */
         return $this->commandBus->handle(

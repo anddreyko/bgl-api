@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bgl\Tests\Integration\MessageBus;
 
 use Bgl\Core\Messages\Dispatcher;
+use Bgl\Core\Messages\MessageIdGenerator;
 use Bgl\Tests\Support\DiHelper;
 use Bgl\Tests\Support\IntegrationTester;
 use Bgl\Tests\Support\Messages\GetTimestamp;
@@ -24,6 +25,8 @@ abstract class BaseDispatcher
 
     public function _before(): void
     {
+        $container = DiHelper::container();
+
         $class = $this->dispatcherClass();
         $this->dispatcher = new $class(
             handlers: [
@@ -34,7 +37,8 @@ abstract class BaseDispatcher
             middleware: [
                 Logging::class,
             ],
-            container: DiHelper::container()
+            messageIdGenerator: $container->get(MessageIdGenerator::class),
+            container: $container
         );
     }
 

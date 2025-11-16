@@ -7,6 +7,7 @@ use Bgl\Application\Handlers;
 use Bgl\Core\Messages\Dispatcher;
 use Bgl\Core\Messages\Message;
 use Bgl\Core\Messages\MessageHandler;
+use Bgl\Core\Messages\MessageIdGenerator;
 use Bgl\Core\Messages\MessageMiddleware;
 use Bgl\Infrastructure\MessageBus\Tactician\TacticianDispatcher;
 use Psr\Container\ContainerInterface;
@@ -20,10 +21,13 @@ return [
          * } $config
          */
         $config = $container->get('bus');
+        /** @var MessageIdGenerator $generator */
+        $generator = $container->get(MessageIdGenerator::class);
 
         return new TacticianDispatcher(
             handlers: $config['handlers'],
             middleware: $config['middleware'],
+            messageIdGenerator: $generator,
             container: $container
         );
     },
