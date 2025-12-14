@@ -11,6 +11,10 @@ RUN docker-php-ext-install opcache
 
 RUN apk add --no-cache unzip
 
+RUN apk add --no-cache postgresql-dev bash coreutils \
+    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+    && docker-php-ext-install pdo_pgsql
+
 RUN apk add --no-cache git \
     && git config --global --add safe.directory /app
 
