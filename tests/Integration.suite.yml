@@ -3,4 +3,11 @@ suite_namespace: Bgl\Tests\Integration
 modules:
   enabled:
     - Asserts
+    - Cli
     - Bgl\Tests\Support\Modules\PsrLoggerModule
+extensions:
+  enabled:
+    - \Bgl\Tests\Support\Extensions\CliRunnerExtension:
+        commands: [
+          'APP_ENV=test cli/app orm:schema-tool:update --force'
+        ]
