@@ -3,8 +3,12 @@
         "codeception/codeception": "^5.3",
         "codeception/module-asserts": "^3.2",
         "codeception/module-cli": "^2.0",
+        "codeception/module-db": "^3.2",
         "codeception/module-phpbrowser": "^3.0",
         "codeception/module-rest": "^3.4",
+        "infection/codeception-adapter": "^0.4.4",
+        "infection/infection": "^0.31.9",
+        "roave/infection-static-analysis-plugin": "^1.41",
         "vlucas/phpdotenv": "^5.6"
     },
     "config": {

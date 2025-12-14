@@ -1,0 +1,24 @@
+{
+    "$schema": "https://raw.githubusercontent.com/infection/infection/master/resources/schema.json",
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "timeout": 10,
+    "logs": {
+        "text": "var/.infections/infection.log",
+        "summary": "var/.infections/summary.log",
+        "json": "var/.infections/infection.json",
+        "perMutator": "var/.infections/per-mutator.md"
+    },
+    "mutators": {
+        "@default": true
+    },
+    "testFramework": "codeception",
+    "testFrameworkOptions": "Unit,Functional",
+    "phpUnit": {
+        "configDir": "."
+    },
+    "bootstrap": "./tests/bootstrap.php"
+}
