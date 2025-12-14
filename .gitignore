@@ -1,5 +1,6 @@
 /.env
 /Makefile
+/.context
 /.docker/dev/php-cli/.gitconfig
 /.docker/dev/php-cli/.gitignore
 /vendor

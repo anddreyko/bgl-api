@@ -1,5 +1,6 @@
 /.idea
 /.git
+/.context
 /docker-compose.yml
 /var/
 /vendor/
