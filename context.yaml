@@ -32,3 +32,68 @@ documents:
                 enabled: true
                 showCharCount: true
                 maxDepth: 3
+
+    -   description: 'Repository'
+        outputPath: features/listing.md
+        overwrite: true
+        sources:
+            -   type: tree
+                description: 'Contract'
+                sourcePaths:
+                    - src/Core/Listing
+                    - src/Core/Collections/Repository.php
+                filePattern: '*'
+                renderFormat: ascii
+                enabled: true
+                showCharCount: true
+                maxDepth: 3
+            -   type: tree
+                description: 'Repositories'
+                sourcePaths:
+                    - src/Infrastructure/Persistence
+                filePattern: '*'
+                renderFormat: ascii
+                enabled: true
+                showCharCount: true
+                maxDepth: 3
+
+    -   description: 'Authentification'
+        outputPath: features/authentification.md
+        overwrite: true
+        sources:
+            -   type: tree
+                description: 'Domain'
+                sourcePaths:
+                    - src/Domain/Auth
+                filePattern: '*'
+                renderFormat: ascii
+                enabled: true
+                showCharCount: true
+                maxDepth: 3
+            -   type: tree
+                description: 'Repositories'
+                sourcePaths:
+                    - src/Infrastructure/Persistence
+                filePattern: '*Users*'
+                renderFormat: ascii
+                enabled: true
+                showCharCount: true
+                maxDepth: 3
+            -   type: tree
+                description: 'Open Auth'
+                sourcePaths:
+                    - src/Infrastructure/Authentification/OpenAuth
+                filePattern: '*'
+                renderFormat: ascii
+                enabled: true
+                showCharCount: true
+                maxDepth: 3
+            -   type: tree
+                description: 'Handlers'
+                sourcePaths:
+                    - src/Application/Handlers/Auth
+                filePattern: '*'
+                renderFormat: ascii
+                enabled: true
+                showCharCount: true
+                maxDepth: 3
