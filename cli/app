@@ -3,15 +3,12 @@
 
 declare(strict_types=1);
 
-use Bgl\Application\Handlers\Ping\Command;
-use Bgl\Core\Messages\Dispatcher;
+use Doctrine\ORM\Tools\Console\ConsoleRunner;
+use Doctrine\ORM\Tools\Console\EntityManagerProvider\SingleManagerProvider;
 
 include __DIR__ . '/../vendor/autoload.php';
 
 /** @var \Psr\Container\ContainerInterface $container */
 $container = require __DIR__ . '/../config/container.php';
 
-echo var_export(
-        $container->get(Dispatcher::class)->dispatch(new Command(new DateTimeImmutable())),
-        true
-    ) . PHP_EOL;
+ConsoleRunner::run($container->get(SingleManagerProvider::class));
