@@ -8,24 +8,30 @@ use Bgl\Core\Collections\Repository;
 use Bgl\Core\Listing\Searchable;
 use Bgl\Tests\Support\DiHelper;
 use Bgl\Tests\Support\Repositories\TestDoctrineRepository;
+use Bgl\Tests\Support\Repositories\TestEntity;
 use Codeception\Attribute\Group;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * @covers \Bgl\Infrastructure\Persistence\Doctrine\DoctrineRepository
- * @covers \Bgl\Infrastructure\Persistence\InMemory\DoctrineFilter
+ * @covers \Bgl\Infrastructure\Persistence\Doctrine\DoctrineFilter
  */
 #[Group('repository', 'doctrine')]
 class DoctrineRepositoryCest extends BaseRepository
 {
     private TestDoctrineRepository $repository;
+    private EntityManagerInterface $em;
 
     public function _before(): void
     {
         /** @var EntityManagerInterface $em */
-        $em = DiHelper::container()->get(EntityManagerInterface::class);
-        $em->clear();
-        $this->repository = new TestDoctrineRepository($em);
+        $this->em = DiHelper::container()->get(EntityManagerInterface::class);
+        $this->em->createQueryBuilder()
+            ->delete(TestEntity::class, 'e')
+            ->getQuery()
+            ->execute();
+        $this->em->clear();
+        $this->repository = new TestDoctrineRepository($this->em);
     }
 
     #[\Override]
@@ -33,6 +39,10 @@ class DoctrineRepositoryCest extends BaseRepository
     {
         foreach ($entities as $entity) {
             $this->repository->add($entity);
+        }
+
+        if ($entities !== []) {
+            $this->em->flush();
         }
 
         return $this->repository;

@@ -13,7 +13,6 @@ use Bgl\Core\Listing\Page\PageSort;
 use Bgl\Core\Listing\Page\SortDirection;
 use Bgl\Core\Listing\Searchable;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * @template TEntity of object
@@ -63,30 +62,30 @@ abstract class DoctrineRepository implements Repository, Searchable
             ->select($alias)
             ->from($this->getType(), $alias);
 
-        // Применяем фильтр
         $visitor = new DoctrineFilter($qb, $alias);
-        $filter->accept($visitor);
+        $condition = $filter->accept($visitor);
+        if ($condition !== null) {
+            $qb->andWhere($condition);
+        }
 
-        // Применяем сортировку
         foreach ($sort->fields as $field => $direction) {
             $order = $direction === SortDirection::Asc ? 'ASC' : 'DESC';
             $qb->addOrderBy("{$alias}.{$field}", $order);
         }
 
-        // Применяем пагинацию
         $limit = $size->getValue();
-        $offset = ($number->getValue() - 1) * $limit;
 
-        if ($limit > 0) {
-            $qb->setFirstResult($offset)
-                ->setMaxResults($limit);
-
-            // Используем Paginator для корректного подсчета количества при использовании DQL с JOIN
-            $paginator = new Paginator($qb->getQuery(), true);
-
-            return iterator_to_array($paginator);
+        if ($limit === 0) {
+            return [];
         }
 
+        if ($limit !== null) {
+            $offset = ($number->getValue() - 1) * $limit;
+            $qb->setFirstResult($offset)
+                ->setMaxResults($limit);
+        }
+
+        /** @var list<TEntity> */
         return $qb->getQuery()->getResult();
     }
 }
