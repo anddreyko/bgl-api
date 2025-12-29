@@ -246,6 +246,7 @@ docs/
 | Layer structure change                | `03-structure.md`                                            |
 | Testing approach change               | `04-testing.md`                                              |
 | Workflow/Git process change           | `05-workflow.md`                                             |
+| AI commands or build process change   | `06-ai-development.md`                                       |
 
 ---
 
