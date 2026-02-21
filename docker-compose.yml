@@ -10,7 +10,8 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - api-php-fpm
+      api-php-fpm:
+        condition: service_healthy
     ports:
       - "${APP_EXTERNAL_PORT}:80"
     networks:
@@ -23,6 +24,12 @@ services:
       - "${APP_HOST}:${APP_NETWORK_IP}"
     restart: on-failure
     tty: false
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost/ping || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   api-php-fpm:
     build:
@@ -33,6 +40,11 @@ services:
       - .env
     volumes:
       - .:/app
+    depends_on:
+      db-postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       bglapinet:
         ipv4_address: ${FPM_NETWORK_IP}
@@ -42,6 +54,12 @@ services:
       - "${APP_HOST}:${APP_NETWORK_IP}"
     expose:
       - 9000
+    healthcheck:
+      test: ["CMD-SHELL", "kill -0 1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   api-php-cli:
     build:
@@ -83,9 +101,28 @@ services:
       - "${DB_EXTERNAL_PORT}:5432"
     networks:
       - bglapinet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - api-redis:/data
+    networks:
+      - bglapinet
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
   api-postgres:
+  api-redis:
 
 networks:
   bglapinet:
