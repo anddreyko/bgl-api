@@ -1,0 +1,29 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Bgl\Infrastructure\Serialization;
+
+
+use Bgl\Core\Serialization\Serializer;
+use League\Fractal\Manager;
+use League\Fractal\Resource\Item;
+
+final readonly class FractalSerializer implements Serializer
+{
+    public function __construct(
+        private Manager $manager,
+        private array $transformer,
+    ) {
+    }
+
+    public function serialize(object $data): array
+    {
+        return $this->manager->createData(
+            new Item(
+                data: $data,
+                transformer: $this->transformer[get_class($data)] ?? null,
+            )
+        )->toArray()['data'] ?? [];
+    }
+}
