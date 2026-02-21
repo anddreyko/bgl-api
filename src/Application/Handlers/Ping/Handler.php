@@ -7,6 +7,8 @@ namespace Bgl\Application\Handlers\Ping;
 use Bgl\Core\AppVersion;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
+use Bgl\Core\ValueObjects\DateInterval;
+use Bgl\Core\ValueObjects\DateTime;
 use Psr\Clock\ClockInterface;
 
 /**
@@ -27,8 +29,8 @@ final readonly class Handler implements MessageHandler
         $now = $this->clock->now();
 
         return new Result(
-            datetime: $now,
-            delay: $envelope->message->datetime->diff($now),
+            datetime: new DateTime($now),
+            delay: new DateInterval($envelope->message->datetime->diff($now)),
             version: $this->version->getVersion(),
             environment: (string)getenv('APP_ENV'),
             messageId: $envelope->messageId,
