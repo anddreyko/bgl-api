@@ -13,34 +13,34 @@ Principles
 
 ---
 
-## 2. Commands (ONLY via `make`)
+## 2. Commands (ONLY via `composer`)
 
-**CRITICAL: Never run tools directly. All commands via `make` only.**
+**CRITICAL: Never run tools directly. All commands via `composer` only.**
 
 ### Code Quality
 
-| Command     | Purpose                                           |
-|-------------|---------------------------------------------------|
-| `make cs`   | Fix code style (PHP-CS-Fixer)                     |
-| `make rc`   | Apply automated refactoring (Rector)              |
-| `make lp`   | PHP syntax check (Lint)                           |
-| `make ps`   | Static type analysis (Psalm)                      |
-| `make dt`   | Architecture dependency check (Deptrac) — **LAW** |
-| `make cd`   | Check composer dependencies                       |
-| `make scan` | **MANDATORY before push.** Full validation.       |
+| Command              | Purpose                                           |
+|----------------------|---------------------------------------------------|
+| `composer cs:fix`    | Fix code style (PHP-CS-Fixer)                     |
+| `composer rc:run`    | Apply automated refactoring (Rector)              |
+| `composer lp:run`    | PHP syntax check (Lint)                           |
+| `composer ps:run`    | Static type analysis (Psalm)                      |
+| `composer dt:run`    | Architecture dependency check (Deptrac) — **LAW** |
+| `composer cd:run`    | Check composer dependencies                       |
+| `composer scan:all`  | **MANDATORY before push.** Full validation.       |
 
 ### Testing
 
-| Command       | Purpose                  |
-|---------------|--------------------------|
-| `make t-all`  | Run all test suites      |
-| `make t-unit` | Unit tests               |
-| `make t-func` | Functional tests         |
-| `make t-intg` | Integration tests        |
-| `make t-web`  | Acceptance API tests     |
-| `make t-cli`  | Acceptance CLI tests     |
-| `make t-cov`  | Generate coverage report |
-| `make in`     | Mutation testing         |
+| Command                | Purpose                  |
+|------------------------|--------------------------|
+| `composer test:all`    | Run all test suites      |
+| `composer test:unit`   | Unit tests               |
+| `composer test:func`   | Functional tests         |
+| `composer test:intg`   | Integration tests        |
+| `composer test:web`    | Acceptance API tests     |
+| `composer test:cli`    | Acceptance CLI tests     |
+| `composer test:coverage` | Generate coverage report |
+| `composer in:ps`       | Mutation testing         |
 
 ### Environment
 
@@ -92,7 +92,7 @@ src/
 
 ## 4. Architectural Dependency Law
 
-**Inner layers never depend on outer layers. Enforced by `make dt`.**
+**Inner layers never depend on outer layers. Enforced by `composer dt:run`.**
 
 ```
 Infrastructure → Application → Domain → Core
@@ -173,18 +173,18 @@ Priority: Static Analysis → Integration → Unit → E2E. Integration tests = 
 
 ### Quick Reference
 
-| Stage         | Command              | Required      |
-|---------------|----------------------|---------------|
-| Before commit | `make lp`, `make ps` | Yes           |
-| Before push   | `make scan`          | **MANDATORY** |
+| Stage         | Command                              | Required      |
+|---------------|--------------------------------------|---------------|
+| Before commit | `composer lp:run`, `composer ps:run` | Yes           |
+| Before push   | `composer scan:all`                  | **MANDATORY** |
 
 ### Testing Order (Trophy)
 
-1. Static Analysis: `make lp`, `make ps`, `make dt`
-2. Functional & Integration Tests: `make t-func`, `make t-intg` — **main focus**
-3. Unit Tests: `make t-unit` — complex logic only
-4. Acceptance Tests: `make t-web`, `make t-cli`
-5. Mutation Testing: `make in`
+1. Static Analysis: `composer lp:run`, `composer ps:run`, `composer dt:run`
+2. Functional & Integration Tests: `composer test:func`, `composer test:intg` — **main focus**
+3. Unit Tests: `composer test:unit` — complex logic only
+4. Acceptance Tests: `composer test:web`, `composer test:cli`
+5. Mutation Testing: `composer in:ps`
 
 ### TDD Rules
 
@@ -242,7 +242,7 @@ docs/
 | New Bounded Context                   | `02-business-domain.md`, `03-structure.md`, `03-glossary.md` |
 | New Entity/Aggregate                  | `02-business-domain.md`                                      |
 | Architecture decision                 | Create new ADR in `03-decisions/`                            |
-| New tool or command, new make command | `02-tooling.md`, this file (AGENTS.md)                       |
+| New tool or command, new composer script | `02-tooling.md`, this file (AGENTS.md)                       |
 | Layer structure change                | `03-structure.md`                                            |
 | Testing approach change               | `04-testing.md`                                              |
 | Workflow/Git process change           | `05-workflow.md`                                             |
@@ -270,18 +270,18 @@ docs/
 4. **IMPLEMENT**
     - Place code in correct layer (section 3)
     - Follow layer rules (section 7)
-    - Use ONLY `make` commands (section 2)
+    - Use ONLY `composer` commands (section 2)
 
 5. **TEST** — Follow Testing Trophy (section 8). Integration tests first.
 
 6. **BEFORE COMMIT**
-    - Run `make lp` — must pass
-    - Run `make ps` — must pass
+    - Run `composer lp:run` — must pass
+    - Run `composer ps:run` — must pass
    - **Add all created/modified files to git:** `git add <file>` for each file
    - Stage files incrementally as you work, not all at once at the end
 
 7. **BEFORE PUSH**
-    - Run `make scan` — **MANDATORY**, must pass
+    - Run `composer scan:all` — **MANDATORY**, must pass
 
 8. **AFTER STRUCTURAL CHANGES**
     - Update documentation per section 10
@@ -291,7 +291,7 @@ docs/
 
 ### CONSTRAINTS
 
-- **ONLY `make` commands** — never run composer/vendor/bin directly
+- **ONLY `composer` commands** — never run vendor/bin directly
 - **Git staging required** — always `git add <file>` for created/modified files before commit
 - **Documentation sync** — always update docs when structure changes
 - **English only** — all documentation, comments, and commit messages must be in English

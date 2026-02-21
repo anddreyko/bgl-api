@@ -8,14 +8,14 @@ This document describes the complete development workflow: from creating a branc
 
 Create branches from `develop` with a type prefix:
 
-| Prefix      | Purpose           | Example                      |
-|-------------|-------------------|------------------------------|
-| `feat-`     | New feature       | `feat-add-player-validation` |
-| `fix-`      | Bug fix           | `fix-play-date-bug`          |
-| `refactor-` | Code refactoring  | `refactor-repository`        |
-| `test-`     | Test improvements | `test-plays-integration`     |
-| `docs-`     | Documentation     | `docs-update-readme`         |
-| `chore-`    | Maintenance       | `chore-update-dependencies`  |
+| Prefix      | Purpose                                       | Example                        |
+|-------------|-----------------------------------------------|--------------------------------|
+| `feat-`     | New business feature                          | `feat-add-auth-passkey-method` |
+| `fix-`      | Bug fix                                       | `fix-play-date-bug`            |
+| `refactor-` | Code refactoring                              | `refactor-repository`          |
+| `test-`     | Test improvements                             | `test-plays-integration`       |
+| `docs-`     | Documentation                                 | `docs-update-readme`           |
+| `chore-`    | Maintenance or preparing core or integrations | `chore-update-dependencies`    |
 
 ---
 
@@ -47,6 +47,7 @@ Use **Conventional Commits** format:
 
 ```
 feat(plays): add player count validation
+chore(plays): contract component validation
 fix(auth): handle expired token correctly
 refactor(domain): extract PlayerId value object
 test(plays): add integration tests for repository
@@ -87,8 +88,8 @@ Follow the Testing Trophy approach (see `04-testing.md`):
 Run quick checks:
 
 ```bash
-make lp    # Syntax check
-make ps    # Static analysis
+composer lp:run    # Syntax check
+composer ps:run    # Static analysis
 ```
 
 Both must pass before committing.
@@ -98,12 +99,12 @@ Both must pass before committing.
 Run full validation:
 
 ```bash
-make scan  # MANDATORY - full check
+composer scan:all  # MANDATORY - full check
 ```
 
 This runs: lint, psalm, deptrac, composer check, and all tests.
 
-**Do not push if `make scan` fails.**
+**Do not push if `composer scan:all` fails.**
 
 ### 5. Pull Request
 
@@ -121,15 +122,15 @@ Create PR to `develop` branch:
 When implementing features, follow this order:
 
 ```
-1. Static Analysis    make lp, make ps, make dt
+1. Static Analysis    composer lp:run, composer ps:run, composer dt:run
          ↓
-2. Integration Tests  make t-intg, make t-func  ← MAIN FOCUS
+2. Integration Tests  composer test:intg, composer test:func  ← MAIN FOCUS
          ↓
-3. Unit Tests         make t-unit (complex logic only)
+3. Unit Tests         composer test:unit (complex logic only)
          ↓
-4. Acceptance Tests   make t-web, make t-cli
+4. Acceptance Tests   composer test:web, composer test:cli
          ↓
-5. Mutation Testing   make in
+5. Mutation Testing   composer in:ps
 ```
 
 Integration tests are the primary source of confidence. Don't aim for 100% unit test coverage.
@@ -151,10 +152,10 @@ Integration tests are the primary source of confidence. Don't aim for 100% unit 
 
 Before pushing your branch:
 
-- [ ] `make lp` passes (syntax)
-- [ ] `make ps` passes (static analysis)
-- [ ] `make dt` passes (architecture)
-- [ ] `make scan` passes (full validation)
+- [ ] `composer lp:run` passes (syntax)
+- [ ] `composer ps:run` passes (static analysis)
+- [ ] `composer dt:run` passes (architecture)
+- [ ] `composer scan:all` passes (full validation)
 - [ ] Integration tests written for new code
 - [ ] Commits follow Conventional Commits format
 - [ ] No emojis in code, comments, or commits
@@ -163,11 +164,11 @@ Before pushing your branch:
 
 ## Quick Reference
 
-| Stage         | Command     | Required      |
-|---------------|-------------|---------------|
-| Before commit | `make lp`   | Yes           |
-| Before commit | `make ps`   | Yes           |
-| Before push   | `make scan` | **MANDATORY** |
+| Stage         | Command            | Required      |
+|---------------|--------------------|---------------|
+| Before commit | `composer lp:run`  | Yes           |
+| Before commit | `composer ps:run`  | Yes           |
+| Before push   | `composer scan:all` | **MANDATORY** |
 | CI            | All checks  | Must pass     |
 
 ---

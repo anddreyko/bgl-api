@@ -24,13 +24,13 @@ composer scan:depend    # Deptrac + Composer dependencies
 composer scan:all       # scan:php + scan:depend + test:all (without scan:style)
 ```
 
-### Makefile
+### Makefile (Docker wrapper)
 
 ```bash
-make cs
-make ps
-make dt
-make scan
+make cs    # runs composer cs:fix inside Docker
+make ps    # runs composer ps:run inside Docker
+make dt    # runs composer dt:run inside Docker
+make scan  # runs composer scan:all inside Docker
 ```
 
 ### Direct Invocation

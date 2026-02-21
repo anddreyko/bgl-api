@@ -177,11 +177,11 @@ Developers can use any convenient method:
    composer scan:all       # scan:php + scan:depend + test:all (without scan:style)
    ```
 
-2. **Makefile** — wrappers over composer commands:
+2. **Makefile** — Docker wrappers over composer commands:
    ```bash
-   make ps
-   make cs
-   make scan
+   make ps    # runs composer ps:run inside Docker
+   make cs    # runs composer cs:fix inside Docker
+   make scan  # runs composer scan:all inside Docker
    ```
 
 3. **Direct invocation** — via path to binary in vendor-bin:

@@ -118,7 +118,7 @@ Each stage:
 
 1. Reads stage file instructions
 2. Implements code following patterns
-3. Runs verification (`make lp`, `make ps`)
+3. Runs verification (`composer lp:run`, `composer ps:run`)
 4. Updates checklist
 
 **Step 4: Commit**
@@ -127,7 +127,7 @@ Each stage:
 /fr/commit
 ```
 
-- Runs `make scan` (mandatory)
+- Runs `composer scan:all` (mandatory)
 - Generates commit message
 - Updates CHANGELOG.md
 - Creates documentation.md
@@ -265,18 +265,18 @@ docs/04-feature-requests/
 
 ---
 
-## Integration with Make Commands
+## Integration with Composer Commands
 
-All `/fr/*` commands use `make` under the hood:
+All `/fr/*` commands use `composer` under the hood:
 
-| Stage                  | Commands run                  |
-|------------------------|-------------------------------|
-| After each file change | `make lp` (lint)              |
-| After stage complete   | `make ps` (psalm)             |
-| Before commit          | `make scan` (full validation) |
-| For tests              | `make t-intg`, `make t-unit`  |
+| Stage                  | Commands run                        |
+|------------------------|-------------------------------------|
+| After each file change | `composer lp:run` (lint)            |
+| After stage complete   | `composer ps:run` (psalm)           |
+| Before commit          | `composer scan:all` (full validation) |
+| For tests              | `composer test:intg`, `composer test:unit` |
 
-**Never run vendor/bin directly** — always through make.
+**Never run vendor/bin directly** — always through composer.
 
 ---
 
@@ -292,7 +292,7 @@ All `/fr/*` commands use `make` under the hood:
 
 ### Don't:
 
-- Skip `make scan` before push
+- Skip `composer scan:all` before push
 - Implement without reading stage file first
 - Mark checklist items done before verification passes
 - Forget to update documentation on structural changes

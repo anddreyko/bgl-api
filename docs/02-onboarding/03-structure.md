@@ -24,6 +24,7 @@ This rule is automatically verified via `composer dt` (Deptrac).
 ```
 src/
 ├── Core/                           # Contracts and shared components
+│   ├── Auth/                       # Authentication contracts (Authentificator, Identity)
 │   ├── Collections/                # Collection interfaces
 │   ├── Listing/                    # Search contracts (Filter, Searchable)
 │   ├── Messages/                   # Bus contracts (Message, Command, Query, Event)
@@ -57,6 +58,8 @@ src/
 │           └── GetPlayHistory/
 │
 ├── Infrastructure/                 # External services and adapters
+│   ├── Authentification/
+│   │   └── OpenAuth/               # OAuth2 server adapter (league/oauth2-server)
 │   ├── Persistence/
 │   │   ├── Doctrine/               # Doctrine repository implementations
 │   │   └── InMemory/               # InMemory for tests
@@ -79,7 +82,8 @@ src/
 
 Contracts, interfaces, and shared Value Objects without business logic. Depends on nothing except PHP.
 
-Examples: `Message`, `Command`, `Query`, `Event`, `Filter`, `Searchable`, `Email`, `Id`.
+Examples: `Message`, `Command`, `Query`, `Event`, `Filter`, `Searchable`, `Email`, `Id`, `Authentificator`, `Identity`,
+`GrantType`.
 
 ### Domain
 
@@ -101,8 +105,10 @@ ports defined in Domain Layer.
 
 Depends on `Core`, `Domain`, `Application`, and external libraries.
 
-Ports & Adapters example: the `GameCatalogProvider` interface is defined in `Domain/Sync/`, while its implementation
-`BggCatalogProvider` is located in `Infrastructure/Sync/Bgg/`.
+Ports & Adapters examples:
+
+- `GameCatalogProvider` interface in `Domain/Sync/` -> `BggCatalogProvider` in `Infrastructure/Sync/Bgg/`
+- `Authentificator` interface in `Core/Auth/` -> `LeagueAuthServer` in `Infrastructure/Authentification/OpenAuth/`
 
 ### Presentation
 
