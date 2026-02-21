@@ -78,9 +78,9 @@ sequenceDiagram
 
 ### Endpoints
 
-| Method | Path       | Auth     | Description |
-|--------|------------|----------|-------------|
-| POST   | `/api/...` | Required | Description |
+| Method | Path      | Auth     | Description |
+|--------|-----------|----------|-------------|
+| POST   | `/v1/...` | Required | Description |
 
 ### Request/Response Examples
 

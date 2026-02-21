@@ -75,8 +75,8 @@ if ($condition !== null) {
 Run lint and static analysis:
 
 ```bash
-make lp
-make ps
+composer lp:run
+composer ps:run
 ```
 
 ---
@@ -217,12 +217,12 @@ if ($condition !== null) {
 
 2. **Lint check passes:**
    ```bash
-   make lp
+   composer lp:run
    ```
 
 3. **Static analysis passes:**
    ```bash
-   make ps
+   composer ps:run
    ```
 
 4. **Logic verification:**
@@ -234,10 +234,10 @@ if ($condition !== null) {
 
 ```bash
 # Lint check
-make lp
+composer lp:run
 
 # Static analysis
-make ps
+composer ps:run
 ```
 
 ### Expected Outcomes

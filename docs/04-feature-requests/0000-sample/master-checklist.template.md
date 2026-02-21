@@ -22,7 +22,7 @@
 - [ ] Sub-task 1
 - [ ] Sub-task 2
 - [ ] Sub-task 3
-- [ ] Verify: `make lp && make ps`
+- [ ] Verify: `composer lp:run && composer ps:run`
 
 Details: [stage-1-{slug}.md](./stage-1-{slug}.md)
 
@@ -34,7 +34,7 @@ Details: [stage-1-{slug}.md](./stage-1-{slug}.md)
 
 - [ ] Sub-task 1
 - [ ] Sub-task 2
-- [ ] Verify: `make lp && make ps`
+- [ ] Verify: `composer lp:run && composer ps:run`
 
 Details: [stage-2-{slug}.md](./stage-2-{slug}.md)
 
@@ -44,9 +44,9 @@ Details: [stage-2-{slug}.md](./stage-2-{slug}.md)
 
 **Dependencies:** All previous stages
 
-- [ ] Run `make scan` (MANDATORY)
-- [ ] Run `make dt` (architecture check)
-- [ ] Run `make t-intg` (integration tests)
+- [ ] Run `composer scan:all` (MANDATORY)
+- [ ] Run `composer dt:run` (architecture check)
+- [ ] Run `composer test:intg` (integration tests)
 - [ ] Review code for simplification
 - [ ] Update documentation
 
@@ -60,17 +60,17 @@ Details: [stage-N-final-validation.md](./stage-N-final-validation.md)
 
 ```bash
 # Quality checks
-make lp      # PHP lint
-make ps      # Psalm static analysis
-make dt      # Deptrac architecture
+composer lp:run      # PHP lint
+composer ps:run      # Psalm static analysis
+composer dt:run      # Deptrac architecture
 
 # Testing
-make t-unit  # Unit tests
-make t-intg  # Integration tests
-make t-func  # Functional tests
+composer test:unit   # Unit tests
+composer test:intg   # Integration tests
+composer test:func   # Functional tests
 
 # Full validation (MANDATORY before push)
-make scan
+composer scan:all
 ```
 
 ### Files Overview

@@ -707,9 +707,9 @@ The existing `BaseRepository` test class provides comprehensive scenarios:
 - [ ] `DoctrineRepository::search()` method working with all filter types
 - [ ] `Users::getAlias()` method added to concrete repository
 - [ ] All existing `BaseRepository` tests pass for `DoctrineRepositoryCest`
-- [ ] Code passes `make scan` (all quality checks)
+- [ ] Code passes `composer scan:all` (all quality checks)
 - [ ] No new Psalm errors introduced
-- [ ] Architecture tests pass (`make dt`)
+- [ ] Architecture tests pass (`composer dt:run`)
 
 ### 10.2 Measurable Success Criteria
 
@@ -725,16 +725,16 @@ The existing `BaseRepository` test class provides comprehensive scenarios:
 
 ```bash
 # Run specific integration tests
-make t tests/Integration/Repositories/DoctrineRepositoryCest.php
+composer test -- run tests/Integration/Repositories/DoctrineRepositoryCest.php
 
 # Run all quality checks
-make scan
+composer scan:all
 
 # Run architecture tests specifically
-make dt
+composer dt:run
 
 # Check test coverage
-make t-cov
+composer test:coverage
 ```
 
 ---

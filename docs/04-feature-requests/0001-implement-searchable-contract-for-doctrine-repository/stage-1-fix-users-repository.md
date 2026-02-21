@@ -44,7 +44,7 @@ The alias 'u' follows the convention of using the first letter of the entity nam
 Run lint check to ensure the syntax is correct:
 
 ```bash
-make lp
+composer lp:run
 ```
 
 ---
@@ -147,14 +147,14 @@ final class Users extends DoctrineRepository implements UserRepository
 
 4. **Lint check passes:**
    ```bash
-   make lp
+   composer lp:run
    ```
 
 ### Tests to Run
 
 ```bash
 # Lint check
-make lp
+composer lp:run
 ```
 
 ### Expected Outcomes

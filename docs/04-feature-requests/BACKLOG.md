@@ -9,36 +9,69 @@ Each task contains full context for development. Use `AGENTS.md` and `docs/` for
 
 ## Phase 0: Foundation
 
-### CORE-001: Validation, Denormalization, and Serialization Components
+### CORE-001: Schema-Based Request/Response Mapping
 
 **User Story:**
-> As a developer, I want to have reusable components for working with API input/output data.
+> As a developer, I want schema-based request/response mapping without DTO classes, using OpenAPI config as single
+> source of truth.
 
 **Acceptance Criteria:**
 
-- [ ] `Validator` contract for input data validation
-- [ ] `Denormalizer` contract for converting arrays to DTOs
-- [ ] `Serializer` contract for converting objects to arrays/JSON
-- [ ] Contract implementations with nested object support
-- [ ] Integration with Symfony Validator for validation rules
-- [ ] Integration with Symfony Serializer or manual implementation
-- [ ] Attribute support for field mapping
+- [ ] `SchemaRequestMapper` contract for mapping HTTP request to array via `x-target`
+- [ ] `SchemaResponseSerializer` contract for serializing domain objects via `x-source`
+- [ ] Support for nested objects and `$ref` resolution
+- [ ] Pipe syntax support (`|date:c`, `|nullable`, `|int`, `|datetime`, etc.)
+- [ ] Integration with OpenAPI config schemas from `config/openapi/`
+- [ ] Tests pass (`composer scan:all`)
 
 **Technical Context:**
 
 ```
 Bounded Context: Core (shared)
 Layers:
-├── Core/Validation/Validator.php — validation contract
-├── Core/Validation/ValidationResult.php — result with errors
-├── Core/Serialization/Denormalizer.php — denormalization contract
-├── Core/Serialization/Serializer.php — serialization contract
-├── Infrastructure/Validation/SymfonyValidator.php — implementation
-├── Infrastructure/Serialization/SymfonyDenormalizer.php — implementation
-└── Infrastructure/Serialization/SymfonySerializer.php — implementation
+├── Core/Http/SchemaRequestMapper.php — request mapping contract
+├── Core/Http/SchemaResponseSerializer.php — response serialization contract
+├── Infrastructure/Http/OpenApiSchemaMapper.php — x-target implementation
+└── Infrastructure/Http/OpenApiSchemaSerializer.php — x-source implementation
 ```
 
-**Dependencies:** INFRA-001
+**Request Mapping Example (x-target):**
+
+```php
+// Schema defines mapping
+'gameId' => [
+    'type' => 'string',
+    'format' => 'uuid',
+    'x-target' => 'gameId',
+],
+'startedAt' => [
+    'type' => 'string',
+    'format' => 'date-time',
+    'x-target' => 'startedAt|datetime',
+],
+
+// Mapper returns plain array (no DTO)
+$data = $mapper->map($request, $schema);
+// ['gameId' => 'uuid-value', 'startedAt' => DateTimeImmutable]
+```
+
+**Response Serialization Example (x-source):**
+
+```php
+// Schema defines serialization
+'startedAt' => [
+    '$ref' => '#/components/schemas/DateTime',
+    'x-source' => 'startedAt',
+],
+
+// Serializer extracts from domain object
+$json = $serializer->serialize($play, $schema);
+// ['startedAt' => ['date' => '2026-01-05T14:30:00+00:00', 'timestamp' => 1767709800]]
+```
+
+**Dependencies:** INFRA-001, ADR-011
+
+**ADR Reference:** `docs/03-decisions/011-unified-route-configuration.md`
 
 ---
 
@@ -53,8 +86,11 @@ Layers:
   `verify(string $password, string $hash): bool`
 - [ ] `BcryptPasswordHasher` implementation with configurable cost factor
 - [ ] `Argon2PasswordHasher` implementation as alternative
+- [ ] `PlainPasswordHasher` for tests (no CPU overhead, stores plain text or simple prefix)
 - [ ] All implementations conform to password_hash/password_verify API
+- [ ] Contract tests (base test class) that all implementations must pass (similar to MessageBus contract tests)
 - [ ] Tests for correct hashing and verification
+- [ ] Test environment uses `PlainPasswordHasher` to avoid CPU-intensive hashing
 
 **Technical Context:**
 
@@ -63,7 +99,10 @@ Bounded Context: Core (shared)
 Layers:
 ├── Core/Security/PasswordHasher.php — contract
 ├── Infrastructure/Security/BcryptPasswordHasher.php — bcrypt implementation
-└── Infrastructure/Security/Argon2PasswordHasher.php — argon2 implementation
+├── Infrastructure/Security/Argon2PasswordHasher.php — argon2 implementation
+├── Infrastructure/Security/PlainPasswordHasher.php — test implementation (no hashing)
+├── tests/Support/Security/PasswordHasherContractTest.php — contract tests
+└── config/common/security.php — DI configuration (env-based implementation selection)
 ```
 
 **Contract Example:**
@@ -74,6 +113,29 @@ interface PasswordHasher
     public function hash(string $password): string;
     public function verify(string $password, string $hash): bool;
     public function needsRehash(string $hash): bool;
+}
+```
+
+**PlainPasswordHasher (for tests):**
+
+```php
+// Does not actually hash - just prefixes for identification
+final readonly class PlainPasswordHasher implements PasswordHasher
+{
+    public function hash(string $password): string
+    {
+        return 'plain:' . $password; // No CPU overhead
+    }
+
+    public function verify(string $password, string $hash): bool
+    {
+        return $hash === 'plain:' . $password;
+    }
+
+    public function needsRehash(string $hash): bool
+    {
+        return !str_starts_with($hash, 'plain:');
+    }
 }
 ```
 
@@ -156,18 +218,19 @@ Layers:
 ├── Infrastructure/MessageBus/MiddlewareResolver.php — Aspects resolver
 │
 ├── Presentation/Api/ApiAction.php — single controller
-├── Presentation/Api/RouteMessageMap.php — mapping configuration
+├── Presentation/Api/OpenApiRouter.php — route matching from OpenAPI config
 ├── Presentation/Api/Interceptors/Interceptor.php — contract
 ├── Presentation/Api/Interceptors/AuthInterceptor.php — authentication
 ├── Presentation/Api/Interceptors/AuthorizationInterceptor.php — authorization
-├── Presentation/Api/Interceptors/DenormalizationInterceptor.php — HTTP → DTO
-├── Presentation/Api/Interceptors/SerializationInterceptor.php — Result → JSON
-├── Presentation/Api/Interceptors/ValidationInterceptor.php — input validation
 ├── Presentation/Api/Interceptors/RateLimitInterceptor.php — request limiting
 │
+├── Infrastructure/Http/OpenApiValidationMiddleware.php — league/openapi-psr7-validator wrapper
+│
 └── config/
-    ├── routes.php — HTTP → Message mapping
-    ├── interceptors.php — Interceptors configuration
+    ├── openapi.php — main OpenAPI configuration
+    ├── openapi/components.php — shared schemas
+    ├── openapi/auth.php — auth paths
+    ├── openapi/plays.php — plays paths
     └── aspects.php — Aspects pipeline configuration
 ```
 
@@ -200,33 +263,56 @@ interface MessageMiddleware
 }
 ```
 
-**RouteMessageMap Configuration:**
+**OpenAPI Route Configuration (per ADR-011):**
 
 ```php
-// config/routes.php
+// config/openapi/auth.php
 return [
-    'POST /api/auth/register' => [
-        'message' => \App\Application\Handlers\Auth\Register\Command::class,
-        'interceptors' => ['denormalization', 'validation'],
-        'public' => true, // Does not require authentication
+    '/v1/auth/register' => [
+        'post' => [
+            'operationId' => 'auth.register',
+            'summary' => 'Register new user',
+            'tags' => ['Auth'],
+            'x-message' => Register\Command::class,
+            'requestBody' => [
+                'required' => true,
+                'content' => [
+                    'application/json' => [
+                        'schema' => ['$ref' => '#/components/schemas/RegisterRequest'],
+                    ],
+                ],
+            ],
+            'responses' => [
+                '201' => [
+                    'content' => [
+                        'application/json' => [
+                            'schema' => ['$ref' => '#/components/schemas/AuthResponse'],
+                        ],
+                    ],
+                ],
+            ],
+        ],
     ],
-    'POST /api/auth/login' => [
-        'message' => \App\Application\Handlers\Auth\Login\Command::class,
-        'interceptors' => ['denormalization', 'validation'],
-        'public' => true,
+    '/v1/auth/login' => [
+        'post' => [
+            'operationId' => 'auth.login',
+            'x-message' => Login\Command::class,
+            // Validation automatic via league/openapi-psr7-validator
+            // ...
+        ],
     ],
-    'GET /api/plays' => [
-        'message' => \App\Application\Handlers\Plays\ListPlays\Query::class,
-        'interceptors' => ['auth', 'denormalization'],
-        'public' => false,
-    ],
-    'POST /api/plays' => [
-        'message' => \App\Application\Handlers\Plays\CreatePlay\Command::class,
-        'interceptors' => ['auth', 'denormalization', 'validation'],
-        'public' => false,
-    ],
-    // ...
 ];
+```
+
+**OpenAPI Validation Middleware:**
+
+```php
+// Infrastructure/Http/OpenApiValidationMiddleware.php
+// Uses league/openapi-psr7-validator (PSR-15)
+use League\OpenAPIValidation\PSR15\ValidationMiddleware;
+
+// Validates request against OpenAPI schema automatically
+// No need for x-interceptors for validation
 ```
 
 **ApiAction (Single Entry Point):**
@@ -235,45 +321,45 @@ return [
 final readonly class ApiAction implements RequestHandlerInterface
 {
     public function __construct(
-        private RouteMessageMap $routeMap,
+        private OpenApiRouter $router,
         private MessageBus $messageBus,
-        private Denormalizer $denormalizer,
-        private Serializer $serializer,
+        private SchemaRequestMapper $requestMapper,
+        private SchemaResponseSerializer $responseSerializer,
         private InterceptorPipeline $interceptors,
     ) {}
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        // 1. Get route configuration
-        $route = $this->routeMap->match($request);
+        // 1. Match route from OpenAPI config
+        $route = $this->router->match($request);
 
-        // 2. Execute Interceptors pipeline
+        // 2. Execute Interceptors pipeline (from x-interceptors)
         $request = $this->interceptors->process($request, $route);
 
-        // 3. Denormalize HTTP data to Message
-        $message = $this->denormalizer->denormalize(
-            $request->getParsedBody(),
-            $route->messageClass,
-        );
+        // 3. Map request to array via schema (x-target)
+        $data = $this->requestMapper->map($request, $route->requestSchema);
 
-        // 4. Send to MessageBus (Aspects execute inside)
-        $result = $this->messageBus->handle($message);
+        // 4. Create Message and send to MessageBus
+        $messageClass = $route->operation['x-message'];
+        $result = $this->messageBus->handle(new $messageClass($data));
 
-        // 5. Serialize result to JSON Response
-        return $this->serializer->toResponse($result);
+        // 5. Serialize result via schema (x-source)
+        return $this->responseSerializer->toResponse($result, $route->responseSchema);
     }
 }
 ```
 
 **Interceptors Pipeline (Presentation):**
 
-| Interceptor                  | Responsibility              | Order |
-|------------------------------|-----------------------------|-------|
-| `RateLimitInterceptor`       | Request rate limiting       | 1     |
-| `AuthInterceptor`            | JWT extraction & validation | 2     |
-| `AuthorizationInterceptor`   | Access rights checking      | 3     |
-| `DenormalizationInterceptor` | HTTP body → DTO/Message     | 4     |
-| `ValidationInterceptor`      | Input data validation       | 5     |
+| Interceptor                   | Responsibility              | Order |
+|-------------------------------|-----------------------------|-------|
+| `RateLimitInterceptor`        | Request rate limiting       | 1     |
+| `AuthInterceptor`             | JWT extraction & validation | 2     |
+| `AuthorizationInterceptor`    | Access rights checking      | 3     |
+| `OpenApiValidationMiddleware` | Schema validation (PSR-15)  | 4     |
+
+Note: OpenAPI validation via `league/openapi-psr7-validator` (PSR-15 compatible). Request mapping (x-target) and
+response serialization (x-source) happen in ApiAction.
 
 **Aspects Pipeline (Application):**
 
@@ -297,90 +383,404 @@ return [
 ];
 ```
 
-**Dependencies:** CORE-001, CORE-002, INFRA-001
+**Dependencies:** CORE-001, CORE-002, INFRA-001, ADR-011
+
+**ADR Reference:** `docs/03-decisions/011-unified-route-configuration.md`
 
 ---
 
-### CORE-004: API Response Contracts
+### CORE-004: API Response Schemas
 
 **User Story:**
-> As a developer, I want to have standardized API response format for success and error responses across all endpoints.
+> As a developer, I want standardized API response schemas defined in OpenAPI config for consistent success and error
+> responses.
 
 **Acceptance Criteria:**
 
-- [ ] `SuccessResponse` contract with data payload and optional metadata
-- [ ] `ErrorResponse` contract with error code, message, and optional details
-- [ ] Common response interface for polymorphic handling
-- [ ] Support for HTTP status code binding
+- [ ] Response schemas defined in `config/openapi/components.php`
+- [ ] `ErrorResponse` schema with code, message, errors, exception
+- [ ] `Pagination` schema for collection responses
+- [ ] Universal date/time schemas: `Date`, `DateTime`, `DateInterval`
+- [ ] `x-source` mappings for domain object serialization
 - [ ] Consistent JSON structure across all API endpoints
-- [ ] Integration with `Serializer` from CORE-001
-- [ ] Tests pass (`make scan`)
+- [ ] Tests pass (`composer scan:all`)
 
 **Technical Context:**
 
 ```
 Bounded Context: Core (shared)
 Layers:
-├── src/Presentation/Api/V1/Responses/ResponseInterface.php — common contract
-├── src/Presentation/Api/V1/Responses/SuccessResponse.php — success response
-├── src/Presentation/Api/V1/Responses/ErrorResponse.php — error response
-└── src/Presentation/Api/V1/Responses/ValidationErrorResponse.php — validation errors
+└── config/openapi/components.php — all response schemas in OpenAPI format
 ```
 
-**Response Structure Examples:**
+**Response Schemas (OpenAPI format as PHP arrays):**
 
 ```php
-// Success response
-final readonly class SuccessResponse implements ResponseInterface
-{
-    public function __construct(
-        public mixed $data = null,
-        public ?array $meta = null,
-        public int $statusCode = 200,
-    ) {}
-}
+// config/openapi/components.php
+return [
+    'schemas' => [
+        'ErrorResponse' => [
+            'type' => 'object',
+            'required' => ['code', 'message'],
+            'properties' => [
+                'code' => ['type' => 'integer', 'example' => 1],
+                'message' => ['type' => 'string'],
+                'errors' => [
+                    'type' => 'object',
+                    'additionalProperties' => [
+                        'type' => 'object',
+                        'additionalProperties' => ['type' => 'string'],
+                    ],
+                ],
+                'exception' => ['$ref' => '#/components/schemas/ExceptionDetails'],
+            ],
+        ],
 
-// Error response
-final readonly class ErrorResponse implements ResponseInterface
-{
-    public function __construct(
-        public string $error,
-        public string $message,
-        public ?array $details = null,
-        public int $statusCode = 400,
-    ) {}
-}
+        'Pagination' => [
+            'type' => 'object',
+            'properties' => [
+                'total' => ['type' => 'integer'],
+                'pages' => ['type' => 'integer'],
+                'current' => ['type' => 'integer'],
+                'page_size' => ['type' => 'integer'],
+            ],
+        ],
+
+        // Universal date/time schemas
+        'Date' => [
+            'type' => 'object',
+            'x-source-type' => DateTimeInterface::class,
+            'properties' => [
+                'date' => ['type' => 'string', 'format' => 'date', 'x-source' => 'format:Y-m-d'],
+                'timestamp' => ['type' => 'integer', 'x-source' => 'getTimestamp'],
+            ],
+        ],
+
+        'DateTime' => [
+            'type' => 'object',
+            'x-source-type' => DateTimeInterface::class,
+            'properties' => [
+                'date' => ['type' => 'string', 'format' => 'date-time', 'x-source' => 'format:' . DATE_RFC3339],
+                'timestamp' => ['type' => 'integer', 'x-source' => 'getTimestamp'],
+            ],
+        ],
+
+        'DateInterval' => [
+            'type' => 'object',
+            'x-source-type' => DateInterval::class,
+            'properties' => [
+                'interval' => ['type' => 'string', 'x-source' => 'format:P%yY%mM%dDT%hH%iM%sS'],
+                'seconds' => ['type' => 'integer', 'x-source' => 'totalSeconds'],
+            ],
+        ],
+    ],
+];
 ```
 
 **JSON Output Examples:**
 
 ```json
-// Success
+// Success (single item)
 {
-    "success": true,
+    "code": 0,
     "data": {
-        ...
-    },
-    "meta": {
-        "page": 1,
-        "total": 100
+        "id": 1,
+        "name": "test",
+        "status": 1
     }
 }
 
-// Error
+// Success (collection with pagination)
 {
-    "success": false,
-    "error": "validation_error",
-    "message": "Invalid input data",
-    "details": {
-        "email": [
-            "Email is required"
-        ]
+    "code": 0,
+    "data": [
+        {
+            "id": 1,
+            "name": "test",
+            "status": 1
+        }
+    ],
+    "pagination": {
+        "total": 97,
+        "pages": 5,
+        "current": 1,
+        "page_size": 20
+    }
+}
+
+// Error (validation)
+{
+    "code": 1,
+    "message": "Validation error",
+    "errors": {
+        "id": {
+            "required": "The id field is required"
+        }
+    },
+    "exception": {
+        "code": 422,
+        "message": "Validation error",
+        "trace": "..."
+    }
+}
+
+// DateTime field example
+{
+    "startedAt": {
+        "date": "2026-01-05T14:30:00+00:00",
+        "timestamp": 1767709800
     }
 }
 ```
 
-**Dependencies:** CORE-001
+**Dependencies:** CORE-001, ADR-011
+
+**ADR Reference:** `docs/03-decisions/011-unified-route-configuration.md`
+
+---
+
+### CORE-006: Searchable Contract Return Type Refactor
+
+**User Story:**
+> As a developer, I want the `Searchable::search` method to return an array of identifiers (composite unique keys)
+> instead of entities, to enable more flexible and efficient data retrieval patterns.
+
+**Acceptance Criteria:**
+
+- [ ] `Searchable::search()` returns `list<array<string, mixed>>` (composite key arrays)
+- [ ] Support for composite unique keys (e.g., `['user_id' => 'x', 'game_id' => 'y']` or dynamically
+  `{user_id}-{game_id}`)
+- [ ] Update integration tests in `BaseRepository.php` with new return type expectations, use only simple keys
+- [ ] Update Doctrine repository implementations in `src/Infrastructure/Persistence/Doctrine/`
+- [ ] Update InMemory repository implementations in `src/Infrastructure/Persistence/InMemory/`
+- [ ] Check & update templates `TKEys`
+- [ ] Check & update methods `getKeys`
+- [ ] Tests pass (`composer scan:all`)
+
+**Technical Context:**
+
+```
+Bounded Context: Core (shared)
+Layers:
+├── Core/Listing/Searchable.php — contract change (return type)
+├── Infrastructure/Persistence/Doctrine/DoctrineRepository.php — implementation update
+├── Infrastructure/Persistence/Doctrine/Users.php — implementation update
+├── Infrastructure/Persistence/InMemory/InMemoryRepository.php — implementation update
+├── Infrastructure/Persistence/InMemory/Users.php — implementation update
+└── tests/Integration/Repositories/BaseRepository.php — test expectations update
+```
+
+**Current vs New Return Type:**
+
+```php
+// Current (returns entities)
+public function search(...): iterable<TEntity>;
+
+// New (returns composite key arrays)
+public function search(...): list<array<string, mixed>>;
+```
+
+**Example Return Value:**
+
+```php
+// Simple ID
+[['id' => '550e8400-e29b-41d4-a716-446655440000']]
+
+// Composite key
+[
+    ['user_id' => 'uuid-1', 'game_id' => 'uuid-2'],
+    ['user_id' => 'uuid-1', 'game_id' => 'uuid-3'],
+]
+```
+
+**Dependencies:** INFRA-001
+
+---
+
+### CORE-005: OAuth Server Contract and Implementation
+
+**User Story:**
+> As a developer, I want to have an OAuth 2.0 server abstraction with grants support for consistent authentication
+> flows.
+
+**Acceptance Criteria:**
+
+- [ ] `Authentificator` contract provides User ID
+- [ ] `Grant` enum for authorization grants (password, client_credentials, refresh_token)
+- [ ] Integration with `league/oauth2-server` package
+- [ ] `Users` implement `League\OAuth2\Server\Repositories\UserRepositoryInterface`
+- [ ] Support for Passkey and Credential grant types
+- [ ] Base test classes for each contract
+- [ ] Tests pass (`composer scan:all`)
+
+**Technical Context:**
+
+```
+Bounded Context: Core (shared)
+Layers:
+├── Core/Auth/Authentificator.php — Auth contract
+├── Core/Auth/Identity.php — Identity value object
+├── Core/Auth/Identities.php — Identity resolution contract
+├── Core/Auth/GrantType.php — Grant enum
+├── Domain/Auth/Entities/Users.php — source user repository contract
+├── Infrastructure/Authentification/OpenAuth/LeagueAuthServer.php — league/oauth2-server adapter
+├── Infrastructure/Authentification/OpenAuth/UserId.php — Identities repository adapter
+├── Infrastructure/Authentification/OpenAuth/Users.php — Identities repository adapter
+└── config/common/auth.php — DI configuration
+```
+
+**Existing Code Reference:**
+
+```
+src/
+    ├── Domain/Auth/Entities/Users.php — source user repository contract/
+    └── Infrastructure/Authentification/OpenAuth/
+        ├── GrantType.php — Enum (Passkey, Credential) (move to core)
+        ├── UserId.php — UserEntityInterface impl
+        └── Users.php — Identities impl
+```
+
+**Dependencies:** CORE-006
+
+---
+
+### CORE-008: Token Generator Contract and Component
+
+**User Story:**
+> As a developer, I want to have an abstraction for token generation with payload and expiration support.
+
+**Acceptance Criteria:**
+
+- [ ] `TokenGenerator` contract with methods `generate(array $payload, int $ttlSeconds): string` and
+  `verify(string $token): bool`
+- [ ] `JwtTokenGenerator` implementation using JWT with configurable secret/algorithm
+- [ ] `PlainTokenGenerator` for tests (no CPU overhead, predictable tokens)
+- [ ] Contract tests (base test class) that all implementations must pass
+- [ ] Tests for correct generation, verification, and expiration
+- [ ] Test environment uses `PlainTokenGenerator` to avoid CPU-intensive operations
+
+**Technical Context:**
+
+```
+Bounded Context: Core (shared)
+Layers:
+├── Core/Security/TokenGenerator.php — contract
+├── Infrastructure/Security/JwtTokenGenerator.php — JWT implementation
+├── Infrastructure/Security/PlainTokenGenerator.php — test implementation
+├── tests/Support/Security/TokenGeneratorContractTest.php — contract tests
+└── config/common/security.php — DI configuration
+```
+
+**Contract Example:**
+
+```php
+interface TokenGenerator
+{
+    /**
+     * Generate a token with payload and expiration.
+     * @param array<string, mixed> $payload Data to embed in token
+     * @param int $ttlSeconds Time-to-live in seconds
+     * @return string Token (JWT or other format)
+     */
+    public function generate(array $payload, int $ttlSeconds = 3600): string;
+
+    /**
+     * Verify token validity and check expiration.
+     * @return bool True if token is valid and not expired
+     */
+    public function verify(string $token): bool;
+}
+```
+
+**PlainTokenGenerator (for tests):**
+
+```php
+final readonly class PlainTokenGenerator implements TokenGenerator
+{
+    public function generate(array $payload, int $ttlSeconds = 3600): string
+    {
+        $data = [
+            'payload' => $payload,
+            'exp' => time() + $ttlSeconds,
+        ];
+        return base64_encode(json_encode($data));
+    }
+
+    public function verify(string $token): bool
+    {
+        $data = json_decode(base64_decode($token), true);
+        return $data && ($data['exp'] ?? 0) >= time();
+    }
+}
+```
+
+**Dependencies:** INFRA-001
+
+---
+
+### CORE-007: Input Validation (ADR-012)
+
+**User Story:**
+> As a developer, I want declarative input validation with custom attributes that don't couple Presentation layer to
+> vendor libraries.
+
+**Acceptance Criteria:**
+
+- [ ] `InputValidator` contract in Core
+- [ ] `ValidationResult` value object in Core
+- [ ] Core validation attributes: `NotBlank`, `Email`, `Length`, `Range`, `Regex`, `Uuid`, `Choice`, `Type`, `Callback`
+- [ ] `ValidationRule` interface for all attributes
+- [ ] `AttributeInputValidator` implementation in Infrastructure (reads attributes via Reflection)
+- [ ] Input DTOs use only Core attributes (no vendor imports in Presentation)
+- [ ] Tests pass (`composer scan:all`)
+
+**Technical Context:**
+
+Per ADR-012: Custom attributes in Core, native PHP validation in Infrastructure.
+
+```
+Bounded Context: Core (shared)
+Layers:
+├── Core/Validation/InputValidator.php — validation contract
+├── Core/Validation/ValidationResult.php — result with errors
+├── Core/Validation/Rules/ValidationRule.php — attribute interface
+├── Core/Validation/Rules/NotBlank.php — required field
+├── Core/Validation/Rules/Email.php — email format
+├── Core/Validation/Rules/Length.php — string length (min/max)
+├── Core/Validation/Rules/Range.php — numeric range
+├── Core/Validation/Rules/Regex.php — pattern matching
+├── Core/Validation/Rules/Uuid.php — UUID format
+├── Core/Validation/Rules/Choice.php — value in allowed list
+├── Core/Validation/Rules/Type.php — type validation
+├── Core/Validation/Rules/Callback.php — custom validation
+└── Infrastructure/Validation/AttributeInputValidator.php — implementation
+```
+
+**Example Usage:**
+
+```php
+// Presentation/Api/V1/Inputs/CreateUserInput.php
+use Bgl\Core\Validation\Rules\Email;
+use Bgl\Core\Validation\Rules\Length;
+use Bgl\Core\Validation\Rules\NotBlank;
+
+final readonly class CreateUserInput
+{
+    public function __construct(
+        #[NotBlank(message: 'Email is required')]
+        #[Email(message: 'Email must be valid')]
+        public string $email,
+
+        #[NotBlank(message: 'Password is required')]
+        #[Length(min: 8, max: 255)]
+        public string $password,
+    ) {}
+}
+```
+
+**Dependencies:** INFRA-001
+
+**ADR Reference:** `docs/03-decisions/011-validation-library.md`
 
 ---
 
@@ -394,14 +794,14 @@ final readonly class ErrorResponse implements ResponseInterface
 
 **Acceptance Criteria:**
 
-- [ ] POST `/api/auth/register` accepts `{email, password, username?}`
+- [ ] POST `/v1/auth/register` accepts `{email, password, username?}`
 - [ ] Email is unique, validated by format
 - [ ] Password minimum 8 characters, hashed via `PasswordHasher` contract
 - [ ] After registration, email is sent with magic link for confirmation
-- [ ] GET `/api/auth/confirm/:token` confirms email and activates account
+- [ ] GET `/v1/auth/confirm/:token` confirms email and activates account
 - [ ] Magic link valid for 24 hours, single-use
 - [ ] User cannot log in until email is confirmed
-- [ ] POST `/api/auth/register/passkey` — passkey registration/linking (WebAuthn)
+- [ ] POST `/v1/auth/register/passkey` — passkey registration/linking (WebAuthn)
 - [ ] On duplicate email — 409 Conflict
 - [ ] On invalid data — 422 with error details
 - [ ] Uses `league/oauth2-server` for OAuth flow
@@ -435,17 +835,17 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'POST /api/auth/register' => [
+'POST /v1/auth/register' => [
     'message' => Auth\Register\Command::class,
     'interceptors' => ['denormalization', 'validation'],
     'public' => true,
 ],
-'GET /api/auth/confirm/{token}' => [
+'GET /v1/auth/confirm/{token}' => [
     'message' => Auth\ConfirmEmail\Command::class,
     'interceptors' => ['denormalization'],
     'public' => true,
 ],
-'POST /api/auth/register/passkey' => [
+'POST /v1/auth/register/passkey' => [
     'message' => Auth\RegisterPasskey\Command::class,
     'interceptors' => ['auth', 'denormalization', 'validation'],
     'public' => false,
@@ -525,8 +925,8 @@ APP_URL=https://boardgamelog.app
 
 **Acceptance Criteria:**
 
-- [ ] POST `/api/auth/login` accepts `{email, password}`
-- [ ] POST `/api/auth/login/passkey` — login via passkey (WebAuthn)
+- [ ] POST `/v1/auth/login` accepts `{email, password}`
+- [ ] POST `/v1/auth/login/passkey` — login via passkey (WebAuthn)
 - [ ] Verifies password via `PasswordHasher::verify()`
 - [ ] Returns `{accessToken, refreshToken, expiresIn}`
 - [ ] JWT contains ONLY: sub (userId), iat, exp — **no email**
@@ -556,12 +956,12 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'POST /api/auth/login' => [
+'POST /v1/auth/login' => [
     'message' => Auth\Login\Command::class,
     'interceptors' => ['denormalization', 'validation'],
     'public' => true,
 ],
-'POST /api/auth/login/passkey' => [
+'POST /v1/auth/login/passkey' => [
     'message' => Auth\LoginWithPasskey\Command::class,
     'interceptors' => ['denormalization', 'validation'],
     'public' => true,
@@ -609,7 +1009,7 @@ JWT_ALGORITHM=HS256
 
 **Acceptance Criteria:**
 
-- [ ] POST `/api/auth/refresh` accepts `{refreshToken}`
+- [ ] POST `/v1/auth/refresh` accepts `{refreshToken}`
 - [ ] Validates refresh token by signature and expiration
 - [ ] Verifies user exists and is active
 - [ ] Generates new accessToken + refreshToken pair
@@ -628,7 +1028,7 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'POST /api/auth/refresh' => [
+'POST /v1/auth/refresh' => [
     'message' => Auth\RefreshToken\Command::class,
     'interceptors' => ['denormalization', 'validation'],
     'public' => true,
@@ -753,11 +1153,11 @@ final readonly class AuthorizationInterceptor implements Interceptor
 
 ```php
 return [
-    'POST /api/auth/register' => [
+    'POST /v1/auth/register' => [
         'message' => RegisterCommand::class,
         'public' => true, // AuthInterceptor skips
     ],
-    'GET /api/plays' => [
+    'GET /v1/plays' => [
         'message' => ListPlaysQuery::class,
         'public' => false, // Requires authentication
         'permissions' => ['plays:read'], // For AuthorizationInterceptor
@@ -776,8 +1176,8 @@ return [
 
 **Acceptance Criteria:**
 
-- [ ] GET `/api/games/search?q=carcassonne` returns game list
-- [ ] GET `/api/games/search?q=carcassonne&fields=id,name,bggId` — request only specific fields
+- [ ] GET `/v1/games/search?q=carcassonne` returns game list
+- [ ] GET `/v1/games/search?q=carcassonne&fields=id,name,bggId` — request only specific fields
 - [ ] Minimum 3 characters for search
 - [ ] Results via composer package for BGG API
 - [ ] Uses `Searchable` contract for search
@@ -807,7 +1207,7 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'GET /api/games/search' => [
+'GET /v1/games/search' => [
     'message' => Games\SearchGames\Query::class,
     'interceptors' => ['auth', 'denormalization'],
     'public' => false,
@@ -897,8 +1297,8 @@ SEARCH_BACKEND=postgres # postgres | redis | elasticsearch
 
 **Acceptance Criteria:**
 
-- [ ] GET `/api/games/:id` returns game details
-- [ ] GET `/api/games/:id?fields=id,name,stats` — request only specific fields
+- [ ] GET `/v1/games/:id` returns game details
+- [ ] GET `/v1/games/:id?fields=id,name,stats` — request only specific fields
 - [ ] If game not in DB, fetches from BGG and saves
 - [ ] Returns: all Game fields + user play statistics (if requested)
 - [ ] On non-existent ID — 404
@@ -915,7 +1315,7 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'GET /api/games/{id}' => [
+'GET /v1/games/{id}' => [
     'message' => Games\GetGame\Query::class,
     'interceptors' => ['auth', 'denormalization'],
     'public' => false,
@@ -953,7 +1353,7 @@ Layers:
 
 **Acceptance Criteria:**
 
-- [ ] POST `/api/plays` creates a new session
+- [ ] POST `/v1/plays` creates a new session
 - [ ] Field `gameId` is **optional** (session can exist without game link)
 - [ ] Fields `startedAt` and `finishedAt` — both optional
 - [ ] Validation: `startedAt` cannot be greater than `finishedAt`
@@ -983,7 +1383,7 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'POST /api/plays' => [
+'POST /v1/plays' => [
     'message' => Plays\CreatePlay\Command::class,
     'interceptors' => ['auth', 'denormalization', 'validation'],
     'public' => false,
@@ -1097,7 +1497,7 @@ final readonly class PlayCreated implements \Core\Messages\Event
 
 **Acceptance Criteria:**
 
-- [ ] GET `/api/plays` returns current user's session list
+- [ ] GET `/v1/plays` returns current user's session list
 - [ ] Pagination: `?page=1&limit=20` (default limit=20, max=100)
 - [ ] Filters: `?gameId=uuid`, `?from=2025-01-01`, `?to=2025-01-31`
 - [ ] Sorted by date (newest first)
@@ -1119,7 +1519,7 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'GET /api/plays' => [
+'GET /v1/plays' => [
     'message' => Plays\ListPlays\Query::class,
     'interceptors' => ['auth', 'denormalization'],
     'public' => false,
@@ -1195,7 +1595,7 @@ final readonly class Query implements \Core\Messages\Query
 
 **Acceptance Criteria:**
 
-- [ ] GET `/api/plays/:id` returns full session data
+- [ ] GET `/v1/plays/:id` returns full session data
 - [ ] Includes: game details, all players, notes, location
 - [ ] Visibility check:
     - `private` — owner only
@@ -1221,7 +1621,7 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'GET /api/plays/{id}' => [
+'GET /v1/plays/{id}' => [
     'message' => Plays\GetPlay\Query::class,
     'interceptors' => ['denormalization'], // auth optional — check in VisibilityChecker
     'public' => true, // Access controlled via Visibility
@@ -1267,7 +1667,7 @@ final readonly class VisibilityChecker
 
 **Acceptance Criteria:**
 
-- [ ] PUT `/api/plays/:id` updates session
+- [ ] PUT `/v1/plays/:id` updates session
 - [ ] Can change: `gameId`, `startedAt`, `finishedAt`, `location`, `notes`, `players`, `visibility`
 - [ ] **`gameId` can be changed or removed** (set to null)
 - [ ] Only owner can edit
@@ -1288,7 +1688,7 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'PUT /api/plays/{id}' => [
+'PUT /v1/plays/{id}' => [
     'message' => Plays\UpdatePlay\Command::class,
     'interceptors' => ['auth', 'denormalization', 'validation'],
     'public' => false,
@@ -1326,7 +1726,7 @@ final readonly class Command implements \Core\Messages\Command
 
 **Acceptance Criteria:**
 
-- [ ] DELETE `/api/plays/:id` deletes session
+- [ ] DELETE `/v1/plays/:id` deletes session
 - [ ] Cascade deletion of players
 - [ ] Only owner can delete
 - [ ] Returns 204 No Content
@@ -1346,7 +1746,7 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'DELETE /api/plays/{id}' => [
+'DELETE /v1/plays/{id}' => [
     'message' => Plays\DeletePlay\Command::class,
     'interceptors' => ['auth', 'denormalization'],
     'public' => false,
@@ -1364,14 +1764,14 @@ Layers:
 
 **Acceptance Criteria:**
 
-- [ ] POST `/api/mates` creates a record in co-players directory
+- [ ] POST `/v1/mates` creates a record in co-players directory
 - [ ] Accepts: `{name, notes?}`
 - [ ] Co-player is **not linked to userId** — this is user's own directory
 - [ ] Each user has their own independent co-players list
-- [ ] GET `/api/mates` — list all user's co-players
-- [ ] GET `/api/mates/:id` — co-player details
-- [ ] PUT `/api/mates/:id` — update name/notes
-- [ ] DELETE `/api/mates/:id` — delete (soft delete or usage check)
+- [ ] GET `/v1/mates` — list all user's co-players
+- [ ] GET `/v1/mates/:id` — co-player details
+- [ ] PUT `/v1/mates/:id` — update name/notes
+- [ ] DELETE `/v1/mates/:id` — delete (soft delete or usage check)
 - [ ] **Expansion:** Ability to link co-player to registered user
 
 **Technical Context:**
@@ -1442,7 +1842,7 @@ CREATE INDEX idx_mates_owner ON mates (owner_id);
 CREATE INDEX idx_mates_linked ON mates (linked_user_id);
 ```
 
-**Response for GET /api/mates:**
+**Response for GET /v1/mates:**
 
 ```json
 {
@@ -1472,7 +1872,7 @@ CREATE INDEX idx_mates_linked ON mates (linked_user_id);
 
 **Acceptance Criteria:**
 
-- [ ] GET `/api/stats/games` returns top games by play count
+- [ ] GET `/v1/stats/games` returns top games by play count
 - [ ] Parameters: `?limit=10`, `?period=month|year|all`
 - [ ] Returns: game info, playCount, lastPlayedAt
 - [ ] Sorted by playCount DESC
@@ -1490,7 +1890,7 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'GET /api/stats/games' => [
+'GET /v1/stats/games' => [
     'message' => Stats\GetTopGames\Query::class,
     'interceptors' => ['auth', 'denormalization'],
     'public' => false,
@@ -1540,7 +1940,7 @@ LIMIT :limit
 
 **Acceptance Criteria:**
 
-- [ ] GET `/api/reports/year/:year` generates report
+- [ ] GET `/v1/reports/year/:year` generates report
 - [ ] Includes: top games, top co-players, overall statistics
 - [ ] Total play count for year
 - [ ] Total play time (if started_at/finished_at exist)
@@ -1561,7 +1961,7 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'GET /api/reports/year/{year}' => [
+'GET /v1/reports/year/{year}' => [
     'message' => Stats\GetYearReport\Query::class,
     'interceptors' => ['auth', 'denormalization'],
     'public' => false,
@@ -1616,7 +2016,7 @@ Layers:
 
 - [ ] Swagger/OpenAPI 3.0 specification
 - [ ] Auto-generation from annotations or separate YAML
-- [ ] Swagger UI available at `/api/docs`
+- [ ] Swagger UI available at `/v1/docs`
 - [ ] Request and response examples
 - [ ] Error descriptions
 - [ ] Authentication via Bearer token
@@ -1633,11 +2033,11 @@ Files:
 
 ```php
 // Documentation served statically via nginx or special middleware
-'GET /api/docs' => [
+'GET /v1/docs' => [
     'static' => 'public/api-docs/index.html',
     'public' => true,
 ],
-'GET /api/docs/openapi.yaml' => [
+'GET /v1/docs/openapi.yaml' => [
     'static' => 'docs/api/openapi.yaml',
     'public' => true,
 ],
@@ -1655,7 +2055,7 @@ Files:
 **Acceptance Criteria:**
 
 - [ ] `make init` initializes environment
-- [ ] `make docker-up` starts containers
+- [ ] `make up` starts containers
 - [ ] Containers: php-fpm, nginx, postgres, redis
 - [ ] Volumes for data persistence
 - [ ] Healthchecks for all services
@@ -1771,7 +2171,7 @@ jobs:
                 run: composer install --no-progress
 
             -   name: Run checks
-                run: make scan
+                run: composer scan:all
 ```
 
 **Dependencies:** INFRA-001
@@ -1787,7 +2187,7 @@ jobs:
 
 **Acceptance Criteria:**
 
-- [ ] GET `/api/stats/wins` returns win statistics
+- [ ] GET `/v1/stats/wins` returns win statistics
 - [ ] Overall win percentage
 - [ ] Win percentage per game
 - [ ] Period filter
@@ -1805,7 +2205,7 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'GET /api/stats/wins' => [
+'GET /v1/stats/wins' => [
     'message' => Stats\GetWinStats\Query::class,
     'interceptors' => ['auth', 'denormalization'],
     'public' => false,
@@ -1846,7 +2246,7 @@ Layers:
 
 **Acceptance Criteria:**
 
-- [ ] GET `/api/stats/mates` returns co-player statistics
+- [ ] GET `/v1/stats/mates` returns co-player statistics
 - [ ] Top co-players by joint play count
 - [ ] Win rate against each co-player
 - [ ] Favorite games with each co-player
@@ -1863,7 +2263,7 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'GET /api/stats/mates' => [
+'GET /v1/stats/mates' => [
     'message' => Stats\GetMateStats\Query::class,
     'interceptors' => ['auth', 'denormalization'],
     'public' => false,
@@ -1902,7 +2302,7 @@ Layers:
 
 **Acceptance Criteria:**
 
-- [ ] GET `/api/stats/trends` returns data for graph
+- [ ] GET `/v1/stats/trends` returns data for graph
 - [ ] Parameters: `?period=year` (last 12 months)
 - [ ] Returns: month, play count, unique games
 
@@ -1918,7 +2318,7 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'GET /api/stats/trends' => [
+'GET /v1/stats/trends' => [
     'message' => Stats\GetTrends\Query::class,
     'interceptors' => ['auth', 'denormalization'],
     'public' => false,
@@ -1955,11 +2355,11 @@ Layers:
 
 **Acceptance Criteria:**
 
-- [ ] PUT `/api/mates/:id/link` links co-player to user
+- [ ] PUT `/v1/mates/:id/link` links co-player to user
 - [ ] Accepts: `{userId}` or `{email}` of registered user
 - [ ] Requires confirmation from target user
 - [ ] After linking, statistics are combined
-- [ ] DELETE `/api/mates/:id/link` unlinks user
+- [ ] DELETE `/v1/mates/:id/link` unlinks user
 
 **Technical Context:**
 
@@ -1979,17 +2379,17 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'PUT /api/mates/{id}/link' => [
+'PUT /v1/mates/{id}/link' => [
     'message' => Mates\LinkMate\Command::class,
     'interceptors' => ['auth', 'denormalization', 'validation'],
     'public' => false,
 ],
-'POST /api/mates/{id}/link/confirm' => [
+'POST /v1/mates/{id}/link/confirm' => [
     'message' => Mates\ConfirmLink\Command::class,
     'interceptors' => ['auth', 'denormalization'],
     'public' => false,
 ],
-'DELETE /api/mates/{id}/link' => [
+'DELETE /v1/mates/{id}/link' => [
     'message' => Mates\UnlinkMate\Command::class,
     'interceptors' => ['auth', 'denormalization'],
     'public' => false,
@@ -2009,7 +2409,7 @@ Layers:
 
 **Acceptance Criteria:**
 
-- [ ] POST `/api/sync/bgg/import` starts import
+- [ ] POST `/v1/sync/bgg/import` starts import
 - [ ] Requires bgg_username specified in profile
 - [ ] Imports plays for specified period
 - [ ] Creates games if not in local DB
@@ -2031,7 +2431,7 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'POST /api/sync/bgg/import' => [
+'POST /v1/sync/bgg/import' => [
     'message' => Sync\ImportFromBgg\Command::class,
     'interceptors' => ['auth', 'denormalization', 'validation'],
     'public' => false,
@@ -2055,7 +2455,7 @@ GET https://boardgamegeek.com/xmlapi2/plays?username=xxx&mindate=2024-01-01
 
 **Acceptance Criteria:**
 
-- [ ] POST `/api/sync/bgg/export` exports unsynced plays
+- [ ] POST `/v1/sync/bgg/export` exports unsynced plays
 - [ ] Requires BGG credentials (or OAuth in future)
 - [ ] Updates sync_status after successful export
 - [ ] Returns: exported, failed, already_synced
@@ -2074,7 +2474,7 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'POST /api/sync/bgg/export' => [
+'POST /v1/sync/bgg/export' => [
     'message' => Sync\ExportToBgg\Command::class,
     'interceptors' => ['auth', 'denormalization', 'validation'],
     'public' => false,
@@ -2097,7 +2497,7 @@ browser.
 
 **Acceptance Criteria:**
 
-- [ ] GET `/api/feed` returns co-player activity with linked users
+- [ ] GET `/v1/feed` returns co-player activity with linked users
 - [ ] Cursor pagination (for real-time updates)
 - [ ] Event types: new_play, achievement
 - [ ] Only from linked mates with visibility >= friends
@@ -2114,7 +2514,7 @@ Layers:
 **Routes (config/routes.php):**
 
 ```php
-'GET /api/feed' => [
+'GET /v1/feed' => [
     'message' => Social\GetFeed\Query::class,
     'interceptors' => ['auth', 'denormalization'],
     'public' => false,
@@ -2184,13 +2584,19 @@ Per ADR-008, migration includes:
 INFRA-001 (Docker)
     ↓
 ┌───────────────────────────────────────────────────────┐
-│ CORE-001 (Validation/Serialization)                   │
+│ CORE-001 (Denormalization/Serialization)              │
 │     ↓                                                 │
-│ CORE-004 (API Response Contracts)                     │
+│ CORE-003 (Mediator + ApiAction + /ping)               │
+│     ↓                                                 │
+│ CORE-007 (Input Validation - ADR-012)                 │
 │     ↓                                                 │
 │ CORE-002 (PasswordHasher)                             │
 │     ↓                                                 │
-│ CORE-003 (Mediator + ApiAction)                       │
+│ CORE-008 (TokenGenerator)                             │
+│     ↓                                                 │
+│ CORE-004 (API Response Contracts)                     │
+│     ↓                                                 │
+│ CORE-005 (OAuth Server Contract)                      │
 └───────────────────────────────────────────────────────┘
     ↓
 AUTH-001 (Register + Email Confirm) → AUTH-002 (Login) → AUTH-003 (Refresh) → AUTH-004 (Interceptors)
@@ -2210,7 +2616,7 @@ INFRA-002 (CI)
 
 ### Recommended Sprints:
 
-**Sprint 0:** INFRA-001, CORE-001, CORE-004, CORE-002, CORE-003
+**Sprint 0:** INFRA-001, CORE-001, CORE-003, CORE-007, CORE-002, CORE-008, CORE-004, CORE-005
 
 **Sprint 1:** AUTH-001, AUTH-002, AUTH-003, AUTH-004
 
@@ -2288,11 +2694,19 @@ INFRA-002 (CI)
 
 - Moved to **MVP** (was in Phase 3)
 
+### CORE-001
+
+- Renamed to "Denormalization and Serialization Components" (validation moved to CORE-007)
+- Removed Symfony Validator integration
+- Now depends on CORE-007
+
 ### New Tasks
 
-- CORE-001: Validation, denormalization, and serialization components
+- CORE-007: Input Validation (ADR-012) — custom attributes in Core, native PHP validation
+- CORE-001: Denormalization and serialization components (refactored)
 - CORE-002: Password hashing contract and component
 - CORE-003: Mediator pattern, unified API entry point, two-level middleware system (Interceptors + Aspects)
 - CORE-004: API Response Contracts (success/error response format)
+- CORE-005: OAuth Server Contract and Implementation (league/oauth2-server integration)
 - MATES-002: Link co-player to user (Expansion)
 - GAMES-003: Search migration to Elasticsearch (Phase 3)

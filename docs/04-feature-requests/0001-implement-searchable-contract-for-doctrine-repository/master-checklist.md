@@ -15,7 +15,7 @@ conditions.
 - [x] Add `getAlias()` method to `src/Infrastructure/Persistence/Doctrine/Users.php`
 - [x] Return 'u' as the alias for User entity
 - [x] Add `#[\Override]` attribute
-- [x] Verify file passes `make lp`
+- [x] Verify file passes `composer lp:run`
 
 Details: [stage-1-fix-users-repository.md](./stage-1-fix-users-repository.md)
 
@@ -36,7 +36,7 @@ Details: [stage-1-fix-users-repository.md](./stage-1-fix-users-repository.md)
 - [x] Implement `or()` method for OrX filter
 - [x] Implement `not()` method for Not filter
 - [x] Handle empty filter arrays edge case
-- [x] Verify file passes `make lp` and `make ps`
+- [x] Verify file passes `composer lp:run` and `composer ps:run`
 
 Details: [stage-2-doctrine-filter-full.md](./stage-2-doctrine-filter-full.md)
 
@@ -49,7 +49,7 @@ Details: [stage-2-doctrine-filter-full.md](./stage-2-doctrine-filter-full.md)
 - [x] Update `search()` method in `DoctrineRepository.php`
 - [x] Capture return value from `$filter->accept($visitor)`
 - [x] Apply condition to QueryBuilder only if not null
-- [x] Verify file passes `make lp` and `make ps`
+- [x] Verify file passes `composer lp:run` and `composer ps:run`
 
 Details: [stage-3-fix-doctrine-repository.md](./stage-3-fix-doctrine-repository.md)
 
@@ -58,12 +58,12 @@ Details: [stage-3-fix-doctrine-repository.md](./stage-3-fix-doctrine-repository.
 ## Stage 4: Integration Testing (~45min) - DONE
 **Dependencies:** Stages 1, 2, 3 completed
 
-- [x] Run `make t tests/Integration/Repositories/DoctrineRepositoryCest.php`
+- [x] Run `composer test -- run tests/Integration/Repositories/DoctrineRepositoryCest.php`
 - [x] Fix any failing tests
 - [x] Verify all filter types work correctly (None, Equals, Greater, Less, AndX, OrX)
 - [x] Verify pagination works correctly
 - [x] Verify sorting works correctly
-- [x] Run `make t-intg` for all integration tests
+- [x] Run `composer test:intg` for all integration tests
 
 Details: [stage-4-integration-testing.md](./stage-4-integration-testing.md)
 
@@ -72,9 +72,9 @@ Details: [stage-4-integration-testing.md](./stage-4-integration-testing.md)
 ## Stage 5: Final Validation and Cleanup (~30min) - DONE
 **Dependencies:** All previous stages completed
 
-- [x] Run `make scan` (mandatory before push) - Note: Pre-existing issue with unused `lcobucci/jwt` dependency
+- [x] Run `composer scan:all` (mandatory before push) - Note: Pre-existing issue with unused `lcobucci/jwt` dependency
 - [x] Fix any Psalm errors in DoctrineFilter and DoctrineRepository
-- [x] Run `make dt` (architecture tests) - 0 violations
+- [x] Run `composer dt:run` (architecture tests) - 0 violations
 - [x] Review code for simplification opportunities
 
 Details: [stage-5-final-validation.md](./stage-5-final-validation.md)
@@ -85,22 +85,22 @@ Details: [stage-5-final-validation.md](./stage-5-final-validation.md)
 
 ```bash
 # Lint check
-make lp
+composer lp:run
 
 # Static analysis
-make ps
+composer ps:run
 
 # Run specific test file
-make t tests/Integration/Repositories/DoctrineRepositoryCest.php
+composer test -- run tests/Integration/Repositories/DoctrineRepositoryCest.php
 
 # Run all integration tests
-make t-intg
+composer test:intg
 
 # Full validation (MANDATORY before push)
-make scan
+composer scan:all
 
 # Architecture tests
-make dt
+composer dt:run
 ```
 
 ## Files to Create/Modify

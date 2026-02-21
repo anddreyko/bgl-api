@@ -37,7 +37,7 @@
 **Verify:**
 
 ```bash
-make lp
+composer lp:run
 ```
 
 ---
@@ -54,7 +54,7 @@ make lp
 **Verify:**
 
 ```bash
-make ps
+composer ps:run
 ```
 
 ---
@@ -91,9 +91,9 @@ Read these files before implementing:
 ### Checklist
 
 - [ ] All files created per specification
-- [ ] All files pass `make lp`
-- [ ] All files pass `make ps`
-- [ ] No Deptrac violations (`make dt`)
+- [ ] All files pass `composer lp:run`
+- [ ] All files pass `composer ps:run`
+- [ ] No Deptrac violations (`composer dt:run`)
 
 ### Expected Outcomes
 
@@ -104,8 +104,8 @@ Read these files before implementing:
 
 ```bash
 # Specific tests for this stage
-make t-unit tests/Unit/Path/...
-make t-intg tests/Integration/Path/...
+composer test:unit -- tests/Unit/Path/...
+composer test:intg -- tests/Integration/Path/...
 ```
 
 ---

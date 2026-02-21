@@ -59,7 +59,7 @@
 
 ```bash
 # How to test manually
-curl -X POST http://localhost:8080/api/...
+curl -X POST http://localhost:8080/v1/...
 ```
 
 **Automated Tests Added:**
@@ -74,7 +74,7 @@ curl -X POST http://localhost:8080/api/...
 ### Checklist
 
 - [x] Code follows PSR-12 style guidelines
-- [x] `make scan` passes
+- [x] `composer scan:all` passes
 - [x] Tests added for new functionality
 - [x] Documentation updated (CHANGELOG, AGENTS.md if needed)
 - [x] No Deptrac violations
@@ -92,7 +92,7 @@ curl -X POST http://localhost:8080/api/...
 **Endpoint:**
 
 ```
-{METHOD} /api/path
+{METHOD} /v1/path
 ```
 
 **Request:**
@@ -125,7 +125,7 @@ curl -X POST http://localhost:8080/api/...
 **Example 1: Basic Usage**
 
 ```bash
-curl -X POST http://localhost:8080/api/... \
+curl -X POST http://localhost:8080/v1/... \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -d '{"field": "value"}'

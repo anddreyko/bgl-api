@@ -30,7 +30,7 @@ these tests will immediately reveal any issues with the implementation.
 Execute the specific test file:
 
 ```bash
-make t tests/Integration/Repositories/DoctrineRepositoryCest.php
+composer test -- run tests/Integration/Repositories/DoctrineRepositoryCest.php
 ```
 
 ### Step 2: Analyze Test Results
@@ -78,7 +78,7 @@ var_dump($qb->getParameters()->toArray());
 After fixing any issues, run the full integration test suite:
 
 ```bash
-make t-intg
+composer test:intg
 ```
 
 ---
@@ -133,19 +133,19 @@ No new files in this stage. This stage is about running tests and fixing issues.
 
 1. **All DoctrineRepositoryCest tests pass:**
    ```bash
-   make t tests/Integration/Repositories/DoctrineRepositoryCest.php
+   composer test -- run tests/Integration/Repositories/DoctrineRepositoryCest.php
    ```
 
    Expected output: All tests pass (green)
 
 2. **All integration tests pass:**
    ```bash
-   make t-intg
+   composer test:intg
    ```
 
 3. **Test parity with InMemory:**
    ```bash
-   make t tests/Integration/Repositories/InMemoryRepositoryCest.php
+   composer test -- run tests/Integration/Repositories/InMemoryRepositoryCest.php
    ```
 
    Both Doctrine and InMemory tests should produce the same results.
@@ -154,13 +154,13 @@ No new files in this stage. This stage is about running tests and fixing issues.
 
 ```bash
 # Specific Doctrine tests
-make t tests/Integration/Repositories/DoctrineRepositoryCest.php
+composer test -- run tests/Integration/Repositories/DoctrineRepositoryCest.php
 
 # All integration tests
-make t-intg
+composer test:intg
 
 # Verify InMemory still works (sanity check)
-make t tests/Integration/Repositories/InMemoryRepositoryCest.php
+composer test -- run tests/Integration/Repositories/InMemoryRepositoryCest.php
 ```
 
 ### Expected Outcomes

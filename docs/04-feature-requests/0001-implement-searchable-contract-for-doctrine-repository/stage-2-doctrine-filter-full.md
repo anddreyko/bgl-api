@@ -278,12 +278,12 @@ final readonly class DoctrineFilter implements FilterVisitor
 
 2. **Lint check passes:**
    ```bash
-   make lp
+   composer lp:run
    ```
 
 3. **Static analysis passes:**
    ```bash
-   make ps
+   composer ps:run
    ```
 
 4. **Class structure is correct:**
@@ -304,10 +304,10 @@ final readonly class DoctrineFilter implements FilterVisitor
 
 ```bash
 # Lint check
-make lp
+composer lp:run
 
 # Static analysis
-make ps
+composer ps:run
 ```
 
 ### Expected Outcomes

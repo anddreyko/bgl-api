@@ -1,15 +1,14 @@
 # Project Status
 
-> Updated: 2025-12-29
+> Updated: 2026-01-05
 
 ## Current Focus
 
-**CORE-004: API Response Contracts**
+**CORE-007: Input Validation (ADR-012)**
 
-Folder: `docs/04-feature-requests/0002-core-004-api-response-contracts/`
+Next task after CORE-003 completion.
 
-Implement standardized API response format (SuccessResponse, ErrorResponse) for all endpoints. Empty classes exist, need
-to add actual contracts.
+See: `docs/04-feature-requests/0006-core-007-input-validation/`
 
 ## Blockers
 
@@ -17,11 +16,10 @@ No critical blockers.
 
 ## Next Tasks
 
-1. **CORE-004** — API Response Contracts (newly added)
-2. **AUTH-001** — Registration (Handler + Action + tests)
-3. **AUTH-003** — Refresh Token (entity + handler)
-4. **AUTH-004** — JWT Auth Middleware
-5. **GAMES-001** — Game search via BGG
+1. **CORE-007** — Input Validation (ADR-012) **[NEXT]**
+2. **CORE-002** — Password Hashing Contract and Component
+3. **CORE-008** — Token Generator Contract and Component
+4. **AUTH-001** — Registration (Handler + Action + tests)
 
 ## Completed
 
@@ -32,13 +30,20 @@ No critical blockers.
 - AUTH-002: LoginByCredentials handler (partial)
 - Basic tests: Unit, Integration, Functional
 - Searchable contract for Doctrine repository (internal)
+- **CORE-004: API Response Contracts** — SuccessResponse, ErrorResponse with pagination and validation errors
+- **CORE-005: OAuth Server Contract** — Authentificator contract, Identity value object, GrantType enum,
+  LeagueAuthServer adapter
+- **CORE-001: Denormalization and Serialization Components** — Denormalizer/Serializer contracts,
+  SauceDenormalizer (EventSauce), FractalSerializer (League Fractal), TransformerRegistry, DI config
+- **CORE-003: Mediator Pattern** — Unified ApiAction entry point, RouteMessageMap, InterceptorPipeline,
+  Transactional aspect, DenormalizationInterceptor, Auth/Validation placeholders, /ping endpoint
 
 ## MVP Progress
 
 **Status:** In Progress
-**Phase 0:** 0/4 tasks (0%)
+**Phase 0:** 5/8 tasks (62.5%)
 **Phase 1:** 0/17 tasks (0%)
-**Overall MVP:** ░░░░░░░░░░ ~15% (infrastructure work done, not formally tracked)
+**Overall MVP:** 25% (CORE-004, CORE-005, CORE-001, CORE-003 completed)
 
 ## Metrics
 
@@ -47,7 +52,7 @@ No critical blockers.
 | Integration test coverage | ~60%    | 80%    |
 | Psalm level               | 1       | 1      |
 | Deptrac violations        | 0       | 0      |
-| `make scan`               | Pass    | Pass   |
+| `composer scan:all`       | Pass    | Pass   |
 
 ---
 

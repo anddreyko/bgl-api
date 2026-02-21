@@ -147,8 +147,8 @@ None. This is a new feature implementation that does not modify existing public 
 - [x] Tests added via `BaseRepository` inheritance
 - [x] Documentation updated (feature-request.md serves as specification)
 - [x] No breaking changes
-- [x] `make scan` passes (all quality checks)
-- [x] Architecture tests pass (`make dt`)
+- [x] `composer scan:all` passes (all quality checks)
+- [x] Architecture tests pass (`composer dt:run`)
 
 ---
 

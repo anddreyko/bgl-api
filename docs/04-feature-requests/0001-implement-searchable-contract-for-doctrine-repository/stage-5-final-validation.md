@@ -6,13 +6,13 @@
 
 This stage performs the final validation of the entire feature implementation. It ensures all quality checks pass, the
 code meets project standards, and the implementation is production-ready. This includes running the mandatory
-`make scan` command, verifying architecture compliance, and performing a code review for simplification opportunities.
+`composer scan:all` command, verifying architecture compliance, and performing a code review for simplification opportunities.
 
 ### Why It Needs to Be Done at This Point
 
 Final validation should be the last step before considering the feature complete. All previous stages have built and
 tested the implementation; this stage confirms everything meets the project's quality standards.
-Run `make scan` is **mandatory before push**.
+Run `composer scan:all` is **mandatory before push**.
 
 ### Dependencies
 
@@ -28,7 +28,7 @@ Run `make scan` is **mandatory before push**.
 Execute the mandatory scan command:
 
 ```bash
-make scan
+composer scan:all
 ```
 
 This command runs all validation tools including linting, static analysis, code style checks, and more. All checks must
@@ -47,7 +47,7 @@ If Psalm reports errors, address them:
 Run Psalm independently to see detailed output:
 
 ```bash
-make ps
+composer ps:run
 ```
 
 ### Step 3: Run Architecture Tests
@@ -55,7 +55,7 @@ make ps
 Verify the implementation follows the dependency diagram:
 
 ```bash
-make dt
+composer dt:run
 ```
 
 This ensures:
@@ -84,16 +84,16 @@ Run all test types in order as per Testing Trophy:
 
 ```bash
 # Lint check
-make lp
+composer lp:run
 
 # Static analysis
-make ps
+composer ps:run
 
 # Integration tests
-make t-intg
+composer test:intg
 
 # Architecture tests
-make dt
+composer dt:run
 ```
 
 ### Step 6: Final Validation
@@ -101,7 +101,7 @@ make dt
 Run the complete scan one more time:
 
 ```bash
-make scan
+composer scan:all
 ```
 
 This confirms everything is ready for commit and push.
@@ -114,9 +114,9 @@ This confirms everything is ready for commit and push.
 
 | Command     | Purpose                                         |
 |-------------|-------------------------------------------------|
-| `make scan` | **MANDATORY before push** - runs all validation |
-| `make ps`   | Deep type analysis with Psalm                   |
-| `make dt`   | Architecture/dependency tests                   |
+| `composer scan:all` | **MANDATORY before push** - runs all validation |
+| `composer ps:run`   | Deep type analysis with Psalm                   |
+| `composer dt:run`   | Architecture/dependency tests                   |
 
 ### Architecture Dependency Diagram
 
@@ -142,21 +142,21 @@ No new files in this stage. This stage is about validation.
 
 ### How to Verify This Stage is Done
 
-1. **`make scan` passes completely:**
+1. **`composer scan:all` passes completely:**
    ```bash
-   make scan
+   composer scan:all
    ```
    All checks must pass with no errors.
 
 2. **Architecture tests pass:**
    ```bash
-   make dt
+   composer dt:run
    ```
    No deptrac violations.
 
 3. **All tests pass:**
    ```bash
-   make t-intg
+   composer test:intg
    ```
 
 4. **Code reviewed:**
@@ -167,19 +167,19 @@ No new files in this stage. This stage is about validation.
 
 ```bash
 # 1. Lint check
-make lp
+composer lp:run
 
 # 2. Static analysis
-make ps
+composer ps:run
 
 # 3. Integration tests
-make t-intg
+composer test:intg
 
 # 4. Architecture tests
-make dt
+composer dt:run
 
 # 5. Final comprehensive check (MANDATORY)
-make scan
+composer scan:all
 ```
 
 ### Expected Outcomes
@@ -216,13 +216,13 @@ Infrastructure depends on Application
 ```
 PSR-12 violation in DoctrineFilter.php
 ```
-**Solution:** Run `make cs` to auto-fix code style.
+**Solution:** Run `composer cs:fix` to auto-fix code style.
 
 ### Final Checklist
 
 Before marking the feature complete, verify:
 
-- [ ] `make scan` passes completely
+- [ ] `composer scan:all` passes completely
 - [ ] All integration tests pass
 - [ ] Architecture tests pass
 - [ ] Code follows PSR-12
@@ -242,7 +242,7 @@ Once all criteria are met:
 
 2. **Run final check:**
    ```bash
-   make scan
+   composer scan:all
    ```
 
 3. **Push the changes:**
