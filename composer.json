@@ -29,6 +29,7 @@
         "doctrine/dbal": "^4.3",
         "doctrine/orm": "^3.5",
         "laminas/laminas-config-aggregator": "^1.19",
+        "league/fractal": "^0.21.0",
         "league/tactician": "^1.1",
         "monolog/monolog": "^3.9",
         "php-di/php-di": "^7.1",
