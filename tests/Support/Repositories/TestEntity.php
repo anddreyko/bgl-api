@@ -14,7 +14,9 @@ final readonly class TestEntity
         #[ORM\Id, ORM\Column(type: Types::STRING)]
         private string $id,
         #[ORM\Column(type: Types::STRING)]
-        private string $value
+        private string $value,
+        #[ORM\Column(type: Types::INTEGER, nullable: true)]
+        private ?int $status = null,
     ) {
     }
 
@@ -26,5 +28,10 @@ final readonly class TestEntity
     public function getValue(): string
     {
         return $this->value;
+    }
+
+    public function getStatus(): ?int
+    {
+        return $this->status;
     }
 }

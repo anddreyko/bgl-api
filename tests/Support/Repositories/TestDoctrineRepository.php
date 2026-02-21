@@ -14,8 +14,15 @@ final class TestDoctrineRepository extends DoctrineRepository
         return TestEntity::class;
     }
 
+    #[\Override]
     public function getAlias(): string
     {
         return 'e';
+    }
+
+    #[\Override]
+    public function getKeys(): array
+    {
+        return ['id'];
     }
 }

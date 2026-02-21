@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Core\Listing\Page;
 
-final class PageSize
+final readonly class PageSize
 {
     public function __construct(
         private ?int $value = null

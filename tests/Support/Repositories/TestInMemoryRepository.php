@@ -9,8 +9,8 @@ use Bgl\Infrastructure\Persistence\InMemory\InMemoryRepository;
 final class TestInMemoryRepository extends InMemoryRepository
 {
     #[\Override]
-    public function getKey(): string
+    public function getKeys(): array
     {
-        return 'getId';
+        return ['id'];
     }
 }

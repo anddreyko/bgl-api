@@ -27,35 +27,34 @@ final readonly class InMemoryFilter implements FilterVisitor
     ) {
     }
 
+    #[\Override]
     public function all(All $filter): mixed
     {
         return static fn(): true => true;
     }
 
+    #[\Override]
     public function equals(Equals $filter): mixed
     {
-        return fn(array|object $entity): bool => $this->resolve($entity, $filter->left) === $this->resolve(
-                $entity,
-                $filter->right
-            );
+        return fn(array|object $entity): bool => $this->resolve($entity, $filter->left)
+            === $this->resolve($entity, $filter->right);
     }
 
+    #[\Override]
     public function less(Less $filter): mixed
     {
-        return fn(array|object $entity): bool => $this->resolve($entity, $filter->left) < $this->resolve(
-                $entity,
-                $filter->right
-            );
+        return fn(array|object $entity): bool => $this->resolve($entity, $filter->left)
+            < $this->resolve($entity, $filter->right);
     }
 
+    #[\Override]
     public function greater(Greater $filter): mixed
     {
-        return fn(array|object $entity): bool => $this->resolve($entity, $filter->left) > $this->resolve(
-                $entity,
-                $filter->right
-            );
+        return fn(array|object $entity): bool => $this->resolve($entity, $filter->left)
+            > $this->resolve($entity, $filter->right);
     }
 
+    #[\Override]
     public function and(AndX $filter): mixed
     {
         return fn(array|object $entity): bool => array_all(
@@ -64,6 +63,7 @@ final readonly class InMemoryFilter implements FilterVisitor
         );
     }
 
+    #[\Override]
     public function or(OrX $filter): mixed
     {
         return fn(array|object $entity): bool => array_any(
@@ -72,6 +72,7 @@ final readonly class InMemoryFilter implements FilterVisitor
         );
     }
 
+    #[\Override]
     public function not(Not $filter): mixed
     {
         return fn(array|object $entity): bool => !$filter->filter->accept($this)($entity);

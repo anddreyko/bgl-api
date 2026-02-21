@@ -23,4 +23,10 @@ final class Users extends DoctrineRepository implements UserRepository
     {
         return 'u';
     }
+
+    #[\Override]
+    public function getKeys(): array
+    {
+        return ['id'];
+    }
 }

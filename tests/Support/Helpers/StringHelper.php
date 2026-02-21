@@ -82,7 +82,7 @@ final class StringHelper
             } elseif (is_array($value)) {
                 $value = var_export(
                     array_map(
-                        static fn($item) => self::forceToString($item),
+                        self::forceToString(...),
                         $value
                     ),
                     true
@@ -95,10 +95,10 @@ final class StringHelper
                     } else {
                         $value = var_export($value, true);
                     }
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     try {
                         $value = serialize($value);
-                    } catch (\Exception $e) {
+                    } catch (\Exception) {
                         $value = 'OBJECT';
                     }
                 }

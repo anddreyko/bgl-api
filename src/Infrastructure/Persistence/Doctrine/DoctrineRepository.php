@@ -17,7 +17,6 @@ use Doctrine\ORM\EntityManagerInterface;
 /**
  * @template TEntity of object
  * @implements Repository<TEntity>
- * @implements Searchable<TEntity>
  */
 abstract class DoctrineRepository implements Repository, Searchable
 {
@@ -31,6 +30,11 @@ abstract class DoctrineRepository implements Repository, Searchable
     abstract public function getType(): string;
 
     abstract public function getAlias(): string;
+
+    /**
+     * @return list<string> Key field names
+     */
+    abstract public function getKeys(): array;
 
     #[\Override]
     public function add(object $entity): void
@@ -58,8 +62,19 @@ abstract class DoctrineRepository implements Repository, Searchable
         PageSort $sort = new PageSort([])
     ): iterable {
         $alias = $this->getAlias();
+        $keys = $this->getKeys();
+
+        // Build SELECT clause for key fields only
+        $select = implode(
+            ', ',
+            array_map(
+                fn(string $key): string => "{$alias}.{$key}",
+                $keys
+            )
+        );
+
         $qb = $this->em->createQueryBuilder()
-            ->select($alias)
+            ->select($select)
             ->from($this->getType(), $alias);
 
         $visitor = new DoctrineFilter($qb, $alias);
@@ -85,7 +100,7 @@ abstract class DoctrineRepository implements Repository, Searchable
                 ->setMaxResults($limit);
         }
 
-        /** @var list<TEntity> */
-        return $qb->getQuery()->getResult();
+        /** @var list<array<string, mixed>> */
+        return $qb->getQuery()->getArrayResult();
     }
 }

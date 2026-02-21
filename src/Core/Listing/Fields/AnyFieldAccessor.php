@@ -6,6 +6,7 @@ namespace Bgl\Core\Listing\Fields;
 
 final readonly class AnyFieldAccessor implements FieldAccessor
 {
+    #[\Override]
     public function get(object|array $entity, int|string $field): mixed
     {
         if (\is_array($entity)) {

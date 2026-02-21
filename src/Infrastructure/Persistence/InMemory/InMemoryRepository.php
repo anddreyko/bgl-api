@@ -18,12 +18,11 @@ use Bgl\Core\Listing\Searchable;
 /**
  * @template TEntity of object
  * @implements Repository<TEntity>
- * @implements Searchable<TEntity>
  * @see \Bgl\Tests\Integration\Repositories\InMemoryRepositoryCest
  */
 abstract class InMemoryRepository implements Repository, Searchable
 {
-    /** @var TEntity[] */
+    /** @var array<string, TEntity> */
     private array $entities = [];
 
     public function __construct(
@@ -31,14 +30,16 @@ abstract class InMemoryRepository implements Repository, Searchable
     ) {
     }
 
-    abstract public function getKey(): string;
+    /**
+     * @return list<string> Key field names
+     */
+    abstract public function getKeys(): array;
 
     #[\Override]
     public function add(object $entity): void
     {
-        /** @psalm-suppress MixedMethodCall */
-        /** @var string $key */
-        $key = $entity->{$this->getKey()}();
+        $keyField = $this->getKeys()[0];
+        $key = (string)$this->accessor->get($entity, $keyField);
         $this->entities[$key] = $entity;
     }
 
@@ -51,14 +52,14 @@ abstract class InMemoryRepository implements Repository, Searchable
     #[\Override]
     public function remove(object $entity): void
     {
-        /** @psalm-suppress MixedMethodCall */
-        /** @var string $key */
-        $key = $entity->{$this->getKey()}();
+        $keyField = $this->getKeys()[0];
+        $key = (string)$this->accessor->get($entity, $keyField);
         if (isset($this->entities[$key])) {
             unset($this->entities[$key]);
         }
     }
 
+    #[\Override]
     public function search(
         Filter $filter = None::Filter,
         PageSize $size = new PageSize(),
@@ -74,11 +75,37 @@ abstract class InMemoryRepository implements Repository, Searchable
             usort($entities, $this->compare($sort));
         }
 
-        /** @var list<TEntity> */
-        return \array_slice($entities, ($number->getValue() - 1) * $size->getValue(), $size->getValue());
+        $limit = $size->getValue();
+        $sliced = \array_slice(
+            array_values($entities),
+            ($number->getValue() - 1) * ($limit ?? 0),
+            $limit
+        );
+
+        return array_map(
+            $this->extractKeys(...),
+            $sliced
+        );
     }
 
-    private function compare(PageSort $sort)
+    /**
+     * @return array<string, mixed>
+     */
+    private function extractKeys(object $entity): array
+    {
+        $result = [];
+        foreach ($this->getKeys() as $key) {
+            /** @psalm-suppress MixedAssignment */
+            $result[$key] = $this->accessor->get($entity, $key);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return callable(TEntity, TEntity): int
+     */
+    private function compare(PageSort $sort): callable
     {
         return
             /**
@@ -87,7 +114,9 @@ abstract class InMemoryRepository implements Repository, Searchable
              */
             function (array|object $a, array|object $b) use ($sort): int {
                 foreach ($sort->fields as $field => $direction) {
+                    /** @var string $aValue */
                     $aValue = $this->accessor->get($a, $field);
+                    /** @var string $bValue */
                     $bValue = $this->accessor->get($b, $field);
                     $aVsB = $aValue <=> $bValue;
 

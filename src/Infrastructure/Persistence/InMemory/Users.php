@@ -12,8 +12,8 @@ use Bgl\Domain\Auth\Entities\User;
 final class Users extends InMemoryRepository
 {
     #[\Override]
-    public function getKey(): string
+    public function getKeys(): array
     {
-        return 'getId';
+        return ['id'];
     }
 }

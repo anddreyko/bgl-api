@@ -60,24 +60,30 @@ abstract class BaseRepository
      */
     final public function testQueryDefaultCall(IntegrationTester $i, Scenario $scenario, Example $data): void
     {
+        /** @var list<TestEntity> $entities */
         $entities = $data['entities'];
+        /** @var list<array<string, mixed>> $expected */
+        $expected = $data['expected'];
         $repository = $this->getRepository($entities);
 
         $actual = $repository->search(filter: All::Filter);
 
-        $i->assertEquals($entities, $actual);
+        $i->assertEquals($expected, $actual);
     }
 
     private function providerQueryDefaultCall(): iterable
     {
         yield [
             'entities' => [],
+            'expected' => [],
         ];
         yield [
             'entities' => [new TestEntity('1', '1'), new TestEntity('2', '2'), new TestEntity('3', '3')],
+            'expected' => [['id' => '1'], ['id' => '2'], ['id' => '3']],
         ];
         yield [
             'entities' => [new TestEntity('2', '2'), new TestEntity('4', '4')],
+            'expected' => [['id' => '2'], ['id' => '4']],
         ];
     }
 
@@ -110,19 +116,19 @@ abstract class BaseRepository
         ];
         yield [
             'filter' => new Equals(new Field('id'), '1'),
-            'expected' => [new TestEntity('1', 'a')],
+            'expected' => [['id' => '1']],
         ];
         yield [
             'filter' => new Equals('c', new Field('value')),
-            'expected' => [new TestEntity('3', 'c'), new TestEntity('4', 'c')],
+            'expected' => [['id' => '3'], ['id' => '4']],
         ];
         yield [
             'filter' => new Greater(new Field('id'), '2'),
-            'expected' => [new TestEntity('3', 'c'), new TestEntity('4', 'c')],
+            'expected' => [['id' => '3'], ['id' => '4']],
         ];
         yield [
             'filter' => new Less(new Field('value'), 'c'),
-            'expected' => [new TestEntity('1', 'a'), new TestEntity('2', 'b')],
+            'expected' => [['id' => '1'], ['id' => '2']],
         ];
         yield [
             'filter' => new AndX([new Equals(new Field('id'), '1'), new Equals(new Field('value'), 'c')]),
@@ -130,11 +136,11 @@ abstract class BaseRepository
         ];
         yield [
             'filter' => new OrX([new Equals(new Field('id'), '1'), new Equals(new Field('value'), 'b')]),
-            'expected' => [new TestEntity('1', 'a'), new TestEntity('2', 'b')],
+            'expected' => [['id' => '1'], ['id' => '2']],
         ];
         yield [
             'filter' => new OrX([new Equals(new Field('id'), '1'), new Equals(new Field('value'), 'b')]),
-            'expected' => [new TestEntity('1', 'a'), new TestEntity('2', 'b')],
+            'expected' => [['id' => '1'], ['id' => '2']],
         ];
     }
 
@@ -146,28 +152,29 @@ abstract class BaseRepository
             new TestEntity('3', 'c'),
         ]);
 
-        $entities = $repository->search(filter: All::Filter, sort: new PageSort(['id' => SortDirection::Desc]));
+        $result = $repository->search(filter: All::Filter, sort: new PageSort(['id' => SortDirection::Desc]));
 
         $i->assertEquals([
-            new TestEntity('3', 'c'),
-            new TestEntity('2', 'b'),
-            new TestEntity('1', 'a'),
-        ], $entities);
+            ['id' => '3'],
+            ['id' => '2'],
+            ['id' => '1'],
+        ], $result);
     }
 
     final public function testMultiSort(IntegrationTester $i): void
     {
-        $entity1B = new TestEntity('1', 'b');
-        $entity2C = new TestEntity('2', 'c');
-        $entity3B = new TestEntity('3', 'b');
-        $repository = $this->getRepository([$entity3B, $entity2C, $entity1B]);
+        $repository = $this->getRepository([
+            new TestEntity('3', 'b'),
+            new TestEntity('2', 'c'),
+            new TestEntity('1', 'b'),
+        ]);
 
-        $entities = $repository->search(
+        $result = $repository->search(
             filter: All::Filter,
             sort: new PageSort(['value' => SortDirection::Desc, 'id' => SortDirection::Asc])
         );
 
-        $i->assertEquals([$entity2C, $entity1B, $entity3B], $entities);
+        $i->assertEquals([['id' => '2'], ['id' => '1'], ['id' => '3']], $result);
     }
 
     /**
@@ -198,28 +205,23 @@ abstract class BaseRepository
         yield [
             'offset' => 1,
             'limit' => 1,
-            'expected' => [new TestEntity('1', 'a')],
+            'expected' => [['id' => '1']],
         ];
         yield [
             'offset' => 2,
             'limit' => 1,
-            'expected' => [new TestEntity('2', 'b')],
+            'expected' => [['id' => '2']],
         ];
         yield [
             'offset' => 1,
             'limit' => 2,
-            'expected' => [new TestEntity('1', 'a'), new TestEntity('2', 'b')],
+            'expected' => [['id' => '1'], ['id' => '2']],
         ];
         yield [
             'offset' => 1,
             'limit' => 10,
-            'expected' => [new TestEntity('1', 'a'), new TestEntity('2', 'b'), new TestEntity('3', 'c')],
+            'expected' => [['id' => '1'], ['id' => '2'], ['id' => '3']],
         ];
-        /* yield [
-             'offset' => 1,
-             'limit' => 10,
-             'expected' => [[2], [3]],
-         ];*/
         yield [
             'offset' => 5,
             'limit' => 10,

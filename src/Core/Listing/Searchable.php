@@ -9,18 +9,10 @@ use Bgl\Core\Listing\Page\PageNumber;
 use Bgl\Core\Listing\Page\PageSize;
 use Bgl\Core\Listing\Page\PageSort;
 
-/**
- * @template-covariant TEntity of object
- */
 interface Searchable
 {
     /**
-     * @param Filter $filter
-     * @param PageNumber $number
-     * @param PageSize $size
-     * @param PageSort $sort
-     *
-     * @return iterable<TEntity>
+     * @return list<array<string, mixed>> List of key arrays (e.g., [['id' => 'uuid-1'], ['id' => 'uuid-2']])
      */
     public function search(
         Filter $filter = None::Filter,
