@@ -9,7 +9,6 @@ use Bgl\Core\Listing\Searchable;
 
 /**
  * @extends Repository<User>
- * @extends Searchable<User>
  */
 interface Users extends Repository, Searchable
 {

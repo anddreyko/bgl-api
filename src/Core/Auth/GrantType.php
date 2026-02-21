@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Infrastructure\Authentification\OpenAuth;
+namespace Bgl\Core\Auth;
 
 enum GrantType: string
 {
