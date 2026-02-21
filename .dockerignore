@@ -2,3 +2,15 @@
 !.docker/
 !composer.json
 !composer.lock
+!src/
+!config/
+!web/
+!cli/
+!fixtures/
+!tests/
+!rector.php
+!psalm.xml
+!.php-cs-fixer.dist.php
+!deptrac.yml
+!.phplint.yml
+!composer-dependency-analyser.php

@@ -57,6 +57,20 @@ services:
     extra_hosts:
       - "${APP_HOST}:${APP_NETWORK_IP}"
 
+  api-ci:
+    build:
+      context: .
+      dockerfile: .docker/prod/Dockerfile
+      target: ci
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    networks:
+      - bglapinet
+    extra_hosts:
+      - "${APP_HOST}:${APP_NETWORK_IP}"
+
   db-postgres:
     image: postgres:15.2-alpine
     environment:
