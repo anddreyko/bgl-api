@@ -258,8 +258,7 @@ docs/
 
 2. **READ CONTEXT**
     - This file (`AGENTS.md`) — architecture, rules, commands
-    - `docs/04-feature-requests/BACKLOG.md` — task details with full context
-    - `docs/04-feature-requests/PROJECT-STATUS.md` — current focus and progress
+    - Beads (`bd list`, `bd show {ID}`) — task tracking, descriptions, dependencies
     - Relevant ADRs in `docs/03-decisions/`
     - For new agents: `docs/01-project-overview/` (vision, domain, glossary)
 

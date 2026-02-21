@@ -2,6 +2,8 @@
 
 This document describes the complete development workflow: from creating a branch to merging a pull request.
 
+For AI-assisted development details, see `06-ai-development.md`.
+
 ---
 
 ## Git Branching
@@ -25,10 +27,6 @@ Use **Conventional Commits** format:
 
 ```
 <type>(<scope>): <description>
-
-[optional body]
-
-[optional footer]
 ```
 
 **Types:**
@@ -61,6 +59,7 @@ docs(readme): update installation instructions
 - No period at end
 - Keep first line under 72 characters
 - No emojis in commit messages
+- Title only (no body/description)
 
 ---
 
@@ -123,13 +122,13 @@ When implementing features, follow this order:
 
 ```
 1. Static Analysis    composer lp:run, composer ps:run, composer dt:run
-         ↓
-2. Integration Tests  composer test:intg, composer test:func  ← MAIN FOCUS
-         ↓
+         |
+2. Integration Tests  composer test:intg, composer test:func  <- MAIN FOCUS
+         |
 3. Unit Tests         composer test:unit (complex logic only)
-         ↓
+         |
 4. Acceptance Tests   composer test:web, composer test:cli
-         ↓
+         |
 5. Mutation Testing   composer in:ps
 ```
 
@@ -164,17 +163,18 @@ Before pushing your branch:
 
 ## Quick Reference
 
-| Stage         | Command            | Required      |
-|---------------|--------------------|---------------|
-| Before commit | `composer lp:run`  | Yes           |
-| Before commit | `composer ps:run`  | Yes           |
+| Stage         | Command             | Required      |
+|---------------|---------------------|---------------|
+| Before commit | `composer lp:run`   | Yes           |
+| Before commit | `composer ps:run`   | Yes           |
 | Before push   | `composer scan:all` | **MANDATORY** |
-| CI            | All checks  | Must pass     |
+| CI            | All checks          | Must pass     |
 
 ---
 
 ## Related Documents
 
-- `02-tooling.md` — Available commands
-- `04-testing.md` — Testing strategy and examples
-- `AGENTS.md` — Complete rules reference
+- `02-tooling.md` -- Available commands
+- `04-testing.md` -- Testing strategy and examples
+- `06-ai-development.md` -- AI-assisted development with FR commands
+- `AGENTS.md` -- Complete rules reference
