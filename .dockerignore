@@ -1,8 +1,4 @@
-/.idea
-/.git
-/.context
-/docker-compose.yml
-/var/
-/vendor/
-/vendor-bin/**/vendor/
-/vendor-bin/**/composer.lock binary
+*
+!.docker/
+!composer.json
+!composer.lock
