@@ -40,6 +40,7 @@ return [
         ],
         'middleware' => [
             Aspects\Logging::class,
+            Aspects\Transactional::class,
         ],
     ],
 ];

@@ -10,7 +10,7 @@ use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 use DI\Container;
 use Psr\Http\Message\ServerRequestInterface;
-use Slim\Psr7\Factory\ServerRequestFactory;
+use GuzzleHttp\Psr7\ServerRequest;
 
 /**
  * @covers \Bgl\Presentation\Api\InterceptorPipeline
@@ -21,7 +21,7 @@ final class InterceptorPipelineCest
     public function testEmptyPipeline(UnitTester $i): void
     {
         $pipeline = new InterceptorPipeline(new Container());
-        $request = (new ServerRequestFactory())->createServerRequest('GET', '/ping');
+        $request = new ServerRequest('GET', '/ping');
 
         $result = $pipeline->process($request, []);
 
@@ -43,7 +43,7 @@ final class InterceptorPipelineCest
         ]);
 
         $pipeline = new InterceptorPipeline($container);
-        $request = (new ServerRequestFactory())->createServerRequest('GET', '/ping');
+        $request = new ServerRequest('GET', '/ping');
 
         $result = $pipeline->process($request, [$interceptor::class]);
 
@@ -82,7 +82,7 @@ final class InterceptorPipelineCest
         ]);
 
         $pipeline = new InterceptorPipeline($container);
-        $request = (new ServerRequestFactory())->createServerRequest('GET', '/ping');
+        $request = new ServerRequest('GET', '/ping');
 
         $result = $pipeline->process($request, [$first::class, $second::class]);
 
