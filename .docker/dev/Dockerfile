@@ -25,7 +25,11 @@ FROM php:8.4-fpm-alpine AS php-fpm
 COPY --from=xdebug-builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
 COPY --from=xdebug-builder /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini /usr/local/etc/php/conf.d/
 
-RUN docker-php-ext-install opcache \
+RUN --mount=type=cache,target=/var/cache/apk \
+    apk add --no-cache postgresql-dev \
+    && docker-php-ext-install opcache \
+    && docker-php-ext-configure pgsql -with-pgsql=/usr/local/pgsql \
+    && docker-php-ext-install pdo_pgsql \
     && mv $PHP_INI_DIR/php.ini-development $PHP_INI_DIR/php.ini
 
 COPY base/php-fpm/conf.d /usr/local/etc/php/conf.d
