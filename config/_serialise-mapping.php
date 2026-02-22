@@ -40,4 +40,13 @@ return [
         'refresh_token' => $model->refreshToken,
         'expires_in' => $model->expiresIn,
     ],
+    Handlers\User\GetUser\Result::class => static fn(Handlers\User\GetUser\Result $model) => [
+        'id' => $model->id,
+        'email' => $model->email,
+        'is_active' => $model->isActive,
+        'created_at' => $model->createdAt,
+    ],
+    Handlers\Plays\OpenSession\Result::class => static fn(Handlers\Plays\OpenSession\Result $model) => [
+        'session_id' => $model->sessionId,
+    ],
 ];

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\EmailConfirmationTokenMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\UserMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\PhpMappingDriver;
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\SessionMapping;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
@@ -50,6 +51,7 @@ return [
         'mapping' => new PhpMappingDriver([
             new UserMapping(),
             new EmailConfirmationTokenMapping(),
+            new SessionMapping(),
         ]),
     ],
 ];

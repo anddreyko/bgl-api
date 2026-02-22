@@ -6,6 +6,8 @@ use Bgl\Application\Handlers\Auth\ConfirmEmail;
 use Bgl\Application\Handlers\Auth\LoginByCredentials;
 use Bgl\Application\Handlers\Auth\RefreshToken;
 use Bgl\Application\Handlers\Auth\Register;
+use Bgl\Application\Handlers\Auth\SignOut;
+use Bgl\Presentation\Api\Interceptors\AuthInterceptor;
 
 return [
     'openapi' => [
@@ -79,6 +81,29 @@ return [
                                     'required' => ['refreshToken'],
                                     'properties' => [
                                         'refreshToken' => ['type' => 'string'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            '/v1/auth/sign-out' => [
+                'post' => [
+                    'summary' => 'Sign out',
+                    'x-message' => SignOut\Command::class,
+                    'x-interceptors' => [AuthInterceptor::class],
+                    'requestBody' => [
+                        'required' => false,
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'userId' => [
+                                            'x-target' => 'userId',
+                                            'x-source' => 'attribute:auth.userId',
+                                        ],
                                     ],
                                 ],
                             ],

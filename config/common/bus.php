@@ -5,6 +5,8 @@ declare(strict_types=1);
 use Bgl\Application\Aspects;
 use Bgl\Application\Handlers;
 use Bgl\Application\Handlers\Auth;
+use Bgl\Application\Handlers\Plays;
+use Bgl\Application\Handlers\User;
 use Bgl\Core\Messages\Dispatcher;
 use Bgl\Core\Messages\EnvelopeFactory;
 use Bgl\Core\Messages\Message;
@@ -42,6 +44,9 @@ return [
             [Auth\ConfirmEmail\Command::class, Auth\ConfirmEmail\Handler::class],
             [Auth\LoginByCredentials\Command::class, Auth\LoginByCredentials\Handler::class],
             [Auth\RefreshToken\Command::class, Auth\RefreshToken\Handler::class],
+            [Auth\SignOut\Command::class, Auth\SignOut\Handler::class],
+            [User\GetUser\Query::class, User\GetUser\Handler::class],
+            [Plays\OpenSession\Command::class, Plays\OpenSession\Handler::class],
         ],
         'middleware' => [
             Aspects\Logging::class,
