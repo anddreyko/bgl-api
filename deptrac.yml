@@ -33,11 +33,6 @@ deptrac:
         - type: directory
           value: src/Presentation/.*
 
-    - name: Tests
-      collectors:
-        - type: directory
-          value: tests/.*
-
     - name: Vendor
       collectors:
         - type: directory
@@ -49,4 +44,3 @@ deptrac:
     Infrastructure: [ Vendor, Domain, Core ]
     Application: [ Infrastructure, Domain, Core ]
     Presentation: [ Vendor, Application, Domain, Core ]
-    Tests: [ Vendor, Presentation, Infrastructure, Application, Domain, Core ]
