@@ -35,6 +35,7 @@ final readonly class OpenApiSchemaMapper implements SchemaMapper
                 $body,
                 $queryParams,
                 $result,
+                $request,
             );
         }
 
@@ -56,6 +57,7 @@ final readonly class OpenApiSchemaMapper implements SchemaMapper
         array $body,
         array $queryParams,
         array $result,
+        ServerRequestInterface $request,
     ): array {
         $targetName = $propertyName;
         $cast = null;
@@ -64,6 +66,20 @@ final readonly class OpenApiSchemaMapper implements SchemaMapper
             $parts = explode('|', $propertyConfig['x-target']);
             $targetName = $parts[0];
             $cast = $parts[1] ?? null;
+        }
+
+        if (is_array($propertyConfig) && isset($propertyConfig['x-source']) && is_string($propertyConfig['x-source'])) {
+            $source = $propertyConfig['x-source'];
+            if (str_starts_with($source, 'attribute:')) {
+                $attrName = substr($source, 10);
+                /** @var string|null $attrValue */
+                $attrValue = $request->getAttribute($attrName);
+                if ($attrValue !== null) {
+                    $result[$targetName] = $attrValue;
+
+                    return $result;
+                }
+            }
         }
 
         $value = $this->resolveValue($propertyName, $pathParams, $body, $queryParams);

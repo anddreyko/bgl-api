@@ -35,4 +35,9 @@ return [
         'refresh_token' => $model->refreshToken,
         'expires_in' => $model->expiresIn,
     ],
+    Handlers\Auth\RefreshToken\Result::class => static fn(Handlers\Auth\RefreshToken\Result $model) => [
+        'access_token' => $model->accessToken,
+        'refresh_token' => $model->refreshToken,
+        'expires_in' => $model->expiresIn,
+    ],
 ];

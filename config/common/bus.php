@@ -41,6 +41,7 @@ return [
             [Auth\Register\Command::class, Auth\Register\Handler::class],
             [Auth\ConfirmEmail\Command::class, Auth\ConfirmEmail\Handler::class],
             [Auth\LoginByCredentials\Command::class, Auth\LoginByCredentials\Handler::class],
+            [Auth\RefreshToken\Command::class, Auth\RefreshToken\Handler::class],
         ],
         'middleware' => [
             Aspects\Logging::class,

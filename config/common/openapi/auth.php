@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Bgl\Application\Handlers\Auth\ConfirmEmail;
 use Bgl\Application\Handlers\Auth\LoginByCredentials;
+use Bgl\Application\Handlers\Auth\RefreshToken;
 use Bgl\Application\Handlers\Auth\Register;
 
 return [
@@ -61,6 +62,26 @@ return [
                             'in' => 'path',
                             'required' => true,
                             'schema' => ['type' => 'string'],
+                        ],
+                    ],
+                ],
+            ],
+            '/v1/auth/refresh' => [
+                'post' => [
+                    'summary' => 'Refresh token pair',
+                    'x-message' => RefreshToken\Command::class,
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'required' => ['refreshToken'],
+                                    'properties' => [
+                                        'refreshToken' => ['type' => 'string'],
+                                    ],
+                                ],
+                            ],
                         ],
                     ],
                 ],
