@@ -14,12 +14,14 @@ final readonly class MatchedOperation
      * @param list<class-string<Interceptor>> $interceptors
      * @param array<string, string> $pathParams
      * @param array<string, mixed> $schema
+     * @param array<string, mixed> $rawOperation Original OpenAPI operation definition
      */
     public function __construct(
         public string $messageClass,
         public array $interceptors = [],
         public array $pathParams = [],
         public array $schema = [],
+        public array $rawOperation = [],
     ) {
     }
 }

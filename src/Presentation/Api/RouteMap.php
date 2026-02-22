@@ -51,6 +51,7 @@ final readonly class RouteMap
                 interceptors: $interceptors,
                 pathParams: $pathParams,
                 schema: $schema,
+                rawOperation: $operation,
             );
         }
 

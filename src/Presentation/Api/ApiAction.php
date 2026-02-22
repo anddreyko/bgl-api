@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Presentation\Api;
 
+use Bgl\Core\Http\RequestValidator;
 use Bgl\Core\Http\SchemaMapper;
 use Bgl\Core\Messages\Dispatcher;
 use Bgl\Core\Serialization\Serializer;
@@ -18,6 +19,7 @@ final readonly class ApiAction
     public function __construct(
         private RouteMap $routeMap,
         private InterceptorPipeline $interceptorPipeline,
+        private RequestValidator $requestValidator,
         private SchemaMapper $schemaMapper,
         private Dispatcher $dispatcher,
         private Serializer $serializer,
@@ -61,6 +63,18 @@ final readonly class ApiAction
         }
 
         $request = $this->interceptorPipeline->process($request, $operation->interceptors);
+
+        $validationErrors = $this->requestValidator->validate(
+            $request,
+            $operation->rawOperation,
+            $operation->pathParams,
+        );
+
+        if ($validationErrors !== []) {
+            return $this->jsonResponse(
+                ErrorResponse::validation(message: 'Validation failed', errors: $validationErrors),
+            );
+        }
 
         $data = $this->schemaMapper->map($request, $operation->schema, $operation->pathParams);
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Functional;
 
+use Bgl\Core\Http\RequestValidator;
 use Bgl\Core\Http\SchemaMapper;
 use Bgl\Core\Messages\Dispatcher;
 use Bgl\Core\Serialization\Serializer;
@@ -46,9 +47,14 @@ final class ApiActionCest
 
         $serializer = Stub::makeEmpty(Serializer::class);
 
+        $requestValidator = Stub::makeEmpty(RequestValidator::class, [
+            'validate' => static fn(): array => [],
+        ]);
+
         $action = new ApiAction(
             routeMap: $routeMap,
             interceptorPipeline: $pipeline,
+            requestValidator: $requestValidator,
             schemaMapper: $schemaMapper,
             dispatcher: $dispatcher,
             serializer: $serializer,
@@ -77,9 +83,14 @@ final class ApiActionCest
         $dispatcher = Stub::makeEmpty(Dispatcher::class);
         $serializer = Stub::makeEmpty(Serializer::class);
 
+        $requestValidator = Stub::makeEmpty(RequestValidator::class, [
+            'validate' => static fn(): array => [],
+        ]);
+
         $action = new ApiAction(
             routeMap: $routeMap,
             interceptorPipeline: $pipeline,
+            requestValidator: $requestValidator,
             schemaMapper: $schemaMapper,
             dispatcher: $dispatcher,
             serializer: $serializer,
@@ -123,9 +134,14 @@ final class ApiActionCest
 
         $serializer = Stub::makeEmpty(Serializer::class);
 
+        $requestValidator = Stub::makeEmpty(RequestValidator::class, [
+            'validate' => static fn(): array => [],
+        ]);
+
         $action = new ApiAction(
             routeMap: $routeMap,
             interceptorPipeline: $pipeline,
+            requestValidator: $requestValidator,
             schemaMapper: $schemaMapper,
             dispatcher: $dispatcher,
             serializer: $serializer,
