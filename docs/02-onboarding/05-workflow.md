@@ -177,4 +177,5 @@ Before pushing your branch:
 - `02-tooling.md` -- Available commands
 - `04-testing.md` -- Testing strategy and examples
 - `06-ai-development.md` -- AI-assisted development with FR commands
+- `07-troubleshooting.md` -- Common issues and solutions
 - `AGENTS.md` -- Complete rules reference

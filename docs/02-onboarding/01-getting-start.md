@@ -84,6 +84,7 @@ Secrets are stored only in `.env`. `.env` files are never committed to the repos
 | [03-structure.md](03-structure.md)                 | Project structure and implementation rules |
 | [04-testing.md](04-testing.md)                     | Testing strategy and workflow              |
 | [../01-project-overview/](../01-project-overview/) | Project vision, domain, glossary           |
+| [07-troubleshooting.md](07-troubleshooting.md)     | Common issues and solutions                |
 | [../03-decisions/](../03-decisions/)               | Architectural decisions (ADR)              |
 
 ---
