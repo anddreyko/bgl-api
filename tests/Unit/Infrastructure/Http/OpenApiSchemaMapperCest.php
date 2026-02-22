@@ -24,7 +24,7 @@ final class OpenApiSchemaMapperCest
 
     public function testMapBodyParam(UnitTester $i): void
     {
-        $request = (new ServerRequestFactory())
+        $request = new ServerRequestFactory()
             ->createServerRequest('POST', '/v1/users')
             ->withParsedBody(['email' => 'test@example.com']);
 
@@ -39,7 +39,7 @@ final class OpenApiSchemaMapperCest
 
     public function testMapQueryParam(UnitTester $i): void
     {
-        $request = (new ServerRequestFactory())
+        $request = new ServerRequestFactory()
             ->createServerRequest('GET', '/v1/users?page=2')
             ->withQueryParams(['page' => '2']);
 
@@ -54,7 +54,7 @@ final class OpenApiSchemaMapperCest
 
     public function testMapPathParam(UnitTester $i): void
     {
-        $request = (new ServerRequestFactory())
+        $request = new ServerRequestFactory()
             ->createServerRequest('GET', '/v1/auth/confirm/abc123');
 
         $schema = [
@@ -68,7 +68,7 @@ final class OpenApiSchemaMapperCest
 
     public function testCastInt(UnitTester $i): void
     {
-        $request = (new ServerRequestFactory())
+        $request = new ServerRequestFactory()
             ->createServerRequest('GET', '/test')
             ->withQueryParams(['limit' => '10']);
 
@@ -83,7 +83,7 @@ final class OpenApiSchemaMapperCest
 
     public function testCastBool(UnitTester $i): void
     {
-        $request = (new ServerRequestFactory())
+        $request = new ServerRequestFactory()
             ->createServerRequest('GET', '/test')
             ->withQueryParams(['active' => '1']);
 
@@ -98,7 +98,7 @@ final class OpenApiSchemaMapperCest
 
     public function testCastFloat(UnitTester $i): void
     {
-        $request = (new ServerRequestFactory())
+        $request = new ServerRequestFactory()
             ->createServerRequest('GET', '/test')
             ->withQueryParams(['score' => '3.14']);
 
@@ -113,7 +113,7 @@ final class OpenApiSchemaMapperCest
 
     public function testCastDatetime(UnitTester $i): void
     {
-        $request = (new ServerRequestFactory())
+        $request = new ServerRequestFactory()
             ->createServerRequest('POST', '/test')
             ->withParsedBody(['created_at' => '2025-01-01T12:00:00+00:00']);
 
@@ -129,7 +129,7 @@ final class OpenApiSchemaMapperCest
 
     public function testEmptySchema(UnitTester $i): void
     {
-        $request = (new ServerRequestFactory())
+        $request = new ServerRequestFactory()
             ->createServerRequest('GET', '/ping');
 
         $result = $this->mapper->map($request, []);
@@ -139,7 +139,7 @@ final class OpenApiSchemaMapperCest
 
     public function testPathParamOverridesBody(UnitTester $i): void
     {
-        $request = (new ServerRequestFactory())
+        $request = new ServerRequestFactory()
             ->createServerRequest('POST', '/v1/items/123')
             ->withParsedBody(['id' => '456']);
 
@@ -154,7 +154,7 @@ final class OpenApiSchemaMapperCest
 
     public function testSkipNullValues(UnitTester $i): void
     {
-        $request = (new ServerRequestFactory())
+        $request = new ServerRequestFactory()
             ->createServerRequest('POST', '/test');
 
         $schema = [

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Bgl\Application\Aspects;
 use Bgl\Application\Handlers;
+use Bgl\Application\Handlers\Auth;
 use Bgl\Core\Messages\Dispatcher;
 use Bgl\Core\Messages\EnvelopeFactory;
 use Bgl\Core\Messages\Message;
@@ -37,6 +38,8 @@ return [
     'bus' => [
         'handlers' => [
             [Handlers\Ping\Command::class, Handlers\Ping\Handler::class],
+            [Auth\Register\Command::class, Auth\Register\Handler::class],
+            [Auth\ConfirmEmail\Command::class, Auth\ConfirmEmail\Handler::class],
         ],
         'middleware' => [
             Aspects\Logging::class,

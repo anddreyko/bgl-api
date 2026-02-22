@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth;
 
-use Bgl\Domain\Auth\Entities\User;
+use Bgl\Domain\Auth\Entities\EmailConfirmationToken;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\EntityMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-final class UserMapping implements EntityMapping
+final class EmailConfirmationTokenMapping implements EntityMapping
 {
     #[\Override]
     public function getEntityClass(): string
     {
-        return User::class;
+        return EmailConfirmationToken::class;
     }
 
     #[\Override]
     public function configure(ClassMetadata $metadata): void
     {
-        $metadata->setPrimaryTable(['name' => 'auth_user']);
+        $metadata->setPrimaryTable(['name' => 'auth_email_confirmation_token']);
 
         $metadata->mapField([
             'fieldName' => 'id',
@@ -29,25 +29,21 @@ final class UserMapping implements EntityMapping
         $metadata->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_NONE);
 
         $metadata->mapField([
-            'fieldName' => 'email',
+            'fieldName' => 'userId',
+            'type' => 'guid',
+            'columnName' => 'user_id',
+        ]);
+
+        $metadata->mapField([
+            'fieldName' => 'token',
             'type' => 'string',
             'unique' => true,
         ]);
 
         $metadata->mapField([
-            'fieldName' => 'passwordHash',
-            'type' => 'string',
-            'columnName' => 'password_hash',
-        ]);
-
-        $metadata->mapField([
-            'fieldName' => 'createdAt',
+            'fieldName' => 'expiresAt',
             'type' => 'datetime_immutable',
-        ]);
-
-        $metadata->mapField([
-            'fieldName' => 'status',
-            'type' => 'string',
+            'columnName' => 'expires_at',
         ]);
     }
 }

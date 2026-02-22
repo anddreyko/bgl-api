@@ -6,8 +6,7 @@ namespace Bgl\Core\ValueObjects;
 
 final class Date
 {
-
-    private ?\DateTimeInterface $date;
+    private readonly ?\DateTimeInterface $date;
 
     /**
      * Дата
@@ -26,7 +25,7 @@ final class Date
 
         switch (true) {
             case is_int($date):
-                $res = (new \DateTimeImmutable())->setTimestamp($date);
+                $res = new \DateTimeImmutable()->setTimestamp($date);
                 break;
 
             case is_string($date) && $format !== null:
@@ -51,8 +50,7 @@ final class Date
             if (method_exists($res, 'setTime')) {
                 $res->setTime(0, 0);
             }
-        }
-        else {
+        } else {
             $res = null;
         }
 

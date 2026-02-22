@@ -31,6 +31,14 @@ abstract class InMemoryRepository implements Repository, Searchable
     }
 
     /**
+     * @return array<string, TEntity>
+     */
+    protected function getEntities(): array
+    {
+        return $this->entities;
+    }
+
+    /**
      * @return list<string> Key field names
      */
     abstract public function getKeys(): array;

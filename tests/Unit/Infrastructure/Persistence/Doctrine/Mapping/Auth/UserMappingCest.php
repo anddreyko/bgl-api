@@ -62,7 +62,7 @@ class UserMappingCest
 
         $mapping->configure($metadata);
 
-        $i->assertSame('date_immutable', $metadata->getTypeOfField('createdAt'));
+        $i->assertSame('datetime_immutable', $metadata->getTypeOfField('createdAt'));
     }
 
     public function testConfigureSetsStatusField(UnitTester $i): void
@@ -85,6 +85,6 @@ class UserMappingCest
         $fieldNames = $metadata->getFieldNames();
         sort($fieldNames);
 
-        $i->assertSame(['createdAt', 'email', 'id', 'status'], $fieldNames);
+        $i->assertSame(['createdAt', 'email', 'id', 'passwordHash', 'status'], $fieldNames);
     }
 }

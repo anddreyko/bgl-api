@@ -28,7 +28,7 @@ final class ApiActionCest
 
     public function testPingEndpoint(FunctionalTester $i): void
     {
-        $request = (new ServerRequestFactory())->createServerRequest('GET', '/ping');
+        $request = new ServerRequestFactory()->createServerRequest('GET', '/ping');
 
         $response = $this->action->handle($request);
 
@@ -45,7 +45,7 @@ final class ApiActionCest
 
     public function testNotFoundRoute(FunctionalTester $i): void
     {
-        $request = (new ServerRequestFactory())->createServerRequest('GET', '/nonexistent');
+        $request = new ServerRequestFactory()->createServerRequest('GET', '/nonexistent');
 
         $response = $this->action->handle($request);
 
@@ -61,7 +61,7 @@ final class ApiActionCest
 
     public function testMethodNotAllowed(FunctionalTester $i): void
     {
-        $request = (new ServerRequestFactory())->createServerRequest('POST', '/ping');
+        $request = new ServerRequestFactory()->createServerRequest('POST', '/ping');
 
         $response = $this->action->handle($request);
 

@@ -29,4 +29,17 @@ final class Users extends DoctrineRepository implements UserRepository
     {
         return ['id'];
     }
+
+    #[\Override]
+    public function findByEmail(string $email): ?User
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('u')
+            ->from(User::class, 'u')
+            ->where('u.email = :email')
+            ->setParameter('email', $email);
+
+        /** @var User|null */
+        return $qb->getQuery()->getOneOrNullResult();
+    }
 }

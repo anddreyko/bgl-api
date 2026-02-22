@@ -15,19 +15,16 @@ final class DateInterval
     {
         if ($value instanceof \DateInterval) {
             $this->value = $value;
-        }
-        elseif (null === $value) {
+        } elseif (null === $value) {
             $this->value = null;
-        }
-        else {
+        } else {
             if (is_numeric($value)) {
                 $value = "PT{$value}S";
             }
 
             try {
                 $this->value = new \DateInterval($value);
-            }
-            catch (\Exception $e) {
+            } catch (\Exception) {
                 $this->value = null;
             }
         }
@@ -70,8 +67,7 @@ final class DateInterval
         if ($this->value) {
             if (false === $this->value->days) {
                 $value = (int)($this->getSeconds() / 86400);
-            }
-            else {
+            } else {
                 $value = $this->value->days;
             }
         }

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\EmailConfirmationTokenMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\UserMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\PhpMappingDriver;
 use Doctrine\DBAL\DriverManager;
@@ -48,6 +49,7 @@ return [
         ],
         'mapping' => new PhpMappingDriver([
             new UserMapping(),
+            new EmailConfirmationTokenMapping(),
         ]),
     ],
 ];

@@ -6,8 +6,7 @@ namespace Bgl\Core\ValueObjects;
 
 final class DateTime
 {
-
-    private ?\DateTimeInterface $dateTime;
+    private readonly ?\DateTimeInterface $dateTime;
 
     /**
      * Дата со временем.
@@ -26,7 +25,7 @@ final class DateTime
 
         switch (true) {
             case is_int($dateTime):
-                $res = (new \DateTimeImmutable())->setTimestamp($dateTime);
+                $res = new \DateTimeImmutable()->setTimestamp($dateTime);
                 break;
 
             case is_string($dateTime) && $format !== null:

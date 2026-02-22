@@ -24,6 +24,11 @@ abstract class DoctrineRepository implements Repository, Searchable
     {
     }
 
+    protected function getEntityManager(): EntityManagerInterface
+    {
+        return $this->em;
+    }
+
     /**
      * @return class-string<TEntity>
      */

@@ -12,6 +12,7 @@ use Codeception\Attribute\Group;
 #[Group('core', 'serialization', 'serializer')]
 final class FractalSerializerCest extends BaseSerializer
 {
+    #[\Override]
     protected function serializer(): Serializer
     {
         return DiHelper::container()->get(FractalSerializer::class);

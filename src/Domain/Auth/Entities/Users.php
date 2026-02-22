@@ -12,4 +12,5 @@ use Bgl\Core\Listing\Searchable;
  */
 interface Users extends Repository, Searchable
 {
+    public function findByEmail(string $email): ?User;
 }

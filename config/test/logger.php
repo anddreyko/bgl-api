@@ -8,8 +8,7 @@ use Psr\Log\LoggerInterface;
 
 return [
     LoggerInterface::class => static fn(): LoggerInterface => new TestLogger(),
-    TestLogger::class => static function (ContainerInterface $container): TestLogger {
+    TestLogger::class => static fn(ContainerInterface $container): TestLogger =>
         /** @var TestLogger */
-        return $container->get(LoggerInterface::class);
-    },
+        $container->get(LoggerInterface::class),
 ];

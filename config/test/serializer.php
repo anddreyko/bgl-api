@@ -13,7 +13,8 @@ return [
         $manager = $container->get(Manager::class);
 
         return new FractalSerializer(
-            $manager, (require __DIR__ . '/../_serialise-mapping.php') + [
+            $manager,
+            (require __DIR__ . '/../_serialise-mapping.php') + [
                 TestEntity::class => static fn(TestEntity $entity) => [
                     'id' => $entity->getId(),
                     'value' => $entity->getValue(),
