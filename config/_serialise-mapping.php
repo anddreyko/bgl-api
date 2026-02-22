@@ -30,4 +30,9 @@ return [
             'interval' => $model->delay->getIso(),
         ] : null,
     ],
+    Handlers\Auth\LoginByCredentials\Result::class => static fn(Handlers\Auth\LoginByCredentials\Result $model) => [
+        'access_token' => $model->accessToken,
+        'refresh_token' => $model->refreshToken,
+        'expires_in' => $model->expiresIn,
+    ],
 ];

@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace Bgl\Application\Handlers\Auth\LoginByCredentials;
 
 use Bgl\Core\Messages\Message;
-use Bgl\Domain\Auth\Entities\User;
 
 /**
- * @extends Message<User>
+ * @implements Message<Result>
  */
-interface Command extends Message
+final class Command implements Message
 {
-    public function getUsername(): string;
-
-    public function getPassword(): string;
+    public function __construct(
+        public readonly string $email,
+        public readonly string $password,
+    ) {
+    }
 }

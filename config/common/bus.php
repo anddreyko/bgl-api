@@ -40,6 +40,7 @@ return [
             [Handlers\Ping\Command::class, Handlers\Ping\Handler::class],
             [Auth\Register\Command::class, Auth\Register\Handler::class],
             [Auth\ConfirmEmail\Command::class, Auth\ConfirmEmail\Handler::class],
+            [Auth\LoginByCredentials\Command::class, Auth\LoginByCredentials\Handler::class],
         ],
         'middleware' => [
             Aspects\Logging::class,

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Bgl\Application\Handlers\Auth\ConfirmEmail;
+use Bgl\Application\Handlers\Auth\LoginByCredentials;
 use Bgl\Application\Handlers\Auth\Register;
 
 return [
@@ -22,6 +23,27 @@ return [
                                     'properties' => [
                                         'email' => ['type' => 'string', 'format' => 'email'],
                                         'password' => ['type' => 'string', 'minLength' => 6],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            '/v1/auth/sign-in' => [
+                'post' => [
+                    'summary' => 'Login with credentials',
+                    'x-message' => LoginByCredentials\Command::class,
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'required' => ['email', 'password'],
+                                    'properties' => [
+                                        'email' => ['type' => 'string', 'format' => 'email'],
+                                        'password' => ['type' => 'string'],
                                     ],
                                 ],
                             ],
