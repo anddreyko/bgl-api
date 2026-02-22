@@ -42,6 +42,17 @@ Principles
 | `composer test:coverage` | Generate coverage report |
 | `composer in:ps`       | Mutation testing         |
 
+### Database
+
+| Command                | Purpose                                  |
+|------------------------|------------------------------------------|
+| `make wait-db`         | Wait for database readiness              |
+| `make migrate`         | Run all pending migrations               |
+| `make migrate-gen`     | Generate migration diff from ORM mapping |
+| `make migrate-empty`   | Generate empty migration class           |
+| `make validate-schema` | Validate ORM schema against database     |
+| `make load-fixtures`   | Load fixtures into database              |
+
 ### Environment
 
 | Command     | Purpose           |
@@ -77,6 +88,8 @@ src/
 │           └── Handler.php
 │
 ├── Infrastructure/          # External services & adapters
+│   ├── Database/
+│   │   └── Migrations/      # Doctrine database migrations
 │   ├── Persistence/
 │   │   ├── Doctrine/        # Repository implementations
 │   │   └── InMemory/        # For tests

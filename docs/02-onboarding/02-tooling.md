@@ -88,6 +88,31 @@ then `scan:all` for verification.
 | `composer test:coverage` | Generate coverage report |
 | `composer in`            | Mutation testing         |
 
+### Database
+
+| Command              | Purpose                                  |
+|----------------------|------------------------------------------|
+| `make wait-db`       | Wait for database readiness              |
+| `make migrate`       | Run all pending migrations               |
+| `make migrate-gen`   | Generate migration diff from ORM mapping |
+| `make migrate-empty` | Generate empty migration class           |
+| `make validate-schema` | Validate ORM schema against database   |
+| `make load-fixtures` | Load fixtures into database              |
+
+CLI application (`cli/app`) provides direct access to Doctrine ORM and Migrations commands:
+
+```bash
+# Inside Docker container (via make sh)
+php cli/app migrations:status       # Show migration status
+php cli/app migrations:migrate      # Run pending migrations
+php cli/app migrations:diff         # Generate migration from mapping diff
+php cli/app migrations:generate     # Generate empty migration
+php cli/app migrations:execute      # Execute specific migration up/down
+php cli/app orm:validate-schema     # Validate entity mapping
+```
+
+Migrations are stored in `src/Infrastructure/Database/Migrations/` with namespace `Bgl\Infrastructure\Database\Migrations`. Configuration: `config/common/migrations.php`. Migration table: `migration`.
+
 ### Versioning
 
 | Command             | Purpose                           |
@@ -96,6 +121,21 @@ then `scan:all` for verification.
 | `composer vi:major` | Increment major version           |
 | `composer vi:minor` | Increment minor version           |
 | `composer vi:patch` | Increment patch version           |
+
+---
+
+## Docker Services
+
+| Service        | Image                | Purpose                      | Healthcheck               |
+|----------------|----------------------|------------------------------|---------------------------|
+| `api`          | nginx:1.29-alpine    | Reverse proxy                | `wget /ping`              |
+| `api-php-fpm`  | php:8.4-fpm-alpine   | PHP-FPM application server   | Process check (PID 1)     |
+| `api-php-cli`  | php:8.4-cli-alpine   | CLI runner for commands       | --                        |
+| `api-ci`       | production Dockerfile | CI/CD runner                 | --                        |
+| `db-postgres`  | postgres:15.2-alpine | PostgreSQL database           | `pg_isready`              |
+| `redis`        | redis:7-alpine       | Redis cache/session store    | `redis-cli ping`          |
+
+Service startup order is enforced via `depends_on` with health conditions: `db-postgres` and `redis` must be healthy before `api-php-fpm` starts, and `api-php-fpm` must be healthy before `api` (nginx) starts.
 
 ---
 

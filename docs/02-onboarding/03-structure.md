@@ -60,6 +60,8 @@ src/
 ├── Infrastructure/                 # External services and adapters
 │   ├── Authentification/
 │   │   └── OpenAuth/               # OAuth2 server adapter (league/oauth2-server)
+│   ├── Database/
+│   │   └── Migrations/             # Doctrine database migrations
 │   ├── Persistence/
 │   │   ├── Doctrine/               # Doctrine repository implementations
 │   │   └── InMemory/               # InMemory for tests
