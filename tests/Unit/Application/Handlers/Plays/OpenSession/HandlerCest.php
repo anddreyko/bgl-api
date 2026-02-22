@@ -7,7 +7,9 @@ namespace Bgl\Tests\Unit\Application\Handlers\Plays\OpenSession;
 use Bgl\Application\Handlers\Plays\OpenSession\Command;
 use Bgl\Application\Handlers\Plays\OpenSession\Handler;
 use Bgl\Application\Handlers\Plays\OpenSession\Result;
+use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
+use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Plays\Entities\Sessions;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
@@ -31,7 +33,11 @@ final class HandlerCest
             'now' => static fn(): \DateTimeImmutable => new \DateTimeImmutable('2024-06-15 20:00:00'),
         ]);
 
-        $handler = new Handler($sessions, $clock);
+        $uuidGenerator = Stub::makeEmpty(UuidGenerator::class, [
+            'generate' => static fn(): Uuid => new Uuid('generated-uuid'),
+        ]);
+
+        $handler = new Handler($sessions, $uuidGenerator, $clock);
 
         $command = new Command(userId: 'user-123', name: 'Game night');
         $envelope = new Envelope($command, 'msg-1');
@@ -53,7 +59,11 @@ final class HandlerCest
             'now' => static fn(): \DateTimeImmutable => new \DateTimeImmutable('2024-06-15 20:00:00'),
         ]);
 
-        $handler = new Handler($sessions, $clock);
+        $uuidGenerator = Stub::makeEmpty(UuidGenerator::class, [
+            'generate' => static fn(): Uuid => new Uuid('generated-uuid'),
+        ]);
+
+        $handler = new Handler($sessions, $uuidGenerator, $clock);
 
         $command = new Command(userId: 'user-456');
         $envelope = new Envelope($command, 'msg-2');

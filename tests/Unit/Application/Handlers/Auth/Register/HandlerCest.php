@@ -6,6 +6,7 @@ namespace Bgl\Tests\Unit\Application\Handlers\Auth\Register;
 
 use Bgl\Application\Handlers\Auth\Register\Command;
 use Bgl\Application\Handlers\Auth\Register\Handler;
+use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Security\PasswordHasher;
 use Bgl\Core\ValueObjects\Email;
@@ -42,11 +43,15 @@ final class HandlerCest
             'hash' => static fn(): string => 'hashed_password',
         ]);
 
+        $uuidGenerator = Stub::makeEmpty(UuidGenerator::class, [
+            'generate' => static fn(): Uuid => new Uuid('generated-uuid'),
+        ]);
+
         $clock = Stub::makeEmpty(ClockInterface::class, [
             'now' => static fn(): \DateTimeImmutable => new \DateTimeImmutable('2024-01-01 12:00:00'),
         ]);
 
-        $handler = new Handler($users, $tokens, $passwordHasher, $clock);
+        $handler = new Handler($users, $tokens, $passwordHasher, $uuidGenerator, $clock);
 
         $command = new Command(email: 'test@example.com', password: 'secret123');
         $envelope = new Envelope($command, 'msg-1');
@@ -73,11 +78,13 @@ final class HandlerCest
 
         $passwordHasher = Stub::makeEmpty(PasswordHasher::class);
 
+        $uuidGenerator = Stub::makeEmpty(UuidGenerator::class);
+
         $clock = Stub::makeEmpty(ClockInterface::class, [
             'now' => static fn(): \DateTimeImmutable => new \DateTimeImmutable('2024-01-01 12:00:00'),
         ]);
 
-        $handler = new Handler($users, $tokens, $passwordHasher, $clock);
+        $handler = new Handler($users, $tokens, $passwordHasher, $uuidGenerator, $clock);
 
         $command = new Command(email: 'existing@example.com', password: 'secret123');
         $envelope = new Envelope($command, 'msg-2');
