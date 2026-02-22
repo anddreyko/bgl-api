@@ -71,6 +71,7 @@ src/
 │   ├── Collections/
 │   ├── Listing/
 │   ├── Messages/            # Message, Command, Query, Event, MessageBus
+│   ├── Security/            # Security contracts (PasswordHasher)
 │   └── ValueObjects/
 │
 ├── Domain/                  # Business logic by Bounded Context
@@ -94,6 +95,7 @@ src/
 │   │   ├── Doctrine/        # Repository implementations
 │   │   └── InMemory/        # For tests
 │   ├── MessageBus/Tactician/
+│   ├── Security/            # Security adapters (BcryptPasswordHasher)
 │   └── Clients/Bgg/         # BoardGameGeek adapter
 │
 └── Presentation/            # Entry points

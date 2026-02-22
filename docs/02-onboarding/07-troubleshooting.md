@@ -258,6 +258,32 @@ Test output and cache are stored in `var/.tests/`.
 
 ---
 
+## DI Container (PHP-DI)
+
+### Interface Alias Returns String Instead of Object
+
+**Symptom:** `TypeError: Argument must be of type MyInterface, string given` when resolving from container.
+
+**Cause:** PHP-DI with `Laminas\ConfigAggregator` treats `Interface::class => Implementation::class` as a plain string value, not as a reference to another definition.
+
+**Fix:** Use `DI\get()` to create a proper alias:
+
+```php
+// Wrong -- returns the string "App\MyImplementation"
+return [
+    MyInterface::class => MyImplementation::class,
+];
+
+// Correct -- resolves MyImplementation from container
+return [
+    MyInterface::class => DI\get(MyImplementation::class),
+];
+```
+
+This applies to all interface-to-implementation mappings in `config/` files.
+
+---
+
 ## Related Documents
 
 - `02-tooling.md` -- Available commands and tools

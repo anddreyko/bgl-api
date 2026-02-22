@@ -26,8 +26,10 @@ src/
 ├── Core/                           # Contracts and shared components
 │   ├── Auth/                       # Authentication contracts (Authentificator, Identity)
 │   ├── Collections/                # Collection interfaces
+│   ├── Http/                       # HTTP contracts (SchemaMapper)
 │   ├── Listing/                    # Search contracts (Filter, Searchable)
 │   ├── Messages/                   # Bus contracts (Message, Command, Query, Event)
+│   ├── Security/                   # Security contracts (PasswordHasher)
 │   └── ValueObjects/               # Shared Value Objects
 │
 ├── Domain/                         # Business logic (grouped by contexts)
@@ -67,12 +69,18 @@ src/
 │   │   └── InMemory/               # InMemory for tests
 │   ├── MessageBus/
 │   │   └── Tactician/              # MessageBus implementation
+│   ├── Http/                       # HTTP adapters (OpenApiSchemaMapper)
+│   ├── Security/                   # Security adapters (BcryptPasswordHasher)
 │   └── Sync/
 │       └── Bgg/                    # BoardGameGeek adapter
 │
 └── Presentation/                   # Entry points
     ├── Api/                        # HTTP API (Slim)
-    │   └── Actions/
+    │   ├── Interceptors/           # Request interceptor contracts
+    │   ├── ApiAction.php           # Single entry point for all API routes
+    │   ├── RouteMap.php            # OpenAPI config to route matching
+    │   ├── InterceptorPipeline.php # Interceptor chain executor
+    │   └── MatchedOperation.php    # Matched route value object
     └── Console/                    # CLI commands
 ```
 
@@ -111,6 +119,8 @@ Ports & Adapters examples:
 
 - `GameCatalogProvider` interface in `Domain/Sync/` -> `BggCatalogProvider` in `Infrastructure/Sync/Bgg/`
 - `Authentificator` interface in `Core/Auth/` -> `LeagueAuthServer` in `Infrastructure/Authentification/OpenAuth/`
+- `PasswordHasher` interface in `Core/Security/` -> `BcryptPasswordHasher` in `Infrastructure/Security/`
+- `SchemaMapper` interface in `Core/Http/` -> `OpenApiSchemaMapper` in `Infrastructure/Http/`
 
 ### Presentation
 

@@ -16,5 +16,5 @@ return [
 
         return new FractalSerializer($manager, require __DIR__ . '/../_serialise-mapping.php');
     },
-    Serializer::class => FractalSerializer::class,
+    Serializer::class => DI\get(FractalSerializer::class),
 ];
