@@ -49,4 +49,9 @@ return [
     Handlers\Plays\OpenSession\Result::class => static fn(Handlers\Plays\OpenSession\Result $model) => [
         'session_id' => $model->sessionId,
     ],
+    Handlers\Plays\CloseSession\Result::class => static fn(Handlers\Plays\CloseSession\Result $model) => [
+        'session_id' => $model->sessionId,
+        'started_at' => $model->startedAt,
+        'finished_at' => $model->finishedAt,
+    ],
 ];

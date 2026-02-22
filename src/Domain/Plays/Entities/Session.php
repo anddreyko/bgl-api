@@ -56,4 +56,14 @@ final class Session
     {
         return $this->finishedAt;
     }
+
+    public function close(\DateTimeImmutable $finishedAt): void
+    {
+        if ($this->status !== SessionStatus::Draft) {
+            throw new \DomainException('Session can only be closed from draft status');
+        }
+
+        $this->status = SessionStatus::Published;
+        $this->finishedAt = $finishedAt;
+    }
 }

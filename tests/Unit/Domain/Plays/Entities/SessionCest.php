@@ -64,4 +64,39 @@ final class SessionCest
 
         $i->assertSame('user-abc', $session->getUserId());
     }
+
+    public function testCloseChangesStatusToPublishedAndSetsFinishedAt(UnitTester $i): void
+    {
+        $session = Session::open(
+            new Uuid('session-id'),
+            'user-123',
+            'Game night',
+            new \DateTimeImmutable('2024-06-15 20:00:00'),
+        );
+
+        $finishedAt = new \DateTimeImmutable('2024-06-15 23:00:00');
+        $session->close($finishedAt);
+
+        $i->assertSame(SessionStatus::Published, $session->getStatus());
+        $i->assertSame($finishedAt, $session->getFinishedAt());
+    }
+
+    public function testCloseThrowsWhenSessionIsNotDraft(UnitTester $i): void
+    {
+        $session = Session::open(
+            new Uuid('session-id'),
+            'user-123',
+            null,
+            new \DateTimeImmutable('2024-06-15 20:00:00'),
+        );
+
+        $session->close(new \DateTimeImmutable('2024-06-15 23:00:00'));
+
+        $i->expectThrowable(
+            new \DomainException('Session can only be closed from draft status'),
+            static function () use ($session): void {
+                $session->close(new \DateTimeImmutable('2024-06-16 00:00:00'));
+            },
+        );
+    }
 }

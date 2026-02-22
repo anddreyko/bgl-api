@@ -47,6 +47,7 @@ return [
             [Auth\SignOut\Command::class, Auth\SignOut\Handler::class],
             [User\GetUser\Query::class, User\GetUser\Handler::class],
             [Plays\OpenSession\Command::class, Plays\OpenSession\Handler::class],
+            [Plays\CloseSession\Command::class, Plays\CloseSession\Handler::class],
         ],
         'middleware' => [
             Aspects\Logging::class,
