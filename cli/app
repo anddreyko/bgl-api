@@ -11,4 +11,7 @@ include __DIR__ . '/../vendor/autoload.php';
 /** @var \Psr\Container\ContainerInterface $container */
 $container = require __DIR__ . '/../config/container.php';
 
-ConsoleRunner::run($container->get(SingleManagerProvider::class));
+/** @var list<\Symfony\Component\Console\Command\Command> $migrationCommands */
+$migrationCommands = $container->get('migrations:commands');
+
+ConsoleRunner::run($container->get(SingleManagerProvider::class), $migrationCommands);
