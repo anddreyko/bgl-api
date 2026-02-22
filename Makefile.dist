@@ -1,0 +1,258 @@
+ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+$(eval $(sort $(subst :,\:,$(ARGS))):;@:)
+
+include .env
+-include .env.local
+
+ifeq ($(shell uname), Darwin)
+    export UID=1000
+    export GID=1000
+else
+    export UID=$(shell id -u)
+    export GID=$(shell id -g)
+endif
+
+export COMPOSE_PROJECT_NAME
+export DOCKER_BUILDKIT=1
+DC = docker compose
+APP = $(DC) run --rm api-php-cli
+CODECEPT = vendor-bin/codeception/vendor/bin/codecept
+
+.DEFAULT_GOAL := help
+
+##
+## Docker
+## -----
+
+init: ## Full reset: down + pull + build + up
+	$(DC) down -v --remove-orphans
+	$(DC) pull
+	$(DC) build
+	$(DC) up -d
+.PHONY: init
+
+init-full: init wait-db migrate validate-schema load-fixtures ## Full reset + migrate + fixtures
+.PHONY: init-full
+
+up: ## Start containers
+	$(DC) up -d --remove-orphans
+.PHONY: up
+
+down: ## Stop containers
+	$(DC) down --remove-orphans
+.PHONY: down
+
+build: ## Rebuild containers
+	$(DC) build $(ARGS)
+.PHONY: build
+
+sh: ## Enter CLI container shell
+	docker exec -it $(APP_CONTAINER_NAME) sh
+.PHONY: sh
+
+##
+## Production
+## -----
+
+build-prod: ## Build production image (ci target)
+	$(DC) build api-ci
+.PHONY: build-prod
+
+build-prod-standalone: ## Build standalone production image (no dev deps)
+	docker build -f .docker/prod/Dockerfile --target production -t bgl-prod .
+.PHONY: build-prod-standalone
+
+run-prod: ## Run production container locally (port 10000)
+	docker run --rm -d --name bgl-prod -p 10000:10000 --env-file .env bgl-prod
+.PHONY: run-prod
+
+stop-prod: ## Stop production container
+	docker stop bgl-prod
+.PHONY: stop-prod
+
+smoke-prod: ## Smoke test production container (expects running bgl-prod)
+	@HTTP_CODE=$$(curl -s -o /dev/null -w "%{http_code}" http://localhost:10000/ping 2>/dev/null); \
+	if [ "$$HTTP_CODE" = "000" ]; then \
+		echo "FAIL: container not reachable"; exit 1; \
+	else \
+		echo "OK: GET /ping -> HTTP $$HTTP_CODE"; \
+	fi
+.PHONY: smoke-prod
+
+scan-ci: ## Run full scan in production-like image
+	$(DC) run --rm api-ci composer scan:all
+.PHONY: scan-ci
+
+test-ci: ## Run all tests in production-like image
+	$(DC) run --rm api-ci composer test:all
+.PHONY: test-ci
+
+##
+## Code Quality
+## -----
+
+scan: ## Full validation (MANDATORY before push)
+	$(APP) composer scan:all
+.PHONY: scan
+
+lp: ## PHP syntax check (Lint)
+	$(APP) composer lp:run $(ARGS)
+.PHONY: lp
+
+ps: ## Static type analysis (Psalm)
+	$(APP) composer ps:run $(ARGS)
+.PHONY: ps
+
+ps-alter: ## Psalm auto-fix suggestions (dry-run)
+	$(APP) composer psalm -- --alter --issues=InvalidFalsableReturnType,InvalidNullableReturnType,InvalidReturnType,LessSpecificReturnType,MismatchingDocblockParamType,MismatchingDocblockReturnType,MissingClosureReturnType,MissingParamType,MissingPropertyType,MissingReturnType,ParamNameMismatch,PossiblyUndefinedGlobalVariable,PossiblyUndefinedVariable,PossiblyUnusedMethod,PossiblyUnusedProperty,RedundantCast,RedundantCastGivenDocblockType,UnusedMethod,UnusedProperty,UnusedVariable,UnnecessaryVarAnnotation,MissingImmutableAnnotation,MissingPureAnnotation,MissingThrowsDocblock --dry-run
+.PHONY: ps-alter
+
+cs: ## Fix code style (PHP-CS-Fixer)
+	$(APP) composer cs:fix $(ARGS)
+.PHONY: cs
+
+cs-check: ## Code style check (dry-run)
+	$(APP) composer cs-check
+.PHONY: cs-check
+
+rc: ## Apply automated refactoring (Rector)
+	$(APP) composer rc:run
+.PHONY: rc
+
+rc-check: ## Rector check (dry-run)
+	$(APP) composer rector:check
+.PHONY: rc-check
+
+dt: ## Architecture dependency check (Deptrac)
+	$(APP) composer dt:run
+.PHONY: dt
+
+cd: ## Check composer dependencies
+	$(APP) composer cd:run
+.PHONY: cd
+
+pdepend: ## Code metrics (PDepend)
+	$(APP) composer pdepend:check
+.PHONY: pdepend
+
+##
+## Testing
+## -----
+
+t: ## Codecept run (make t Unit path/Test.php)
+	$(APP) $(CODECEPT) run $(ARGS)
+.PHONY: t
+
+t-all: ## All tests + reload fixtures
+	$(APP) composer test:all
+	$(MAKE) load-fixtures
+.PHONY: t-all
+
+t-unit: ## Unit tests
+	$(APP) composer test:unit $(ARGS)
+.PHONY: t-unit
+
+t-func: ## Functional tests (no DB)
+	$(APP) composer test:func $(ARGS)
+.PHONY: t-func
+
+t-intg: ## Integration tests (with DB)
+	$(APP) composer test:intg $(ARGS)
+.PHONY: t-intg
+
+t-web: ## Acceptance API tests
+	$(APP) composer test:web $(ARGS)
+.PHONY: t-web
+
+t-cli: ## Acceptance CLI tests
+	$(APP) composer test:cli $(ARGS)
+.PHONY: t-cli
+
+t-smoke: ## Smoke tests
+	$(APP) composer test:smoke $(ARGS)
+.PHONY: t-smoke
+
+t-cov: ## Tests with coverage
+	$(APP) sh -c 'rm -rf var/.tests/*'
+	$(APP) composer test:unit --coverage --coverage-html
+.PHONY: t-cov
+
+t-clean: ## Rebuild test classes (clean + build)
+	$(APP) composer test:clean
+.PHONY: t-clean
+
+t-startup: ## Startup smoke test
+	$(APP) composer test:startup
+.PHONY: t-startup
+
+in: ## Mutation testing (Infection)
+	$(APP) composer in:ps $(ARGS)
+.PHONY: in
+
+##
+## Database
+## -----
+
+wait-db: ## Wait for database readiness
+	$(APP) /usr/local/bin/wait-for-it.sh db-postgres:5432
+.PHONY: wait-db
+
+migrate: ## Run migrations
+	$(APP) php app migrations:migrate --no-interaction
+.PHONY: migrate
+
+migrate-gen: ## Generate migration diff
+	$(APP) php app migrations:diff --no-interaction
+.PHONY: migrate-gen
+
+migrate-empty: ## Generate empty migration
+	$(APP) php app migrations:generate --no-interaction
+.PHONY: migrate-empty
+
+validate-schema: ## Validate ORM schema
+	$(APP) php app orm:validate-schema
+.PHONY: validate-schema
+
+load-fixtures: ## Load fixtures
+	$(APP) php app fixtures:load
+.PHONY: load-fixtures
+
+##
+## Other
+## -----
+
+gen-api: ## Generate OpenAPI spec
+	$(DC) run api-php-cli ./vendor/bin/openapi . -o web/assets/openapi.json -f json -e vendor -e tests -e .docker -e var -e templates -e cli -e web -e config -e fixtures
+.PHONY: gen-api
+
+ci: ## Composer install
+	$(APP) composer install $(ARGS)
+.PHONY: ci
+
+cu: ## Composer update
+	$(APP) composer update $(ARGS)
+.PHONY: cu
+
+cr: ## Composer require
+	$(APP) composer require $(ARGS)
+.PHONY: cr
+
+##
+## Help
+## -----
+
+help: ## Show available commands
+	@awk ' \
+		BEGIN {RS=""; FS="\n"} \
+		/^##(\n##.*)+$$/ { \
+			gsub("## ?", "\033[33m", $$0); \
+			print $$0; \
+			next; \
+		} \
+		/^[0-9a-zA-Z_-]+: .*?##/ { \
+			split($$1, command, ":.*?## "); \
+			printf "\033[32m%-20s\033[0m %s\n", command[1], command[2]; \
+			next; \
+		} \
+	' $(MAKEFILE_LIST) && printf "\033[0m"
+.PHONY: help
