@@ -11,7 +11,7 @@ use Psr\Clock\ClockInterface;
 
 return [
     BcryptPasswordHasher::class => static fn(): BcryptPasswordHasher => new BcryptPasswordHasher(['cost' => 12]),
-    PasswordHasher::class => BcryptPasswordHasher::class,
+    PasswordHasher::class => DI\get(BcryptPasswordHasher::class),
     JwtTokenGenerator::class => static function (ClockInterface $clock): JwtTokenGenerator {
         $secret = (string) getenv('JWT_KEY');
         if ($secret === '') {
@@ -20,7 +20,7 @@ return [
 
         return new JwtTokenGenerator(secret: $secret, clock: $clock);
     },
-    TokenGenerator::class => JwtTokenGenerator::class,
+    TokenGenerator::class => DI\get(JwtTokenGenerator::class),
     TokenTtlConfig::class => static function (): TokenTtlConfig {
         $accessTtl = getenv('JWT_ACCESS_TTL');
         $refreshTtl = getenv('JWT_REFRESH_TTL');

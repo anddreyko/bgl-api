@@ -46,7 +46,7 @@ return [
             dispatcher: $dispatcher,
             serializer: $serializer,
             responseFactory: $responseFactory,
-            debugMode: (bool) ($_ENV['APP_DEBUG'] ?? false),
+            debugMode: getenv('APP_DEBUG') === 'true' || getenv('APP_DEBUG') === '1',
         );
     },
 ];
