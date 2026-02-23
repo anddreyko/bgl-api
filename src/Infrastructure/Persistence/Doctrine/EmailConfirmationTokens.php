@@ -8,9 +8,9 @@ use Bgl\Domain\Auth\Entities\EmailConfirmationToken;
 use Bgl\Domain\Auth\Entities\EmailConfirmationTokens as EmailConfirmationTokensInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class EmailConfirmationTokens implements EmailConfirmationTokensInterface
+final readonly class EmailConfirmationTokens implements EmailConfirmationTokensInterface
 {
-    public function __construct(private readonly EntityManagerInterface $em)
+    public function __construct(private EntityManagerInterface $em)
     {
     }
 

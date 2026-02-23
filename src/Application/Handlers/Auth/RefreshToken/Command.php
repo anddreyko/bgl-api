@@ -9,10 +9,10 @@ use Bgl\Core\Messages\Message;
 /**
  * @implements Message<Result>
  */
-final class Command implements Message
+final readonly class Command implements Message
 {
     public function __construct(
-        public readonly string $refreshToken,
+        public string $refreshToken,
     ) {
     }
 }

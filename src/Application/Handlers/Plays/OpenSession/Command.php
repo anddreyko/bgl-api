@@ -9,14 +9,14 @@ use Bgl\Core\Messages\Message;
 /**
  * @implements Message<Result>
  */
-final class Command implements Message
+final readonly class Command implements Message
 {
     /**
      * @param non-empty-string $userId
      */
     public function __construct(
-        public readonly string $userId,
-        public readonly ?string $name = null,
+        public string $userId,
+        public ?string $name = null,
     ) {
     }
 }

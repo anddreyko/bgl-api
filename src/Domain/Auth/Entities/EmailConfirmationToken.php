@@ -10,9 +10,9 @@ final class EmailConfirmationToken
 {
     private function __construct(
         public Uuid $id,
-        private Uuid $userId,
-        private string $token,
-        private \DateTimeImmutable $expiresAt,
+        private readonly Uuid $userId,
+        private readonly string $token,
+        private readonly \DateTimeImmutable $expiresAt,
     ) {
     }
 

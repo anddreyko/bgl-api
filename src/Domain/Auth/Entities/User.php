@@ -11,10 +11,11 @@ final class User
 {
     public function __construct(
         public Uuid $id,
-        private Email $email,
-        private string $passwordHash,
-        private \DateTimeImmutable $createdAt,
+        private readonly Email $email,
+        private readonly string $passwordHash,
+        private readonly \DateTimeImmutable $createdAt,
         private UserStatus $status,
+        private int $tokenVersion = 1,
     ) {
     }
 
@@ -59,5 +60,15 @@ final class User
     public function getStatus(): UserStatus
     {
         return $this->status;
+    }
+
+    public function getTokenVersion(): int
+    {
+        return $this->tokenVersion;
+    }
+
+    public function incrementTokenVersion(): void
+    {
+        $this->tokenVersion++;
     }
 }

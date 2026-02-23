@@ -51,15 +51,23 @@ final readonly class Handler implements MessageHandler
             throw new UserNotActiveException();
         }
 
+        $payloadVersion = isset($payload['tokenVersion']) && is_int($payload['tokenVersion'])
+            ? $payload['tokenVersion']
+            : 0;
+
+        if ($payloadVersion !== $user->getTokenVersion()) {
+            throw new AuthenticationException('Token has been revoked');
+        }
+
         $userId = $user->getId()->getValue();
 
         $accessToken = $this->tokenGenerator->generate(
-            ['userId' => $userId, 'type' => 'access'],
+            ['userId' => $userId, 'type' => 'access', 'tokenVersion' => $user->getTokenVersion()],
             $this->tokenTtlConfig->accessTtl,
         );
 
         $refreshToken = $this->tokenGenerator->generate(
-            ['userId' => $userId, 'type' => 'refresh'],
+            ['userId' => $userId, 'type' => 'refresh', 'tokenVersion' => $user->getTokenVersion()],
             $this->tokenTtlConfig->refreshTtl,
         );
 

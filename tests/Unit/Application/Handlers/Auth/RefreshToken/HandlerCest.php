@@ -39,7 +39,7 @@ final class HandlerCest
         );
 
         $tokenGenerator = Stub::makeEmpty(TokenGenerator::class, [
-            'verify' => static fn(): array => ['userId' => 'user-id-123', 'type' => 'refresh'],
+            'verify' => static fn(): array => ['userId' => 'user-id-123', 'type' => 'refresh', 'tokenVersion' => 1],
             'generate' => Stub::consecutive('new-access-token', 'new-refresh-token'),
         ]);
 
@@ -105,7 +105,7 @@ final class HandlerCest
     public function testUserNotFoundThrowsAuthenticationException(UnitTester $i): void
     {
         $tokenGenerator = Stub::makeEmpty(TokenGenerator::class, [
-            'verify' => static fn(): array => ['userId' => 'nonexistent-id', 'type' => 'refresh'],
+            'verify' => static fn(): array => ['userId' => 'nonexistent-id', 'type' => 'refresh', 'tokenVersion' => 1],
         ]);
 
         $users = Stub::makeEmpty(Users::class, [
@@ -136,7 +136,7 @@ final class HandlerCest
         );
 
         $tokenGenerator = Stub::makeEmpty(TokenGenerator::class, [
-            'verify' => static fn(): array => ['userId' => 'user-id-123', 'type' => 'refresh'],
+            'verify' => static fn(): array => ['userId' => 'user-id-123', 'type' => 'refresh', 'tokenVersion' => 1],
         ]);
 
         $users = Stub::makeEmpty(Users::class, [
@@ -150,6 +150,68 @@ final class HandlerCest
 
         $i->expectThrowable(
             new UserNotActiveException(),
+            static function () use ($handler, $envelope): void {
+                $handler($envelope);
+            },
+        );
+    }
+
+    public function testTokenVersionMismatchThrowsAuthenticationException(UnitTester $i): void
+    {
+        $user = new User(
+            id: new Uuid('user-id-123'),
+            email: new Email('test@example.com'),
+            passwordHash: 'hashed_password',
+            createdAt: new \DateTimeImmutable('2024-01-01 12:00:00'),
+            status: UserStatus::Active,
+        );
+        // user has tokenVersion=1, but token payload says tokenVersion=5
+        $tokenGenerator = Stub::makeEmpty(TokenGenerator::class, [
+            'verify' => static fn(): array => ['userId' => 'user-id-123', 'type' => 'refresh', 'tokenVersion' => 5],
+        ]);
+
+        $users = Stub::makeEmpty(Users::class, [
+            'find' => static fn(): User => $user,
+        ]);
+
+        $handler = new Handler($tokenGenerator, $users, new TokenTtlConfig(7200, 2592000));
+
+        $command = new Command(refreshToken: 'old-refresh-token');
+        $envelope = new Envelope($command, 'msg-6');
+
+        $i->expectThrowable(
+            AuthenticationException::class,
+            static function () use ($handler, $envelope): void {
+                $handler($envelope);
+            },
+        );
+    }
+
+    public function testMissingTokenVersionInPayloadTreatedAsZero(UnitTester $i): void
+    {
+        $user = new User(
+            id: new Uuid('user-id-123'),
+            email: new Email('test@example.com'),
+            passwordHash: 'hashed_password',
+            createdAt: new \DateTimeImmutable('2024-01-01 12:00:00'),
+            status: UserStatus::Active,
+        );
+        // token payload has no tokenVersion field -- treated as 0, user has 1
+        $tokenGenerator = Stub::makeEmpty(TokenGenerator::class, [
+            'verify' => static fn(): array => ['userId' => 'user-id-123', 'type' => 'refresh'],
+        ]);
+
+        $users = Stub::makeEmpty(Users::class, [
+            'find' => static fn(): User => $user,
+        ]);
+
+        $handler = new Handler($tokenGenerator, $users, new TokenTtlConfig(7200, 2592000));
+
+        $command = new Command(refreshToken: 'legacy-refresh-token');
+        $envelope = new Envelope($command, 'msg-7');
+
+        $i->expectThrowable(
+            AuthenticationException::class,
             static function () use ($handler, $envelope): void {
                 $handler($envelope);
             },

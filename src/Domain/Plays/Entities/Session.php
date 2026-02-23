@@ -9,11 +9,11 @@ use Bgl\Core\ValueObjects\Uuid;
 final class Session
 {
     public function __construct(
-        private Uuid $id,
-        private Uuid $userId,
-        private ?string $name,
+        private readonly Uuid $id,
+        private readonly Uuid $userId,
+        private readonly ?string $name,
         private SessionStatus $status,
-        private \DateTimeImmutable $startedAt,
+        private readonly \DateTimeImmutable $startedAt,
         private ?\DateTimeImmutable $finishedAt,
     ) {
     }

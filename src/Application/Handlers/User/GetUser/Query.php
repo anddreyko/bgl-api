@@ -9,10 +9,10 @@ use Bgl\Core\Messages\Message;
 /**
  * @implements Message<Result>
  */
-final class Query implements Message
+final readonly class Query implements Message
 {
     public function __construct(
-        public readonly string $userId,
+        public string $userId,
     ) {
     }
 }

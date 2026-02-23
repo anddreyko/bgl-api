@@ -9,12 +9,12 @@ use Bgl\Core\Messages\Message;
 /**
  * @implements Message<Result>
  */
-final class Command implements Message
+final readonly class Command implements Message
 {
     public function __construct(
-        public readonly string $sessionId,
-        public readonly string $userId,
-        public readonly ?\DateTimeImmutable $finishedAt = null,
+        public string $sessionId,
+        public string $userId,
+        public ?\DateTimeImmutable $finishedAt = null,
     ) {
     }
 }

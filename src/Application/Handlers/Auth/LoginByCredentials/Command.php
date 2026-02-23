@@ -9,11 +9,11 @@ use Bgl\Core\Messages\Message;
 /**
  * @implements Message<Result>
  */
-final class Command implements Message
+final readonly class Command implements Message
 {
     public function __construct(
-        public readonly string $email,
-        public readonly string $password,
+        public string $email,
+        public string $password,
     ) {
     }
 }

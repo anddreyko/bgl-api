@@ -49,12 +49,12 @@ final readonly class Handler implements MessageHandler
         $userId = $user->getId()->getValue();
 
         $accessToken = $this->tokenGenerator->generate(
-            ['userId' => $userId, 'type' => 'access'],
+            ['userId' => $userId, 'type' => 'access', 'tokenVersion' => $user->getTokenVersion()],
             $this->tokenTtlConfig->accessTtl,
         );
 
         $refreshToken = $this->tokenGenerator->generate(
-            ['userId' => $userId, 'type' => 'refresh'],
+            ['userId' => $userId, 'type' => 'refresh', 'tokenVersion' => $user->getTokenVersion()],
             $this->tokenTtlConfig->refreshTtl,
         );
 

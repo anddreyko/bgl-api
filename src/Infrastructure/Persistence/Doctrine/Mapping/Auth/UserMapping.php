@@ -49,5 +49,12 @@ final class UserMapping implements EntityMapping
             'fieldName' => 'status',
             'type' => 'string',
         ]);
+
+        $metadata->mapField([
+            'fieldName' => 'tokenVersion',
+            'type' => 'integer',
+            'columnName' => 'token_version',
+            'options' => ['default' => 1],
+        ]);
     }
 }
