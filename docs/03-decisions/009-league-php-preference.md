@@ -20,7 +20,6 @@ dependency conflicts, reduce learning curve, and ensure long-term maintainabilit
 The project already uses several League packages:
 
 - `league/tactician` — Command Bus (MessageBus implementation)
-- `league/oauth2-server` — OAuth2 authentication (planned for AUTH-001)
 
 **Requirements:**
 
@@ -78,7 +77,7 @@ Prefer League PHP packages where suitable alternatives exist, supplementing with
 - Designed for framework-agnostic use
 - Lightweight with minimal dependencies
 - Consistent API design philosophy across packages
-- Already established in the project (Tactician, OAuth2)
+- Already established in the project (Tactician)
 
 **Cons:**
 
@@ -104,7 +103,7 @@ When selecting infrastructure packages, the following priority order applies:
 1. **Consistency** — unified API patterns across infrastructure code
 2. **Lightweight** — minimal dependency footprint aligns with Slim framework
 3. **Framework-agnostic** — supports Clean Architecture principle of infrastructure independence
-4. **Established foundation** — Tactician and OAuth2 already in use
+4. **Established foundation** — Tactician already in use
 5. **PSR compliance** — ensures interoperability and future flexibility
 
 ---
@@ -131,12 +130,20 @@ When selecting infrastructure packages, the following priority order applies:
 
 **League packages currently in use or planned:**
 
-| Package                | Purpose                     | Status                |
-|------------------------|-----------------------------|-----------------------|
-| `league/tactician`     | Command/Query Bus           | In use                |
-| `league/oauth2-server` | OAuth2 authentication       | Planned (AUTH-001)    |
-| `league/fractal`       | API response transformation | Planned (see ADR-010) |
-| `league/flysystem`     | File system abstraction     | Potential future use  |
+| Package                        | Purpose                     | Status                |
+|--------------------------------|-----------------------------|-----------------------|
+| `league/tactician`             | Command/Query Bus           | In use                |
+| `league/oauth2-server`         | OAuth2 authentication       | Deferred (see below)  |
+| `league/openapi-psr7-validator`| OpenAPI request validation  | Planned (CORE-010)    |
+| `league/fractal`               | API response transformation | Planned (see ADR-010) |
+| `league/flysystem`             | File system abstraction     | Potential future use  |
+
+**OAuth2 server status (updated 2026-02-23):**
+
+MVP authentication uses JWT-based handlers with `Authenticator` interface in Core. The `league/oauth2-server` package
+is removed for MVP to avoid dead code. When Public API or third-party integrations are needed (Phase 3), OAuth2 will be
+added by implementing `OAuth2Authenticator` against the same `Authenticator` interface -- handlers and interceptors
+remain unchanged. See FR-0020 for architecture details.
 
 **When to deviate from League preference:**
 
