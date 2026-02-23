@@ -9,6 +9,11 @@ final readonly class Email
     public function __construct(
         private ?string $value = null,
     ) {
+        if ($this->value !== null && filter_var($this->value, FILTER_VALIDATE_EMAIL) === false) {
+            throw new \InvalidArgumentException(
+                sprintf('Invalid email format: "%s"', $this->value),
+            );
+        }
     }
 
     public function isNull(): bool

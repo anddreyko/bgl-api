@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Unit\Presentation\Api\Interceptors;
 
+use Bgl\Core\Auth\AuthenticationException;
 use Bgl\Core\Security\TokenGenerator;
 use Bgl\Presentation\Api\Interceptors\AuthInterceptor;
 use Bgl\Tests\Support\UnitTester;
@@ -38,7 +39,7 @@ final class AuthInterceptorCest
 
         $request = new ServerRequest('GET', '/test');
 
-        $i->expectThrowable(\DomainException::class, static function () use ($interceptor, $request): void {
+        $i->expectThrowable(AuthenticationException::class, static function () use ($interceptor, $request): void {
             $interceptor->process($request);
         });
     }
@@ -50,7 +51,7 @@ final class AuthInterceptorCest
 
         $request = new ServerRequest('GET', '/test', ['Authorization' => 'Basic abc123']);
 
-        $i->expectThrowable(\DomainException::class, static function () use ($interceptor, $request): void {
+        $i->expectThrowable(AuthenticationException::class, static function () use ($interceptor, $request): void {
             $interceptor->process($request);
         });
     }
@@ -59,16 +60,38 @@ final class AuthInterceptorCest
     {
         $tokenGen = Stub::makeEmpty(TokenGenerator::class, [
             'verify' => static function (): never {
-                throw new \DomainException('Invalid token');
+                throw new \RuntimeException('Invalid token');
             },
         ]);
         $interceptor = new AuthInterceptor($tokenGen);
 
         $request = new ServerRequest('GET', '/test', ['Authorization' => 'Bearer bad-token']);
 
-        $i->expectThrowable(\DomainException::class, static function () use ($interceptor, $request): void {
+        $i->expectThrowable(AuthenticationException::class, static function () use ($interceptor, $request): void {
             $interceptor->process($request);
         });
+    }
+
+    public function testTokenVerifyRuntimeExceptionWrapped(UnitTester $i): void
+    {
+        $original = new \RuntimeException('Token expired', 42);
+        $tokenGen = Stub::makeEmpty(TokenGenerator::class, [
+            'verify' => static function () use ($original): never {
+                throw $original;
+            },
+        ]);
+        $interceptor = new AuthInterceptor($tokenGen);
+
+        $request = new ServerRequest('GET', '/test', ['Authorization' => 'Bearer expired-token']);
+
+        try {
+            $interceptor->process($request);
+            $i->fail('Expected AuthenticationException was not thrown');
+        } catch (AuthenticationException $e) {
+            $i->assertSame('Token expired', $e->getMessage());
+            $i->assertSame(42, $e->getCode());
+            $i->assertSame($original, $e->getPrevious());
+        }
     }
 
     public function testTokenWithoutUserIdThrows(UnitTester $i): void
@@ -80,7 +103,7 @@ final class AuthInterceptorCest
 
         $request = new ServerRequest('GET', '/test', ['Authorization' => 'Bearer token-no-user']);
 
-        $i->expectThrowable(\DomainException::class, static function () use ($interceptor, $request): void {
+        $i->expectThrowable(AuthenticationException::class, static function () use ($interceptor, $request): void {
             $interceptor->process($request);
         });
     }
@@ -94,7 +117,7 @@ final class AuthInterceptorCest
 
         $request = new ServerRequest('GET', '/test', ['Authorization' => 'Bearer refresh-token']);
 
-        $i->expectThrowable(\DomainException::class, static function () use ($interceptor, $request): void {
+        $i->expectThrowable(AuthenticationException::class, static function () use ($interceptor, $request): void {
             $interceptor->process($request);
         });
     }

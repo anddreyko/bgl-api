@@ -19,4 +19,5 @@
             <directory name="vendor-bin"/>
         </ignoreFiles>
     </projectFiles>
+
 </psalm>

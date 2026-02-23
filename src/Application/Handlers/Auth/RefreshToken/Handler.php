@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Bgl\Application\Handlers\Auth\RefreshToken;
 
+use Bgl\Core\Auth\AuthenticationException;
+use Bgl\Core\Auth\InvalidRefreshTokenException;
+use Bgl\Core\Auth\UserNotActiveException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Core\Security\TokenGenerator;
+use Bgl\Core\Security\TokenTtlConfig;
 use Bgl\Domain\Auth\Entities\Users;
 use Bgl\Domain\Auth\Entities\UserStatus;
 
@@ -15,12 +19,10 @@ use Bgl\Domain\Auth\Entities\UserStatus;
  */
 final readonly class Handler implements MessageHandler
 {
-    private const int ACCESS_TOKEN_TTL = 7200;
-    private const int REFRESH_TOKEN_TTL = 2592000;
-
     public function __construct(
         private TokenGenerator $tokenGenerator,
         private Users $users,
+        private TokenTtlConfig $tokenTtlConfig,
     ) {
     }
 
@@ -33,38 +35,38 @@ final readonly class Handler implements MessageHandler
         $payload = $this->tokenGenerator->verify($command->refreshToken);
 
         if (!isset($payload['userId']) || !is_string($payload['userId'])) {
-            throw new \DomainException('Invalid refresh token');
+            throw new InvalidRefreshTokenException();
         }
 
         if (!isset($payload['type']) || $payload['type'] !== 'refresh') {
-            throw new \DomainException('Invalid token type');
+            throw new InvalidRefreshTokenException();
         }
 
         $user = $this->users->find($payload['userId']);
         if ($user === null) {
-            throw new \DomainException('User not found');
+            throw new AuthenticationException('User not found');
         }
 
         if ($user->getStatus() !== UserStatus::Active) {
-            throw new \DomainException('User is not active');
+            throw new UserNotActiveException();
         }
 
         $userId = $user->getId()->getValue();
 
         $accessToken = $this->tokenGenerator->generate(
             ['userId' => $userId, 'type' => 'access'],
-            self::ACCESS_TOKEN_TTL,
+            $this->tokenTtlConfig->accessTtl,
         );
 
         $refreshToken = $this->tokenGenerator->generate(
             ['userId' => $userId, 'type' => 'refresh'],
-            self::REFRESH_TOKEN_TTL,
+            $this->tokenTtlConfig->refreshTtl,
         );
 
         return new Result(
             accessToken: $accessToken,
             refreshToken: $refreshToken,
-            expiresIn: self::ACCESS_TOKEN_TTL,
+            expiresIn: $this->tokenTtlConfig->accessTtl,
         );
     }
 }

@@ -24,8 +24,11 @@ return [
         'trace_id' => $model->traceId,
         'environment' => $model->environment,
         'version' => $model->version,
-        'datetime' => $model->datetime->isNull() ? null : $model->datetime,
-        'delay' => $model->delay ? [
+        'datetime' => !$model->datetime->isNull() ? [
+            'timestamp' => $model->datetime->getNullableFormattedValue('U'),
+            'datetime' => $model->datetime->getNullableFormattedValue(DATE_W3C),
+        ] : null,
+        'delay' => !$model->delay->isNull() ? [
             'seconds' => $model->delay->getSeconds(),
             'interval' => $model->delay->getIso(),
         ] : null,

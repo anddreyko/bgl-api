@@ -7,8 +7,12 @@ namespace Bgl\Tests\Unit\Application\Handlers\Auth\RefreshToken;
 use Bgl\Application\Handlers\Auth\RefreshToken\Command;
 use Bgl\Application\Handlers\Auth\RefreshToken\Handler;
 use Bgl\Application\Handlers\Auth\RefreshToken\Result;
+use Bgl\Core\Auth\AuthenticationException;
+use Bgl\Core\Auth\InvalidRefreshTokenException;
+use Bgl\Core\Auth\UserNotActiveException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Security\TokenGenerator;
+use Bgl\Core\Security\TokenTtlConfig;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Auth\Entities\User;
@@ -43,7 +47,7 @@ final class HandlerCest
             'find' => static fn(): User => $user,
         ]);
 
-        $handler = new Handler($tokenGenerator, $users);
+        $handler = new Handler($tokenGenerator, $users, new TokenTtlConfig(7200, 2592000));
 
         $command = new Command(refreshToken: 'old-refresh-token');
         $envelope = new Envelope($command, 'msg-1');
@@ -56,7 +60,7 @@ final class HandlerCest
         $i->assertSame(7200, $result->expiresIn);
     }
 
-    public function testInvalidTokenThrowsDomainException(UnitTester $i): void
+    public function testInvalidTokenThrowsInvalidRefreshToken(UnitTester $i): void
     {
         $tokenGenerator = Stub::makeEmpty(TokenGenerator::class, [
             'verify' => static fn(): array => ['invalid' => 'payload'],
@@ -64,20 +68,20 @@ final class HandlerCest
 
         $users = Stub::makeEmpty(Users::class);
 
-        $handler = new Handler($tokenGenerator, $users);
+        $handler = new Handler($tokenGenerator, $users, new TokenTtlConfig(7200, 2592000));
 
         $command = new Command(refreshToken: 'invalid-token');
         $envelope = new Envelope($command, 'msg-2');
 
         $i->expectThrowable(
-            new \DomainException('Invalid refresh token'),
+            new InvalidRefreshTokenException(),
             static function () use ($handler, $envelope): void {
                 $handler($envelope);
             },
         );
     }
 
-    public function testWrongTokenTypeThrowsDomainException(UnitTester $i): void
+    public function testWrongTokenTypeThrowsInvalidRefreshToken(UnitTester $i): void
     {
         $tokenGenerator = Stub::makeEmpty(TokenGenerator::class, [
             'verify' => static fn(): array => ['userId' => 'user-id-123', 'type' => 'access'],
@@ -85,20 +89,20 @@ final class HandlerCest
 
         $users = Stub::makeEmpty(Users::class);
 
-        $handler = new Handler($tokenGenerator, $users);
+        $handler = new Handler($tokenGenerator, $users, new TokenTtlConfig(7200, 2592000));
 
         $command = new Command(refreshToken: 'access-token-instead');
         $envelope = new Envelope($command, 'msg-3');
 
         $i->expectThrowable(
-            new \DomainException('Invalid token type'),
+            new InvalidRefreshTokenException(),
             static function () use ($handler, $envelope): void {
                 $handler($envelope);
             },
         );
     }
 
-    public function testUserNotFoundThrowsDomainException(UnitTester $i): void
+    public function testUserNotFoundThrowsAuthenticationException(UnitTester $i): void
     {
         $tokenGenerator = Stub::makeEmpty(TokenGenerator::class, [
             'verify' => static fn(): array => ['userId' => 'nonexistent-id', 'type' => 'refresh'],
@@ -108,20 +112,20 @@ final class HandlerCest
             'find' => static fn(): ?User => null,
         ]);
 
-        $handler = new Handler($tokenGenerator, $users);
+        $handler = new Handler($tokenGenerator, $users, new TokenTtlConfig(7200, 2592000));
 
         $command = new Command(refreshToken: 'valid-refresh-token');
         $envelope = new Envelope($command, 'msg-4');
 
         $i->expectThrowable(
-            new \DomainException('User not found'),
+            new AuthenticationException('User not found'),
             static function () use ($handler, $envelope): void {
                 $handler($envelope);
             },
         );
     }
 
-    public function testInactiveUserThrowsDomainException(UnitTester $i): void
+    public function testInactiveUserThrowsUserNotActive(UnitTester $i): void
     {
         $user = new User(
             id: new Uuid('user-id-123'),
@@ -139,13 +143,13 @@ final class HandlerCest
             'find' => static fn(): User => $user,
         ]);
 
-        $handler = new Handler($tokenGenerator, $users);
+        $handler = new Handler($tokenGenerator, $users, new TokenTtlConfig(7200, 2592000));
 
         $command = new Command(refreshToken: 'valid-refresh-token');
         $envelope = new Envelope($command, 'msg-5');
 
         $i->expectThrowable(
-            new \DomainException('User is not active'),
+            new UserNotActiveException(),
             static function () use ($handler, $envelope): void {
                 $handler($envelope);
             },

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Bgl\Core\Security\PasswordHasher;
 use Bgl\Core\Security\TokenGenerator;
+use Bgl\Core\Security\TokenTtlConfig;
 use Bgl\Infrastructure\Security\BcryptPasswordHasher;
 use Bgl\Infrastructure\Security\JwtTokenGenerator;
 use Psr\Clock\ClockInterface;
@@ -20,4 +21,13 @@ return [
         return new JwtTokenGenerator(secret: $secret, clock: $clock);
     },
     TokenGenerator::class => JwtTokenGenerator::class,
+    TokenTtlConfig::class => static function (): TokenTtlConfig {
+        $accessTtl = getenv('JWT_ACCESS_TTL');
+        $refreshTtl = getenv('JWT_REFRESH_TTL');
+
+        return new TokenTtlConfig(
+            accessTtl: $accessTtl !== false && $accessTtl !== '' ? (int) $accessTtl : 7200,
+            refreshTtl: $refreshTtl !== false && $refreshTtl !== '' ? (int) $refreshTtl : 2592000,
+        );
+    },
 ];

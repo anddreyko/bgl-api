@@ -42,7 +42,7 @@ class PingHandlerCest
         $i->assertEquals('345', $result->traceId);
         $i->assertEquals('2.0.0', $result->version);
         $i->assertEquals('test', $result->environment);
-        $i->assertEquals('2025-10-13', $result->datetime->format('Y-m-d'));
-        $i->assertEquals(3, $result->delay->days);
+        $i->assertEquals('2025-10-13', $result->datetime->getFormattedValue('Y-m-d'));
+        $i->assertEquals(3, $result->delay->getDays());
     }
 }

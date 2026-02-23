@@ -5,15 +5,27 @@ declare(strict_types=1);
 namespace Bgl\Application\Handlers\Auth\Register;
 
 use Bgl\Core\Messages\Message;
+use Bgl\Core\ValueObjects\Email;
+use Bgl\Core\ValueObjects\Password;
 
 /**
  * @implements Message<string>
  */
-final class Command implements Message
+final readonly class Command implements Message
 {
+    public string $email;
+    public string $password;
+
     public function __construct(
-        public string $email,
-        public string $password,
+        string $email,
+        string $password,
     ) {
+        // Validate email format
+        new Email($email);
+        // Validate password strength
+        new Password($password);
+
+        $this->email = $email;
+        $this->password = $password;
     }
 }

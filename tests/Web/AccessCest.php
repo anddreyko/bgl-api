@@ -18,24 +18,18 @@ class AccessCest
         $i->seeResponseMatchesJsonType([
             'data' => [
                 'datetime' => [
-                    'date' => 'string',
-                    'timezone_type' => 'integer',
-                    'timezone' => 'string',
+                    'timestamp' => 'string',
+                    'datetime' => 'string',
                 ],
                 'delay' => [
-                    'y' => 'integer',
-                    'm' => 'integer',
-                    'd' => 'integer',
-                    'h' => 'integer',
-                    'i' => 'integer',
-                    's' => 'integer',
-                    'f' => 'float|integer',
+                    'seconds' => 'integer',
+                    'interval' => 'string',
                 ],
                 'version' => 'string',
                 'environment' => 'string',
-                'messageId' => 'string',
-                'parentId' => 'string|null',
-                'traceId' => 'string|null',
+                'message_id' => 'string',
+                'parent_id' => 'string|null',
+                'trace_id' => 'string|null',
             ],
         ]);
     }

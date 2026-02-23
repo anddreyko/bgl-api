@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Bgl\Application\Handlers\Auth\LoginByCredentials;
 
+use Bgl\Core\Auth\EmailNotConfirmedException;
+use Bgl\Core\Auth\InvalidCredentialsException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Core\Security\PasswordHasher;
 use Bgl\Core\Security\TokenGenerator;
+use Bgl\Core\Security\TokenTtlConfig;
 use Bgl\Domain\Auth\Entities\Users;
 use Bgl\Domain\Auth\Entities\UserStatus;
 
@@ -16,13 +19,11 @@ use Bgl\Domain\Auth\Entities\UserStatus;
  */
 final readonly class Handler implements MessageHandler
 {
-    private const int ACCESS_TOKEN_TTL = 7200;
-    private const int REFRESH_TOKEN_TTL = 2592000;
-
     public function __construct(
         private Users $users,
         private PasswordHasher $passwordHasher,
         private TokenGenerator $tokenGenerator,
+        private TokenTtlConfig $tokenTtlConfig,
     ) {
     }
 
@@ -34,33 +35,33 @@ final readonly class Handler implements MessageHandler
 
         $user = $this->users->findByEmail($command->email);
         if ($user === null) {
-            throw new \DomainException('Invalid credentials');
+            throw new InvalidCredentialsException();
         }
 
         if (!$this->passwordHasher->verify($command->password, $user->getPasswordHash())) {
-            throw new \DomainException('Invalid credentials');
+            throw new InvalidCredentialsException();
         }
 
         if ($user->getStatus() !== UserStatus::Active) {
-            throw new \DomainException('Email not confirmed');
+            throw new EmailNotConfirmedException();
         }
 
         $userId = $user->getId()->getValue();
 
         $accessToken = $this->tokenGenerator->generate(
             ['userId' => $userId, 'type' => 'access'],
-            self::ACCESS_TOKEN_TTL,
+            $this->tokenTtlConfig->accessTtl,
         );
 
         $refreshToken = $this->tokenGenerator->generate(
             ['userId' => $userId, 'type' => 'refresh'],
-            self::REFRESH_TOKEN_TTL,
+            $this->tokenTtlConfig->refreshTtl,
         );
 
         return new Result(
             accessToken: $accessToken,
             refreshToken: $refreshToken,
-            expiresIn: self::ACCESS_TOKEN_TTL,
+            expiresIn: $this->tokenTtlConfig->accessTtl,
         );
     }
 }

@@ -53,8 +53,9 @@ final class DateInterval
     {
         $value = 0;
 
-        if ($this->value) {
-            $value = date_create('@0')->add($this->value)->getTimestamp();
+        if ($this->value !== null) {
+            $epoch = new \DateTime('@0');
+            $value = $epoch->add($this->value)->getTimestamp();
         }
 
         return $value;

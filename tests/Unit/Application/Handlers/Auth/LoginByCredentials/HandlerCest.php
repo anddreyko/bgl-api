@@ -7,9 +7,12 @@ namespace Bgl\Tests\Unit\Application\Handlers\Auth\LoginByCredentials;
 use Bgl\Application\Handlers\Auth\LoginByCredentials\Command;
 use Bgl\Application\Handlers\Auth\LoginByCredentials\Handler;
 use Bgl\Application\Handlers\Auth\LoginByCredentials\Result;
+use Bgl\Core\Auth\EmailNotConfirmedException;
+use Bgl\Core\Auth\InvalidCredentialsException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Security\PasswordHasher;
 use Bgl\Core\Security\TokenGenerator;
+use Bgl\Core\Security\TokenTtlConfig;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Auth\Entities\User;
@@ -47,7 +50,7 @@ final class HandlerCest
             'generate' => Stub::consecutive('access-token-value', 'refresh-token-value'),
         ]);
 
-        $handler = new Handler($users, $passwordHasher, $tokenGenerator);
+        $handler = new Handler($users, $passwordHasher, $tokenGenerator, new TokenTtlConfig(7200, 2592000));
 
         $command = new Command(email: 'test@example.com', password: 'secret123');
         $envelope = new Envelope($command, 'msg-1');
@@ -60,7 +63,7 @@ final class HandlerCest
         $i->assertSame(7200, $result->expiresIn);
     }
 
-    public function testWrongEmailThrowsDomainException(UnitTester $i): void
+    public function testWrongEmailThrowsInvalidCredentials(UnitTester $i): void
     {
         $users = Stub::makeEmpty(Users::class, [
             'findByEmail' => static fn(): ?User => null,
@@ -69,20 +72,20 @@ final class HandlerCest
         $passwordHasher = Stub::makeEmpty(PasswordHasher::class);
         $tokenGenerator = Stub::makeEmpty(TokenGenerator::class);
 
-        $handler = new Handler($users, $passwordHasher, $tokenGenerator);
+        $handler = new Handler($users, $passwordHasher, $tokenGenerator, new TokenTtlConfig(7200, 2592000));
 
         $command = new Command(email: 'nonexistent@example.com', password: 'secret123');
         $envelope = new Envelope($command, 'msg-2');
 
         $i->expectThrowable(
-            new \DomainException('Invalid credentials'),
+            new InvalidCredentialsException(),
             static function () use ($handler, $envelope): void {
                 $handler($envelope);
             },
         );
     }
 
-    public function testWrongPasswordThrowsDomainException(UnitTester $i): void
+    public function testWrongPasswordThrowsInvalidCredentials(UnitTester $i): void
     {
         $user = new User(
             id: new Uuid('user-id-123'),
@@ -102,20 +105,20 @@ final class HandlerCest
 
         $tokenGenerator = Stub::makeEmpty(TokenGenerator::class);
 
-        $handler = new Handler($users, $passwordHasher, $tokenGenerator);
+        $handler = new Handler($users, $passwordHasher, $tokenGenerator, new TokenTtlConfig(7200, 2592000));
 
         $command = new Command(email: 'test@example.com', password: 'wrong-password');
         $envelope = new Envelope($command, 'msg-3');
 
         $i->expectThrowable(
-            new \DomainException('Invalid credentials'),
+            new InvalidCredentialsException(),
             static function () use ($handler, $envelope): void {
                 $handler($envelope);
             },
         );
     }
 
-    public function testInactiveUserThrowsDomainException(UnitTester $i): void
+    public function testInactiveUserThrowsEmailNotConfirmed(UnitTester $i): void
     {
         $user = new User(
             id: new Uuid('user-id-123'),
@@ -135,13 +138,13 @@ final class HandlerCest
 
         $tokenGenerator = Stub::makeEmpty(TokenGenerator::class);
 
-        $handler = new Handler($users, $passwordHasher, $tokenGenerator);
+        $handler = new Handler($users, $passwordHasher, $tokenGenerator, new TokenTtlConfig(7200, 2592000));
 
         $command = new Command(email: 'test@example.com', password: 'secret123');
         $envelope = new Envelope($command, 'msg-4');
 
         $i->expectThrowable(
-            new \DomainException('Email not confirmed'),
+            new EmailNotConfirmedException(),
             static function () use ($handler, $envelope): void {
                 $handler($envelope);
             },
