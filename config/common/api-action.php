@@ -14,14 +14,16 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Slim\Factory\AppFactory;
 
 return [
-    ResponseFactoryInterface::class => static fn(): ResponseFactoryInterface => AppFactory::determineResponseFactory(),
+    ResponseFactoryInterface::class => AppFactory::determineResponseFactory(...),
     RouteMap::class => static function (ContainerInterface $container): RouteMap {
         /** @var array{paths: array<string, array<string, mixed>>} $config */
         $config = $container->get('openapi');
 
         return new RouteMap($config['paths'] ?? []);
     },
-    InterceptorPipeline::class => static fn(ContainerInterface $container): InterceptorPipeline => new InterceptorPipeline($container),
+    InterceptorPipeline::class => static function (ContainerInterface $container): InterceptorPipeline {
+        return new InterceptorPipeline($container);
+    },
     ApiAction::class => static function (ContainerInterface $container): ApiAction {
         /** @var RouteMap $routeMap */
         $routeMap = $container->get(RouteMap::class);

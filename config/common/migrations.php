@@ -28,7 +28,8 @@ return [
         return DependencyFactory::fromEntityManager(
             new ConfigurationArray([
                 'migrations_paths' => [
-                    'Bgl\\Infrastructure\\Database\\Migrations' => __DIR__ . '/../../src/Infrastructure/Database/Migrations',
+                    'Bgl\\Infrastructure\\Database\\Migrations' =>
+                        __DIR__ . '/../../src/Infrastructure/Database/Migrations',
                 ],
                 'table_storage' => [
                     'table_name' => 'migration',

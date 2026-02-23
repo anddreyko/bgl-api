@@ -235,7 +235,10 @@ final readonly class OpenApiRequestValidator implements RequestValidator
     {
         $valid = match ($format) {
             'email' => filter_var($value, FILTER_VALIDATE_EMAIL) !== false,
-            'uuid' => preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $value) === 1,
+            'uuid' => preg_match(
+                '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i',
+                $value,
+            ) === 1,
             'date' => $this->isValidDate($value),
             'date-time' => $this->isValidDateTime($value),
             'uri', 'url' => filter_var($value, FILTER_VALIDATE_URL) !== false,

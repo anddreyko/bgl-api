@@ -129,8 +129,10 @@ final readonly class OpenApiSchemaMapper implements SchemaMapper
      *
      * @return string|int|float|bool|array<mixed>|\DateTimeImmutable
      */
-    private static function castValue(string|int|float|bool|array $value, string $cast): string|int|float|bool|array|\DateTimeImmutable
-    {
+    private static function castValue(
+        string|int|float|bool|array $value,
+        string $cast,
+    ): string|int|float|bool|array|\DateTimeImmutable {
         if (is_array($value)) {
             return $value;
         }

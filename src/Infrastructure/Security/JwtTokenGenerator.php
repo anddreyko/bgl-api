@@ -39,7 +39,13 @@ final readonly class JwtTokenGenerator implements TokenGenerator
         $token = $facade->issue(
             $this->signer,
             $this->key,
-            function (\Lcobucci\JWT\Builder $builder, \DateTimeImmutable $issuedAt) use ($payload, $ttlSeconds): \Lcobucci\JWT\Builder {
+            function (
+                \Lcobucci\JWT\Builder $builder,
+                \DateTimeImmutable $issuedAt,
+            ) use (
+                $payload,
+                $ttlSeconds,
+            ): \Lcobucci\JWT\Builder {
                 $builder = $builder->expiresAt($issuedAt->modify('+' . $ttlSeconds . ' seconds'));
 
                 /**
