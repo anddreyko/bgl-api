@@ -3,7 +3,22 @@ suite_namespace: Bgl\Tests\Web
 modules:
   enabled:
     - Asserts
+    - Cli
+    - Db:
+        dsn: 'pgsql:host=%DB_HOST%;port=%DB_PORT%;dbname=%DB_NAME%'
+        user: '%DB_USER%'
+        password: '%DB_PASS%'
+        cleanup: true
+        reconnect: true
+        waitlock: 10
+    - Bgl\Tests\Support\Modules\AuthModule
     - REST:
         depends: PhpBrowser
         part: json
         url: '%APP_EXTERNAL_HOST%:%APP_EXTERNAL_PORT%'
+extensions:
+  enabled:
+    - \Bgl\Tests\Support\Extensions\CliRunnerExtension:
+        commands: [
+          'APP_ENV=test cli/app orm:schema-tool:update --force'
+        ]

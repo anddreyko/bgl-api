@@ -139,7 +139,7 @@ composer test:func
 
 E2E tests via HTTP API and CLI. Verify the full path from entry point to database.
 
-Location: `tests/Acceptance/`
+Location: `tests/Web/` (API), `tests/Cli/` (CLI)
 
 ```bash
 composer test:web    # API tests
@@ -148,6 +148,17 @@ composer test:cli    # CLI tests
 
 When to write: for critical user scenarios — registration, session creation, statistics retrieval. Not needed for every
 endpoint.
+
+**Principles:**
+
+- **Happy path only** — acceptance tests verify that the system works end-to-end. A basic scenario: a user can register,
+  log in, perform an action, and log out. Business logic details (validation, errors, edge cases) are covered by
+  functional and unit tests.
+- **Protected endpoints require Bearer token** — all requests to protected routes need `Authorization: Bearer {token}`.
+  Use `AuthModule` for automatic token retrieval in tests.
+- **Test data via API + Db module** — test data is created through HTTP requests (sign-up, sign-in) and Codeception Db
+  module methods (`updateInDatabase`, `grabFromDatabase`) for state preparation (e.g. confirming a user).
+- **Automatic cleanup** — Db module with `cleanup: true` wraps each test in a transaction and rolls it back afterward.
 
 ### Mutation Tests (Automatic Quality Check)
 
