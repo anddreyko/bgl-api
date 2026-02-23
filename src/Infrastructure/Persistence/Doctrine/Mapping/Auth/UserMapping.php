@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth;
 
 use Bgl\Domain\Auth\Entities\User;
+use Bgl\Domain\Auth\Entities\UserStatus;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\EntityMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
@@ -23,14 +24,14 @@ final class UserMapping implements EntityMapping
 
         $metadata->mapField([
             'fieldName' => 'id',
-            'type' => 'guid',
+            'type' => 'uuid_vo',
             'id' => true,
         ]);
         $metadata->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_NONE);
 
         $metadata->mapField([
             'fieldName' => 'email',
-            'type' => 'string',
+            'type' => 'email_vo',
             'unique' => true,
         ]);
 
@@ -48,6 +49,7 @@ final class UserMapping implements EntityMapping
         $metadata->mapField([
             'fieldName' => 'status',
             'type' => 'string',
+            'enumType' => UserStatus::class,
         ]);
 
         $metadata->mapField([

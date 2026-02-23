@@ -42,7 +42,7 @@ class UserMappingCest
 
         $i->assertSame(['id'], $metadata->getIdentifierFieldNames());
         $i->assertSame(ClassMetadata::GENERATOR_TYPE_NONE, $metadata->generatorType);
-        $i->assertSame('guid', $metadata->getTypeOfField('id'));
+        $i->assertSame('uuid_vo', $metadata->getTypeOfField('id'));
     }
 
     public function testConfigureSetsEmailField(UnitTester $i): void
@@ -52,7 +52,7 @@ class UserMappingCest
 
         $mapping->configure($metadata);
 
-        $i->assertSame('string', $metadata->getTypeOfField('email'));
+        $i->assertSame('email_vo', $metadata->getTypeOfField('email'));
     }
 
     public function testConfigureSetsCreatedAtField(UnitTester $i): void

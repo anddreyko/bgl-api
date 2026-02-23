@@ -42,7 +42,7 @@ final class SessionMappingCest
 
         $i->assertSame(['id'], $metadata->getIdentifierFieldNames());
         $i->assertSame(ClassMetadata::GENERATOR_TYPE_NONE, $metadata->generatorType);
-        $i->assertSame('guid', $metadata->getTypeOfField('id'));
+        $i->assertSame('uuid_vo', $metadata->getTypeOfField('id'));
     }
 
     public function testConfigureSetsUserIdField(UnitTester $i): void
@@ -52,7 +52,7 @@ final class SessionMappingCest
 
         $mapping->configure($metadata);
 
-        $i->assertSame('guid', $metadata->getTypeOfField('userId'));
+        $i->assertSame('uuid_vo', $metadata->getTypeOfField('userId'));
         $i->assertSame('user_id', $metadata->getColumnName('userId'));
     }
 

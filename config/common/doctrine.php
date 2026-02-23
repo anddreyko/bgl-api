@@ -6,7 +6,10 @@ use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\EmailConfirmationTokenM
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\UserMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\PhpMappingDriver;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\SessionMapping;
+use Bgl\Infrastructure\Persistence\Doctrine\Type\EmailType;
+use Bgl\Infrastructure\Persistence\Doctrine\Type\UuidType;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,6 +19,13 @@ use Psr\Container\ContainerInterface;
 
 return [
     EntityManagerInterface::class => static function (ContainerInterface $container): EntityManagerInterface {
+        if (!Type::hasType('uuid_vo')) {
+            Type::addType('uuid_vo', UuidType::class);
+        }
+        if (!Type::hasType('email_vo')) {
+            Type::addType('email_vo', EmailType::class);
+        }
+
         /** @var array{db: array{driver: string}, mapping: MappingDriver, proxy_dir: string} $config */
         $config = $container->get('doctrine');
 

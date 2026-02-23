@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays;
 
 use Bgl\Domain\Plays\Entities\Session;
+use Bgl\Domain\Plays\Entities\SessionStatus;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\EntityMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
@@ -23,14 +24,14 @@ final class SessionMapping implements EntityMapping
 
         $metadata->mapField([
             'fieldName' => 'id',
-            'type' => 'guid',
+            'type' => 'uuid_vo',
             'id' => true,
         ]);
         $metadata->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_NONE);
 
         $metadata->mapField([
             'fieldName' => 'userId',
-            'type' => 'guid',
+            'type' => 'uuid_vo',
             'columnName' => 'user_id',
         ]);
 
@@ -43,6 +44,7 @@ final class SessionMapping implements EntityMapping
         $metadata->mapField([
             'fieldName' => 'status',
             'type' => 'string',
+            'enumType' => SessionStatus::class,
         ]);
 
         $metadata->mapField([

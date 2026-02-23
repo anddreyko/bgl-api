@@ -23,14 +23,14 @@ final class EmailConfirmationTokenMapping implements EntityMapping
 
         $metadata->mapField([
             'fieldName' => 'id',
-            'type' => 'guid',
+            'type' => 'uuid_vo',
             'id' => true,
         ]);
         $metadata->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_NONE);
 
         $metadata->mapField([
             'fieldName' => 'userId',
-            'type' => 'guid',
+            'type' => 'uuid_vo',
             'columnName' => 'user_id',
         ]);
 
