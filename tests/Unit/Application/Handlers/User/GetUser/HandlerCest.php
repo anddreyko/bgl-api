@@ -52,6 +52,7 @@ final class HandlerCest
         $i->assertSame('user@example.com', $result->email);
         $i->assertTrue($result->isActive);
         $i->assertSame('2024-01-15T10:30:00+00:00', $result->createdAt);
+        $i->assertMatchesRegularExpression('/^User#\d{4}$/', (string)$result->name);
     }
 
     public function testUserNotFoundThrowsDomainException(UnitTester $i): void

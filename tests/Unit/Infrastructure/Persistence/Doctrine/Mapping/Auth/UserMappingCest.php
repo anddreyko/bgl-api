@@ -85,6 +85,17 @@ class UserMappingCest
         $i->assertSame('integer', $metadata->getTypeOfField('tokenVersion'));
     }
 
+    public function testConfigureSetsNameField(UnitTester $i): void
+    {
+        $mapping = new UserMapping();
+        $metadata = new ClassMetadata(User::class);
+
+        $mapping->configure($metadata);
+
+        $i->assertSame('string', $metadata->getTypeOfField('name'));
+        $i->assertTrue($metadata->isNullable('name'));
+    }
+
     public function testConfigureSetsAllExpectedFields(UnitTester $i): void
     {
         $mapping = new UserMapping();
@@ -95,6 +106,6 @@ class UserMappingCest
         $fieldNames = $metadata->getFieldNames();
         sort($fieldNames);
 
-        $i->assertSame(['createdAt', 'email', 'id', 'passwordHash', 'status', 'tokenVersion'], $fieldNames);
+        $i->assertSame(['createdAt', 'email', 'id', 'name', 'passwordHash', 'status', 'tokenVersion'], $fieldNames);
     }
 }

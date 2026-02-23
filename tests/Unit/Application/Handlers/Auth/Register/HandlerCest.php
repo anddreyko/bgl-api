@@ -93,4 +93,39 @@ final class HandlerCest
             $handler($envelope);
         });
     }
+
+    public function testRegistrationWithName(UnitTester $i): void
+    {
+        $users = Stub::makeEmpty(Users::class, [
+            'findByEmail' => static fn(): ?User => null,
+            'add' => static function (): void {
+            },
+        ]);
+
+        $tokens = Stub::makeEmpty(EmailConfirmationTokens::class, [
+            'add' => static function (): void {
+            },
+        ]);
+
+        $passwordHasher = Stub::makeEmpty(PasswordHasher::class, [
+            'hash' => static fn(): string => 'hashed_password',
+        ]);
+
+        $uuidGenerator = Stub::makeEmpty(UuidGenerator::class, [
+            'generate' => static fn(): Uuid => new Uuid('generated-uuid'),
+        ]);
+
+        $clock = Stub::makeEmpty(ClockInterface::class, [
+            'now' => static fn(): \DateTimeImmutable => new \DateTimeImmutable('2024-01-01 12:00:00'),
+        ]);
+
+        $handler = new Handler($users, $tokens, $passwordHasher, $uuidGenerator, $clock);
+
+        $command = new Command(email: 'test@example.com', password: 'secret123', name: 'Bob');
+        $envelope = new Envelope($command, 'msg-3');
+
+        $result = $handler($envelope);
+
+        $i->assertSame('Confirm the specified email', $result);
+    }
 }

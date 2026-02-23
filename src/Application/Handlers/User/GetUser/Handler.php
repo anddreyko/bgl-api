@@ -34,6 +34,7 @@ final readonly class Handler implements MessageHandler
             email: $user->getEmail()->getValue() ?? '',
             isActive: $user->getStatus() === \Bgl\Domain\Auth\Entities\UserStatus::Active,
             createdAt: $user->getCreatedAt()->format(\DateTimeInterface::ATOM),
+            name: $user->getName(),
         );
     }
 }

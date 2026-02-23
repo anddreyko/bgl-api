@@ -51,6 +51,7 @@ final readonly class Handler implements MessageHandler
             email: new Email($command->email),
             passwordHash: $passwordHash,
             createdAt: $now,
+            name: $command->name,
         );
 
         $this->users->add($user);

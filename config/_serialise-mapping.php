@@ -46,6 +46,7 @@ return [
     Handlers\User\GetUser\Result::class => static fn(Handlers\User\GetUser\Result $model) => [
         'id' => $model->id,
         'email' => $model->email,
+        'name' => $model->name,
         'is_active' => $model->isActive,
         'created_at' => $model->createdAt,
     ],

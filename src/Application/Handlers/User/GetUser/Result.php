@@ -11,6 +11,7 @@ final readonly class Result
         public string $email,
         public bool $isActive,
         public string $createdAt,
+        public ?string $name = null,
     ) {
     }
 }

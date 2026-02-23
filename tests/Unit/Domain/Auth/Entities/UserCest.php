@@ -89,4 +89,29 @@ final class UserCest
 
         $i->assertSame(3, $user->getTokenVersion());
     }
+
+    public function testRegisterWithNameUsesProvidedName(UnitTester $i): void
+    {
+        $user = User::register(
+            id: new Uuid('user-id-1'),
+            email: new Email('test@example.com'),
+            passwordHash: 'hashed',
+            createdAt: new \DateTimeImmutable('2024-01-01 00:00:00'),
+            name: 'Alice',
+        );
+
+        $i->assertSame('Alice', $user->getName());
+    }
+
+    public function testRegisterWithoutNameGeneratesDefault(UnitTester $i): void
+    {
+        $user = User::register(
+            id: new Uuid('user-id-1'),
+            email: new Email('test@example.com'),
+            passwordHash: 'hashed',
+            createdAt: new \DateTimeImmutable('2024-01-01 00:00:00'),
+        );
+
+        $i->assertMatchesRegularExpression('/^User#\d{4}$/', $user->getName());
+    }
 }

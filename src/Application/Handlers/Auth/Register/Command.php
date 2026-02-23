@@ -19,10 +19,9 @@ final readonly class Command implements Message
     public function __construct(
         string $email,
         string $password,
+        public ?string $name = null,
     ) {
-        // Validate email format
         new Email($email);
-        // Validate password strength
         new Password($password);
 
         $this->email = $email;

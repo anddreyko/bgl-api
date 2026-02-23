@@ -16,6 +16,7 @@ final class User
         private readonly \DateTimeImmutable $createdAt,
         private UserStatus $status,
         private int $tokenVersion = 1,
+        private readonly ?string $name = null,
     ) {
     }
 
@@ -24,8 +25,21 @@ final class User
         Email $email,
         string $passwordHash,
         \DateTimeImmutable $createdAt,
+        ?string $name = null,
     ): self {
-        return new self($id, $email, $passwordHash, $createdAt, UserStatus::Inactive);
+        return new self(
+            $id,
+            $email,
+            $passwordHash,
+            $createdAt,
+            UserStatus::Inactive,
+            name: $name ?? self::generateDefaultName(),
+        );
+    }
+
+    private static function generateDefaultName(): string
+    {
+        return 'User#' . str_pad((string)random_int(0, 9999), 4, '0', STR_PAD_LEFT);
     }
 
     public function confirm(): void
@@ -60,6 +74,11 @@ final class User
     public function getStatus(): UserStatus
     {
         return $this->status;
+    }
+
+    public function getName(): string
+    {
+        return $this->name ?? self::generateDefaultName();
     }
 
     public function getTokenVersion(): int
