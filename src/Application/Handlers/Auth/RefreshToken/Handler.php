@@ -32,7 +32,11 @@ final readonly class Handler implements MessageHandler
         /** @var Command $command */
         $command = $envelope->message;
 
-        $payload = $this->tokenGenerator->verify($command->refreshToken);
+        try {
+            $payload = $this->tokenGenerator->verify($command->refreshToken);
+        } catch (\RuntimeException $e) {
+            throw new InvalidRefreshTokenException($e->getMessage(), (int) $e->getCode(), $e);
+        }
 
         if (!isset($payload['userId']) || !is_string($payload['userId'])) {
             throw new InvalidRefreshTokenException();
