@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Bgl\Core\ValueObjects;
 
+/**
+ * @see \Bgl\Tests\Unit\Core\ValueObjects\EmailCest
+ */
 final readonly class Email implements \Stringable
 {
     public function __construct(

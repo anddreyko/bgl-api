@@ -10,6 +10,8 @@ use Codeception\Attribute\Group;
 
 /**
  * @covers \Bgl\Core\ValueObjects\Email
+ *
+ * @see \Bgl\Core\ValueObjects\Email
  */
 #[Group('core', 'value-object')]
 final class EmailCest
@@ -48,5 +50,19 @@ final class EmailCest
                 new Email('');
             },
         );
+    }
+
+    public function testToString(UnitTester $i): void
+    {
+        $email = new Email('user@example.com');
+
+        $i->assertSame('user@example.com', (string) $email);
+    }
+
+    public function testNullToStringReturnsEmpty(UnitTester $i): void
+    {
+        $email = new Email(null);
+
+        $i->assertSame('', (string) $email);
     }
 }
