@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Core\ValueObjects;
 
-final readonly class Email
+final readonly class Email implements \Stringable
 {
     public function __construct(
         private ?string $value = null,
@@ -24,5 +24,11 @@ final readonly class Email
     public function getValue(): ?string
     {
         return $this->value;
+    }
+
+    #[\Override]
+    public function __toString(): string
+    {
+        return $this->value ?? '';
     }
 }

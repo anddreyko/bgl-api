@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Core\ValueObjects;
 
-final readonly class Uuid
+final readonly class Uuid implements \Stringable
 {
     /**
      * @param non-empty-string|null $value
@@ -25,5 +25,11 @@ final readonly class Uuid
     public function getValue(): ?string
     {
         return $this->value;
+    }
+
+    #[\Override]
+    public function __toString(): string
+    {
+        return $this->value ?? '';
     }
 }
