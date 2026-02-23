@@ -29,7 +29,7 @@ final class HandlerCest
     {
         $user = new User(
             id: new Uuid('user-id-123'),
-            email: new Email(),
+            email: new Email('test@example.com'),
             passwordHash: 'hashed_password',
             createdAt: new \DateTimeImmutable('2024-01-01 12:00:00'),
             status: UserStatus::Active,
@@ -86,7 +86,7 @@ final class HandlerCest
     {
         $user = new User(
             id: new Uuid('user-id-123'),
-            email: new Email(),
+            email: new Email('test@example.com'),
             passwordHash: 'hashed_password',
             createdAt: new \DateTimeImmutable('2024-01-01 12:00:00'),
             status: UserStatus::Active,
@@ -119,7 +119,7 @@ final class HandlerCest
     {
         $user = new User(
             id: new Uuid('user-id-123'),
-            email: new Email(),
+            email: new Email('test@example.com'),
             passwordHash: 'hashed_password',
             createdAt: new \DateTimeImmutable('2024-01-01 12:00:00'),
             status: UserStatus::Inactive,

@@ -18,13 +18,15 @@ final class Users extends InMemoryRepository implements UsersInterface
         return ['id'];
     }
 
-    /**
-     * Stub: Email VO has no value accessor yet.
-     * Will be implemented when Email VO gets proper constructor and getValue().
-     */
     #[\Override]
     public function findByEmail(string $email): ?User
     {
+        foreach ($this->getEntities() as $user) {
+            if ($user->getEmail()->getValue() === $email) {
+                return $user;
+            }
+        }
+
         return null;
     }
 }

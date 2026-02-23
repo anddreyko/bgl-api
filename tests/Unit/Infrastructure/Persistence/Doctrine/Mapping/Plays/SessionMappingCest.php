@@ -52,7 +52,7 @@ final class SessionMappingCest
 
         $mapping->configure($metadata);
 
-        $i->assertSame('string', $metadata->getTypeOfField('userId'));
+        $i->assertSame('guid', $metadata->getTypeOfField('userId'));
         $i->assertSame('user_id', $metadata->getColumnName('userId'));
     }
 

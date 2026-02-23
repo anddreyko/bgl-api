@@ -41,7 +41,7 @@ final class HandlerCest
 
         $user = User::register(
             id: $userId,
-            email: new Email(),
+            email: new Email('test@example.com'),
             passwordHash: 'hashed',
             createdAt: $now,
         );

@@ -34,7 +34,7 @@ final readonly class Handler implements MessageHandler
             throw new \DomainException('Session not found');
         }
 
-        if ($session->getUserId() !== $command->userId) {
+        if ($session->getUserId()->getValue() !== $command->userId) {
             throw new \DomainException('Access denied');
         }
 

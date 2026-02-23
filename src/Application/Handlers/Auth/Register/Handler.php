@@ -48,7 +48,7 @@ final readonly class Handler implements MessageHandler
 
         $user = User::register(
             id: $this->uuidGenerator->generate(),
-            email: new Email(),
+            email: new Email($command->email),
             passwordHash: $passwordHash,
             createdAt: $now,
         );

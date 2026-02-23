@@ -7,6 +7,7 @@ namespace Bgl\Application\Handlers\Plays\OpenSession;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
+use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Plays\Entities\Session;
 use Bgl\Domain\Plays\Entities\Sessions;
 use Psr\Clock\ClockInterface;
@@ -33,7 +34,7 @@ final readonly class Handler implements MessageHandler
 
         $session = Session::open(
             id: $this->uuidGenerator->generate(),
-            userId: $command->userId,
+            userId: new Uuid($command->userId),
             name: $command->name,
             startedAt: $now,
         );

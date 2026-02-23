@@ -10,7 +10,7 @@ final class Session
 {
     public function __construct(
         private Uuid $id,
-        private string $userId,
+        private Uuid $userId,
         private ?string $name,
         private SessionStatus $status,
         private \DateTimeImmutable $startedAt,
@@ -20,7 +20,7 @@ final class Session
 
     public static function open(
         Uuid $id,
-        string $userId,
+        Uuid $userId,
         ?string $name,
         \DateTimeImmutable $startedAt,
     ): self {
@@ -32,7 +32,7 @@ final class Session
         return $this->id;
     }
 
-    public function getUserId(): string
+    public function getUserId(): Uuid
     {
         return $this->userId;
     }

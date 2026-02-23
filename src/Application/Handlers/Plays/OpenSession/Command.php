@@ -11,6 +11,9 @@ use Bgl\Core\Messages\Message;
  */
 final class Command implements Message
 {
+    /**
+     * @param non-empty-string $userId
+     */
     public function __construct(
         public readonly string $userId,
         public readonly ?string $name = null,

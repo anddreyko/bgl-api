@@ -30,7 +30,7 @@ final class HandlerCest
 
         $user = new User(
             id: new Uuid($userId),
-            email: new Email(),
+            email: new Email('user@example.com'),
             passwordHash: 'hashed_password',
             createdAt: $createdAt,
             status: UserStatus::Active,
@@ -49,6 +49,7 @@ final class HandlerCest
 
         $i->assertInstanceOf(Result::class, $result);
         $i->assertSame($userId, $result->id);
+        $i->assertSame('user@example.com', $result->email);
         $i->assertTrue($result->isActive);
         $i->assertSame('2024-01-15T10:30:00+00:00', $result->createdAt);
     }

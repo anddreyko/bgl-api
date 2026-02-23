@@ -65,7 +65,7 @@ final class HandlerCest
     {
         $existingUser = User::register(
             id: new Uuid('existing-user-id'),
-            email: new Email(),
+            email: new Email('existing@example.com'),
             passwordHash: 'hashed',
             createdAt: new \DateTimeImmutable('2024-01-01 12:00:00'),
         );

@@ -27,7 +27,7 @@ final class HandlerCest
     {
         $session = Session::open(
             new Uuid('session-1'),
-            'user-123',
+            new Uuid('user-123'),
             'Game night',
             new \DateTimeImmutable('2024-06-15 20:00:00'),
         );
@@ -58,7 +58,7 @@ final class HandlerCest
     {
         $session = Session::open(
             new Uuid('session-2'),
-            'user-123',
+            new Uuid('user-123'),
             null,
             new \DateTimeImmutable('2024-06-15 20:00:00'),
         );
@@ -110,7 +110,7 @@ final class HandlerCest
     {
         $session = Session::open(
             new Uuid('session-3'),
-            'user-owner',
+            new Uuid('user-owner'),
             null,
             new \DateTimeImmutable('2024-06-15 20:00:00'),
         );

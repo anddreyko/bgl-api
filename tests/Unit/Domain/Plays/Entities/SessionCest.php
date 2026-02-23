@@ -19,7 +19,7 @@ final class SessionCest
     public function testOpenCreatesSessionWithDraftStatus(UnitTester $i): void
     {
         $id = new Uuid('session-id');
-        $userId = 'user-123';
+        $userId = new Uuid('user-123');
         $name = 'Friday night game';
         $startedAt = new \DateTimeImmutable('2024-06-15 20:00:00');
 
@@ -36,7 +36,7 @@ final class SessionCest
     public function testOpenCreatesSessionWithNullName(UnitTester $i): void
     {
         $id = new Uuid('session-id');
-        $userId = 'user-456';
+        $userId = new Uuid('user-456');
         $startedAt = new \DateTimeImmutable('2024-06-15 20:00:00');
 
         $session = Session::open($id, $userId, null, $startedAt);
@@ -48,7 +48,7 @@ final class SessionCest
     public function testGetIdReturnsUuid(UnitTester $i): void
     {
         $id = new Uuid('test-uuid');
-        $session = Session::open($id, 'user-1', null, new \DateTimeImmutable());
+        $session = Session::open($id, new Uuid('user-1'), null, new \DateTimeImmutable());
 
         $i->assertSame('test-uuid', $session->getId()->getValue());
     }
@@ -57,19 +57,19 @@ final class SessionCest
     {
         $session = Session::open(
             new Uuid('id'),
-            'user-abc',
+            new Uuid('user-abc'),
             null,
             new \DateTimeImmutable(),
         );
 
-        $i->assertSame('user-abc', $session->getUserId());
+        $i->assertSame('user-abc', $session->getUserId()->getValue());
     }
 
     public function testCloseChangesStatusToPublishedAndSetsFinishedAt(UnitTester $i): void
     {
         $session = Session::open(
             new Uuid('session-id'),
-            'user-123',
+            new Uuid('user-123'),
             'Game night',
             new \DateTimeImmutable('2024-06-15 20:00:00'),
         );
@@ -85,7 +85,7 @@ final class SessionCest
     {
         $session = Session::open(
             new Uuid('session-id'),
-            'user-123',
+            new Uuid('user-123'),
             null,
             new \DateTimeImmutable('2024-06-15 20:00:00'),
         );

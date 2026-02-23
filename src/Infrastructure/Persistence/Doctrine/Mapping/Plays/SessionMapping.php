@@ -30,7 +30,7 @@ final class SessionMapping implements EntityMapping
 
         $metadata->mapField([
             'fieldName' => 'userId',
-            'type' => 'string',
+            'type' => 'guid',
             'columnName' => 'user_id',
         ]);
 
