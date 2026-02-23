@@ -136,9 +136,12 @@ final readonly class RouteMap
                 $in = $param['in'] ?? '';
                 /** @var mixed $name */
                 $name = $param['name'] ?? null;
-                if ($in === 'query' && is_string($name)) {
+                if (($in === 'query' || $in === 'path') && is_string($name)) {
                     /** @var array<string, mixed>|array<never, never> $paramSchema */
                     $paramSchema = is_array($param['schema'] ?? null) ? $param['schema'] : [];
+                    if (isset($param['x-target']) && is_string($param['x-target'])) {
+                        $paramSchema['x-target'] = $param['x-target'];
+                    }
                     $schema[$name] = $paramSchema;
                 }
             }
