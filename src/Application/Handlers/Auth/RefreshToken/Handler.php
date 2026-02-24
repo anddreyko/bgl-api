@@ -4,15 +4,9 @@ declare(strict_types=1);
 
 namespace Bgl\Application\Handlers\Auth\RefreshToken;
 
-use Bgl\Core\Auth\AuthenticationException;
-use Bgl\Core\Auth\InvalidRefreshTokenException;
-use Bgl\Core\Auth\UserNotActiveException;
+use Bgl\Core\Auth\Authenticator;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
-use Bgl\Core\Security\TokenGenerator;
-use Bgl\Core\Security\TokenTtlConfig;
-use Bgl\Domain\Auth\Entities\Users;
-use Bgl\Domain\Auth\Entities\UserStatus;
 
 /**
  * @implements MessageHandler<Result, Command>
@@ -20,9 +14,7 @@ use Bgl\Domain\Auth\Entities\UserStatus;
 final readonly class Handler implements MessageHandler
 {
     public function __construct(
-        private TokenGenerator $tokenGenerator,
-        private Users $users,
-        private TokenTtlConfig $tokenTtlConfig,
+        private Authenticator $authenticator,
     ) {
     }
 
@@ -32,53 +24,12 @@ final readonly class Handler implements MessageHandler
         /** @var Command $command */
         $command = $envelope->message;
 
-        try {
-            $payload = $this->tokenGenerator->verify($command->refreshToken);
-        } catch (\RuntimeException $e) {
-            throw new InvalidRefreshTokenException($e->getMessage(), (int) $e->getCode(), $e);
-        }
-
-        if (!isset($payload['userId']) || !is_string($payload['userId'])) {
-            throw new InvalidRefreshTokenException();
-        }
-
-        if (!isset($payload['type']) || $payload['type'] !== 'refresh') {
-            throw new InvalidRefreshTokenException();
-        }
-
-        $user = $this->users->find($payload['userId']);
-        if ($user === null) {
-            throw new AuthenticationException('User not found');
-        }
-
-        if ($user->getStatus() !== UserStatus::Active) {
-            throw new UserNotActiveException();
-        }
-
-        $payloadVersion = isset($payload['tokenVersion']) && is_int($payload['tokenVersion'])
-            ? $payload['tokenVersion']
-            : 0;
-
-        if ($payloadVersion !== $user->getTokenVersion()) {
-            throw new AuthenticationException('Token has been revoked');
-        }
-
-        $userId = $user->getId()->getValue();
-
-        $accessToken = $this->tokenGenerator->generate(
-            ['userId' => $userId, 'type' => 'access', 'tokenVersion' => $user->getTokenVersion()],
-            $this->tokenTtlConfig->accessTtl,
-        );
-
-        $refreshToken = $this->tokenGenerator->generate(
-            ['userId' => $userId, 'type' => 'refresh', 'tokenVersion' => $user->getTokenVersion()],
-            $this->tokenTtlConfig->refreshTtl,
-        );
+        $tokenPair = $this->authenticator->refresh($command->refreshToken);
 
         return new Result(
-            accessToken: $accessToken,
-            refreshToken: $refreshToken,
-            expiresIn: $this->tokenTtlConfig->accessTtl,
+            accessToken: $tokenPair->accessToken,
+            refreshToken: $tokenPair->refreshToken,
+            expiresIn: $tokenPair->expiresIn,
         );
     }
 }

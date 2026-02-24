@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace Bgl\Presentation\Api\Interceptors;
 
 use Bgl\Core\Auth\AuthenticationException;
-use Bgl\Core\Security\TokenGenerator;
-use Bgl\Domain\Auth\Entities\Users;
+use Bgl\Core\Auth\Authenticator;
 use Psr\Http\Message\ServerRequestInterface;
 
+/**
+ * @see \Bgl\Tests\Unit\Presentation\Api\Interceptors\AuthInterceptorCest
+ */
 final readonly class AuthInterceptor implements Interceptor
 {
     public function __construct(
-        private TokenGenerator $tokenGenerator,
-        private Users $users,
+        private Authenticator $authenticator,
     ) {
     }
 
@@ -26,34 +27,8 @@ final readonly class AuthInterceptor implements Interceptor
         }
 
         $token = substr($header, 7);
+        $authPayload = $this->authenticator->verify($token);
 
-        try {
-            $payload = $this->tokenGenerator->verify($token);
-        } catch (\RuntimeException $e) {
-            throw new AuthenticationException($e->getMessage(), (int) $e->getCode(), $e);
-        }
-
-        if (!isset($payload['userId']) || !is_string($payload['userId'])) {
-            throw new AuthenticationException('Unauthorized');
-        }
-
-        if (isset($payload['type']) && $payload['type'] !== 'access') {
-            throw new AuthenticationException('Unauthorized');
-        }
-
-        $user = $this->users->find($payload['userId']);
-        if ($user === null) {
-            throw new AuthenticationException('User not found');
-        }
-
-        $payloadVersion = isset($payload['tokenVersion']) && is_int($payload['tokenVersion'])
-            ? $payload['tokenVersion']
-            : 0;
-
-        if ($payloadVersion !== $user->getTokenVersion()) {
-            throw new AuthenticationException('Token has been revoked');
-        }
-
-        return $request->withAttribute('auth.userId', $payload['userId']);
+        return $request->withAttribute('auth.userId', $authPayload->userId);
     }
 }

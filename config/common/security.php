@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use Bgl\Core\Auth\Authenticator;
 use Bgl\Core\Security\PasswordHasher;
 use Bgl\Core\Security\TokenGenerator;
 use Bgl\Core\Security\TokenTtlConfig;
+use Bgl\Infrastructure\Auth\JwtAuthenticator;
 use Bgl\Infrastructure\Security\BcryptPasswordHasher;
 use Bgl\Infrastructure\Security\JwtTokenGenerator;
 use Psr\Clock\ClockInterface;
@@ -30,4 +32,5 @@ return [
             refreshTtl: $refreshTtl !== false && $refreshTtl !== '' ? (int) $refreshTtl : 2592000,
         );
     },
+    Authenticator::class => DI\get(JwtAuthenticator::class),
 ];

@@ -7,17 +7,10 @@ namespace Bgl\Tests\Unit\Application\Handlers\Auth\LoginByCredentials;
 use Bgl\Application\Handlers\Auth\LoginByCredentials\Command;
 use Bgl\Application\Handlers\Auth\LoginByCredentials\Handler;
 use Bgl\Application\Handlers\Auth\LoginByCredentials\Result;
-use Bgl\Core\Auth\EmailNotConfirmedException;
+use Bgl\Core\Auth\Authenticator;
 use Bgl\Core\Auth\InvalidCredentialsException;
+use Bgl\Core\Auth\TokenPair;
 use Bgl\Core\Messages\Envelope;
-use Bgl\Core\Security\PasswordHasher;
-use Bgl\Core\Security\TokenGenerator;
-use Bgl\Core\Security\TokenTtlConfig;
-use Bgl\Core\ValueObjects\Email;
-use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Auth\Entities\User;
-use Bgl\Domain\Auth\Entities\Users;
-use Bgl\Domain\Auth\Entities\UserStatus;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 use Codeception\Stub;
@@ -30,27 +23,15 @@ final class HandlerCest
 {
     public function testSuccessfulLogin(UnitTester $i): void
     {
-        $user = new User(
-            id: new Uuid('user-id-123'),
-            email: new Email('test@example.com'),
-            passwordHash: 'hashed_password',
-            createdAt: new \DateTimeImmutable('2024-01-01 12:00:00'),
-            status: UserStatus::Active,
-        );
-
-        $users = Stub::makeEmpty(Users::class, [
-            'findByEmail' => static fn(): User => $user,
+        $authenticator = Stub::makeEmpty(Authenticator::class, [
+            'login' => static fn(): TokenPair => new TokenPair(
+                accessToken: 'access-token-value',
+                refreshToken: 'refresh-token-value',
+                expiresIn: 7200,
+            ),
         ]);
 
-        $passwordHasher = Stub::makeEmpty(PasswordHasher::class, [
-            'verify' => static fn(): bool => true,
-        ]);
-
-        $tokenGenerator = Stub::makeEmpty(TokenGenerator::class, [
-            'generate' => Stub::consecutive('access-token-value', 'refresh-token-value'),
-        ]);
-
-        $handler = new Handler($users, $passwordHasher, $tokenGenerator, new TokenTtlConfig(7200, 2592000));
+        $handler = new Handler($authenticator);
 
         $command = new Command(email: 'test@example.com', password: 'secret123');
         $envelope = new Envelope($command, 'msg-1');
@@ -63,88 +44,21 @@ final class HandlerCest
         $i->assertSame(7200, $result->expiresIn);
     }
 
-    public function testWrongEmailThrowsInvalidCredentials(UnitTester $i): void
+    public function testInvalidCredentialsPropagate(UnitTester $i): void
     {
-        $users = Stub::makeEmpty(Users::class, [
-            'findByEmail' => static fn(): ?User => null,
+        $authenticator = Stub::makeEmpty(Authenticator::class, [
+            'login' => static function (): never {
+                throw new InvalidCredentialsException();
+            },
         ]);
 
-        $passwordHasher = Stub::makeEmpty(PasswordHasher::class);
-        $tokenGenerator = Stub::makeEmpty(TokenGenerator::class);
+        $handler = new Handler($authenticator);
 
-        $handler = new Handler($users, $passwordHasher, $tokenGenerator, new TokenTtlConfig(7200, 2592000));
-
-        $command = new Command(email: 'nonexistent@example.com', password: 'secret123');
+        $command = new Command(email: 'test@example.com', password: 'wrong');
         $envelope = new Envelope($command, 'msg-2');
 
         $i->expectThrowable(
             new InvalidCredentialsException(),
-            static function () use ($handler, $envelope): void {
-                $handler($envelope);
-            },
-        );
-    }
-
-    public function testWrongPasswordThrowsInvalidCredentials(UnitTester $i): void
-    {
-        $user = new User(
-            id: new Uuid('user-id-123'),
-            email: new Email('test@example.com'),
-            passwordHash: 'hashed_password',
-            createdAt: new \DateTimeImmutable('2024-01-01 12:00:00'),
-            status: UserStatus::Active,
-        );
-
-        $users = Stub::makeEmpty(Users::class, [
-            'findByEmail' => static fn(): User => $user,
-        ]);
-
-        $passwordHasher = Stub::makeEmpty(PasswordHasher::class, [
-            'verify' => static fn(): bool => false,
-        ]);
-
-        $tokenGenerator = Stub::makeEmpty(TokenGenerator::class);
-
-        $handler = new Handler($users, $passwordHasher, $tokenGenerator, new TokenTtlConfig(7200, 2592000));
-
-        $command = new Command(email: 'test@example.com', password: 'wrong-password');
-        $envelope = new Envelope($command, 'msg-3');
-
-        $i->expectThrowable(
-            new InvalidCredentialsException(),
-            static function () use ($handler, $envelope): void {
-                $handler($envelope);
-            },
-        );
-    }
-
-    public function testInactiveUserThrowsEmailNotConfirmed(UnitTester $i): void
-    {
-        $user = new User(
-            id: new Uuid('user-id-123'),
-            email: new Email('test@example.com'),
-            passwordHash: 'hashed_password',
-            createdAt: new \DateTimeImmutable('2024-01-01 12:00:00'),
-            status: UserStatus::Inactive,
-        );
-
-        $users = Stub::makeEmpty(Users::class, [
-            'findByEmail' => static fn(): User => $user,
-        ]);
-
-        $passwordHasher = Stub::makeEmpty(PasswordHasher::class, [
-            'verify' => static fn(): bool => true,
-        ]);
-
-        $tokenGenerator = Stub::makeEmpty(TokenGenerator::class);
-
-        $handler = new Handler($users, $passwordHasher, $tokenGenerator, new TokenTtlConfig(7200, 2592000));
-
-        $command = new Command(email: 'test@example.com', password: 'secret123');
-        $envelope = new Envelope($command, 'msg-4');
-
-        $i->expectThrowable(
-            new EmailNotConfirmedException(),
             static function () use ($handler, $envelope): void {
                 $handler($envelope);
             },

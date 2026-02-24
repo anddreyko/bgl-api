@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Bgl\Application\Handlers\Auth\SignOut;
 
-use Bgl\Core\Auth\AuthenticationException;
+use Bgl\Core\Auth\Authenticator;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
-use Bgl\Domain\Auth\Entities\Users;
 
 /**
  * @implements MessageHandler<string, Command>
@@ -15,7 +14,7 @@ use Bgl\Domain\Auth\Entities\Users;
 final readonly class Handler implements MessageHandler
 {
     public function __construct(
-        private Users $users,
+        private Authenticator $authenticator,
     ) {
     }
 
@@ -25,12 +24,7 @@ final readonly class Handler implements MessageHandler
         /** @var Command $command */
         $command = $envelope->message;
 
-        $user = $this->users->find($command->userId);
-        if ($user === null) {
-            throw new AuthenticationException('User not found');
-        }
-
-        $user->incrementTokenVersion();
+        $this->authenticator->revoke($command->userId);
 
         return 'sign out';
     }

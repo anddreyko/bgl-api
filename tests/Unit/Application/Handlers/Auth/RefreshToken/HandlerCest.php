@@ -7,17 +7,10 @@ namespace Bgl\Tests\Unit\Application\Handlers\Auth\RefreshToken;
 use Bgl\Application\Handlers\Auth\RefreshToken\Command;
 use Bgl\Application\Handlers\Auth\RefreshToken\Handler;
 use Bgl\Application\Handlers\Auth\RefreshToken\Result;
-use Bgl\Core\Auth\AuthenticationException;
+use Bgl\Core\Auth\Authenticator;
 use Bgl\Core\Auth\InvalidRefreshTokenException;
-use Bgl\Core\Auth\UserNotActiveException;
+use Bgl\Core\Auth\TokenPair;
 use Bgl\Core\Messages\Envelope;
-use Bgl\Core\Security\TokenGenerator;
-use Bgl\Core\Security\TokenTtlConfig;
-use Bgl\Core\ValueObjects\Email;
-use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Auth\Entities\User;
-use Bgl\Domain\Auth\Entities\Users;
-use Bgl\Domain\Auth\Entities\UserStatus;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 use Codeception\Stub;
@@ -30,24 +23,15 @@ final class HandlerCest
 {
     public function testSuccessfulRefresh(UnitTester $i): void
     {
-        $user = new User(
-            id: new Uuid('user-id-123'),
-            email: new Email('test@example.com'),
-            passwordHash: 'hashed_password',
-            createdAt: new \DateTimeImmutable('2024-01-01 12:00:00'),
-            status: UserStatus::Active,
-        );
-
-        $tokenGenerator = Stub::makeEmpty(TokenGenerator::class, [
-            'verify' => static fn(): array => ['userId' => 'user-id-123', 'type' => 'refresh', 'tokenVersion' => 1],
-            'generate' => Stub::consecutive('new-access-token', 'new-refresh-token'),
+        $authenticator = Stub::makeEmpty(Authenticator::class, [
+            'refresh' => static fn(): TokenPair => new TokenPair(
+                accessToken: 'new-access-token',
+                refreshToken: 'new-refresh-token',
+                expiresIn: 7200,
+            ),
         ]);
 
-        $users = Stub::makeEmpty(Users::class, [
-            'find' => static fn(): User => $user,
-        ]);
-
-        $handler = new Handler($tokenGenerator, $users, new TokenTtlConfig(7200, 2592000));
+        $handler = new Handler($authenticator);
 
         $command = new Command(refreshToken: 'old-refresh-token');
         $envelope = new Envelope($command, 'msg-1');
@@ -60,158 +44,21 @@ final class HandlerCest
         $i->assertSame(7200, $result->expiresIn);
     }
 
-    public function testInvalidTokenThrowsInvalidRefreshToken(UnitTester $i): void
+    public function testInvalidRefreshTokenPropagate(UnitTester $i): void
     {
-        $tokenGenerator = Stub::makeEmpty(TokenGenerator::class, [
-            'verify' => static fn(): array => ['invalid' => 'payload'],
+        $authenticator = Stub::makeEmpty(Authenticator::class, [
+            'refresh' => static function (): never {
+                throw new InvalidRefreshTokenException();
+            },
         ]);
 
-        $users = Stub::makeEmpty(Users::class);
-
-        $handler = new Handler($tokenGenerator, $users, new TokenTtlConfig(7200, 2592000));
+        $handler = new Handler($authenticator);
 
         $command = new Command(refreshToken: 'invalid-token');
         $envelope = new Envelope($command, 'msg-2');
 
         $i->expectThrowable(
             new InvalidRefreshTokenException(),
-            static function () use ($handler, $envelope): void {
-                $handler($envelope);
-            },
-        );
-    }
-
-    public function testWrongTokenTypeThrowsInvalidRefreshToken(UnitTester $i): void
-    {
-        $tokenGenerator = Stub::makeEmpty(TokenGenerator::class, [
-            'verify' => static fn(): array => ['userId' => 'user-id-123', 'type' => 'access'],
-        ]);
-
-        $users = Stub::makeEmpty(Users::class);
-
-        $handler = new Handler($tokenGenerator, $users, new TokenTtlConfig(7200, 2592000));
-
-        $command = new Command(refreshToken: 'access-token-instead');
-        $envelope = new Envelope($command, 'msg-3');
-
-        $i->expectThrowable(
-            new InvalidRefreshTokenException(),
-            static function () use ($handler, $envelope): void {
-                $handler($envelope);
-            },
-        );
-    }
-
-    public function testUserNotFoundThrowsAuthenticationException(UnitTester $i): void
-    {
-        $tokenGenerator = Stub::makeEmpty(TokenGenerator::class, [
-            'verify' => static fn(): array => ['userId' => 'nonexistent-id', 'type' => 'refresh', 'tokenVersion' => 1],
-        ]);
-
-        $users = Stub::makeEmpty(Users::class, [
-            'find' => static fn(): ?User => null,
-        ]);
-
-        $handler = new Handler($tokenGenerator, $users, new TokenTtlConfig(7200, 2592000));
-
-        $command = new Command(refreshToken: 'valid-refresh-token');
-        $envelope = new Envelope($command, 'msg-4');
-
-        $i->expectThrowable(
-            new AuthenticationException('User not found'),
-            static function () use ($handler, $envelope): void {
-                $handler($envelope);
-            },
-        );
-    }
-
-    public function testInactiveUserThrowsUserNotActive(UnitTester $i): void
-    {
-        $user = new User(
-            id: new Uuid('user-id-123'),
-            email: new Email('test@example.com'),
-            passwordHash: 'hashed_password',
-            createdAt: new \DateTimeImmutable('2024-01-01 12:00:00'),
-            status: UserStatus::Inactive,
-        );
-
-        $tokenGenerator = Stub::makeEmpty(TokenGenerator::class, [
-            'verify' => static fn(): array => ['userId' => 'user-id-123', 'type' => 'refresh', 'tokenVersion' => 1],
-        ]);
-
-        $users = Stub::makeEmpty(Users::class, [
-            'find' => static fn(): User => $user,
-        ]);
-
-        $handler = new Handler($tokenGenerator, $users, new TokenTtlConfig(7200, 2592000));
-
-        $command = new Command(refreshToken: 'valid-refresh-token');
-        $envelope = new Envelope($command, 'msg-5');
-
-        $i->expectThrowable(
-            new UserNotActiveException(),
-            static function () use ($handler, $envelope): void {
-                $handler($envelope);
-            },
-        );
-    }
-
-    public function testTokenVersionMismatchThrowsAuthenticationException(UnitTester $i): void
-    {
-        $user = new User(
-            id: new Uuid('user-id-123'),
-            email: new Email('test@example.com'),
-            passwordHash: 'hashed_password',
-            createdAt: new \DateTimeImmutable('2024-01-01 12:00:00'),
-            status: UserStatus::Active,
-        );
-        // user has tokenVersion=1, but token payload says tokenVersion=5
-        $tokenGenerator = Stub::makeEmpty(TokenGenerator::class, [
-            'verify' => static fn(): array => ['userId' => 'user-id-123', 'type' => 'refresh', 'tokenVersion' => 5],
-        ]);
-
-        $users = Stub::makeEmpty(Users::class, [
-            'find' => static fn(): User => $user,
-        ]);
-
-        $handler = new Handler($tokenGenerator, $users, new TokenTtlConfig(7200, 2592000));
-
-        $command = new Command(refreshToken: 'old-refresh-token');
-        $envelope = new Envelope($command, 'msg-6');
-
-        $i->expectThrowable(
-            AuthenticationException::class,
-            static function () use ($handler, $envelope): void {
-                $handler($envelope);
-            },
-        );
-    }
-
-    public function testMissingTokenVersionInPayloadTreatedAsZero(UnitTester $i): void
-    {
-        $user = new User(
-            id: new Uuid('user-id-123'),
-            email: new Email('test@example.com'),
-            passwordHash: 'hashed_password',
-            createdAt: new \DateTimeImmutable('2024-01-01 12:00:00'),
-            status: UserStatus::Active,
-        );
-        // token payload has no tokenVersion field -- treated as 0, user has 1
-        $tokenGenerator = Stub::makeEmpty(TokenGenerator::class, [
-            'verify' => static fn(): array => ['userId' => 'user-id-123', 'type' => 'refresh'],
-        ]);
-
-        $users = Stub::makeEmpty(Users::class, [
-            'find' => static fn(): User => $user,
-        ]);
-
-        $handler = new Handler($tokenGenerator, $users, new TokenTtlConfig(7200, 2592000));
-
-        $command = new Command(refreshToken: 'legacy-refresh-token');
-        $envelope = new Envelope($command, 'msg-7');
-
-        $i->expectThrowable(
-            AuthenticationException::class,
             static function () use ($handler, $envelope): void {
                 $handler($envelope);
             },
