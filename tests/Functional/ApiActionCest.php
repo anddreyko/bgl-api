@@ -9,13 +9,15 @@ use Bgl\Core\Http\SchemaMapper;
 use Bgl\Core\Messages\Dispatcher;
 use Bgl\Core\Serialization\Serializer;
 use Bgl\Presentation\Api\ApiAction;
+use Bgl\Presentation\Api\CompiledRouteMap;
 use Bgl\Presentation\Api\InterceptorPipeline;
-use Bgl\Presentation\Api\RouteMap;
 use Bgl\Tests\Support\FunctionalTester;
 use Bgl\Tests\Support\Messages\Ping;
 use Codeception\Attribute\Group;
 use Codeception\Stub;
 use DI\Container;
+use EventSauce\ObjectHydrator\ObjectMapper;
+use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\ServerRequest;
 
@@ -27,7 +29,7 @@ final class ApiActionCest
 {
     public function testSuccessfulDispatchReturnsJson200(FunctionalTester $i): void
     {
-        $routeMap = new RouteMap([
+        $routeMap = new CompiledRouteMap([
             '/ping' => [
                 'get' => [
                     'x-message' => Ping::class,
@@ -51,11 +53,15 @@ final class ApiActionCest
             'validate' => static fn(): array => [],
         ]);
 
+        /** @var ObjectMapper $hydrator */
+        $hydrator = new ObjectMapperUsingReflection();
+
         $action = new ApiAction(
             routeMap: $routeMap,
             interceptorPipeline: $pipeline,
             requestValidator: $requestValidator,
             schemaMapper: $schemaMapper,
+            hydrator: $hydrator,
             dispatcher: $dispatcher,
             serializer: $serializer,
             responseFactory: new HttpFactory(),
@@ -76,7 +82,7 @@ final class ApiActionCest
 
     public function testRouteNotFoundReturns404(FunctionalTester $i): void
     {
-        $routeMap = new RouteMap([]);
+        $routeMap = new CompiledRouteMap([]);
 
         $pipeline = new InterceptorPipeline(new Container());
         $schemaMapper = Stub::makeEmpty(SchemaMapper::class);
@@ -87,11 +93,15 @@ final class ApiActionCest
             'validate' => static fn(): array => [],
         ]);
 
+        /** @var ObjectMapper $hydrator */
+        $hydrator = new ObjectMapperUsingReflection();
+
         $action = new ApiAction(
             routeMap: $routeMap,
             interceptorPipeline: $pipeline,
             requestValidator: $requestValidator,
             schemaMapper: $schemaMapper,
+            hydrator: $hydrator,
             dispatcher: $dispatcher,
             serializer: $serializer,
             responseFactory: new HttpFactory(),
@@ -112,7 +122,7 @@ final class ApiActionCest
 
     public function testHandlerExceptionReturns500(FunctionalTester $i): void
     {
-        $routeMap = new RouteMap([
+        $routeMap = new CompiledRouteMap([
             '/ping' => [
                 'get' => [
                     'x-message' => Ping::class,
@@ -138,11 +148,15 @@ final class ApiActionCest
             'validate' => static fn(): array => [],
         ]);
 
+        /** @var ObjectMapper $hydrator */
+        $hydrator = new ObjectMapperUsingReflection();
+
         $action = new ApiAction(
             routeMap: $routeMap,
             interceptorPipeline: $pipeline,
             requestValidator: $requestValidator,
             schemaMapper: $schemaMapper,
+            hydrator: $hydrator,
             dispatcher: $dispatcher,
             serializer: $serializer,
             responseFactory: new HttpFactory(),

@@ -7,32 +7,40 @@ use Bgl\Core\Http\SchemaMapper;
 use Bgl\Core\Messages\Dispatcher;
 use Bgl\Core\Serialization\Serializer;
 use Bgl\Presentation\Api\ApiAction;
+use Bgl\Presentation\Api\CompiledRouteMap;
 use Bgl\Presentation\Api\InterceptorPipeline;
-use Bgl\Presentation\Api\RouteMap;
+use EventSauce\ObjectHydrator\DefinitionProvider;
+use EventSauce\ObjectHydrator\KeyFormatterWithoutConversion;
+use EventSauce\ObjectHydrator\ObjectMapper;
+use EventSauce\ObjectHydrator\ObjectMapperUsingReflection;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Slim\Factory\AppFactory;
 
 return [
     ResponseFactoryInterface::class => AppFactory::determineResponseFactory(...),
-    RouteMap::class => static function (ContainerInterface $container): RouteMap {
+    CompiledRouteMap::class => static function (ContainerInterface $container): CompiledRouteMap {
         /** @var array{paths: array<string, array<string, mixed>>} $config */
         $config = $container->get('openapi');
 
-        return new RouteMap($config['paths'] ?? []);
+        return new CompiledRouteMap($config['paths'] ?? []);
     },
-    InterceptorPipeline::class => static function (ContainerInterface $container): InterceptorPipeline {
-        return new InterceptorPipeline($container);
-    },
+    InterceptorPipeline::class => static fn(ContainerInterface $container): InterceptorPipeline
+        => new InterceptorPipeline($container),
+    ObjectMapper::class => static fn(): ObjectMapper => new ObjectMapperUsingReflection(
+        new DefinitionProvider(keyFormatter: new KeyFormatterWithoutConversion()),
+    ),
     ApiAction::class => static function (ContainerInterface $container): ApiAction {
-        /** @var RouteMap $routeMap */
-        $routeMap = $container->get(RouteMap::class);
+        /** @var CompiledRouteMap $routeMap */
+        $routeMap = $container->get(CompiledRouteMap::class);
         /** @var InterceptorPipeline $interceptorPipeline */
         $interceptorPipeline = $container->get(InterceptorPipeline::class);
         /** @var RequestValidator $requestValidator */
         $requestValidator = $container->get(RequestValidator::class);
         /** @var SchemaMapper $schemaMapper */
         $schemaMapper = $container->get(SchemaMapper::class);
+        /** @var ObjectMapper $hydrator */
+        $hydrator = $container->get(ObjectMapper::class);
         /** @var Dispatcher $dispatcher */
         $dispatcher = $container->get(Dispatcher::class);
         /** @var Serializer $serializer */
@@ -45,6 +53,7 @@ return [
             interceptorPipeline: $interceptorPipeline,
             requestValidator: $requestValidator,
             schemaMapper: $schemaMapper,
+            hydrator: $hydrator,
             dispatcher: $dispatcher,
             serializer: $serializer,
             responseFactory: $responseFactory,

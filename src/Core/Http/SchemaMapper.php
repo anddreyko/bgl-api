@@ -9,10 +9,16 @@ use Psr\Http\Message\ServerRequestInterface;
 interface SchemaMapper
 {
     /**
-     * @param array<string, mixed> $schema OpenAPI requestBody schema properties
-     * @param array<string, string> $pathParams Path parameters extracted from URL
+     * @param array<string, string> $pathParams
+     * @param list<string> $authParams
+     * @param array<string, string> $paramMap
      *
-     * @return array<string, mixed> Mapped data for message constructor
+     * @return array<string, mixed>
      */
-    public function map(ServerRequestInterface $request, array $schema, array $pathParams = []): array;
+    public function map(
+        ServerRequestInterface $request,
+        array $pathParams = [],
+        array $authParams = [],
+        array $paramMap = [],
+    ): array;
 }

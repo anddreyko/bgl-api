@@ -13,13 +13,13 @@ return [
                     'summary' => 'Get user info',
                     'x-message' => GetUser\Query::class,
                     'x-interceptors' => [AuthInterceptor::class],
+                    'x-map' => ['id' => 'userId'],
                     'parameters' => [
                         [
                             'name' => 'id',
                             'in' => 'path',
                             'required' => true,
                             'schema' => ['type' => 'string'],
-                            'x-target' => 'userId',
                         ],
                     ],
                 ],

@@ -7,21 +7,21 @@ namespace Bgl\Presentation\Api;
 use Bgl\Core\Messages\Message;
 use Bgl\Presentation\Api\Interceptors\Interceptor;
 
-final readonly class MatchedOperation
+final readonly class CompiledOperation
 {
     /**
      * @param class-string<Message> $messageClass
      * @param list<class-string<Interceptor>> $interceptors
-     * @param array<string, string> $pathParams
-     * @param array<string, mixed> $schema
-     * @param array<string, mixed> $rawOperation Original OpenAPI operation definition
+     * @param list<string> $authParams
+     * @param array<string, string> $paramMap
+     * @param array<string, mixed> $openApiSchema
      */
     public function __construct(
         public string $messageClass,
         public array $interceptors = [],
-        public array $pathParams = [],
-        public array $schema = [],
-        public array $rawOperation = [],
+        public array $authParams = [],
+        public array $paramMap = [],
+        public array $openApiSchema = [],
     ) {
     }
 }

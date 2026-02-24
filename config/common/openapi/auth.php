@@ -94,22 +94,7 @@ return [
                     'summary' => 'Sign out',
                     'x-message' => SignOut\Command::class,
                     'x-interceptors' => [AuthInterceptor::class],
-                    'requestBody' => [
-                        'required' => false,
-                        'content' => [
-                            'application/json' => [
-                                'schema' => [
-                                    'type' => 'object',
-                                    'properties' => [
-                                        'userId' => [
-                                            'x-target' => 'userId',
-                                            'x-source' => 'attribute:auth.userId',
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
+                    'x-auth' => ['userId'],
                 ],
             ],
         ],

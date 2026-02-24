@@ -14,6 +14,7 @@ return [
                     'summary' => 'Open play session',
                     'x-message' => OpenSession\Command::class,
                     'x-interceptors' => [AuthInterceptor::class],
+                    'x-auth' => ['userId'],
                     'requestBody' => [
                         'required' => false,
                         'content' => [
@@ -21,10 +22,6 @@ return [
                                 'schema' => [
                                     'type' => 'object',
                                     'properties' => [
-                                        'userId' => [
-                                            'x-target' => 'userId',
-                                            'x-source' => 'attribute:auth.userId',
-                                        ],
                                         'name' => ['type' => 'string'],
                                     ],
                                 ],
@@ -38,13 +35,14 @@ return [
                     'summary' => 'Close play session',
                     'x-message' => CloseSession\Command::class,
                     'x-interceptors' => [AuthInterceptor::class],
+                    'x-map' => ['id' => 'sessionId'],
+                    'x-auth' => ['userId'],
                     'parameters' => [
                         [
                             'name' => 'id',
                             'in' => 'path',
                             'required' => true,
                             'schema' => ['type' => 'string'],
-                            'x-target' => 'sessionId',
                         ],
                     ],
                     'requestBody' => [
@@ -54,14 +52,9 @@ return [
                                 'schema' => [
                                     'type' => 'object',
                                     'properties' => [
-                                        'userId' => [
-                                            'x-target' => 'userId',
-                                            'x-source' => 'attribute:auth.userId',
-                                        ],
                                         'finishedAt' => [
                                             'type' => 'string',
                                             'format' => 'date-time',
-                                            'x-target' => 'finishedAt|datetime',
                                         ],
                                     ],
                                 ],

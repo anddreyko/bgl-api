@@ -11,6 +11,7 @@ use Bgl\Core\Messages\Dispatcher;
 use Bgl\Core\Serialization\Serializer;
 use Bgl\Presentation\Api\V1\Responses\ErrorResponse;
 use Bgl\Presentation\Api\V1\Responses\SuccessResponse;
+use EventSauce\ObjectHydrator\ObjectMapper;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -18,10 +19,11 @@ use Psr\Http\Message\ServerRequestInterface;
 final readonly class ApiAction
 {
     public function __construct(
-        private RouteMap $routeMap,
+        private CompiledRouteMap $routeMap,
         private InterceptorPipeline $interceptorPipeline,
         private RequestValidator $requestValidator,
         private SchemaMapper $schemaMapper,
+        private ObjectMapper $hydrator,
         private Dispatcher $dispatcher,
         private Serializer $serializer,
         private ResponseFactoryInterface $responseFactory,
@@ -56,23 +58,25 @@ final readonly class ApiAction
 
     private function doHandle(ServerRequestInterface $request): ResponseInterface
     {
-        $operation = $this->routeMap->match(
+        $matchResult = $this->routeMap->match(
             $request->getMethod(),
             $request->getUri()->getPath(),
         );
 
-        if ($operation === null) {
+        if ($matchResult === null) {
             return $this->jsonResponse(
                 new ErrorResponse(message: 'Not Found', httpStatus: 404),
             );
         }
 
+        $operation = $matchResult->operation;
+
         $request = $this->interceptorPipeline->process($request, $operation->interceptors);
 
         $validationErrors = $this->requestValidator->validate(
             $request,
-            $operation->rawOperation,
-            $operation->pathParams,
+            $operation->openApiSchema,
+            $matchResult->pathParams,
         );
 
         if ($validationErrors !== []) {
@@ -81,14 +85,21 @@ final readonly class ApiAction
             );
         }
 
-        $data = $this->schemaMapper->map($request, $operation->schema, $operation->pathParams);
+        $data = $this->schemaMapper->map(
+            $request,
+            $matchResult->pathParams,
+            $operation->authParams,
+            $operation->paramMap,
+        );
 
-        $message = new $operation->messageClass(...$data);
+        /** @var \Bgl\Core\Messages\Message $message */
+        $message = $this->hydrator->hydrateObject($operation->messageClass, $data);
         /** @var mixed $result */
         $result = $this->dispatcher->dispatch($message);
 
         if (is_object($result)) {
             $serialized = $this->serializer->serialize($result);
+
             return $this->jsonResponse(new SuccessResponse(data: $serialized));
         }
 

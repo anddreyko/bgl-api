@@ -33,6 +33,7 @@
         "doctrine/migrations": "^3.9",
         "doctrine/orm": "^3.5",
         "doctrine/persistence": "^4.1",
+        "eventsauce/object-hydrator": "^1.8",
         "laminas/laminas-config-aggregator": "^1.19",
         "lcobucci/jwt": "^5.6",
         "league/fractal": "^0.21.0",
