@@ -147,6 +147,9 @@ final readonly class JwtAuthenticator implements Authenticator
     private function issueTokenPair(User $user): TokenPair
     {
         $userId = $user->getId()->getValue();
+        if ($userId === null) {
+            throw new AuthenticationException('Unauthorized');
+        }
 
         $accessToken = $this->tokenGenerator->generate(
             ['userId' => $userId, 'type' => 'access', 'tokenVersion' => $user->getTokenVersion()],
