@@ -12,7 +12,7 @@ use Bgl\Core\Auth\InvalidRefreshTokenException;
 use Bgl\Core\Auth\TokenPair;
 use Bgl\Core\Auth\UserNotActiveException;
 use Bgl\Core\Security\PasswordHasher;
-use Bgl\Core\Security\TokenGenerator;
+use Bgl\Core\Security\Tokenizer;
 use Bgl\Core\Security\TokenTtlConfig;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Core\ValueObjects\Uuid;
@@ -61,7 +61,7 @@ final class JwtAuthenticatorCest
         $user = $this->makeUser();
 
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class, [
+            tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'generate' => Stub::consecutive('access-token', 'refresh-token'),
             ]),
             users: Stub::makeEmpty(Users::class, [
@@ -84,7 +84,7 @@ final class JwtAuthenticatorCest
     public function testLoginUserNotFoundThrows(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class),
+            tokenizer: Stub::makeEmpty(Tokenizer::class),
             users: Stub::makeEmpty(Users::class, [
                 'findByEmail' => static fn(): ?User => null,
             ]),
@@ -103,7 +103,7 @@ final class JwtAuthenticatorCest
     public function testLoginWrongPasswordThrows(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class),
+            tokenizer: Stub::makeEmpty(Tokenizer::class),
             users: Stub::makeEmpty(Users::class, [
                 'findByEmail' => fn(): User => $this->makeUser(),
             ]),
@@ -124,7 +124,7 @@ final class JwtAuthenticatorCest
     public function testLoginInactiveUserThrows(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class),
+            tokenizer: Stub::makeEmpty(Tokenizer::class),
             users: Stub::makeEmpty(Users::class, [
                 'findByEmail' => fn(): User => $this->makeUser(UserStatus::Inactive),
             ]),
@@ -149,7 +149,7 @@ final class JwtAuthenticatorCest
         $user = $this->makeUser();
 
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class, [
+            tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): array => [
                     'userId' => 'user-id-123',
                     'type' => 'refresh',
@@ -175,7 +175,7 @@ final class JwtAuthenticatorCest
     public function testRefreshInvalidTokenThrows(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class, [
+            tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static function (): never {
                     throw new \RuntimeException('Invalid token');
                 },
@@ -196,7 +196,7 @@ final class JwtAuthenticatorCest
     public function testRefreshWrongTypeThrows(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class, [
+            tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): array => [
                     'userId' => 'user-id-123',
                     'type' => 'access',
@@ -218,7 +218,7 @@ final class JwtAuthenticatorCest
     public function testRefreshMissingTypeThrows(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class, [
+            tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): array => ['userId' => 'user-id-123'],
             ]),
             users: Stub::makeEmpty(Users::class),
@@ -237,7 +237,7 @@ final class JwtAuthenticatorCest
     public function testRefreshUserNotFoundThrows(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class, [
+            tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): array => [
                     'userId' => 'nonexistent',
                     'type' => 'refresh',
@@ -262,7 +262,7 @@ final class JwtAuthenticatorCest
     public function testRefreshInactiveUserThrows(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class, [
+            tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): array => [
                     'userId' => 'user-id-123',
                     'type' => 'refresh',
@@ -287,7 +287,7 @@ final class JwtAuthenticatorCest
     public function testRefreshTokenVersionMismatchThrows(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class, [
+            tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): array => [
                     'userId' => 'user-id-123',
                     'type' => 'refresh',
@@ -317,7 +317,7 @@ final class JwtAuthenticatorCest
         $i->assertSame(1, $user->getTokenVersion());
 
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class),
+            tokenizer: Stub::makeEmpty(Tokenizer::class),
             users: Stub::makeEmpty(Users::class, [
                 'find' => static fn(): User => $user,
             ]),
@@ -333,7 +333,7 @@ final class JwtAuthenticatorCest
     public function testRevokeUserNotFoundThrows(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class),
+            tokenizer: Stub::makeEmpty(Tokenizer::class),
             users: Stub::makeEmpty(Users::class, [
                 'find' => static fn(): ?User => null,
             ]),
@@ -354,7 +354,7 @@ final class JwtAuthenticatorCest
     public function testVerifySuccessful(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class, [
+            tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): array => [
                     'userId' => 'user-id-123',
                     'type' => 'access',
@@ -377,7 +377,7 @@ final class JwtAuthenticatorCest
     public function testVerifyInvalidTokenThrows(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class, [
+            tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static function (): never {
                     throw new \RuntimeException('Token expired', 42);
                 },
@@ -399,7 +399,7 @@ final class JwtAuthenticatorCest
     public function testVerifyRefreshTypeThrows(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class, [
+            tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): array => [
                     'userId' => 'user-id-123',
                     'type' => 'refresh',
@@ -421,7 +421,7 @@ final class JwtAuthenticatorCest
     public function testVerifyTokenWithoutTypeIsAccepted(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class, [
+            tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): array => [
                     'userId' => 'user-id-123',
                     'tokenVersion' => 1,
@@ -442,7 +442,7 @@ final class JwtAuthenticatorCest
     public function testVerifyMissingUserIdThrows(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class, [
+            tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): array => ['type' => 'access'],
             ]),
             users: Stub::makeEmpty(Users::class),
@@ -461,7 +461,7 @@ final class JwtAuthenticatorCest
     public function testVerifyUserNotFoundThrows(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class, [
+            tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): array => [
                     'userId' => 'nonexistent',
                     'type' => 'access',
@@ -486,7 +486,7 @@ final class JwtAuthenticatorCest
     public function testVerifyInactiveUserThrows(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class, [
+            tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): array => [
                     'userId' => 'user-id-123',
                     'type' => 'access',
@@ -511,7 +511,7 @@ final class JwtAuthenticatorCest
     public function testVerifyTokenVersionMismatchThrows(UnitTester $i): void
     {
         $authenticator = new JwtAuthenticator(
-            tokenGenerator: Stub::makeEmpty(TokenGenerator::class, [
+            tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): array => [
                     'userId' => 'user-id-123',
                     'type' => 'access',

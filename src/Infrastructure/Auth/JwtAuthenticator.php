@@ -13,7 +13,7 @@ use Bgl\Core\Auth\InvalidRefreshTokenException;
 use Bgl\Core\Auth\TokenPair;
 use Bgl\Core\Auth\UserNotActiveException;
 use Bgl\Core\Security\PasswordHasher;
-use Bgl\Core\Security\TokenGenerator;
+use Bgl\Core\Security\Tokenizer;
 use Bgl\Core\Security\TokenTtlConfig;
 use Bgl\Domain\Auth\Entities\User;
 use Bgl\Domain\Auth\Entities\Users;
@@ -25,7 +25,7 @@ use Bgl\Domain\Auth\Entities\UserStatus;
 final readonly class JwtAuthenticator implements Authenticator
 {
     public function __construct(
-        private TokenGenerator $tokenGenerator,
+        private Tokenizer $tokenizer,
         private Users $users,
         private PasswordHasher $passwordHasher,
         private TokenTtlConfig $tokenTtlConfig,
@@ -103,7 +103,7 @@ final readonly class JwtAuthenticator implements Authenticator
     private function verifyToken(string $token): array
     {
         try {
-            return $this->tokenGenerator->verify($token);
+            return $this->tokenizer->verify($token);
         } catch (\RuntimeException $e) {
             throw new AuthenticationException($e->getMessage(), (int) $e->getCode(), $e);
         }
@@ -151,12 +151,12 @@ final readonly class JwtAuthenticator implements Authenticator
             throw new AuthenticationException('Unauthorized');
         }
 
-        $accessToken = $this->tokenGenerator->generate(
+        $accessToken = $this->tokenizer->generate(
             ['userId' => $userId, 'type' => 'access', 'tokenVersion' => $user->getTokenVersion()],
             $this->tokenTtlConfig->accessTtl,
         );
 
-        $refreshToken = $this->tokenGenerator->generate(
+        $refreshToken = $this->tokenizer->generate(
             ['userId' => $userId, 'type' => 'refresh', 'tokenVersion' => $user->getTokenVersion()],
             $this->tokenTtlConfig->refreshTtl,
         );

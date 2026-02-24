@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Core\Security;
 
-interface TokenGenerator
+interface Tokenizer
 {
     /**
      * @param array<string, mixed> $payload

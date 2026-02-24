@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Security;
 
-use Bgl\Core\Security\TokenGenerator;
+use Bgl\Core\Security\Tokenizer;
 use Psr\Clock\ClockInterface;
 
 /**
- * @see \Bgl\Tests\Unit\Infrastructure\Security\PlainTokenGeneratorCest
+ * @see \Bgl\Tests\Unit\Infrastructure\Security\PlainTokenizerCest
  */
-final readonly class PlainTokenGenerator implements TokenGenerator
+final readonly class PlainTokenizer implements Tokenizer
 {
     public function __construct(
         private ClockInterface $clock,

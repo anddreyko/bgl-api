@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Security;
 
-use Bgl\Core\Security\TokenGenerator;
+use Bgl\Core\Security\Tokenizer;
 use Lcobucci\JWT\JwtFacade;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
@@ -13,9 +13,9 @@ use Lcobucci\JWT\Validation\Constraint;
 use Psr\Clock\ClockInterface;
 
 /**
- * @see \Bgl\Tests\Unit\Infrastructure\Security\JwtTokenGeneratorCest
+ * @see \Bgl\Tests\Unit\Infrastructure\Security\JwtTokenizerCest
  */
-final readonly class JwtTokenGenerator implements TokenGenerator
+final readonly class JwtTokenizer implements Tokenizer
 {
     private Sha256 $signer;
     private InMemory $key;

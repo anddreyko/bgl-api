@@ -5,23 +5,23 @@ declare(strict_types=1);
 namespace Bgl\Tests\Unit\Infrastructure\Security;
 
 use Bgl\Core\Clock;
-use Bgl\Infrastructure\Security\JwtTokenGenerator;
+use Bgl\Infrastructure\Security\JwtTokenizer;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 
 /**
- * @covers \Bgl\Infrastructure\Security\JwtTokenGenerator
+ * @covers \Bgl\Infrastructure\Security\JwtTokenizer
  */
-#[Group('core', 'security', 'tokenGenerator')]
-final class JwtTokenGeneratorCest
+#[Group('core', 'security', 'tokenizer')]
+final class JwtTokenizerCest
 {
-    private JwtTokenGenerator $generator;
+    private JwtTokenizer $generator;
     private Clock $clock;
 
     public function _before(): void
     {
         $this->clock = new Clock(stub: new \DateTimeImmutable('2024-06-01 12:00:00', new \DateTimeZone('UTC')));
-        $this->generator = new JwtTokenGenerator(
+        $this->generator = new JwtTokenizer(
             secret: 'test-secret-key-that-is-long-enough-for-hmac',
             clock: $this->clock,
         );
@@ -50,14 +50,14 @@ final class JwtTokenGeneratorCest
     public function testExpiredTokenThrowsException(UnitTester $i): void
     {
         $pastClock = new Clock(stub: new \DateTimeImmutable('2024-01-01 00:00:00', new \DateTimeZone('UTC')));
-        $pastGenerator = new JwtTokenGenerator(
+        $pastGenerator = new JwtTokenizer(
             secret: 'test-secret-key-that-is-long-enough-for-hmac',
             clock: $pastClock,
         );
         $token = $pastGenerator->generate(['user_id' => '123'], 60);
 
         $futureClock = new Clock(stub: new \DateTimeImmutable('2024-06-01 00:00:00', new \DateTimeZone('UTC')));
-        $futureGenerator = new JwtTokenGenerator(
+        $futureGenerator = new JwtTokenizer(
             secret: 'test-secret-key-that-is-long-enough-for-hmac',
             clock: $futureClock,
         );

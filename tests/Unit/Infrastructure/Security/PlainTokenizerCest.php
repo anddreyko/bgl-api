@@ -5,23 +5,23 @@ declare(strict_types=1);
 namespace Bgl\Tests\Unit\Infrastructure\Security;
 
 use Bgl\Core\Clock;
-use Bgl\Infrastructure\Security\PlainTokenGenerator;
+use Bgl\Infrastructure\Security\PlainTokenizer;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 
 /**
- * @covers \Bgl\Infrastructure\Security\PlainTokenGenerator
+ * @covers \Bgl\Infrastructure\Security\PlainTokenizer
  */
-#[Group('core', 'security', 'tokenGenerator')]
-final class PlainTokenGeneratorCest
+#[Group('core', 'security', 'tokenizer')]
+final class PlainTokenizerCest
 {
-    private PlainTokenGenerator $generator;
+    private PlainTokenizer $generator;
     private Clock $clock;
 
     public function _before(): void
     {
         $this->clock = new Clock(stub: new \DateTimeImmutable('2024-06-01 12:00:00', new \DateTimeZone('UTC')));
-        $this->generator = new PlainTokenGenerator(clock: $this->clock);
+        $this->generator = new PlainTokenizer(clock: $this->clock);
     }
 
     public function testGenerateAndVerifyRoundtrip(UnitTester $i): void
@@ -39,11 +39,11 @@ final class PlainTokenGeneratorCest
     public function testExpiredTokenThrowsException(UnitTester $i): void
     {
         $pastClock = new Clock(stub: new \DateTimeImmutable('2024-01-01 00:00:00', new \DateTimeZone('UTC')));
-        $pastGenerator = new PlainTokenGenerator(clock: $pastClock);
+        $pastGenerator = new PlainTokenizer(clock: $pastClock);
         $token = $pastGenerator->generate(['user_id' => '456'], 60);
 
         $futureClock = new Clock(stub: new \DateTimeImmutable('2024-06-01 00:00:00', new \DateTimeZone('UTC')));
-        $futureGenerator = new PlainTokenGenerator(clock: $futureClock);
+        $futureGenerator = new PlainTokenizer(clock: $futureClock);
 
         $i->expectThrowable(\RuntimeException::class, static function () use ($futureGenerator, $token): void {
             $futureGenerator->verify($token);
