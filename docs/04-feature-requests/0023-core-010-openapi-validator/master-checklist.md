@@ -38,11 +38,11 @@
   - After hydrating Command: call `$this->inputValidator->validate($command)`
   - If `ValidationResult::hasErrors()`, return 422 with structured errors
 - [ ] Update DI config: remove RequestValidator binding, add InputValidator if not already bound
-- [ ] Write tests:
+- [ ] Write functional tests in `tests/Functional/` (Application layer -> Functional suite per ADR-015):
   - Valid request passes both middleware and attribute validation
   - Invalid body rejected by League middleware (400)
   - Valid body but invalid attribute (e.g. short password) rejected by AttributeInputValidator (422)
-- [ ] Verify: `composer lp:run && composer ps:run && composer test:unit`
+- [ ] Verify: `composer lp:run && composer ps:run && composer test:func`
 - [ ] Run `composer test:web` -- E2E must pass
 
 ---

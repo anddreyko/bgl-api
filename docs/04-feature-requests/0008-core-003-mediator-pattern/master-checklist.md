@@ -36,20 +36,14 @@ ApiAction, RouteMap, InterceptorPipeline, SchemaMapper, MatchedOperation are ALR
 
 ## Stage 3: Tests for ApiAction Flow
 
-- [ ] Create `tests/Functional/ApiAction/ApiActionCest.php` (or similar)
+> Note: RouteMap and OpenApiSchemaMapper were replaced by CompiledRouteMap and HydratorMapper in CORE-009 (FR-0022).
+> Their tests already exist. Only ApiAction functional test remains.
+
+- [ ] Create `tests/Functional/ApiAction/ApiActionCest.php` (Application layer -> Functional suite per ADR-015)
   - Test: successful dispatch returns JSON response
   - Test: route not found returns 404
   - Test: method not allowed returns 405
   - Test: handler exception returns error response
-- [ ] Create `tests/Unit/Presentation/RouteMapCest.php`
-  - Test: path matching with parameters
-  - Test: method matching
-  - Test: no match returns null
-  - Test: extracts x-message, x-interceptors, schema
-- [ ] Create `tests/Unit/Presentation/InterceptorPipelineCest.php`
-  - Test: empty pipeline returns request unchanged
-  - Test: interceptor modifies request
-  - Test: multiple interceptors chain correctly
 - [ ] Run all tests -- confirm they PASS
 
 ## Stage 4: Quality Gates

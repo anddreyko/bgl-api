@@ -32,11 +32,11 @@
 
 **Dependencies:** Stage 1
 
-- [ ] Write unit test for strip logic:
+- [ ] Write unit test in `tests/Unit/` for strip logic (pure function, no deps -> Unit suite per ADR-015):
   - Internal extensions removed (`x-message`, `x-interceptors`, `x-auth`, `x-map`)
   - Standard OpenAPI fields preserved (`summary`, `requestBody`, `parameters`)
   - Nested properties not affected
-- [ ] Write CLI test:
+- [ ] Write CLI acceptance test in `tests/Cli/` (Presentation layer -> Cli suite per ADR-015):
   - Command executes successfully
   - Output file exists and is valid JSON
   - Output contains expected paths
