@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Domain\Auth\Entities;
+namespace Bgl\Domain\Profile\Entities;
 
 final readonly class UserId
 {

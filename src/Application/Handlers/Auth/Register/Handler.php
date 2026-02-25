@@ -9,11 +9,11 @@ use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Core\Security\PasswordHasher;
 use Bgl\Core\ValueObjects\Email;
-use Bgl\Domain\Auth\Entities\EmailConfirmationToken;
-use Bgl\Domain\Auth\Entities\EmailConfirmationTokens;
-use Bgl\Domain\Auth\Entities\User;
-use Bgl\Domain\Auth\Entities\Users;
-use Bgl\Domain\Auth\Exceptions\UserAlreadyExistsException;
+use Bgl\Domain\Profile\Entities\EmailConfirmationToken;
+use Bgl\Domain\Profile\Entities\EmailConfirmationTokens;
+use Bgl\Domain\Profile\Entities\User;
+use Bgl\Domain\Profile\Entities\Users;
+use Bgl\Domain\Profile\Exceptions\UserAlreadyExistsException;
 use Psr\Clock\ClockInterface;
 
 /**

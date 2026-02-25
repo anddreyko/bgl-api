@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Unit\Infrastructure\Persistence\Doctrine\Mapping;
 
-use Bgl\Domain\Auth\Entities\User;
+use Bgl\Domain\Profile\Entities\User;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\UserMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\PhpMappingDriver;
 use Bgl\Tests\Support\UnitTester;

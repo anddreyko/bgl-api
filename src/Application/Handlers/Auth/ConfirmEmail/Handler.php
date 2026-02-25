@@ -6,10 +6,10 @@ namespace Bgl\Application\Handlers\Auth\ConfirmEmail;
 
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
-use Bgl\Domain\Auth\Entities\EmailConfirmationTokens;
-use Bgl\Domain\Auth\Entities\Users;
-use Bgl\Domain\Auth\Exceptions\ExpiredConfirmationTokenException;
-use Bgl\Domain\Auth\Exceptions\InvalidConfirmationTokenException;
+use Bgl\Domain\Profile\Entities\EmailConfirmationTokens;
+use Bgl\Domain\Profile\Entities\Users;
+use Bgl\Domain\Profile\Exceptions\ExpiredConfirmationTokenException;
+use Bgl\Domain\Profile\Exceptions\InvalidConfirmationTokenException;
 use Psr\Clock\ClockInterface;
 
 /**

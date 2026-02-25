@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\InMemory;
 
-use Bgl\Domain\Auth\Entities\User;
-use Bgl\Domain\Auth\Entities\Users as UsersInterface;
+use Bgl\Domain\Profile\Entities\User;
+use Bgl\Domain\Profile\Entities\Users as UsersInterface;
 
 /**
  * @extends InMemoryRepository<User>

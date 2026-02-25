@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Domain\Auth\Exceptions;
+namespace Bgl\Domain\Profile\Exceptions;
 
 final class ExpiredConfirmationTokenException extends \DomainException
 {

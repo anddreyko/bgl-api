@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\Doctrine;
 
-use Bgl\Domain\Auth\Entities\EmailConfirmationToken;
-use Bgl\Domain\Auth\Entities\EmailConfirmationTokens as EmailConfirmationTokensInterface;
+use Bgl\Domain\Profile\Entities\EmailConfirmationToken;
+use Bgl\Domain\Profile\Entities\EmailConfirmationTokens as EmailConfirmationTokensInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class EmailConfirmationTokens implements EmailConfirmationTokensInterface

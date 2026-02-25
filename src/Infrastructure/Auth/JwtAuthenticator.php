@@ -15,9 +15,9 @@ use Bgl\Core\Auth\UserNotActiveException;
 use Bgl\Core\Security\PasswordHasher;
 use Bgl\Core\Security\Tokenizer;
 use Bgl\Core\Security\TokenTtlConfig;
-use Bgl\Domain\Auth\Entities\User;
-use Bgl\Domain\Auth\Entities\Users;
-use Bgl\Domain\Auth\Entities\UserStatus;
+use Bgl\Domain\Profile\Entities\User;
+use Bgl\Domain\Profile\Entities\Users;
+use Bgl\Domain\Profile\Entities\UserStatus;
 
 /**
  * @see \Bgl\Tests\Unit\Infrastructure\Auth\JwtAuthenticatorCest

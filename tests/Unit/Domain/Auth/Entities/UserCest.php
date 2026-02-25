@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Tests\Unit\Domain\Auth\Entities;
+namespace Bgl\Tests\Unit\Domain\Profile\Entities;
 
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Auth\Entities\User;
-use Bgl\Domain\Auth\Entities\UserStatus;
+use Bgl\Domain\Profile\Entities\User;
+use Bgl\Domain\Profile\Entities\UserStatus;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 
 /**
- * @covers \Bgl\Domain\Auth\Entities\User
+ * @covers \Bgl\Domain\Profile\Entities\User
  */
 #[Group('auth', 'domain', 'entity')]
 final class UserCest

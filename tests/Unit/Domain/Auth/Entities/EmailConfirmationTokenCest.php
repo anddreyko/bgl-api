@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Tests\Unit\Domain\Auth\Entities;
+namespace Bgl\Tests\Unit\Domain\Profile\Entities;
 
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Auth\Entities\EmailConfirmationToken;
+use Bgl\Domain\Profile\Entities\EmailConfirmationToken;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 
 /**
- * @covers \Bgl\Domain\Auth\Entities\EmailConfirmationToken
+ * @covers \Bgl\Domain\Profile\Entities\EmailConfirmationToken
  */
 #[Group('auth', 'domain', 'entity')]
 final class EmailConfirmationTokenCest

@@ -64,7 +64,7 @@ documents:
             -   type: tree
                 description: 'Domain'
                 sourcePaths:
-                    - src/Domain/Auth
+                    - src/Domain/Profile
                 filePattern: '*'
                 renderFormat: ascii
                 enabled: true
