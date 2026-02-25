@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\EmailConfirmationTokenMapping;
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\PasskeyChallengeMapping;
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\PasskeyMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\UserMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\PhpMappingDriver;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\PlayMapping;
@@ -59,9 +61,11 @@ return [
             'charset' => 'utf-8',
         ],
         'mapping' => new PhpMappingDriver([
-            new UserMapping(),
-            new EmailConfirmationTokenMapping(),
-            new PlayMapping(),
+            UserMapping::class,
+            EmailConfirmationTokenMapping::class,
+            PasskeyMapping::class,
+            PasskeyChallengeMapping::class,
+            PlayMapping::class,
         ]),
     ],
 ];
