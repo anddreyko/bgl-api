@@ -3,6 +3,7 @@
 
 declare(strict_types=1);
 
+use Bgl\Presentation\Console\Commands\OpenApiExportCommand;
 use Doctrine\ORM\Tools\Console\ConsoleRunner;
 use Doctrine\ORM\Tools\Console\EntityManagerProvider\SingleManagerProvider;
 
@@ -13,5 +14,7 @@ $container = require __DIR__ . '/../config/container.php';
 
 /** @var list<\Symfony\Component\Console\Command\Command> $migrationCommands */
 $migrationCommands = $container->get('migrations:commands');
+
+$migrationCommands[] = $container->get(OpenApiExportCommand::class);
 
 ConsoleRunner::run($container->get(SingleManagerProvider::class), $migrationCommands);

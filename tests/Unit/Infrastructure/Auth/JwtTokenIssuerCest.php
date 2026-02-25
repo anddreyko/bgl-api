@@ -49,7 +49,7 @@ final class JwtTokenIssuerCest
                 'generate' => Stub::consecutive('access-token', 'refresh-token'),
             ]),
             users: Stub::makeEmpty(Users::class, [
-                'find' => fn(): User => $this->makeUser(),
+                'find' => $this->makeUser(...),
             ]),
             tokenConfig: $this->tokenConfig,
         );

@@ -40,10 +40,12 @@ return [
 
         return new OpenApi($config);
     },
-    LeagueServerRequestValidator::class => static function (ContainerInterface $container): LeagueServerRequestValidator {
+    LeagueServerRequestValidator::class => static function (
+        ContainerInterface $container,
+    ): LeagueServerRequestValidator {
         /** @var OpenApi $schema */
         $schema = $container->get(OpenApi::class);
 
-        return (new ValidatorBuilder())->fromSchema($schema)->getServerRequestValidator();
+        return new ValidatorBuilder()->fromSchema($schema)->getServerRequestValidator();
     },
 ];

@@ -12,7 +12,7 @@ final class Passkey
         public Uuid $id,
         private readonly Uuid $userId,
         private readonly string $credentialId,
-        private string $credentialData,
+        private readonly string $credentialData,
         private int $counter,
         private readonly \DateTimeImmutable $createdAt,
         private readonly ?string $label = null,

@@ -80,7 +80,7 @@ final class LeagueRequestValidatorCest
         ]);
 
         /** @var LeagueServerRequestValidator $leagueValidator */
-        $leagueValidator = (new ValidatorBuilder())->fromSchema($spec)->getServerRequestValidator();
+        $leagueValidator = new ValidatorBuilder()->fromSchema($spec)->getServerRequestValidator();
         $this->validator = new LeagueRequestValidator($leagueValidator);
     }
 
