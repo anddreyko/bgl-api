@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace Bgl\Tests\Unit\Infrastructure\Auth;
 
 use Bgl\Core\Auth\AuthenticationException;
-use Bgl\Core\Auth\AuthPayload;
 use Bgl\Core\Auth\EmailNotConfirmedException;
 use Bgl\Core\Auth\InvalidCredentialsException;
 use Bgl\Core\Auth\InvalidRefreshTokenException;
+use Bgl\Core\Auth\TokenIssuer;
 use Bgl\Core\Auth\TokenPair;
 use Bgl\Core\Auth\UserNotActiveException;
 use Bgl\Core\Security\Hasher;
 use Bgl\Core\Security\Tokenizer;
-use Bgl\Core\Security\TokenConfig;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Profile\Entities\User;
@@ -30,13 +29,6 @@ use Codeception\Stub;
 #[Group('auth')]
 final class JwtAuthenticatorCest
 {
-    private TokenConfig $ttlConfig;
-
-    public function _before(): void
-    {
-        $this->ttlConfig = new TokenConfig(7200, 2592000);
-    }
-
     private function makeUser(UserStatus $status = UserStatus::Active, int $tokenVersion = 1): User
     {
         $user = new User(
@@ -54,28 +46,30 @@ final class JwtAuthenticatorCest
         return $user;
     }
 
-    // -- login --
+    private function makeTokenIssuer(): TokenIssuer
+    {
+        return Stub::makeEmpty(TokenIssuer::class, [
+            'issue' => static fn(): TokenPair => new TokenPair('access-token', 'refresh-token', 7200),
+        ]);
+    }
 
     public function testLoginSuccessful(UnitTester $i): void
     {
         $user = $this->makeUser();
 
         $authenticator = new JwtAuthenticator(
-            tokenizer: Stub::makeEmpty(Tokenizer::class, [
-                'generate' => Stub::consecutive('access-token', 'refresh-token'),
-            ]),
+            tokenizer: Stub::makeEmpty(Tokenizer::class),
             users: Stub::makeEmpty(Users::class, [
                 'findByEmail' => static fn(): User => $user,
             ]),
             passwordHasher: Stub::makeEmpty(Hasher::class, [
                 'verify' => static fn(): bool => true,
             ]),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $result = $authenticator->login('test@example.com', 'secret123');
 
-        $i->assertInstanceOf(TokenPair::class, $result);
         $i->assertSame('access-token', $result->accessToken);
         $i->assertSame('refresh-token', $result->refreshToken);
         $i->assertSame(7200, $result->expiresIn);
@@ -89,7 +83,7 @@ final class JwtAuthenticatorCest
                 'findByEmail' => static fn(): ?User => null,
             ]),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $i->expectThrowable(
@@ -110,7 +104,7 @@ final class JwtAuthenticatorCest
             passwordHasher: Stub::makeEmpty(Hasher::class, [
                 'verify' => static fn(): bool => false,
             ]),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $i->expectThrowable(
@@ -131,7 +125,7 @@ final class JwtAuthenticatorCest
             passwordHasher: Stub::makeEmpty(Hasher::class, [
                 'verify' => static fn(): bool => true,
             ]),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $i->expectThrowable(
@@ -141,8 +135,6 @@ final class JwtAuthenticatorCest
             },
         );
     }
-
-    // -- refresh --
 
     public function testRefreshSuccessful(UnitTester $i): void
     {
@@ -155,20 +147,18 @@ final class JwtAuthenticatorCest
                     'type' => 'refresh',
                     'tokenVersion' => 1,
                 ],
-                'generate' => Stub::consecutive('new-access', 'new-refresh'),
             ]),
             users: Stub::makeEmpty(Users::class, [
                 'find' => static fn(): User => $user,
             ]),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $result = $authenticator->refresh('old-refresh-token');
 
-        $i->assertInstanceOf(TokenPair::class, $result);
-        $i->assertSame('new-access', $result->accessToken);
-        $i->assertSame('new-refresh', $result->refreshToken);
+        $i->assertSame('access-token', $result->accessToken);
+        $i->assertSame('refresh-token', $result->refreshToken);
         $i->assertSame(7200, $result->expiresIn);
     }
 
@@ -182,7 +172,7 @@ final class JwtAuthenticatorCest
             ]),
             users: Stub::makeEmpty(Users::class),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $i->expectThrowable(
@@ -204,7 +194,7 @@ final class JwtAuthenticatorCest
             ]),
             users: Stub::makeEmpty(Users::class),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $i->expectThrowable(
@@ -223,7 +213,7 @@ final class JwtAuthenticatorCest
             ]),
             users: Stub::makeEmpty(Users::class),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $i->expectThrowable(
@@ -248,7 +238,7 @@ final class JwtAuthenticatorCest
                 'find' => static fn(): ?User => null,
             ]),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $i->expectThrowable(
@@ -273,7 +263,7 @@ final class JwtAuthenticatorCest
                 'find' => fn(): User => $this->makeUser(UserStatus::Inactive),
             ]),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $i->expectThrowable(
@@ -298,7 +288,7 @@ final class JwtAuthenticatorCest
                 'find' => fn(): User => $this->makeUser(),
             ]),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $i->expectThrowable(
@@ -308,8 +298,6 @@ final class JwtAuthenticatorCest
             },
         );
     }
-
-    // -- revoke --
 
     public function testRevokeIncrementsTokenVersion(UnitTester $i): void
     {
@@ -322,7 +310,7 @@ final class JwtAuthenticatorCest
                 'find' => static fn(): User => $user,
             ]),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $authenticator->revoke('user-id-123');
@@ -338,7 +326,7 @@ final class JwtAuthenticatorCest
                 'find' => static fn(): ?User => null,
             ]),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $i->expectThrowable(
@@ -348,8 +336,6 @@ final class JwtAuthenticatorCest
             },
         );
     }
-
-    // -- verify --
 
     public function testVerifySuccessful(UnitTester $i): void
     {
@@ -365,12 +351,11 @@ final class JwtAuthenticatorCest
                 'find' => fn(): User => $this->makeUser(),
             ]),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $result = $authenticator->verify('valid-access-token');
 
-        $i->assertInstanceOf(AuthPayload::class, $result);
         $i->assertSame('user-id-123', $result->userId);
     }
 
@@ -384,7 +369,7 @@ final class JwtAuthenticatorCest
             ]),
             users: Stub::makeEmpty(Users::class),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         try {
@@ -407,7 +392,7 @@ final class JwtAuthenticatorCest
             ]),
             users: Stub::makeEmpty(Users::class),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $i->expectThrowable(
@@ -431,7 +416,7 @@ final class JwtAuthenticatorCest
                 'find' => fn(): User => $this->makeUser(),
             ]),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $result = $authenticator->verify('legacy-token');
@@ -447,7 +432,7 @@ final class JwtAuthenticatorCest
             ]),
             users: Stub::makeEmpty(Users::class),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $i->expectThrowable(
@@ -472,7 +457,7 @@ final class JwtAuthenticatorCest
                 'find' => static fn(): ?User => null,
             ]),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $i->expectThrowable(
@@ -497,7 +482,7 @@ final class JwtAuthenticatorCest
                 'find' => fn(): User => $this->makeUser(UserStatus::Inactive),
             ]),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $i->expectThrowable(
@@ -522,7 +507,7 @@ final class JwtAuthenticatorCest
                 'find' => fn(): User => $this->makeUser(tokenVersion: 2),
             ]),
             passwordHasher: Stub::makeEmpty(Hasher::class),
-            tokenTtlConfig: $this->ttlConfig,
+            tokenIssuer: $this->makeTokenIssuer(),
         );
 
         $i->expectThrowable(

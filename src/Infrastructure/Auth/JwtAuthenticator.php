@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Bgl\Infrastructure\Auth;
 
 use Bgl\Core\Auth\AuthenticationException;
-use Bgl\Core\Auth\AuthPayload;
 use Bgl\Core\Auth\Authenticator;
+use Bgl\Core\Auth\AuthPayload;
 use Bgl\Core\Auth\EmailNotConfirmedException;
 use Bgl\Core\Auth\InvalidCredentialsException;
 use Bgl\Core\Auth\InvalidRefreshTokenException;
+use Bgl\Core\Auth\TokenIssuer;
 use Bgl\Core\Auth\TokenPair;
 use Bgl\Core\Auth\UserNotActiveException;
 use Bgl\Core\Security\Hasher;
 use Bgl\Core\Security\Tokenizer;
-use Bgl\Core\Security\TokenConfig;
 use Bgl\Domain\Profile\Entities\User;
 use Bgl\Domain\Profile\Entities\Users;
 use Bgl\Domain\Profile\Entities\UserStatus;
@@ -28,7 +28,7 @@ final readonly class JwtAuthenticator implements Authenticator
         private Tokenizer $tokenizer,
         private Users $users,
         private Hasher $passwordHasher,
-        private TokenConfig $tokenTtlConfig,
+        private TokenIssuer $tokenIssuer,
     ) {
     }
 
@@ -48,7 +48,12 @@ final readonly class JwtAuthenticator implements Authenticator
             throw new EmailNotConfirmedException();
         }
 
-        return $this->issueTokenPair($user);
+        $userId = $user->getId()->getValue();
+        if ($userId === null) {
+            throw new AuthenticationException('Unauthorized');
+        }
+
+        return $this->tokenIssuer->issue($userId);
     }
 
     #[\Override]
@@ -63,7 +68,12 @@ final readonly class JwtAuthenticator implements Authenticator
         $user = $this->findUserFromPayload($payload);
         $this->checkTokenVersion($payload, $user);
 
-        return $this->issueTokenPair($user);
+        $userId = $user->getId()->getValue();
+        if ($userId === null) {
+            throw new AuthenticationException('Unauthorized');
+        }
+
+        return $this->tokenIssuer->issue($userId);
     }
 
     #[\Override]
@@ -142,29 +152,5 @@ final readonly class JwtAuthenticator implements Authenticator
         if ($payloadVersion !== $user->getTokenVersion()) {
             throw new AuthenticationException('Token has been revoked');
         }
-    }
-
-    private function issueTokenPair(User $user): TokenPair
-    {
-        $userId = $user->getId()->getValue();
-        if ($userId === null) {
-            throw new AuthenticationException('Unauthorized');
-        }
-
-        $accessToken = $this->tokenizer->generate(
-            ['userId' => $userId, 'type' => 'access', 'tokenVersion' => $user->getTokenVersion()],
-            $this->tokenTtlConfig->accessTtl,
-        );
-
-        $refreshToken = $this->tokenizer->generate(
-            ['userId' => $userId, 'type' => 'refresh', 'tokenVersion' => $user->getTokenVersion()],
-            $this->tokenTtlConfig->refreshTtl,
-        );
-
-        return new TokenPair(
-            accessToken: $accessToken,
-            refreshToken: $refreshToken,
-            expiresIn: $this->tokenTtlConfig->accessTtl,
-        );
     }
 }
