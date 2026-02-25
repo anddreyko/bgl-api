@@ -33,19 +33,16 @@ src/
 │   └── ValueObjects/               # Shared Value Objects
 │
 ├── Domain/                         # Business logic (grouped by contexts)
-│   ├── Auth/                       # Authentication
+│   ├── Profile/                    # User identity, profile, settings
 │   │   ├── Entities/
-│   │   ├── Services/
-│   │   ├── Repositories/           # Repository interfaces
 │   │   └── ValueObjects/
-│   ├── Games/                      # Game catalog
-│   ├── Plays/                      # Game sessions
+│   ├── Games/                      # Game catalog (BGG import)
+│   │   └── Entities/
+│   ├── Plays/                      # Play logging, players, mates, locations
 │   │   ├── Entities/
-│   │   ├── Events/                 # Domain events
-│   │   └── Repositories/
-│   ├── Stats/                      # Statistics
-│   └── Sync/                       # External source synchronization
-│       └── Services/
+│   │   └── Events/                 # Domain events
+│   ├── Stats/                      # Analytics and reporting
+│   └── Access/                     # Auth methods, device sessions (Phase 4)
 │
 ├── Application/                    # Use cases
 │   ├── Aspects/                    # AOP aspects (transactions, logging)
@@ -97,8 +94,8 @@ Examples: `Message`, `Command`, `Query`, `Event`, `Filter`, `Searchable`, `Email
 
 ### Domain
 
-Business logic grouped by **Bounded Contexts** (Auth, Games, Plays, Stats). Contains entities, domain services,
-repository interfaces, and domain events.
+Business logic grouped by **Bounded Contexts** (Profile, Games, Plays, Stats, Access). Contains entities, domain
+services, repository interfaces, and domain events. Auth and Sync are infrastructure, not bounded contexts.
 
 Depends only on `Core`.
 
@@ -117,8 +114,8 @@ Depends on `Core`, `Domain`, `Application`, and external libraries.
 
 Ports & Adapters examples:
 
-- `GameCatalogProvider` interface in `Domain/Sync/` -> `BggCatalogProvider` in `Infrastructure/Sync/Bgg/`
-- `Authentificator` interface in `Core/Auth/` -> `LeagueAuthServer` in `Infrastructure/Authentification/OpenAuth/`
+- `GameCatalogProvider` interface in `Core/Sync/` -> `BggCatalogProvider` in `Infrastructure/Sync/Bgg/`
+- `Authenticator` interface in `Core/Auth/` -> JWT implementation in `Infrastructure/Auth/`
 - `PasswordHasher` interface in `Core/Security/` -> `BcryptPasswordHasher` in `Infrastructure/Security/`
 - `SchemaMapper` interface in `Core/Http/` -> `OpenApiSchemaMapper` in `Infrastructure/Http/`
 

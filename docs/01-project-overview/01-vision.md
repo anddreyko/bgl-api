@@ -8,21 +8,21 @@
 ## 1. Project Overview
 
 **BoardGameLog** is an API platform for tracking and managing board game sessions. The project provides structured data
-processing for recording game sessions, player statistics, and integration with external systems such as BoardGameGeek (
+processing for recording game plays, player statistics, and integration with external systems such as BoardGameGeek (
 BGG).
 
 ### 1.1 Mission
 
 Build a reliable, scalable platform that enables board game enthusiasts to:
 
-- Easily record their game sessions with minimal effort
+- Easily record their game plays with minimal effort
 - Gain valuable analytics about their gaming habits and achievements
 - Share statistics and achievements with friends
 - Synchronize data with the global BoardGameGeek community
 
 ### 1.2 Core Product Values
 
-**Ease of Use** — minimal barrier to entry for session logging. Users can record a game in just a few seconds.
+**Ease of Use** — minimal barrier to entry for play logging. Users can record a game in just a few seconds.
 
 **Deep Analytics** — transforming raw data into meaningful insights: win statistics, favorite games, activity over time.
 
@@ -55,8 +55,8 @@ Goal: Create a minimum viable product to validate the concept.
 |-----------------|----------------------------------------------------------|
 | Authentication  | JWT-based registration and authorization                 |
 | Game Search     | Integration with BGG API for board game search           |
-| Session Logging | Creating game records: date, game, participants, results |
-| Session History | Viewing and filtering game history                       |
+| Play Logging    | Creating game records: date, game, participants, results |
+| Play History    | Viewing and filtering play history                       |
 | Basic Analytics | Top games by number of plays                             |
 
 ### Phase 2: Expansion
@@ -68,7 +68,7 @@ Goal: Extend analytics functionality and add social features.
 | Advanced Analytics  | Win percentage, player statistics, trends               |
 | Friends System      | Adding co-players for shared viewing                    |
 | Notifications       | Push notifications for achievements and friend activity |
-| BGG Synchronization | Two-way session synchronization with BoardGameGeek      |
+| BGG Synchronization | Two-way play synchronization with BoardGameGeek      |
 
 ### Phase 3: Scaling
 
@@ -92,8 +92,8 @@ of hundreds of thousands of games and the ability to synchronize sessions with t
 
 - Game search by name with autocomplete
 - Game information retrieval: description, images, ratings
-- Session export to BGG profile
-- Session history import from BGG
+- Play export to BGG profile
+- Play history import from BGG
 
 ---
 
@@ -105,8 +105,8 @@ graph TD
 
     subgraph BGL API
         B[API Gateway]
-        C[Auth Service]
-        D[Sessions Service]
+        C[Auth]
+        D[Plays Service]
         E[BGG Sync]
         B --> C
         B --> D

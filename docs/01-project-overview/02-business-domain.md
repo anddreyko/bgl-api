@@ -1,6 +1,7 @@
 # Business Domain
 
-**Document Version:** 1.0
+**Document Version:** 2.0
+**Status:** Draft (under discussion)
 
 ---
 
@@ -11,371 +12,523 @@ information about their board game sessions.
 
 ---
 
-## 2. Core Business Entities
+## 2. Bounded Contexts
 
-### 2.1 Play (Session)
+| Context | Responsibility                    | Phase | Domain Layer      |
+|---------|-----------------------------------|-------|-------------------|
+| Profile | User identity, profile, settings  | 1+    | `Domain/Profile/` |
+| Plays   | Play logging, players, mates      | 1     | `Domain/Plays/`   |
+| Games   | Game catalog (BGG import)         | 1     | `Domain/Games/`   |
+| Stats   | Analytics and reporting           | 1+    | `Domain/Stats/`   |
+| Access  | Auth methods, device session mgmt | 4     | `Domain/Access/`  |
 
-The central entity of the system. Represents one completed board game session.
+**Not a bounded context:**
 
-**Attributes:**
+- **Sync** -- external integration ports (`Core/Sync/`) and adapters (`Infrastructure/Sync/`). No domain logic.
+- **Auth** -- authentication/authorization infrastructure. Contracts in `Core/Auth/`, implementations in
+  `Infrastructure/Auth/`.
 
-- Session identifier
-- Game reference
-- Start date and time
-- End date and time
-- Location
-- List of players with results
-- Session notes
-- BGG synchronization status
+### Context Map
 
-**Business Rules:**
+```mermaid
+graph LR
+    Profile -->|User ID| Plays
+    Profile -->|User ID| Stats
+    Profile -->|User ID| Games
+    Plays -->|Play data| Stats
+    Games -->|Game ID| Plays
+    Sync["Sync (Infrastructure)"] -->|import/export| Games
+    Sync -->|import/export| Plays
+    Auth["Auth (Infrastructure)"] -->|credentials| Profile
+    Access -->|auth methods| Profile
+```
 
-- A session must contain at least one player
-- End date cannot be earlier than start date
-- Location is optional
-- Results are determined by game type (winner/score/cooperative)
+### Cross-Context References
 
-### 2.2 Game (Board Game)
+Contexts reference each other only by ID (Uuid). No entity references across boundaries.
 
-Represents a specific board game from the catalog.
+| From  | To      | Reference      | Purpose                                |
+|-------|---------|----------------|----------------------------------------|
+| Plays | Profile | User ID (Uuid) | Play owner, Mate owner, Location owner |
+| Plays | Games   | Game ID (Uuid) | Game reference in Play                 |
+| Plays | Plays   | Mate ID (Uuid) | Player -> Mate reference               |
+| Stats | Profile | User ID (Uuid) | Statistics subject                     |
+| Stats | Plays   | Play data      | Source data for analytics              |
+| Stats | Games   | Game ID (Uuid) | Game statistics                        |
 
-**Attributes:**
+---
 
-- Game identifier
-- BGG ID (BoardGameGeek external identifier)
-- Name
-- Release year
-- Type (base game/expansion)
-- Minimum/maximum player count
-- Play time (min/max)
-- Image
+## 3. Profile Context
 
-**Business Rules:**
+Manages user identity, profile information, and personal settings.
 
-- A game can be linked to one BGG record
-- Expansions are linked to base games
-- Game information is cached after retrieval from BGG
+### 3.1 User (Aggregate Root)
 
-### 2.3 Player
+| Attribute         | Type              | Required | Constraint                      |
+|-------------------|-------------------|----------|---------------------------------|
+| id                | Uuid              | yes      | Unique                          |
+| email             | Email             | yes      | Unique, valid format            |
+| passwordHash      | string            | yes      | Source password min 8 chars     |
+| name              | string            | yes      | Auto-generated if not provided  |
+| status            | UserStatus        | yes      | See state machine below         |
+| bggUsername       | string            | no       | Unique if set                   |
+| defaultVisibility | Visibility        | no       | Default for new plays           |
+| avatar            | string            | no       | Future                          |
+| tokenVersion      | int               | yes      | Incremented on token revocation |
+| createdAt         | DateTimeImmutable | yes      |                                 |
 
-Represents a participant in a specific session.
+**Invariants:**
 
-**Attributes:**
+- Email is unique across the system
+- Email must be valid format
+- Name is required (auto-generated if not provided at registration)
+- BGG username is unique across the system if set
+- Password minimum 8 characters (validated at creation/change)
 
-- Player record identifier
-- User reference (if registered)
-- Player name (for unregistered participants)
-- Result (win/loss/place)
-- Score earned
-- Color/faction (optional)
-- First player (yes/no)
+**State Machine (UserStatus):**
 
-**Business Rules:**
+```mermaid
+stateDiagram-v2
+    [*] --> Inactive: register
+    Inactive --> Active: confirm email
+    Inactive --> Deleted: delete
+    Active --> Inactive: block / require re-verification
+    Active --> Deleted: delete account
+    Deleted --> Active: restore account
+```
 
-- A player can be linked to a User or exist as a guest
-- Result is determined by specific game rules
-- One User can be a Player in multiple sessions
+Forbidden transition: `Deleted -> Inactive`.
 
-### 2.4 User
+---
 
-A registered system user.
+## 4. Plays Context
 
-**Attributes:**
+Manages play logging, player tracking, mate directory, and location directory.
 
-- User identifier
-- Email
-- Username
-- Registration date
-- BGG Username (for synchronization)
-- Profile settings
-- Status (active/blocked)
+### 4.1 Play (Aggregate Root)
 
-**Business Rules:**
+The central entity of the system. Represents one board game play.
 
-- Email is unique in the system
-- BGG Username is optional but must be unique if specified
-- User can delete account (soft delete)
+| Attribute      | Type              | Required      | Constraint                               |
+|----------------|-------------------|---------------|------------------------------------------|
+| id             | Uuid              | yes           | Unique                                   |
+| userId         | Uuid              | yes           | Owner (Profile context)                  |
+| game           | Uuid              | for Published | Reference to Games context               |
+| gameName       | string            | no            | Custom name when Game not selected       |
+| startedAt      | DateTimeImmutable | yes           |                                          |
+| finishedAt     | DateTimeImmutable | no            | Must be >= startedAt if set              |
+| location       | Uuid              | no            | Reference to user's Location             |
+| visibility     | Visibility        | yes           | Default: Authenticated (or from profile) |
+| includeInStats | bool              | yes           | Default: true                            |
+| status         | PlayStatus        | yes           | See state machine below                  |
+| syncStatus     | SyncStatus        | yes           | Default: not_synced                      |
+| players        | Player[]          | for Published | At least one for Published               |
 
-### 2.5 Mate (Co-player)
+**Invariants:**
 
-A connection between users for shared statistics access.
+- Owner (User ID) is required
+- Start date is required
+- End date must be >= start date (if set)
+- Game or gameName must be set for Published status
+- At least one Player required for Published status
+- Visibility default: Authenticated, overridden by profile setting, then per-play setting
 
-**Attributes:**
+**State Machine (PlayStatus):**
 
-- Connection identifier
-- User 1 (initiator)
-- User 2 (acceptor)
-- Status (pending/confirmed/rejected)
-- Connection creation date
+```mermaid
+stateDiagram-v2
+    [*] --> Draft: open
+    Draft --> Published: publish
+    Draft --> Deleted: delete
+    Published --> Draft: reopen for editing
+    Published --> Deleted: delete
+    Deleted --> Draft: restore
+```
 
-**Business Rules:**
+Forbidden transition: `Deleted -> Published` (must go through Draft first).
 
-- Connection is bidirectional after confirmation
-- Co-players can see shared session statistics
-- Connection can be broken at any time
+**Sync Status (SyncStatus):**
 
-### 2.6 Stats (Statistics)
+| Status       | Description               |
+|--------------|---------------------------|
+| `not_synced` | Not synchronized with BGG |
+| `pending`    | Awaiting synchronization  |
+| `synced`     | Successfully synchronized |
+| `failed`     | Synchronization error     |
 
-Aggregated data from sessions.
+On sync conflict: user is notified and resolves manually in Play.
+
+### 4.2 Player (Entity, child of Play)
+
+Represents a participant in a specific play.
+
+| Attribute | Type   | Required | Constraint                                  |
+|-----------|--------|----------|---------------------------------------------|
+| id        | Uuid   | yes      | Unique within Play                          |
+| mateId    | Uuid   | yes      | Reference to Mate                           |
+| teamTag   | string | no       | Same value = same team, null = free-for-all |
+| score     | int    | no       | Non-negative                                |
+| number    | int    | no       | Player number (1 = first player)            |
+| color     | string | no       | Color or faction                            |
+| winner    | bool   | no       | Winner flag                                 |
+
+**Invariants:**
+
+- Mate reference is required
+- Score is non-negative (if set)
+
+### 4.3 Mate (Aggregate Root)
+
+Personal directory of co-players. Each user maintains their own directory.
+
+| Attribute  | Type              | Required | Constraint                   |
+|------------|-------------------|----------|------------------------------|
+| id         | Uuid              | yes      | Unique                       |
+| userId     | Uuid              | yes      | Owner of the directory       |
+| name       | string            | yes      |                              |
+| linkedUser | Uuid              | no       | Reference to registered User |
+| bggAccount | string            | no       | Reference to BGG account     |
+| createdAt  | DateTimeImmutable | yes      |                              |
+
+**Invariants:**
+
+- Name is required
+- Owner (User ID) is required
+- One User cannot be linked to multiple Mates of the same owner
+- One BGG account cannot be linked to multiple Mates of the same owner
+
+**System Mates (global, not owned by any user):**
+
+- **Anonymous** -- unknown/random player
+- **Automa** -- NPC / solo mode opponent
+
+### 4.4 Location (Aggregate Root)
+
+Personal directory of places where plays happen.
+
+| Attribute | Type              | Required | Constraint |
+|-----------|-------------------|----------|------------|
+| id        | Uuid              | yes      | Unique     |
+| userId    | Uuid              | yes      | Owner      |
+| name      | string            | yes      |            |
+| createdAt | DateTimeImmutable | yes      |            |
+| icon      | string            | no       | Future     |
+
+**Invariants:**
+
+- Name is required
+- Owner (User ID) is required
+
+### 4.5 Visibility (Enum)
+
+| Level         | Description                                        |
+|---------------|----------------------------------------------------|
+| Private       | Only the author                                    |
+| Participants  | Author + Users linked to Mates in this Play        |
+| Link          | Anyone with a direct link (unlisted)               |
+| Authenticated | All authenticated users                            |
+| Public        | Everyone, including unauthenticated internet users |
+
+Priority: system default (Authenticated) -> profile setting -> per-play setting.
+
+---
+
+## 5. Games Context
+
+Global game catalog. Games are imported from BGG, not created manually by users.
+When a user searches and is connected to BGG, their games are prioritized in results.
+
+### 5.1 Game (Aggregate Root)
+
+| Attribute        | Type     | Required | Constraint                                      |
+|------------------|----------|----------|-------------------------------------------------|
+| id               | Uuid     | yes      | Unique                                          |
+| name             | string   | yes      | Primary name                                    |
+| alternativeNames | string[] | no       | From BGG                                        |
+| bggId            | int      | yes      | Unique                                          |
+| year             | int      | no       | Release year                                    |
+| type             | GameType | yes      | base/expansion/standalone_expansion             |
+| minPlayers       | int      | no       |                                                 |
+| maxPlayers       | int      | no       |                                                 |
+| minPlayTime      | int      | no       | Minutes                                         |
+| maxPlayTime      | int      | no       | Minutes                                         |
+| image            | string   | no       | URL                                             |
+| family           | string   | no       | Informational only, community-maintained in BGG |
+
+**Invariants:**
+
+- BGG ID is unique in the system
+- Name is required
+- Games are imported from BGG only, users do not create Game entities manually
+
+**Game Type (Enum):**
+
+| Type                   | Description            |
+|------------------------|------------------------|
+| `base`                 | Base game              |
+| `expansion`            | Expansion to base game |
+| `standalone_expansion` | Standalone expansion   |
+
+---
+
+## 6. Stats Context
+
+Analytics and reporting. Structured as a full bounded context for future extensibility (achievements, ratings), but
+currently operates as a read model over Plays data.
+
+**Characteristics:**
+
+- Read-only: Stats does not modify data in other contexts
+- Eventually consistent (caches, materialized views)
+- References other contexts by ID (User ID, Mate ID, Game ID)
+- Play's `includeInStats` flag determines whether a play is counted
 
 **Statistics Types:**
 
-- Session count by game
-- Win percentage by game/player
-- Most played games for period
-- Win leaderboards
-- Average session duration
-- Play frequency by day of week
-- Period tops (month/quarter/year)
+| Type           | Description                    | Phase |
+|----------------|--------------------------------|-------|
+| Personal Stats | User's personal statistics     | 1     |
+| Game Stats     | Statistics for a specific game | 1     |
+| Group Stats    | Co-player group statistics     | 2     |
+| Period Stats   | Statistics for a period        | 2     |
+| Annual Reports | Automated period reports       | 3     |
+
+**Future invariants (when achievements/ratings are added):**
+
+- Achievement is granted once
+- Rating cannot be negative
 
 ---
 
-## 3. Domain Contexts (Bounded Contexts)
+## 7. Access Context (Phase 4)
 
-### 3.1 Auth Context
+Authentication methods management and device session control.
 
-**Responsibility:** User authentication and authorization.
+**Planned functionality:**
 
-**Entities:**
+- Passkey support
+- Multiple authentication methods per user
+- Device session management (view, revoke)
+- Authorization moderation across devices
 
-- User
-- Token
-- RefreshToken
-
-**Operations:**
-
-- New user registration
-- System login
-- System logout
-- Password reset
-- Token refresh
-
-### 3.2 Games Context
-
-**Responsibility:** Game catalog management.
-
-**Entities:**
-
-- Game
-- GameExpansion
-- GameImage
-
-**Operations:**
-
-- Game search by name (via BGG)
-- Adding game to local catalog
-- Getting game details
-- Linking expansions to base game
-
-### 3.3 Plays Context
-
-**Responsibility:** Game session logging and management.
-
-**Entities:**
-
-- Play
-- Player
-- PlayComment
-
-**Operations:**
-
-- Creating new session
-- Editing session
-- Deleting session
-- Adding players to session
-- Recording results
-
-### 3.4 Stats Context
-
-**Responsibility:** Analytics and reporting.
-
-**Aggregates:**
-
-- GameStats
-- PlayerStats
-- PeriodReport
-
-**Operations:**
-
-- Calculating game statistics
-- Calculating player statistics
-- Generating period reports
-- Updating leaderboards
-
-### 3.5 Sync Context
-
-**Responsibility:** Data synchronization abstraction with external sources. Defines interfaces (ports) for data
-import/export without binding to a specific provider.
-
-**Interfaces (Ports):**
-
-- GameCatalogProvider — game search and information retrieval
-- PlayExporter — session export to external system
-- PlayImporter — session import from external system
-
-**Operations:**
-
-- Searching game in external catalog
-- Importing game information
-- Exporting session
-- Importing user sessions
-
-**Note:** Specific implementations (e.g., BoardGameGeek) are located in Infrastructure Layer as adapters. This allows
-adding other data sources without changing domain logic.
+**Not designed in detail yet.** Will be defined when Phase 4 planning begins.
 
 ---
 
-## 4. Domain Events
+## 8. Infrastructure: Auth
 
-### 4.1 Auth Events
+Authentication and authorization mechanics. Not a bounded context.
+
+**Core contracts:**
+
+- `Authenticator` -- login, refresh, revoke, verify
+- `Tokenizer` -- generate and verify tokens
+- `PasswordHasher` -- hash, verify, needsRehash
+
+**Infrastructure implementations:**
+
+- JWT token generation
+- Bcrypt password hashing
+- Email confirmation tokens (infrastructure mechanism, not domain entity)
+
+---
+
+## 9. Infrastructure: Sync
+
+External system integration. Not a bounded context.
+
+**Core ports:**
+
+- `GameCatalogProvider` -- search and retrieve game information
+- `PlayExporter` -- export plays to external system
+- `PlayImporter` -- import plays from external system
+
+**Infrastructure adapters:**
+
+- BGG (BoardGameGeek) implementations
+
+**Conflict resolution:** on import conflict, user is notified and resolves manually in Play.
+
+---
+
+## 10. Domain Events
+
+### 10.1 Profile Events
 
 | Event          | Description         | Payload                  |
 |----------------|---------------------|--------------------------|
 | UserRegistered | New user registered | userId, email, createdAt |
-| UserLoggedIn   | User logged in      | userId, loginAt          |
-| UserLoggedOut  | User logged out     | userId, logoutAt         |
-| PasswordReset  | Password was reset  | userId, resetAt          |
+| UserConfirmed  | Email confirmed     | userId, confirmedAt      |
+| UserDeleted    | Account deleted     | userId, deletedAt        |
+| UserRestored   | Account restored    | userId, restoredAt       |
 
-### 4.2 Plays Events
+### 10.2 Plays Events
 
-| Event          | Description             | Payload                       |
-|----------------|-------------------------|-------------------------------|
-| PlayCreated    | New session created     | playId, gameId, date, players |
-| PlayUpdated    | Session edited          | playId, changes               |
-| PlayDeleted    | Session deleted         | playId, deletedAt             |
-| PlayerAdded    | Player added to session | playId, playerId              |
-| ResultRecorded | Result recorded         | playId, playerId, result      |
+| Event         | Description          | Payload                 |
+|---------------|----------------------|-------------------------|
+| PlayCreated   | New play created     | playId, userId, date    |
+| PlayPublished | Play published       | playId, gameId, players |
+| PlayUpdated   | Play edited          | playId, changes         |
+| PlayDeleted   | Play deleted         | playId, deletedAt       |
+| PlayRestored  | Play restored        | playId                  |
+| PlayerAdded   | Player added to play | playId, mateId          |
+| PlayerRemoved | Player removed       | playId, mateId          |
 
-### 4.3 Sync Events
+### 10.3 Games Events
 
-| Event         | Description                  | Payload                 |
-|---------------|------------------------------|-------------------------|
-| SyncRequested | Synchronization requested    | userId, provider, scope |
-| GameImported  | Game imported from source    | gameId, providerId      |
-| PlayExported  | Session exported to source   | playId, providerId      |
-| PlayImported  | Session imported from source | providerId, playId      |
-| SyncFailed    | Synchronization error        | error, retryAt          |
+| Event        | Description            | Payload       |
+|--------------|------------------------|---------------|
+| GameImported | Game imported from BGG | gameId, bggId |
 
----
+### 10.4 Sync Events
 
-## 5. Business Rules and Invariants
-
-### 5.1 Session Creation Rules
-
-1. Session must be linked to an existing game
-2. At least one player is required
-3. Player count must not exceed game maximum
-4. Session date cannot be in the future
-5. Duration is calculated automatically
-
-### 5.2 Result Rules
-
-1. Cooperative games have shared result (win/loss)
-2. Competitive games require winner or score specification
-3. Ties are possible for certain game types
-4. Scores must be non-negative
-
-### 5.3 External Source Synchronization Rules
-
-1. Synchronization requires linked provider account
-2. Rate limit is determined by specific provider
-3. On error, retry with exponential backoff
-4. Conflicts are resolved in favor of newer data
-5. Provider is determined through interface — specific implementation in Infrastructure
+| Event         | Description                 | Payload                 |
+|---------------|-----------------------------|-------------------------|
+| SyncRequested | Synchronization requested   | userId, provider, scope |
+| PlayExported  | Play exported to provider   | playId, providerId      |
+| PlayImported  | Play imported from provider | providerId, playId      |
+| SyncFailed    | Synchronization error       | error, retryAt          |
+| SyncConflict  | Conflict detected on import | playId, providerId      |
 
 ---
 
-## 6. Data Schema
+## 11. Data Schema
 
 ```mermaid
 erDiagram
     User ||--o{ Play: "creates"
-    User ||--o{ Mate: "connected to"
-    Play ||--|{ Player: "contains"
-    Play }o--|| Game: "uses"
-    Player }o--o| User: "can be"
+    User ||--o{ Mate: "owns directory"
+    User ||--o{ Location: "owns directory"
+    Play ||--o{ Player: "contains"
+    Play }o--o| Game: "references"
+    Play }o--o| Location: "at"
+    Player }o--|| Mate: "references"
+    Mate }o--o| User: "linked to"
 
     User {
         uuid id PK
         string email UK
-        string username
+        string name
+        string bgg_username UK
+        enum status
+        enum default_visibility
     }
 
     Play {
         uuid id PK
-        uuid game_id FK
         uuid user_id FK
-        timestamp played_at
+        uuid game_id FK
+        string game_name
+        uuid location_id FK
+        timestamp started_at
+        timestamp finished_at
+        enum status
+        enum visibility
+        bool include_in_stats
+        enum sync_status
     }
 
     Player {
         uuid id PK
         uuid play_id FK
-        uuid user_id FK
-        string name
-        boolean is_winner
+        uuid mate_id FK
+        string team_tag
+        int score
+        int number
+        string color
+        bool winner
     }
 
     Game {
         uuid id PK
-        integer bgg_id UK
+        int bgg_id UK
         string name
+        enum type
+        int year
     }
 
     Mate {
         uuid id PK
-        uuid user1_id FK
-        uuid user2_id FK
-        string status
+        uuid user_id FK
+        uuid linked_user_id FK
+        string name
+        string bgg_account
+    }
+
+    Location {
+        uuid id PK
+        uuid user_id FK
+        string name
     }
 ```
 
 ---
 
-## 7. Integration Points
+## 12. Shared Value Objects (Core)
 
-### 7.1 External Data Providers (Ports & Adapters)
-
-The system uses the Ports & Adapters pattern for integration with external data sources. Domain Layer defines
-interfaces (ports), Infrastructure Layer contains specific implementations (adapters).
-
-**Ports (Domain/Sync/):**
-
-- `GameCatalogProvider` — game search and information retrieval
-- `PlayExporter` — session export to external system
-- `PlayImporter` — session import from external system
-
-Specific adapter implementations (e.g., for BoardGameGeek) are located in Infrastructure Layer. This allows adding new
-data sources without changing domain logic.
-
-### 7.2 Internal Events (Event Bus)
-
-The system uses event-driven architecture for:
-
-- Updating statistics after session recording
-- Triggering background BGG synchronization
-- Sending user notifications
-- Action audit logging
+| Value Object | Location            | Validation                     |
+|--------------|---------------------|--------------------------------|
+| Uuid         | `Core/ValueObjects` | Non-empty string or null       |
+| Email        | `Core/ValueObjects` | PHP FILTER_VALIDATE_EMAIL      |
+| Password     | `Core/ValueObjects` | Minimum 8 characters           |
+| DateTime     | `Core/ValueObjects` | Flexible input (string/int/DT) |
+| Date         | `Core/ValueObjects` | Date only, time zeroed         |
+| DateInterval | `Core/ValueObjects` | ISO-8601 duration              |
 
 ---
 
-## 8. Non-Functional Domain Requirements
+## 13. Non-Functional Domain Requirements
 
-### 8.1 Data Consistency
+### 13.1 Data Consistency
 
-- All session operations are atomic
+- All play operations are atomic
 - Statistics can be eventually consistent
 - BGG synchronization is asynchronous
 
-### 8.2 Audit
+### 13.2 Audit
 
-- Session changes trigger domain events for reactive updates (statistics, notifications)
+- Play changes trigger domain events for reactive updates (statistics, notifications)
 - Events are processed within transactions but not persisted in MVP (see ADR-006)
 - Full event history with state reconstruction planned for later phases if needed
 - Storing metadata about time and author of changes in entity fields
 
-### 8.3 Scalability
+### 13.3 Scalability
 
 - Separate storage for analytical data
 - Game search result caching
 - Materialized views for tops
+
+---
+
+## 14. Naming Decisions
+
+| Decision               | Chosen      | Rationale                                          |
+|------------------------|-------------|----------------------------------------------------|
+| Session vs Play        | **Play**    | BGG standard, matches Plays context name           |
+| Auth vs Profile        | **Profile** | Auth is infrastructure, Profile is domain          |
+| Mate location          | **Plays**   | Mate is a co-player, exists in gaming context      |
+| User across contexts   | **By ID**   | No entity duplication, reference by Uuid           |
+| EmailConfirmationToken | **Infra**   | Infrastructure mechanism, not domain entity        |
+| Stats as context       | **Yes**     | Future-proof for achievements/ratings/microservice |
+| Sync as context        | **No**      | No domain logic, just ports and adapters           |
+
+---
+
+## 15. Migration Notes
+
+Current code uses names and structures that differ from this model:
+
+| Current (code)    | Target (this document) | Action                |
+|-------------------|------------------------|-----------------------|
+| `Domain/Auth/`    | `Domain/Profile/`      | Rename context        |
+| `Session`         | `Play`                 | Rename entity         |
+| `SessionStatus`   | `PlayStatus`           | Rename enum           |
+| `Session::open()` | `Play::open()`         | Rename factory method |
+| `Sessions` (repo) | `Plays` (repo)         | Rename repository     |
+| Missing           | `Player`               | Create entity         |
+| Missing           | `Mate`                 | Create aggregate      |
+| Missing           | `Location`             | Create aggregate      |
+| Missing           | `Game`                 | Create aggregate      |
+| Missing           | `Visibility`           | Create enum           |
+| Missing           | `GameType`             | Create enum           |
+| Missing           | `SyncStatus`           | Create enum           |

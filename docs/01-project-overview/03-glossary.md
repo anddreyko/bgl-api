@@ -1,91 +1,110 @@
 # Glossary
 
-**Document Version:** 1.0
+**Document Version:** 2.0
 
 ---
 
 ## Business Terms
 
-### Play (Session)
+### Play
 
-One completed gaming session of a group of players in one board game. A session records date, time, participants, and
-results. It is the central unit of accounting in the system.
+One board game play. Records date, time, participants, and results. The central unit of accounting in the system.
 
-**Synonyms:** Session, Game Session
+**Canonical name:** Play (not "Session").
 
 **Examples:**
 
-- A Carcassonne session on December 15 with 4 participants
-- A Sunday Gloomhaven session lasting 3 hours
+- A Carcassonne play on December 15 with 4 participants
+- A Sunday Gloomhaven play lasting 3 hours
 
 ---
 
 ### Game (Board Game)
 
-A specific board game from the BoardGameGeek catalog or local storage. Can be a base game or expansion.
+A specific board game from the BoardGameGeek catalog. Can be a base game, expansion, or standalone expansion. Games are
+imported from BGG, not created manually.
 
 **Attributes:**
 
-- Name
-- BGG ID — unique identifier on BoardGameGeek
-- Type — base game or expansion
+- Name (primary + alternative names)
+- BGG ID -- unique identifier on BoardGameGeek
+- Type -- base game, expansion, or standalone expansion
 - Release year
 - Player range (min/max)
 - Play time (min/max)
+- Family -- informational grouping from BGG (community-maintained, may be inaccurate)
 
 ---
 
 ### Player
 
-A participant in a specific session. A player can be linked to a registered system user (User) or exist as a guest
-record with a name.
+A participant in a specific play. Always references a Mate from the owner's directory.
 
 **Attributes:**
 
-- Name
-- Result (winner/loser/place)
-- Score (if applicable)
-- First player flag
+- Mate reference (required)
+- Team tag (optional, same value = same team)
+- Score (optional, non-negative)
+- Player number (optional, 1 = first player)
+- Color/faction (optional)
+- Winner flag (optional)
 
 ---
 
 ### Mate (Co-player)
 
-A connection between two registered users for shared access to statistics of joint sessions. Co-players can view and
-edit shared sessions.
+An entry in a user's personal directory of co-players. Not a connection between users -- a personal record of someone
+you play with.
 
-**Connection Statuses:**
+A Mate can exist without any system linkage (just a name), or be linked to a registered User and/or a BGG account.
 
-- Pending — awaiting confirmation
-- Confirmed — confirmed by both parties
-- Rejected — declined
+**System Mates (global):**
+
+- **Anonymous** -- unknown/random player
+- **Automa** -- NPC / solo mode opponent
+
+**Belongs to:** Plays context.
 
 ---
 
 ### User
 
-A registered BoardGameLog system user. A user can create sessions, be a player, have co-players, and synchronize with
-BGG.
+A registered BoardGameLog system user. Manages profile, creates plays, owns a mate directory and location directory.
+
+**Belongs to:** Profile context.
+
+---
+
+### Location
+
+An entry in a user's personal directory of places where plays happen. Allows tracking where games were played.
+
+**Attributes:**
+
+- Name (required)
+- Icon/photo (future)
+
+**Belongs to:** Plays context.
 
 ---
 
 ### Stats (Statistics)
 
-Aggregated analytical data calculated from recorded sessions. Includes game tops, win percentages, play frequency, and
-other metrics.
+Aggregated analytical data calculated from recorded plays. Includes game tops, win percentages, play frequency, and
+other metrics. A play's `includeInStats` flag determines whether it is counted.
 
 **Statistics Types:**
 
-- Personal Stats — user's personal statistics
-- Game Stats — statistics for a specific game
-- Group Stats — co-player group statistics
-- Period Stats — statistics for a period (month/year)
+- Personal Stats -- user's personal statistics
+- Game Stats -- statistics for a specific game
+- Group Stats -- co-player group statistics
+- Period Stats -- statistics for a period (month/year)
 
 ---
 
 ### BGG (BoardGameGeek)
 
-The largest online board game database and community. BoardGameLog integrates with BGG for game search and session
+The largest online board game database and community. BoardGameLog integrates with BGG for game search and play
 synchronization.
 
 **URL:** https://boardgamegeek.com
@@ -99,16 +118,16 @@ synchronization.
 An architectural pattern where system state is reconstructed from a sequence of events. Events are stored in Event Store
 as the single source of truth.
 
-**Note:** BoardGameLog does NOT use Event Sourcing in MVP. The project uses domain events without persistent storage —
+**Note:** BoardGameLog does NOT use Event Sourcing in MVP. The project uses domain events without persistent storage --
 events are processed within transactions but not stored for replay. See ADR-006 for the phased approach to event-driven
 architecture.
 
 **Event Example (domain event, not stored):**
 
 ```
-PlayCreated { playId, gameId, occurredAt }
-PlayerAdded { playId, playerId }
-ResultRecorded { playId, playerId, isWinner, score }
+PlayCreated { playId, userId, date }
+PlayPublished { playId, gameId, players }
+PlayerAdded { playId, mateId }
 ```
 
 ---
@@ -118,11 +137,11 @@ ResultRecorded { playId, playerId, isWinner, score }
 A cluster of domain objects that can be treated as a single unit. In DDD context, an aggregate has a root entity (
 Aggregate Root) and consistency boundaries.
 
-**Aggregate Examples in BGL:**
+**Aggregate Roots in BGL:**
 
-- Play (root) + Players
-- User (root) + Mates
-- Game (root) + Expansions
+- **Profile context:** User
+- **Plays context:** Play (with Player children), Mate, Location
+- **Games context:** Game
 
 ---
 
@@ -133,9 +152,9 @@ considered equal.
 
 **Examples in BGL:**
 
-- `Email` — a valid email address
-- `PlayerId` — UUID player identifier
-- `Score` — non-negative integer score
+- `Email` -- a valid email address
+- `Uuid` -- unique identifier
+- `Password` -- validated password input (min 8 chars)
 
 ---
 
@@ -146,9 +165,10 @@ are equal.
 
 **Examples in BGL:**
 
-- `Play` — identified by `PlayId`
-- `User` — identified by `UserId`
-- `Game` — identified by `GameId`
+- `User` -- identified by Uuid (Profile context)
+- `Play` -- identified by Uuid (Plays context)
+- `Player` -- identified by Uuid, child of Play (Plays context)
+- `Game` -- identified by Uuid (Games context)
 
 ---
 
@@ -158,10 +178,10 @@ A data access abstraction hiding storage details. A repository works with aggreg
 
 **Contract:**
 
-- `add(entity)` — add entity
-- `find(id)` — find by identifier
-- `remove(entity)` — remove entity
-- `search(filter)` — find by criteria
+- `add(entity)` -- add entity
+- `find(id)` -- find by identifier
+- `remove(entity)` -- remove entity
+- `search(filter)` -- find by criteria
 
 ---
 
@@ -172,9 +192,9 @@ services. Handlers are located in use-case folders: `Application/Handlers/{Conte
 
 **Examples:**
 
-- `Handlers/Plays/CreatePlay/Handler.php` — creating a new session
-- `Handlers/Auth/IssueToken/Handler.php` — issuing JWT token
-- `Handlers/Games/SearchGames/Handler.php` — searching games via BGG
+- `Handlers/Plays/CreatePlay/Handler.php` -- creating a new play
+- `Handlers/Auth/IssueToken/Handler.php` -- issuing JWT token
+- `Handlers/Games/SearchGames/Handler.php` -- searching games via BGG
 
 ---
 
@@ -215,9 +235,9 @@ Cross-cutting functionality applied through middleware pipeline. Examples: loggi
 
 **Aspects in BGL:**
 
-- `Logging` — logs handler entry/exit/errors
-- `Transactional` — wraps in DB transaction
-- `Caching` — caches query results
+- `Logging` -- logs handler entry/exit/errors
+- `Transactional` -- wraps in DB transaction
+- `Caching` -- caches query results
 
 Aspects are configured in DI container as middleware, not via attributes on classes.
 
@@ -230,11 +250,11 @@ layers.
 
 **BGL Layers:**
 
-1. **Core** — contracts, interfaces, base VOs
-2. **Domain** — business logic, entities, rules
-3. **Application** — use cases, handlers
-4. **Infrastructure** — DB, external services
-5. **Presentation** — API, CLI
+1. **Core** -- contracts, interfaces, base VOs
+2. **Domain** -- business logic, entities, rules
+3. **Application** -- use cases, handlers
+4. **Infrastructure** -- DB, external services
+5. **Presentation** -- API, CLI
 
 ---
 
@@ -249,13 +269,18 @@ A development approach based on domain modeling. Key concepts: Ubiquitous Langua
 An explicit boundary within which a domain model has a specific meaning. Different contexts may have different models of
 the same concepts.
 
-**BGL Contexts:**
+**BGL Bounded Contexts:**
 
-- Auth Context
-- Games Context
-- Plays Context
-- Stats Context
-- Sync Context
+- **Profile** -- user identity, profile, settings
+- **Plays** -- play logging, players, mates, locations
+- **Games** -- game catalog (BGG import)
+- **Stats** -- analytics and reporting
+- **Access** -- auth methods, device session management (Phase 4)
+
+**Not bounded contexts (infrastructure):**
+
+- **Auth** -- authentication/authorization mechanics (Core contracts + Infrastructure)
+- **Sync** -- external integration (Core ports + Infrastructure adapters)
 
 ---
 
@@ -296,28 +321,46 @@ A precomputed query result stored as a table. Used for optimizing complex analyt
 | CDC     | Change Data Capture                      | Data change capture                          |
 | DAU     | Daily Active Users                       | Daily active users                           |
 | MAU     | Monthly Active Users                     | Monthly active users                         |
+| AR      | Aggregate Root                           | Root entity of an aggregate                  |
 
 ---
 
 ## Statuses and States
 
+### User Status
+
+| Status     | Description                              |
+|------------|------------------------------------------|
+| `inactive` | Newly registered, awaiting confirmation  |
+| `active`   | Confirmed, active account                |
+| `deleted`  | Soft-deleted account                     |
+
+### Play Status
+
+| Status      | Description                  |
+|-------------|------------------------------|
+| `draft`     | In progress, can be edited   |
+| `published` | Finalized play               |
+| `deleted`   | Soft-deleted play            |
+
 ### Sync Status
 
-| Status       | Description                       |
-|--------------|-----------------------------------|
-| `not_synced` | Session not synchronized with BGG |
-| `pending`    | Awaiting synchronization          |
-| `synced`     | Successfully synchronized         |
-| `failed`     | Synchronization error             |
+| Status       | Description                     |
+|--------------|---------------------------------|
+| `not_synced` | Play not synchronized with BGG  |
+| `pending`    | Awaiting synchronization        |
+| `synced`     | Successfully synchronized       |
+| `failed`     | Synchronization error           |
 
-### Mate Connection Status
+### Visibility
 
-| Status      | Description                         |
-|-------------|-------------------------------------|
-| `pending`   | Request sent, awaiting confirmation |
-| `confirmed` | Connection confirmed                |
-| `rejected`  | Request declined                    |
-| `blocked`   | User blocked                        |
+| Level           | Description                                        |
+|-----------------|----------------------------------------------------|
+| `private`       | Only the author                                    |
+| `participants`  | Author + users linked to mates in this play        |
+| `link`          | Anyone with a direct link                          |
+| `authenticated` | All authenticated users (default)                  |
+| `public`        | Everyone, including unauthenticated                |
 
 ### Game Type
 
@@ -326,13 +369,3 @@ A precomputed query result stored as a table. Used for optimizing complex analyt
 | `base`                 | Base game              |
 | `expansion`            | Expansion to base game |
 | `standalone_expansion` | Standalone expansion   |
-
-### Result Type
-
-| Type        | Description      |
-|-------------|------------------|
-| `winner`    | Winner           |
-| `loser`     | Loser            |
-| `tie`       | Tie              |
-| `coop_win`  | Cooperative win  |
-| `coop_loss` | Cooperative loss |

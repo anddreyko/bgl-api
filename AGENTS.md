@@ -19,28 +19,28 @@ Principles
 
 ### Code Quality
 
-| Command              | Purpose                                           |
-|----------------------|---------------------------------------------------|
-| `composer cs:fix`    | Fix code style (PHP-CS-Fixer)                     |
-| `composer rc:run`    | Apply automated refactoring (Rector)              |
-| `composer lp:run`    | PHP syntax check (Lint)                           |
-| `composer ps:run`    | Static type analysis (Psalm)                      |
-| `composer dt:run`    | Architecture dependency check (Deptrac) — **LAW** |
-| `composer cd:run`    | Check composer dependencies                       |
-| `composer scan:all`  | **MANDATORY before push.** Full validation.       |
+| Command             | Purpose                                           |
+|---------------------|---------------------------------------------------|
+| `composer cs:fix`   | Fix code style (PHP-CS-Fixer)                     |
+| `composer rc:run`   | Apply automated refactoring (Rector)              |
+| `composer lp:run`   | PHP syntax check (Lint)                           |
+| `composer ps:run`   | Static type analysis (Psalm)                      |
+| `composer dt:run`   | Architecture dependency check (Deptrac) — **LAW** |
+| `composer cd:run`   | Check composer dependencies                       |
+| `composer scan:all` | **MANDATORY before push.** Full validation.       |
 
 ### Testing
 
-| Command                | Purpose                  |
-|------------------------|--------------------------|
-| `composer test:all`    | Run all test suites      |
-| `composer test:unit`   | Unit tests               |
-| `composer test:func`   | Functional tests         |
-| `composer test:intg`   | Integration tests        |
-| `composer test:web`    | Acceptance API tests     |
-| `composer test:cli`    | Acceptance CLI tests     |
+| Command                  | Purpose                  |
+|--------------------------|--------------------------|
+| `composer test:all`      | Run all test suites      |
+| `composer test:unit`     | Unit tests               |
+| `composer test:func`     | Functional tests         |
+| `composer test:intg`     | Integration tests        |
+| `composer test:web`      | Acceptance API tests     |
+| `composer test:cli`      | Acceptance CLI tests     |
 | `composer test:coverage` | Generate coverage report |
-| `composer in:ps`       | Mutation testing         |
+| `composer in:ps`         | Mutation testing         |
 
 ### Database
 
@@ -120,15 +120,16 @@ Presentation  ↗
 
 ## 5. Bounded Contexts
 
-| Context | Responsibility                        | Location        |
-|---------|---------------------------------------|-----------------|
-| Auth    | Authentication, authorization, users  | `Domain/Auth/`  |
-| Games   | Game catalog management               | `Domain/Games/` |
-| Plays   | Session logging and management        | `Domain/Plays/` |
-| Stats   | Analytics and reporting               | `Domain/Stats/` |
-| Sync    | External integration (contracts only) | `Domain/Sync/`  |
+| Context | Responsibility                    | Phase | Location          |
+|---------|-----------------------------------|-------|-------------------|
+| Profile | User identity, profile, settings  | 1+    | `Domain/Profile/` |
+| Plays   | Play logging, players, mates      | 1     | `Domain/Plays/`   |
+| Games   | Game catalog (BGG import)         | 1     | `Domain/Games/`   |
+| Stats   | Analytics and reporting           | 1+    | `Domain/Stats/`   |
+| Access  | Auth methods, device session mgmt | 4     | `Domain/Access/`  |
 
-**Sync Context** defines interfaces (ports). Adapters live in `Infrastructure/Sync/`.
+**Not bounded contexts:** Auth (infrastructure: `Core/Auth/` + `Infrastructure/Auth/`), Sync (infrastructure:
+`Core/Sync/` + `Infrastructure/Sync/`).
 
 ---
 
@@ -252,16 +253,16 @@ docs/
 
 **When project structure changes, documentation MUST BE updated:**
 
-| Change Type                           | Files to Update                                              |
-|---------------------------------------|--------------------------------------------------------------|
-| New Bounded Context                   | `02-business-domain.md`, `03-structure.md`, `03-glossary.md` |
-| New Entity/Aggregate                  | `02-business-domain.md`                                      |
-| Architecture decision                 | Create new ADR in `03-decisions/`                            |
+| Change Type                              | Files to Update                                              |
+|------------------------------------------|--------------------------------------------------------------|
+| New Bounded Context                      | `02-business-domain.md`, `03-structure.md`, `03-glossary.md` |
+| New Entity/Aggregate                     | `02-business-domain.md`                                      |
+| Architecture decision                    | Create new ADR in `03-decisions/`                            |
 | New tool or command, new composer script | `02-tooling.md`, this file (AGENTS.md)                       |
-| Layer structure change                | `03-structure.md`                                            |
-| Testing approach change               | `04-testing.md`                                              |
-| Workflow/Git process change           | `05-workflow.md`                                             |
-| AI commands or build process change   | `06-ai-development.md`                                       |
+| Layer structure change                   | `03-structure.md`                                            |
+| Testing approach change                  | `04-testing.md`                                              |
+| Workflow/Git process change              | `05-workflow.md`                                             |
+| AI commands or build process change      | `06-ai-development.md`                                       |
 
 ---
 
