@@ -52,7 +52,7 @@ Passkey (FIDO2/WebAuthn) -- alternative passwordless authentication. After passk
 
 ### 1.1 Passkey Entity
 
-- [ ] Create `src/Domain/Auth/Entities/Passkey.php`:
+- [ ] Create `src/Domain/Profile/Entities/Passkey.php`:
   - Pattern: follow User entity (final class, constructor with public id, static factory)
   - Fields: Uuid $id, Uuid $userId, string $credentialId, string $credentialData, int $counter, DateTimeImmutable $createdAt, ?string $label
   - Static factory: `Passkey::create(...)`
@@ -61,7 +61,7 @@ Passkey (FIDO2/WebAuthn) -- alternative passwordless authentication. After passk
 
 ### 1.2 PasskeyChallenge Entity
 
-- [ ] Create `src/Domain/Auth/Entities/PasskeyChallenge.php`:
+- [ ] Create `src/Domain/Profile/Entities/PasskeyChallenge.php`:
   - Pattern: follow User entity (final class, static factories, getters)
   - Fields: Uuid $id, string $challenge, DateTimeImmutable $expiresAt, ?Uuid $userId
   - Static factories: `forRegistration(...)`, `forLogin(...)`
@@ -69,7 +69,7 @@ Passkey (FIDO2/WebAuthn) -- alternative passwordless authentication. After passk
 
 ### 1.3 Passkeys Repository
 
-- [ ] Create `src/Domain/Auth/Entities/Passkeys.php`:
+- [ ] Create `src/Domain/Profile/Entities/Passkeys.php`:
   ```php
   /** @extends Repository<Passkey> */
   interface Passkeys extends Repository, Searchable
@@ -82,7 +82,7 @@ Passkey (FIDO2/WebAuthn) -- alternative passwordless authentication. After passk
 
 ### 1.4 PasskeyChallenges Repository
 
-- [ ] Create `src/Domain/Auth/Entities/PasskeyChallenges.php`:
+- [ ] Create `src/Domain/Profile/Entities/PasskeyChallenges.php`:
   ```php
   /** @extends Repository<PasskeyChallenge> */
   interface PasskeyChallenges extends Repository, Searchable
@@ -93,8 +93,8 @@ Passkey (FIDO2/WebAuthn) -- alternative passwordless authentication. After passk
 
 ### 1.5 Unit Tests
 
-- [ ] `tests/Unit/Domain/Auth/Entities/PasskeyCest.php` -- create, updateCounter, getters
-- [ ] `tests/Unit/Domain/Auth/Entities/PasskeyChallengeCest.php` -- create, isExpired, factories
+- [ ] `tests/Unit/Domain/Profile/Entities/PasskeyCest.php` -- create, updateCounter, getters
+- [ ] `tests/Unit/Domain/Profile/Entities/PasskeyChallengeCest.php` -- create, isExpired, factories
 - [ ] Verify: `composer lp:run && composer ps:run && composer test:unit`
 
 ---
@@ -103,11 +103,11 @@ Passkey (FIDO2/WebAuthn) -- alternative passwordless authentication. After passk
 
 ### 2.1 Doctrine Mappings
 
-- [ ] Create `src/Infrastructure/Persistence/Doctrine/Mapping/Auth/PasskeyMapping.php`:
-  - Table: `auth_passkey`
+- [ ] Create `src/Infrastructure/Persistence/Doctrine/Mapping/Profile/PasskeyMapping.php`:
+  - Table: `profile_passkey`
   - Fields: id (uuid_vo), user_id (uuid_vo), credential_id (string, unique), credential_data (text), counter (integer), created_at (datetime_immutable), label (string, nullable)
-- [ ] Create `src/Infrastructure/Persistence/Doctrine/Mapping/Auth/PasskeyChallengeMapping.php`:
-  - Table: `auth_passkey_challenge`
+- [ ] Create `src/Infrastructure/Persistence/Doctrine/Mapping/Profile/PasskeyChallengeMapping.php`:
+  - Table: `profile_passkey_challenge`
   - Fields: id (uuid_vo), challenge (string, unique), expires_at (datetime_immutable), user_id (uuid_vo, nullable)
 
 ### 2.2 Register Mappings
@@ -117,12 +117,12 @@ Passkey (FIDO2/WebAuthn) -- alternative passwordless authentication. After passk
 ### 2.3 Doctrine Repositories
 
 - [ ] Create `src/Infrastructure/Persistence/Doctrine/Passkeys.php`:
-  - Extends DoctrineRepository (like Doctrine\Users), implements Domain\Auth\Entities\Passkeys
+  - Extends DoctrineRepository (like Doctrine\Users), implements Domain\Profile\Entities\Passkeys
   - getType() -> Passkey::class, getAlias() -> 'p', getKeys() -> ['id']
   - findByCredentialId() via DQL
   - findAllByUserId() via DQL
 - [ ] Create `src/Infrastructure/Persistence/Doctrine/PasskeyChallenges.php`:
-  - Extends DoctrineRepository (like Doctrine\Users), implements Domain\Auth\Entities\PasskeyChallenges
+  - Extends DoctrineRepository (like Doctrine\Users), implements Domain\Profile\Entities\PasskeyChallenges
   - getType() -> PasskeyChallenge::class, getAlias() -> 'pc', getKeys() -> ['id']
   - findByChallenge() via DQL
 
@@ -194,18 +194,18 @@ Passkey (FIDO2/WebAuthn) -- alternative passwordless authentication. After passk
 ### 3.5 Handlers
 
 **RegisterPasskeyOptions** -- generate challenge for registration:
-- [ ] `src/Application/Handlers/Auth/RegisterPasskeyOptions/Command.php` -- userId (from auth)
-- [ ] `src/Application/Handlers/Auth/RegisterPasskeyOptions/Handler.php`:
+- [ ] `src/Application/Handlers/Profile/RegisterPasskeyOptions/Command.php` -- userId (from auth)
+- [ ] `src/Application/Handlers/Profile/RegisterPasskeyOptions/Handler.php`:
   1. Load user from Users repo
   2. Generate challenge via UuidGenerator or random_bytes
   3. Save PasskeyChallenge.forRegistration() to DB
   4. Call PasskeyVerifier.registerOptions(challenge, userId, userName)
   5. Return JSON options
-- [ ] `src/Application/Handlers/Auth/RegisterPasskeyOptions/Result.php`
+- [ ] `src/Application/Handlers/Profile/RegisterPasskeyOptions/Result.php`
 
 **RegisterPasskeyVerify** -- verify and save passkey:
-- [ ] `src/Application/Handlers/Auth/RegisterPasskeyVerify/Command.php` -- userId (from auth), response (JSON string), label?
-- [ ] `src/Application/Handlers/Auth/RegisterPasskeyVerify/Handler.php`:
+- [ ] `src/Application/Handlers/Profile/RegisterPasskeyVerify/Command.php` -- userId (from auth), response (JSON string), label?
+- [ ] `src/Application/Handlers/Profile/RegisterPasskeyVerify/Handler.php`:
   1. Find challenge by userId from PasskeyChallenges
   2. Check not expired
   3. Call PasskeyVerifier.register(response, challenge)
@@ -213,17 +213,17 @@ Passkey (FIDO2/WebAuthn) -- alternative passwordless authentication. After passk
   5. Remove challenge
 
 **PasskeySignInOptions** -- generate challenge for login:
-- [ ] `src/Application/Handlers/Auth/PasskeySignInOptions/Command.php` -- empty
-- [ ] `src/Application/Handlers/Auth/PasskeySignInOptions/Handler.php`:
+- [ ] `src/Application/Handlers/Profile/PasskeySignInOptions/Command.php` -- empty
+- [ ] `src/Application/Handlers/Profile/PasskeySignInOptions/Handler.php`:
   1. Generate challenge
   2. Save PasskeyChallenge.forLogin()
   3. Call PasskeyVerifier.loginOptions(challenge)
   4. Return JSON options
-- [ ] `src/Application/Handlers/Auth/PasskeySignInOptions/Result.php`
+- [ ] `src/Application/Handlers/Profile/PasskeySignInOptions/Result.php`
 
 **PasskeySignInVerify** -- verify passkey and issue tokens:
-- [ ] `src/Application/Handlers/Auth/PasskeySignInVerify/Command.php` -- response (JSON string)
-- [ ] `src/Application/Handlers/Auth/PasskeySignInVerify/Handler.php`:
+- [ ] `src/Application/Handlers/Profile/PasskeySignInVerify/Command.php` -- response (JSON string)
+- [ ] `src/Application/Handlers/Profile/PasskeySignInVerify/Handler.php`:
   1. Extract credentialId from response
   2. Find Passkey by credentialId
   3. Find challenge from PasskeyChallenges
@@ -231,7 +231,7 @@ Passkey (FIDO2/WebAuthn) -- alternative passwordless authentication. After passk
   5. Update passkey counter
   6. Call TokenIssuer.issue(userId)
   7. Return Result with TokenPair
-- [ ] `src/Application/Handlers/Auth/PasskeySignInVerify/Result.php` -- accessToken, refreshToken, expiresIn
+- [ ] `src/Application/Handlers/Profile/PasskeySignInVerify/Result.php` -- accessToken, refreshToken, expiresIn
 
 ### 3.6 OpenAPI Config
 

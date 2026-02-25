@@ -43,7 +43,7 @@ Passkey entity stores: credentialId, publicKey, signCount, optional name. Linked
 - AuthInterceptor: register passkey requires authentication
 - TokenGenerator (CORE-008): issue JWT after successful passkey login
 - Doctrine ORM: Passkey entity with PhpMappingDriver mapping
-- Database: `auth_passkey` table via migration
+- Database: `profile_passkey` table via migration
 
 ### Dependencies
 
@@ -148,11 +148,11 @@ classDiagram
 
 ```
 src/
-    Domain/Auth/
+    Domain/Profile/
         Entities/Passkey.php
         Repositories/Passkeys.php
 
-    Application/Handlers/Auth/
+    Application/Handlers/Profile/
         RegisterPasskey/
             Command.php
             Handler.php
@@ -161,10 +161,10 @@ src/
             Handler.php
 
     Infrastructure/
-        Persistence/Doctrine/Auth/DoctrinePasskeys.php
-        Persistence/InMemory/Auth/InMemoryPasskeys.php
-        Persistence/Doctrine/Mapping/Auth/PasskeyMapping.php
-        Database/Migrations/VersionXXX_CreateAuthPasskey.php
+        Persistence/Doctrine/Profile/DoctrinePasskeys.php
+        Persistence/InMemory/Profile/InMemoryPasskeys.php
+        Persistence/Doctrine/Mapping/Profile/PasskeyMapping.php
+        Database/Migrations/VersionXXX_CreateProfilePasskey.php
 ```
 
 ---
@@ -209,7 +209,7 @@ src/
 
 - [ ] `web-auth/webauthn-lib` installed via composer
 - [ ] Passkey entity with repository contract
-- [ ] Doctrine mapping and migration for `auth_passkey` table
+- [ ] Doctrine mapping and migration for `profile_passkey` table
 - [ ] RegisterPasskey handler (authenticated endpoint)
 - [ ] LoginWithPasskey handler (public endpoint, returns JWT)
 - [ ] OpenAPI config for both endpoints

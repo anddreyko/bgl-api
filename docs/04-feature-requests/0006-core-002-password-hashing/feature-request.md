@@ -34,7 +34,7 @@ passwords as plain text. This is a security vulnerability and blocks AUTH-001 (R
 ### Existing Code
 
 - `src/Core/Auth/` -- Authentificator, Identity, Identities interfaces
-- `src/Domain/Auth/Entities/User.php` -- no password field currently
+- `src/Domain/Profile/Entities/User.php` -- no password field currently
 - `src/Infrastructure/Authentification/OpenAuth/` -- LeagueAuthServer, uses plain text password
 
 ### Patterns

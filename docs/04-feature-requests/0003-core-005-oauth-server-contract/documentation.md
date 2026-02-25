@@ -103,7 +103,7 @@ Tests can mock `Identities` without database dependencies.
 **Integration points:**
 
 - `LeagueAuthServer` depends on `Identities` (Core interface, injected via constructor)
-- `Users` depends on `Domain\Auth\Entities\Users` (Domain repository, injected via constructor)
+- `Users` depends on `Domain\Profile\Entities\Users` (Domain repository, injected via constructor)
 - `Users::findByCredentials()` uses `Searchable::search()` with `AndX` and `Equals` filters from Core Listing contracts
 - `Users::findById()` uses `Repository::find()` from Core Collections contract
 

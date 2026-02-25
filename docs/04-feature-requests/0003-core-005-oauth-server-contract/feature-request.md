@@ -60,7 +60,7 @@ The OAuth contracts integrate at the following points:
 
 1. **Core layer** (`Bgl\Core\Auth\`): Defines `Authentificator`, `Identity`, `Identities`, `GrantType`, and exception
    hierarchy — no dependencies on external packages
-2. **Domain layer** (`Bgl\Domain\Auth\Entities\Users`): Existing user repository contract used as data source for
+2. **Domain layer** (`Bgl\Domain\Profile\Entities\Users`): Existing user repository contract used as data source for
    identity resolution
 3. **Infrastructure layer** (`Bgl\Infrastructure\Authentification\OpenAuth\`): `LeagueAuthServer` implements
    `Authentificator`; `Users` implements both `Identities` and League's `UserRepositoryInterface`; `UserId` implements
@@ -568,8 +568,8 @@ src/
 
 | File                                      | Relevance                                               |
 |-------------------------------------------|---------------------------------------------------------|
-| `src/Domain/Auth/Entities/Users.php`      | User repository used by `Users` adapter for data access |
-| `src/Domain/Auth/Entities/User.php`       | User entity with id, email, createdAt, status           |
+| `src/Domain/Profile/Entities/Users.php`      | User repository used by `Users` adapter for data access |
+| `src/Domain/Profile/Entities/User.php`       | User entity with id, email, createdAt, status           |
 | `src/Core/ValueObjects/Uuid.php`          | Shared UUID value object used by `Identity`             |
 | `src/Core/Listing/Searchable.php`         | Search interface used by `Users` for credential lookup  |
 

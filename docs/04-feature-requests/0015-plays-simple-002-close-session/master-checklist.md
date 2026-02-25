@@ -13,14 +13,14 @@
 
 **Dependencies:** PLAYS-001 complete
 
-- [x] Create `src/Application/Handlers/Plays/CloseSession/Command.php`:
-  - Properties: string $sessionId, string $userId, ?string $startedAt, ?string $finishedAt
+- [x] Create `src/Application/Handlers/Plays/ClosePlay/Command.php`:
+  - Properties: string $playId, string $userId, ?string $startedAt, ?string $finishedAt
   - Implements `Message<Result>`
-- [x] Create `src/Application/Handlers/Plays/CloseSession/Result.php`:
-  - Properties: string $sessionId, string $startedAt, string $finishedAt
-- [x] Create `src/Application/Handlers/Plays/CloseSession/Handler.php`:
-  - Dependencies: Sessions, ClockInterface
-  - Logic: find session -> validate ownership (userId match) -> close -> return Result
+- [x] Create `src/Application/Handlers/Plays/ClosePlay/Result.php`:
+  - Properties: string $playId, string $startedAt, string $finishedAt
+- [x] Create `src/Application/Handlers/Plays/ClosePlay/Handler.php`:
+  - Dependencies: Plays, ClockInterface
+  - Logic: find play -> validate ownership (userId match) -> close -> return Result
 - [x] Add serialization mapping for Result in `config/_serialise-mapping.php`
 - [x] Register handler in `config/common/bus.php`
 - [x] Add to `config/common/openapi/plays.php`:
@@ -42,9 +42,9 @@
 
 | File | Action | Stage |
 |------|--------|-------|
-| `src/Application/Handlers/Plays/CloseSession/Command.php` | CREATE | 1 |
-| `src/Application/Handlers/Plays/CloseSession/Handler.php` | CREATE | 1 |
-| `src/Application/Handlers/Plays/CloseSession/Result.php` | CREATE | 1 |
+| `src/Application/Handlers/Plays/ClosePlay/Command.php` | CREATE | 1 |
+| `src/Application/Handlers/Plays/ClosePlay/Handler.php` | CREATE | 1 |
+| `src/Application/Handlers/Plays/ClosePlay/Result.php` | CREATE | 1 |
 | `config/_serialise-mapping.php` | MODIFY | 1 |
 | `config/common/bus.php` | MODIFY | 1 |
 | `config/common/openapi/plays.php` | MODIFY | 1 |

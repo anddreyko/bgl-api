@@ -31,8 +31,8 @@ the main branch.
 
 ### Approach
 
-Domain entity `Session` with repository contract. Command + Handler pattern. Doctrine mapping via PhpMappingDriver,
-database migration for `records_session` table. Protected endpoint.
+Domain entity `Play` with repository contract. Command + Handler pattern. Doctrine mapping via PhpMappingDriver,
+database migration for `plays_session` table. Protected endpoint.
 
 ### Integration Points
 
@@ -52,35 +52,35 @@ database migration for `records_session` table. Protected endpoint.
 
 ```mermaid
 classDiagram
-    class Session {
+    class Play {
         <<Entity>>
         -Id id
         -Id userId
         -string name
-        -SessionStatus status
+        -PlayStatus status
         -DateTime startedAt
         -DateTime|null finishedAt
     }
 
-    class SessionStatus {
+    class PlayStatus {
         <<enum>>
         Open
         Closed
     }
 
-    class Sessions {
+    class Plays {
         <<interface>>
-        +save(Session session) void
-        +getById(Id id) Session
+        +save(Play play) void
+        +getById(Id id) Play
     }
 
     class OpenSessionHandler {
         +__invoke(Envelope envelope) Result
     }
 
-    Session --> SessionStatus
-    Sessions ..> Session : manages
-    OpenSessionHandler ..> Sessions : uses
+    Play --> PlayStatus
+    Plays ..> Play : manages
+    OpenSessionHandler ..> Plays : uses
 ```
 
 ---
@@ -124,9 +124,9 @@ All fields optional. Default: empty name, current timestamp for started_at.
 ```
 src/
     Domain/Plays/
-        Entities/Session.php
-        ValueObjects/SessionStatus.php
-        Repositories/Sessions.php
+        Entities/Play.php
+        ValueObjects/PlayStatus.php
+        Repositories/Plays.php
 
     Application/Handlers/Plays/OpenSession/
         Command.php
@@ -134,9 +134,9 @@ src/
         Result.php
 
     Infrastructure/
-        Persistence/Doctrine/Plays/DoctrineSessions.php
-        Persistence/InMemory/Plays/InMemorySessions.php
-        Persistence/Doctrine/Mapping/Plays/SessionMapping.php
+        Persistence/Doctrine/Plays/DoctrinePlays.php
+        Persistence/InMemory/Plays/InMemoryPlays.php
+        Persistence/Doctrine/Mapping/Plays/PlayMapping.php
         Database/Migrations/VersionXXX_CreateRecordsSession.php
 ```
 
@@ -193,11 +193,11 @@ CREATE INDEX idx_session_started ON records_session (started_at DESC);
 
 ## 8. Acceptance Criteria
 
-- [ ] Session entity with SessionStatus enum
-- [ ] Sessions repository contract in Domain
+- [ ] Play entity with PlayStatus enum
+- [ ] Plays repository contract in Domain
 - [ ] Doctrine and InMemory repository implementations
-- [ ] PhpMappingDriver mapping for Session
-- [ ] Database migration for `records_session` table
+- [ ] PhpMappingDriver mapping for Play
+- [ ] Database migration for `plays_session` table
 - [ ] OpenSession Command + Handler + Result
 - [ ] OpenAPI config for POST `/v1/plays/sessions`
 - [ ] Functional and integration tests pass

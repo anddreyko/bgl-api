@@ -11,18 +11,18 @@
 
 ### Description
 
-Close an open game session by setting the finish time and updating the status. Accepts optional `started_at`,
-`finished_at`, and `interval` fields. Protected endpoint. The session must belong to the authenticated user.
+Close an open game play by setting the finish time and updating the status. Accepts optional `started_at`,
+`finished_at`, and `interval` fields. Protected endpoint. The play must belong to the authenticated user.
 
 ### Business Value
 
-- Complete session lifecycle: open -> close
-- Users can record session duration
+- Complete play lifecycle: open -> close
+- Users can record play duration
 - Feature parity with main branch
 
 ### Target Users
 
-- Board game enthusiasts finishing their play sessions
+- Board game enthusiasts finishing their plays
 
 ---
 
@@ -30,14 +30,14 @@ Close an open game session by setting the finish time and updating the status. A
 
 ### Approach
 
-Command + Handler pattern. Handler loads existing Session entity, validates ownership, updates fields, and saves.
-Uses existing Sessions repository from PLAYS-001.
+Command + Handler pattern. Handler loads existing Play entity, validates ownership, updates fields, and saves.
+Uses existing Plays repository from PLAYS-001.
 
 ### Integration Points
 
 - AuthInterceptor: userId from JWT
-- Sessions repository: load and save session
-- Session entity: close() method changes status and sets finishedAt
+- Plays repository: load and save play
+- Play entity: close() method changes status and sets finishedAt
 
 ### Dependencies
 
@@ -52,17 +52,17 @@ sequenceDiagram
     participant Client
     participant ApiAction
     participant AuthInterceptor
-    participant Handler as CloseSession Handler
-    participant Repo as Sessions Repository
+    participant Handler as ClosePlay Handler
+    participant Repo as Plays Repository
 
     Client->>ApiAction: PATCH /v1/plays/sessions/{id} (Bearer token)
     ApiAction->>AuthInterceptor: validate token
     AuthInterceptor->>ApiAction: userId
-    ApiAction->>Handler: CloseSession Command(sessionId, userId, fields)
-    Handler->>Repo: getById(sessionId)
-    Repo-->>Handler: Session entity
-    Handler->>Handler: validate ownership, close session
-    Handler->>Repo: save(session)
+    ApiAction->>Handler: ClosePlay Command(playId, userId, fields)
+    Handler->>Repo: getById(playId)
+    Repo-->>Handler: Play entity
+    Handler->>Handler: validate ownership, close play
+    Handler->>Repo: save(play)
     Handler-->>ApiAction: void
     ApiAction-->>Client: 200 OK
 ```
@@ -92,7 +92,7 @@ All fields optional. If `finished_at` not provided, use current server time.
 {
     "data": {
         "id": "550e8400-e29b-41d4-a716-446655440000",
-        "status": "closed"
+        "status": "Closed"
     }
 }
 ```
@@ -100,22 +100,22 @@ All fields optional. If `finished_at` not provided, use current server time.
 ### Errors
 
 - 401 Unauthorized -- missing or invalid token
-- 403 Forbidden -- session belongs to another user
-- 404 Not Found -- session does not exist
-- 409 Conflict -- session already closed
+- 403 Forbidden -- play belongs to another user
+- 404 Not Found -- play does not exist
+- 409 Conflict -- play already closed
 
 ---
 
 ## 5. Directory Structure
 
 ```
-src/Application/Handlers/Plays/CloseSession/
+src/Application/Handlers/Plays/ClosePlay/
     Command.php
     Handler.php
     Result.php
 
 config/common/openapi/
-    plays.php       # Add close session endpoint
+    plays.php       # Add close play endpoint
 ```
 
 ---
@@ -124,15 +124,15 @@ config/common/openapi/
 
 ### Edge Cases
 
-- Session already closed: return 409 Conflict
-- Session belongs to different user: return 403 Forbidden
+- Play already closed: return 409 Conflict
+- Play belongs to different user: return 403 Forbidden
 - Missing finished_at: default to current server time
 - started_at update: allow correcting the start time
 - finished_at before started_at: validation error
 
 ### Security
 
-- Must validate that authenticated user owns the session
+- Must validate that authenticated user owns the play
 
 ---
 
@@ -140,32 +140,32 @@ config/common/openapi/
 
 ### Functional Tests
 
-- Handler closes open session successfully
-- Handler rejects already closed session
-- Handler rejects session owned by different user
+- Handler closes open play successfully
+- Handler rejects already closed play
+- Handler rejects play owned by different user
 - Handler uses default finished_at when not provided
 
 ### Integration Tests
 
-- Full persistence: open session, then close it
+- Full persistence: open play, then close it
 
 ### Acceptance Tests (Web)
 
 - PATCH /v1/plays/sessions/{id} with valid token returns 200
 - PATCH with wrong user returns 403
-- PATCH already closed session returns 409
+- PATCH already closed play returns 409
 - PATCH without token returns 401
 
 ---
 
 ## 8. Acceptance Criteria
 
-- [ ] CloseSession Command + Handler + Result
-- [ ] Session entity has `close()` method that validates state
+- [ ] ClosePlay Command + Handler + Result
+- [ ] Play entity has `close()` method that validates state
 - [ ] Ownership validation in handler
 - [ ] OpenAPI config for PATCH `/v1/plays/sessions/{id}`
 - [ ] Functional tests pass for all scenarios
-- [ ] Integration test for full open->close cycle
+- [ ] Integration test for full open->close play cycle
 - [ ] Web acceptance tests pass
 - [ ] `composer scan:all` passes
 

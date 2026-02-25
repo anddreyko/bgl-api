@@ -11,21 +11,21 @@ Implemented user registration via email and password with email confirmation flo
 
 | File | Purpose |
 |------|---------|
-| `src/Domain/Auth/Entities/User.php` | Modified to add passwordHash field and register/confirm methods |
-| `src/Domain/Auth/Entities/EmailConfirmationToken.php` | Confirmation token entity with expiry (24h TTL) |
-| `src/Domain/Auth/Entities/EmailConfirmationTokens.php` | Token repository interface |
-| `src/Domain/Auth/Entities/Users.php` | Modified to add findByEmail method |
-| `src/Domain/Auth/Exceptions/UserAlreadyExistsException.php` | Exception for duplicate email |
-| `src/Domain/Auth/Exceptions/InvalidConfirmationTokenException.php` | Exception for token not found |
-| `src/Domain/Auth/Exceptions/ExpiredConfirmationTokenException.php` | Exception for expired token |
-| `src/Infrastructure/Persistence/Doctrine/Mapping/Auth/UserMapping.php` | Updated with passwordHash mapping |
-| `src/Infrastructure/Persistence/Doctrine/Mapping/Auth/EmailConfirmationTokenMapping.php` | ORM mapping for token entity |
+| `src/Domain/Profile/Entities/User.php` | Modified to add passwordHash field and register/confirm methods |
+| `src/Domain/Profile/Entities/EmailConfirmationToken.php` | Confirmation token entity with expiry (24h TTL) |
+| `src/Domain/Profile/Entities/EmailConfirmationTokens.php` | Token repository interface |
+| `src/Domain/Profile/Entities/Users.php` | Modified to add findByEmail method |
+| `src/Domain/Profile/Exceptions/UserAlreadyExistsException.php` | Exception for duplicate email |
+| `src/Domain/Profile/Exceptions/InvalidConfirmationTokenException.php` | Exception for token not found |
+| `src/Domain/Profile/Exceptions/ExpiredConfirmationTokenException.php` | Exception for expired token |
+| `src/Infrastructure/Persistence/Doctrine/Mapping/Profile/UserMapping.php` | Updated with passwordHash mapping |
+| `src/Infrastructure/Persistence/Doctrine/Mapping/Profile/EmailConfirmationTokenMapping.php` | ORM mapping for token entity |
 | `src/Infrastructure/Persistence/Doctrine/Users.php` | Updated with findByEmail implementation |
 | `src/Infrastructure/Persistence/Doctrine/EmailConfirmationTokens.php` | Doctrine repository for tokens |
-| `src/Application/Handlers/Auth/Register/Command.php` | Registration command |
-| `src/Application/Handlers/Auth/Register/Handler.php` | Registration handler with uniqueness check |
-| `src/Application/Handlers/Auth/ConfirmEmail/Command.php` | Confirmation command |
-| `src/Application/Handlers/Auth/ConfirmEmail/Handler.php` | Confirmation handler with expiry check |
+| `src/Application/Handlers/Profile/Register/Command.php` | Registration command |
+| `src/Application/Handlers/Profile/Register/Handler.php` | Registration handler with uniqueness check |
+| `src/Application/Handlers/Profile/ConfirmEmail/Command.php` | Confirmation command |
+| `src/Application/Handlers/Profile/ConfirmEmail/Handler.php` | Confirmation handler with expiry check |
 | `tests/Unit/Application/Handlers/Auth/Register/HandlerCest.php` | Registration tests |
 | `config/common/openapi/auth.php` | POST /v1/auth/sign-up and GET /v1/auth/confirm/{token} endpoints |
 

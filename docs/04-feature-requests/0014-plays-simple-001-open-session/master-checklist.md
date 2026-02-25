@@ -13,14 +13,14 @@
 
 **Dependencies:** AUTH-004 complete
 
-- [x] Create `src/Domain/Plays/Entities/Session.php`:
-  - Properties: Uuid $id, string $name, string $userId, SessionStatus $status, \DateTimeImmutable $startedAt, ?\DateTimeImmutable $finishedAt
+- [x] Create `src/Domain/Plays/Entities/Play.php`:
+  - Properties: Uuid $id, string $name, string $userId, PlayStatus $status, \DateTimeImmutable $startedAt, ?\DateTimeImmutable $finishedAt
   - Static factory: `open(Uuid $id, string $userId, ?string $name, \DateTimeImmutable $startedAt): self`
   - Method: `close(\DateTimeImmutable $finishedAt): void`
-- [x] Create `src/Domain/Plays/Entities/SessionStatus.php` enum:
+- [x] Create `src/Domain/Plays/Entities/PlayStatus.php` enum:
   - Cases: Open, Closed
-- [x] Create `src/Domain/Plays/Entities/Sessions.php` repository interface:
-  - Extends Repository<Session>
+- [x] Create `src/Domain/Plays/Entities/Plays.php` repository interface:
+  - Extends Repository<Play>
 - [x] Verify: `composer lp:run && composer ps:run`
 
 ---
@@ -29,11 +29,11 @@
 
 **Dependencies:** Stage 1
 
-- [x] Create `src/Infrastructure/Persistence/Doctrine/Mapping/Plays/SessionMapping.php`
-- [x] Create `src/Infrastructure/Persistence/Doctrine/Plays/Sessions.php` (Doctrine impl)
+- [x] Create `src/Infrastructure/Persistence/Doctrine/Mapping/Plays/PlayMapping.php`
+- [x] Create `src/Infrastructure/Persistence/Doctrine/Plays/Plays.php` (Doctrine impl)
 - [x] Register mapping in `config/common/doctrine.php`
 - [x] Register repository in `config/common/persistence.php`
-- [x] Generate migration: `make migrate-gen` (creates records_session table)
+- [x] Generate migration: `make migrate-gen` (creates plays_session table)
 - [x] Verify: `composer lp:run && composer ps:run`
 
 ---
@@ -46,10 +46,10 @@
   - Properties: string $userId, ?string $name, ?string $startedAt
   - Implements `Message<Result>`
 - [x] Create `src/Application/Handlers/Plays/OpenSession/Result.php`:
-  - Properties: string $sessionId
+  - Properties: string $playId
 - [x] Create `src/Application/Handlers/Plays/OpenSession/Handler.php`:
-  - Dependencies: Sessions, ClockInterface
-  - Logic: create Session::open() -> add to repo -> return Result
+  - Dependencies: Plays, ClockInterface
+  - Logic: create Play::open() -> add to repo -> return Result
 - [x] Add serialization mapping for Result in `config/_serialise-mapping.php`
 - [x] Register handler in `config/common/bus.php`
 - [x] Create `config/common/openapi/plays.php`:
@@ -71,11 +71,11 @@
 
 | File | Action | Stage |
 |------|--------|-------|
-| `src/Domain/Plays/Entities/Session.php` | CREATE | 1 |
-| `src/Domain/Plays/Entities/SessionStatus.php` | CREATE | 1 |
-| `src/Domain/Plays/Entities/Sessions.php` | CREATE | 1 |
-| `src/Infrastructure/Persistence/Doctrine/Mapping/Plays/SessionMapping.php` | CREATE | 2 |
-| `src/Infrastructure/Persistence/Doctrine/Plays/Sessions.php` | CREATE | 2 |
+| `src/Domain/Plays/Entities/Play.php` | CREATE | 1 |
+| `src/Domain/Plays/Entities/PlayStatus.php` | CREATE | 1 |
+| `src/Domain/Plays/Entities/Plays.php` | CREATE | 1 |
+| `src/Infrastructure/Persistence/Doctrine/Mapping/Plays/PlayMapping.php` | CREATE | 2 |
+| `src/Infrastructure/Persistence/Doctrine/Plays/Plays.php` | CREATE | 2 |
 | `config/common/doctrine.php` | MODIFY | 2 |
 | `config/common/persistence.php` | MODIFY | 2 |
 | `src/Application/Handlers/Plays/OpenSession/Command.php` | CREATE | 3 |

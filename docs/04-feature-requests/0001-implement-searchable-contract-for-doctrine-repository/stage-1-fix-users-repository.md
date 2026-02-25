@@ -61,8 +61,8 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\Doctrine;
 
-use Bgl\Domain\Auth\Entities\User;
-use Bgl\Domain\Auth\Entities\Users as UserRepository;
+use Bgl\Domain\Profile\Entities\User;
+use Bgl\Domain\Profile\Entities\Users as UserRepository;
 
 /**
  * @extends DoctrineRepository<User>
