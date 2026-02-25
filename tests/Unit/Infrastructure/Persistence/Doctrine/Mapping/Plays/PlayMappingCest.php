@@ -4,29 +4,29 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Unit\Infrastructure\Persistence\Doctrine\Mapping\Plays;
 
-use Bgl\Domain\Plays\Entities\Session;
-use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\SessionMapping;
+use Bgl\Domain\Plays\Entities\Play;
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\PlayMapping;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 /**
- * @covers \Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\SessionMapping
+ * @covers \Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\PlayMapping
  */
 #[Group('doctrine', 'mapping')]
-final class SessionMappingCest
+final class PlayMappingCest
 {
     public function testGetEntityClass(UnitTester $i): void
     {
-        $mapping = new SessionMapping();
+        $mapping = new PlayMapping();
 
-        $i->assertSame(Session::class, $mapping->getEntityClass());
+        $i->assertSame(Play::class, $mapping->getEntityClass());
     }
 
     public function testConfigureSetsTableName(UnitTester $i): void
     {
-        $mapping = new SessionMapping();
-        $metadata = new ClassMetadata(Session::class);
+        $mapping = new PlayMapping();
+        $metadata = new ClassMetadata(Play::class);
 
         $mapping->configure($metadata);
 
@@ -35,8 +35,8 @@ final class SessionMappingCest
 
     public function testConfigureSetsIdField(UnitTester $i): void
     {
-        $mapping = new SessionMapping();
-        $metadata = new ClassMetadata(Session::class);
+        $mapping = new PlayMapping();
+        $metadata = new ClassMetadata(Play::class);
 
         $mapping->configure($metadata);
 
@@ -47,8 +47,8 @@ final class SessionMappingCest
 
     public function testConfigureSetsUserIdField(UnitTester $i): void
     {
-        $mapping = new SessionMapping();
-        $metadata = new ClassMetadata(Session::class);
+        $mapping = new PlayMapping();
+        $metadata = new ClassMetadata(Play::class);
 
         $mapping->configure($metadata);
 
@@ -58,8 +58,8 @@ final class SessionMappingCest
 
     public function testConfigureSetsNameField(UnitTester $i): void
     {
-        $mapping = new SessionMapping();
-        $metadata = new ClassMetadata(Session::class);
+        $mapping = new PlayMapping();
+        $metadata = new ClassMetadata(Play::class);
 
         $mapping->configure($metadata);
 
@@ -69,8 +69,8 @@ final class SessionMappingCest
 
     public function testConfigureSetsStatusField(UnitTester $i): void
     {
-        $mapping = new SessionMapping();
-        $metadata = new ClassMetadata(Session::class);
+        $mapping = new PlayMapping();
+        $metadata = new ClassMetadata(Play::class);
 
         $mapping->configure($metadata);
 
@@ -79,8 +79,8 @@ final class SessionMappingCest
 
     public function testConfigureSetsStartedAtField(UnitTester $i): void
     {
-        $mapping = new SessionMapping();
-        $metadata = new ClassMetadata(Session::class);
+        $mapping = new PlayMapping();
+        $metadata = new ClassMetadata(Play::class);
 
         $mapping->configure($metadata);
 
@@ -89,8 +89,8 @@ final class SessionMappingCest
 
     public function testConfigureSetsFinishedAtField(UnitTester $i): void
     {
-        $mapping = new SessionMapping();
-        $metadata = new ClassMetadata(Session::class);
+        $mapping = new PlayMapping();
+        $metadata = new ClassMetadata(Play::class);
 
         $mapping->configure($metadata);
 
@@ -100,8 +100,8 @@ final class SessionMappingCest
 
     public function testConfigureSetsAllExpectedFields(UnitTester $i): void
     {
-        $mapping = new SessionMapping();
-        $metadata = new ClassMetadata(Session::class);
+        $mapping = new PlayMapping();
+        $metadata = new ClassMetadata(Play::class);
 
         $mapping->configure($metadata);
 

@@ -9,9 +9,9 @@ use Bgl\Application\Handlers\Plays\CloseSession\Handler;
 use Bgl\Application\Handlers\Plays\CloseSession\Result;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Plays\Entities\Session;
-use Bgl\Domain\Plays\Entities\SessionStatus;
-use Bgl\Domain\Plays\Entities\Sessions;
+use Bgl\Domain\Plays\Entities\Play;
+use Bgl\Domain\Plays\Entities\PlayStatus;
+use Bgl\Domain\Plays\Entities\Plays;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 use Codeception\Stub;
@@ -25,22 +25,22 @@ final class HandlerCest
 {
     public function testSuccessfulClose(UnitTester $i): void
     {
-        $session = Session::open(
+        $play = Play::open(
             new Uuid('session-1'),
             new Uuid('user-123'),
             'Game night',
             new \DateTimeImmutable('2024-06-15 20:00:00'),
         );
 
-        $sessions = Stub::makeEmpty(Sessions::class, [
-            'find' => static fn(): Session => $session,
+        $plays = Stub::makeEmpty(Plays::class, [
+            'find' => static fn(): Play => $play,
         ]);
 
         $clock = Stub::makeEmpty(ClockInterface::class, [
             'now' => static fn(): \DateTimeImmutable => new \DateTimeImmutable('2024-06-15 23:00:00'),
         ]);
 
-        $handler = new Handler($sessions, $clock);
+        $handler = new Handler($plays, $clock);
 
         $command = new Command(sessionId: 'session-1', userId: 'user-123');
         $envelope = new Envelope($command, 'msg-1');
@@ -51,25 +51,25 @@ final class HandlerCest
         $i->assertSame('session-1', $result->sessionId);
         $i->assertSame('2024-06-15T20:00:00+00:00', $result->startedAt);
         $i->assertSame('2024-06-15T23:00:00+00:00', $result->finishedAt);
-        $i->assertSame(SessionStatus::Published, $session->getStatus());
+        $i->assertSame(PlayStatus::Published, $play->getStatus());
     }
 
     public function testCloseWithCustomFinishedAt(UnitTester $i): void
     {
-        $session = Session::open(
+        $play = Play::open(
             new Uuid('session-2'),
             new Uuid('user-123'),
             null,
             new \DateTimeImmutable('2024-06-15 20:00:00'),
         );
 
-        $sessions = Stub::makeEmpty(Sessions::class, [
-            'find' => static fn(): Session => $session,
+        $plays = Stub::makeEmpty(Plays::class, [
+            'find' => static fn(): Play => $play,
         ]);
 
         $clock = Stub::makeEmpty(ClockInterface::class);
 
-        $handler = new Handler($sessions, $clock);
+        $handler = new Handler($plays, $clock);
 
         $customFinishedAt = new \DateTimeImmutable('2024-06-15 22:30:00');
         $command = new Command(
@@ -85,21 +85,21 @@ final class HandlerCest
         $i->assertSame('2024-06-15T22:30:00+00:00', $result->finishedAt);
     }
 
-    public function testSessionNotFoundThrowsDomainException(UnitTester $i): void
+    public function testPlayNotFoundThrowsDomainException(UnitTester $i): void
     {
-        $sessions = Stub::makeEmpty(Sessions::class, [
-            'find' => static fn(): ?Session => null,
+        $plays = Stub::makeEmpty(Plays::class, [
+            'find' => static fn(): ?Play => null,
         ]);
 
         $clock = Stub::makeEmpty(ClockInterface::class);
 
-        $handler = new Handler($sessions, $clock);
+        $handler = new Handler($plays, $clock);
 
         $command = new Command(sessionId: 'non-existent', userId: 'user-123');
         $envelope = new Envelope($command, 'msg-3');
 
         $i->expectThrowable(
-            new \DomainException('Session not found'),
+            new \DomainException('Play not found'),
             static function () use ($handler, $envelope): void {
                 $handler($envelope);
             },
@@ -108,20 +108,20 @@ final class HandlerCest
 
     public function testAccessDeniedThrowsDomainException(UnitTester $i): void
     {
-        $session = Session::open(
+        $play = Play::open(
             new Uuid('session-3'),
             new Uuid('user-owner'),
             null,
             new \DateTimeImmutable('2024-06-15 20:00:00'),
         );
 
-        $sessions = Stub::makeEmpty(Sessions::class, [
-            'find' => static fn(): Session => $session,
+        $plays = Stub::makeEmpty(Plays::class, [
+            'find' => static fn(): Play => $play,
         ]);
 
         $clock = Stub::makeEmpty(ClockInterface::class);
 
-        $handler = new Handler($sessions, $clock);
+        $handler = new Handler($plays, $clock);
 
         $command = new Command(sessionId: 'session-3', userId: 'user-other');
         $envelope = new Envelope($command, 'msg-4');

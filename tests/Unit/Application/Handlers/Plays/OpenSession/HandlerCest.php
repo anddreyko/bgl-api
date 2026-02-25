@@ -10,7 +10,7 @@ use Bgl\Application\Handlers\Plays\OpenSession\Result;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Plays\Entities\Sessions;
+use Bgl\Domain\Plays\Entities\Plays;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 use Codeception\Stub;
@@ -22,9 +22,9 @@ use Psr\Clock\ClockInterface;
 #[Group('plays', 'open-session')]
 final class HandlerCest
 {
-    public function testSuccessfulSessionOpening(UnitTester $i): void
+    public function testSuccessfulPlayOpening(UnitTester $i): void
     {
-        $sessions = Stub::makeEmpty(Sessions::class, [
+        $plays = Stub::makeEmpty(Plays::class, [
             'add' => static function (): void {
             },
         ]);
@@ -37,7 +37,7 @@ final class HandlerCest
             'generate' => static fn(): Uuid => new Uuid('generated-uuid'),
         ]);
 
-        $handler = new Handler($sessions, $uuidGenerator, $clock);
+        $handler = new Handler($plays, $uuidGenerator, $clock);
 
         $command = new Command(userId: 'user-123', name: 'Game night');
         $envelope = new Envelope($command, 'msg-1');
@@ -48,9 +48,9 @@ final class HandlerCest
         $i->assertNotEmpty($result->sessionId);
     }
 
-    public function testSessionOpeningWithoutName(UnitTester $i): void
+    public function testPlayOpeningWithoutName(UnitTester $i): void
     {
-        $sessions = Stub::makeEmpty(Sessions::class, [
+        $plays = Stub::makeEmpty(Plays::class, [
             'add' => static function (): void {
             },
         ]);
@@ -63,7 +63,7 @@ final class HandlerCest
             'generate' => static fn(): Uuid => new Uuid('generated-uuid'),
         ]);
 
-        $handler = new Handler($sessions, $uuidGenerator, $clock);
+        $handler = new Handler($plays, $uuidGenerator, $clock);
 
         $command = new Command(userId: 'user-456');
         $envelope = new Envelope($command, 'msg-2');

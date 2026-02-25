@@ -8,8 +8,8 @@ use Bgl\Core\Collections\Repository;
 use Bgl\Core\Listing\Searchable;
 
 /**
- * @extends Repository<Session>
+ * @extends Repository<Play>
  */
-interface Sessions extends Repository, Searchable
+interface Plays extends Repository, Searchable
 {
 }

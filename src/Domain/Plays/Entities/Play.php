@@ -6,13 +6,13 @@ namespace Bgl\Domain\Plays\Entities;
 
 use Bgl\Core\ValueObjects\Uuid;
 
-final class Session
+final class Play
 {
     public function __construct(
         private readonly Uuid $id,
         private readonly Uuid $userId,
         private readonly ?string $name,
-        private SessionStatus $status,
+        private PlayStatus $status,
         private readonly \DateTimeImmutable $startedAt,
         private ?\DateTimeImmutable $finishedAt,
     ) {
@@ -24,7 +24,7 @@ final class Session
         ?string $name,
         \DateTimeImmutable $startedAt,
     ): self {
-        return new self($id, $userId, $name, SessionStatus::Draft, $startedAt, null);
+        return new self($id, $userId, $name, PlayStatus::Draft, $startedAt, null);
     }
 
     public function getId(): Uuid
@@ -42,7 +42,7 @@ final class Session
         return $this->name;
     }
 
-    public function getStatus(): SessionStatus
+    public function getStatus(): PlayStatus
     {
         return $this->status;
     }
@@ -59,11 +59,11 @@ final class Session
 
     public function close(\DateTimeImmutable $finishedAt): void
     {
-        if ($this->status !== SessionStatus::Draft) {
-            throw new \DomainException('Session can only be closed from draft status');
+        if ($this->status !== PlayStatus::Draft) {
+            throw new \DomainException('Play can only be closed from draft status');
         }
 
-        $this->status = SessionStatus::Published;
+        $this->status = PlayStatus::Published;
         $this->finishedAt = $finishedAt;
     }
 }

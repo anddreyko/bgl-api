@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\EmailConfirmationTokenMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\UserMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\PhpMappingDriver;
-use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\SessionMapping;
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\PlayMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Type\EmailType;
 use Bgl\Infrastructure\Persistence\Doctrine\Type\UuidType;
 use Doctrine\DBAL\DriverManager;
@@ -61,7 +61,7 @@ return [
         'mapping' => new PhpMappingDriver([
             new UserMapping(),
             new EmailConfirmationTokenMapping(),
-            new SessionMapping(),
+            new PlayMapping(),
         ]),
     ],
 ];

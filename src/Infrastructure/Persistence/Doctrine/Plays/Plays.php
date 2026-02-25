@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\Doctrine\Plays;
 
-use Bgl\Domain\Plays\Entities\Session;
-use Bgl\Domain\Plays\Entities\Sessions as PlaysSessions;
+use Bgl\Domain\Plays\Entities\Play;
+use Bgl\Domain\Plays\Entities\Plays as DomainPlays;
 use Bgl\Infrastructure\Persistence\Doctrine\DoctrineRepository;
 
 /**
- * @extends DoctrineRepository<Session>
+ * @extends DoctrineRepository<Play>
  */
-final class Sessions extends DoctrineRepository implements PlaysSessions
+final class Plays extends DoctrineRepository implements DomainPlays
 {
     #[\Override]
     public function getType(): string
     {
-        return Session::class;
+        return Play::class;
     }
 
     #[\Override]
     public function getAlias(): string
     {
-        return 's';
+        return 'p';
     }
 
     #[\Override]

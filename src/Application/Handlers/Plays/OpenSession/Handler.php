@@ -8,8 +8,8 @@ use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Plays\Entities\Session;
-use Bgl\Domain\Plays\Entities\Sessions;
+use Bgl\Domain\Plays\Entities\Play;
+use Bgl\Domain\Plays\Entities\Plays;
 use Psr\Clock\ClockInterface;
 
 /**
@@ -18,7 +18,7 @@ use Psr\Clock\ClockInterface;
 final readonly class Handler implements MessageHandler
 {
     public function __construct(
-        private Sessions $sessions,
+        private Plays $plays,
         private UuidGenerator $uuidGenerator,
         private ClockInterface $clock,
     ) {
@@ -32,17 +32,17 @@ final readonly class Handler implements MessageHandler
 
         $now = \DateTimeImmutable::createFromInterface($this->clock->now());
 
-        $session = Session::open(
+        $play = Play::open(
             id: $this->uuidGenerator->generate(),
             userId: new Uuid($command->userId),
             name: $command->name,
             startedAt: $now,
         );
 
-        $this->sessions->add($session);
+        $this->plays->add($play);
 
         return new Result(
-            sessionId: $session->getId()->getValue() ?? '',
+            sessionId: $play->getId()->getValue() ?? '',
         );
     }
 }

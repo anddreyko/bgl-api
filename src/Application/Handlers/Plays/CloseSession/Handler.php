@@ -6,8 +6,8 @@ namespace Bgl\Application\Handlers\Plays\CloseSession;
 
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
-use Bgl\Domain\Plays\Entities\Session;
-use Bgl\Domain\Plays\Entities\Sessions;
+use Bgl\Domain\Plays\Entities\Play;
+use Bgl\Domain\Plays\Entities\Plays;
 use Psr\Clock\ClockInterface;
 
 /**
@@ -16,7 +16,7 @@ use Psr\Clock\ClockInterface;
 final readonly class Handler implements MessageHandler
 {
     public function __construct(
-        private Sessions $sessions,
+        private Plays $plays,
         private ClockInterface $clock,
     ) {
     }
@@ -27,25 +27,25 @@ final readonly class Handler implements MessageHandler
         /** @var Command $command */
         $command = $envelope->message;
 
-        /** @var Session|null $session */
-        $session = $this->sessions->find($command->sessionId);
+        /** @var Play|null $play */
+        $play = $this->plays->find($command->sessionId);
 
-        if ($session === null) {
-            throw new \DomainException('Session not found');
+        if ($play === null) {
+            throw new \DomainException('Play not found');
         }
 
-        if ($session->getUserId()->getValue() !== $command->userId) {
+        if ($play->getUserId()->getValue() !== $command->userId) {
             throw new \DomainException('Access denied');
         }
 
         $finishedAt = $command->finishedAt
             ?? \DateTimeImmutable::createFromInterface($this->clock->now());
 
-        $session->close($finishedAt);
+        $play->close($finishedAt);
 
         return new Result(
-            sessionId: $session->getId()->getValue() ?? '',
-            startedAt: $session->getStartedAt()->format('c'),
+            sessionId: $play->getId()->getValue() ?? '',
+            startedAt: $play->getStartedAt()->format('c'),
             finishedAt: $finishedAt->format('c'),
         );
     }
