@@ -15,7 +15,6 @@ $chain = new MappingDriverChain();
 $chain->addDriver(
     new PhpMappingDriver([
         new UserMapping(),
-        new EmailConfirmationTokenMapping(),
         new PasskeyMapping(),
         new PasskeyChallengeMapping(),
         new PlayMapping(),
