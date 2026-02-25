@@ -211,13 +211,7 @@ Priority: Static Analysis → Integration → Unit → E2E. Integration tests = 
 
 ### Test Placement
 
-| Type        | Location              | Requirements                 |
-|-------------|-----------------------|------------------------------|
-| Unit        | `tests/Unit/{path}/`  | No dependencies              |
-| Functional  | `tests/Functional/`   | Mock externals, fixtures     |
-| Integration | `tests/Integration/`  | DB, fixtures, mock externals |
-| CLI         | `tests/Cli/*.feature` | DB, fixtures, mock externals |
-| Web         | `tests/Web/*.feature` | DB, fixtures, mock externals |
+See detailed guide: `docs/02-onboarding/04-testing.md` (layer mapping table, test doubles, examples).
 
 **All new classes MUST have test coverage.**
 

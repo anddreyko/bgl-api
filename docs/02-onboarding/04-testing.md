@@ -8,45 +8,38 @@ concept rather than the traditional pyramid.
 ## Testing Trophy
 
 Unlike the classic testing pyramid where unit tests form the base, we follow the Testing Trophy approach. The trophy
-shape reflects effort distribution: the wide middle (integration tests) is the foundation of system confidence.
+shape reflects effort distribution: the wide middle (functional + integration tests) is the foundation of system
+confidence.
 
 ```
-       ╱‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾╲
-      │      End-to-End   │       ← Few E2E tests
-       ╲_________________╱
-      ╱                   ╲
-     │                     │
-     │    Integration      │      ← Many integration (foundation)
-     │                     │
-      ╲___________________╱
-       ╱                 ╲
-      │       Unit        │       ← Few unit tests
-       ╲_________________╱
-      │                   │
-      │  Static Analysis  │       ← Base
-      │                   │
-      ╰───────────────────╯
+          +----------------+
+          |   End-to-End   |       <- few
+      +---+--------+-------+----+
+      |       Integration       |  <- many (foundation)
+      +---+--------+-------+----+
+      |        Functional       |  <- many (foundation)
+      +-------+--------+--------+
+              |  Unit  |           <- few
+      +-------+--------+-------+
+      |   Static Analysis      |   <- base
+      +------------------------+
 ```
 
 **Trophy Levels (bottom to top):**
 
-1. **Static Code Analysis** — code verification without execution. Psalm checks types and potential errors, PHP-CS-Fixer
-   ensures style consistency, Deptrac controls architectural dependencies. Catches an entire class of errors without
-   writing tests.
+1. **Static Code Analysis** -- code verification without execution. Psalm checks types and potential errors,
+   PHP-CS-Fixer ensures style consistency, Deptrac controls architectural dependencies. Catches an entire class of
+   errors without writing tests.
 
-2. **Unit Tests (few)** — isolated tests for complex business logic. Written only where there are non-trivial
-   calculations or rules. Not needed for simple operations.
+2. **Unit Tests (few)** -- isolated tests for complex pure logic. Written only for Domain + Core classes with
+   non-trivial invariants or validation. Zero external dependencies, zero stubs.
 
-3. **Integration Tests (many)** — the main confidence level. Verify component interaction: Handler + Repository,
-   Repository + Database. Best cost/benefit ratio.
+3. **Functional + Integration Tests (many)** -- the main confidence level. Functional tests verify application-layer
+   use cases with InMemory/Fake dependencies. Integration tests verify infrastructure contracts with real backing
+   services. Best cost/benefit ratio.
 
-4. **End-to-End Tests (few)** — verification of key user scenarios via API. Cover critical paths but not every endpoint.
-
-**Approach Benefits:**
-
-Static analysis catches simple errors without writing tests. Integration tests provide system confidence with less
-dependency on internal implementation than unit tests. Implementation changes don't break tests as long as behavior
-remains correct.
+4. **End-to-End Tests (few)** -- verification of key user scenarios via HTTP API or CLI. Cover critical happy paths
+   and access control, not every endpoint.
 
 ---
 
@@ -59,7 +52,7 @@ All tests, including unit tests, are written in Codeception style using Cest cla
 approach uniformity and simplifies test infrastructure maintenance.
 
 ```php
-// Correct — Codeception style
+// Correct -- Codeception style
 final class EmailCest
 {
     public function testValidEmail(UnitTester $I): void
@@ -70,7 +63,7 @@ final class EmailCest
     }
 }
 
-// Wrong — PHPUnit style (not supported)
+// Wrong -- PHPUnit style (not supported)
 final class EmailTest extends TestCase
 {
     public function testValidEmail(): void
@@ -82,191 +75,35 @@ final class EmailTest extends TestCase
 
 ---
 
-## Test Types
+## Test Types and Layer Mapping
 
-### Static Analysis (Foundation)
+Each test suite maps to exactly one architecture layer. See ADR-015 for the decision rationale.
 
-Runs before all tests. Checks types, finds potential bugs, controls architecture.
+| Suite       | Layer              | What to Test                          | DI Container    | Backing Services |
+|-------------|--------------------|---------------------------------------|-----------------|------------------|
+| Unit        | Domain + Core pure | Invariants, validation, method logic  | No              | No               |
+| Functional  | Application        | Handlers, use cases, state changes    | Yes (InMemory)  | No               |
+| Integration | Infrastructure     | Repos, adapters, contract compliance  | Yes (real)      | Yes              |
+| Web / Cli   | Presentation       | Happy paths, access control           | N/A (HTTP/CLI)  | Yes              |
 
-```bash
-composer scan:style     # PHP-CS-Fixer + Rector (modifies code)
-composer scan:php       # Lint + Psalm
-composer scan:depend    # Deptrac + Composer dependencies
-composer scan:all       # scan:php + scan:depend + test:all (without scan:style)
-```
+### Unit Tests (Domain + Core Pure)
 
-The `scan:all` command intentionally excludes `scan:style` since it modifies code. Run `scan:style` separately first,
-then `scan:all` for verification.
+**Layer:** Domain entities, Value Objects, Core pure classes (exceptions, collections).
 
-### Unit Tests (Few)
+**Location:** `tests/Unit/`
 
-Isolated tests of individual classes. All dependencies are mocked. Written only for complex logic. Use Codeception
-UnitTester.
+**Rules:**
 
-Location: `tests/Unit/`
+- Zero external dependencies, zero DI, zero database
+- Zero `Stub::makeEmpty()` -- if a class needs stubs to test, it is not a Unit test
+- Test invariants, validation logic, method behavior of self-contained classes
+
+**When to write:** Value Objects with validation, entities with invariant logic, complex pure calculations. Not needed
+for simple getters, delegating methods, trivial operations.
 
 ```bash
 composer test:unit
 ```
-
-When to write: Value Objects with validation, domain services with calculations, complex business rules. Not needed for
-simple getters, delegating methods, trivial operations.
-
-### Integration Tests (Foundation)
-
-The main test type in the project. Verify component interaction with test database and fixtures.
-
-Location: `tests/Integration/`
-
-```bash
-composer test:intg
-```
-
-When to write: for all Handlers, Repository implementations, external integrations (BGG API). This is the main source of
-confidence in system operability. Tests use a separate test database with fixtures, not production data.
-
-### Functional Tests
-
-Business scenario tests with InMemory repositories. Faster than integration, verify business logic without DB.
-
-Location: `tests/Functional/`
-
-```bash
-composer test:func
-```
-
-### End-to-End Tests (Few)
-
-E2E tests via HTTP API and CLI. Verify the full path from entry point to database.
-
-Location: `tests/Web/` (API), `tests/Cli/` (CLI)
-
-```bash
-composer test:web    # API tests
-composer test:cli    # CLI tests
-```
-
-When to write: for critical user scenarios — registration, session creation, statistics retrieval. Not needed for every
-endpoint.
-
-**Principles:**
-
-- **Happy path only** — acceptance tests verify that the system works end-to-end. A basic scenario: a user can register,
-  log in, perform an action, and log out. Business logic details (validation, errors, edge cases) are covered by
-  functional and unit tests.
-- **Protected endpoints require Bearer token** — all requests to protected routes need `Authorization: Bearer {token}`.
-  Use `AuthModule` for automatic token retrieval in tests.
-- **Test data via API + Db module** — test data is created through HTTP requests (sign-up, sign-in) and Codeception Db
-  module methods (`updateInDatabase`, `grabFromDatabase`) for state preparation (e.g. confirming a user).
-- **Automatic cleanup** — Db module with `cleanup: true` wraps each test in a transaction and rolls it back afterward.
-
-### Mutation Tests (Automatic Quality Check)
-
-Mutation testing is an automatic quality check of existing tests. Infection makes small changes (mutations) to the code
-and verifies that tests detect these changes.
-
-```bash
-composer in          # Run mutation testing
-```
-
-Mutation tests don't need to be written manually. They run automatically based on existing tests. The developer's task
-is to ensure mutation tests pass, meaning existing tests are good enough to "kill" mutations.
-
-If a mutation "survives" (tests don't fail when code changes), it signals insufficient coverage or weak assertions. In
-this case, strengthen existing tests rather than writing new mutation tests.
-
----
-
-## Testing Commands
-
-| Command                  | Purpose              |
-|--------------------------|----------------------|
-| `composer test:unit`     | Unit tests           |
-| `composer test:func`     | Functional tests     |
-| `composer test:intg`     | Integration tests    |
-| `composer test:web`      | Acceptance API tests |
-| `composer test:cli`      | Acceptance CLI tests |
-| `composer test:all`      | All tests            |
-| `composer test:coverage` | Coverage report      |
-| `composer in`            | Mutation testing     |
-
----
-
-## Development Priority
-
-When creating a new feature, follow the Testing Trophy order.
-
-1. **Static Analysis** — ensure `scan:php` and `scan:depend` pass
-2. **Integration Tests** — write tests for Handler with test database and fixtures
-3. **Unit Tests** — only if there's complex isolated logic
-4. **End-to-End Tests** — only for critical scenarios
-5. **Mutation Tests** — verify `composer in` passes
-
-Don't aim for 100% unit test coverage. Integration tests provide more confidence with less maintenance cost.
-
----
-
-## Test Examples
-
-### Integration Test for Handler (Main Type)
-
-Tests use a separate test database with fixtures. Each test runs in a transaction that is rolled back after completion.
-
-```php
-final class CreatePlayHandlerCest
-{
-    public function testCreatesPlaySuccessfully(IntegrationTester $I): void
-    {
-        // Arrange
-        $game = GameFactory::create();
-        $I->haveInDatabase($game);
-
-        $command = new CreatePlayCommand(
-            gameId: $game->id(),
-            date: new DateTimeImmutable('2025-01-15'),
-        );
-
-        // Act
-        $playId = $I->handleCommand($command);
-
-        // Assert
-        $I->assertNotNull($playId);
-        $I->seeInDatabase('plays', ['id' => (string) $playId]);
-    }
-
-    public function testFailsWhenGameNotFound(IntegrationTester $I): void
-    {
-        $command = new CreatePlayCommand(
-            gameId: GameId::generate(),
-            date: new DateTimeImmutable(),
-        );
-
-        $I->expectThrowable(GameNotFoundException::class, function () use ($I, $command) {
-            $I->handleCommand($command);
-        });
-    }
-}
-```
-
-### Integration Test for Repository
-
-```php
-final class DoctrinePlaysCest
-{
-    public function testFindsPlayById(IntegrationTester $I): void
-    {
-        $play = PlayFactory::create();
-        $I->haveInDatabase($play);
-
-        $found = $I->grabRepository(Plays::class)->findById($play->id());
-
-        $I->assertNotNull($found);
-        $I->assertEquals($play->id(), $found->id());
-    }
-}
-```
-
-### Unit Test for Value Object (Codeception Style)
 
 ```php
 final class EmailCest
@@ -287,19 +124,229 @@ final class EmailCest
 }
 ```
 
+### Functional Tests (Application Layer)
+
+**Layer:** Application handlers, use cases, aspects.
+
+**Location:** `tests/Functional/`
+
+**Rules:**
+
+- DI container with InMemory/Fake bindings (no real database)
+- Execute a handler, verify system state changes via InMemory repositories
+- Infrastructure replaced at runtime via `Container::set()` in Codeception module
+- InMemory repos, FakeConfirmer, FakeTokenIssuer, NullTransactor
+
+**When to write:** For every handler / use case. This is the primary test type for business logic.
+
+```bash
+composer test:func
+```
+
+```php
+final class SignUpHandlerCest
+{
+    public function testSignsUpUser(FunctionalTester $I): void
+    {
+        $command = new SignUpCommand(
+            email: 'user@example.com',
+            password: 'SecurePass1!',
+        );
+
+        $I->handleCommand($command);
+
+        $I->seeUserInRepository('user@example.com');
+    }
+
+    public function testFailsOnDuplicateEmail(FunctionalTester $I): void
+    {
+        $I->haveUserInRepository('user@example.com');
+
+        $command = new SignUpCommand(
+            email: 'user@example.com',
+            password: 'SecurePass1!',
+        );
+
+        $I->expectThrowable(UserAlreadyExistsException::class, function () use ($I, $command) {
+            $I->handleCommand($command);
+        });
+    }
+}
+```
+
+### Integration Tests (Infrastructure Layer)
+
+**Layer:** Repository implementations, external adapters, infrastructure services.
+
+**Location:** `tests/Integration/`
+
+**Rules:**
+
+- Real DI container (`APP_ENV=test`), real database
+- Contract test pattern: abstract base class defines test methods, concrete class provides implementation via
+  factory method
+- Tests use a separate test database with fixtures
+- Each test runs in a transaction that is rolled back after completion
+
+**When to write:** For all repository implementations, external service adapters, infrastructure contracts.
+
+```bash
+composer test:intg
+```
+
+```php
+final class DoctrinePlaysCest
+{
+    public function testFindsPlayById(IntegrationTester $I): void
+    {
+        $play = PlayFactory::create();
+        $I->haveInDatabase($play);
+
+        $found = $I->grabRepository(Plays::class)->findById($play->id());
+
+        $I->assertNotNull($found);
+        $I->assertEquals($play->id(), $found->id());
+    }
+}
+```
+
+### End-to-End Tests (Presentation Layer)
+
+**Layer:** Presentation -- HTTP API (Web) and CLI commands.
+
+**Location:** `tests/Web/` (API), `tests/Cli/` (CLI)
+
+**Rules:**
+
+- Full stack: real HTTP requests or CLI execution, real database
+- Only happy-path scenarios + access control checks (authenticated/unauthenticated, roles)
+- Edge cases and error paths are covered by Functional and Unit tests
+
+**When to write:** For critical user scenarios -- registration, authentication, session creation. Not needed for
+every endpoint.
+
+```bash
+composer test:web    # API tests
+composer test:cli    # CLI tests
+```
+
+**Principles:**
+
+- **Happy path + access control** -- acceptance tests verify that the system works end-to-end and that access rules
+  are enforced. Edge cases are covered by Functional tests.
+- **Protected endpoints require Bearer token** -- all requests to protected routes need
+  `Authorization: Bearer {token}`. Use `AuthModule` for automatic token retrieval in tests.
+- **Test data via API + Db module** -- test data is created through HTTP requests (sign-up, sign-in) and Codeception
+  Db module methods (`updateInDatabase`, `grabFromDatabase`) for state preparation.
+- **Automatic cleanup** -- Db module with `cleanup: true` wraps each test in a transaction and rolls it back afterward.
+
+---
+
+## Test Doubles
+
+`Stub::makeEmpty()` is **phased out**. Use InMemory/Fake implementations provided via DI instead.
+
+**Why:** Stubs test implementation details (which methods are called), not behavior. InMemory/Fake implementations
+test actual state changes and are reusable across all Functional tests.
+
+### InMemory Repositories
+
+Location: `src/Infrastructure/Persistence/InMemory/`
+
+Concrete classes that implement domain repository interfaces with simple in-memory array storage. Inherit from
+`InMemoryRepository` base class.
+
+### Fake / Null Services
+
+Location: `tests/Support/Dummy/`
+
+- `FakeConfirmer` -- confirms tokens without external service
+- `FakeTokenIssuer` -- issues tokens without cryptographic signing
+- `NullTransactor` -- executes callback directly without transaction wrapping
+
+### DI Replacement Mechanism
+
+Functional tests use a Codeception module that replaces real DI bindings with InMemory/Fake implementations via
+PHP-DI `Container::set()` at runtime. This is configured in `Functional.suite.yml`.
+
+---
+
+## Testing Commands
+
+| Command                  | Purpose              |
+|--------------------------|----------------------|
+| `composer test:unit`     | Unit tests           |
+| `composer test:func`     | Functional tests     |
+| `composer test:intg`     | Integration tests    |
+| `composer test:web`      | Acceptance API tests |
+| `composer test:cli`      | Acceptance CLI tests |
+| `composer test:all`      | All tests            |
+| `composer test:coverage` | Coverage report      |
+| `composer in:ps`         | Mutation testing     |
+
+---
+
+## Static Analysis (Foundation)
+
+Runs before all tests. Checks types, finds potential bugs, controls architecture.
+
+```bash
+composer scan:style     # PHP-CS-Fixer + Rector (modifies code)
+composer scan:php       # Lint + Psalm
+composer scan:depend    # Deptrac + Composer dependencies
+composer scan:all       # scan:php + scan:depend + test:all (without scan:style)
+```
+
+The `scan:all` command intentionally excludes `scan:style` since it modifies code. Run `scan:style` separately first,
+then `scan:all` for verification.
+
+---
+
+## Mutation Tests (Automatic Quality Check)
+
+Mutation testing is an automatic quality check of existing tests. Infection makes small changes (mutations) to the code
+and verifies that tests detect these changes.
+
+```bash
+composer in:ps       # Run mutation testing
+```
+
+Mutation tests don't need to be written manually. They run automatically based on existing tests. The developer's task
+is to ensure mutation tests pass, meaning existing tests are good enough to "kill" mutations.
+
+If a mutation "survives" (tests don't fail when code changes), it signals insufficient coverage or weak assertions. In
+this case, strengthen existing tests rather than writing new mutation tests.
+
+---
+
+## Development Priority
+
+When creating a new feature, follow the Testing Trophy order:
+
+1. **Static Analysis** -- ensure `scan:php` and `scan:depend` pass
+2. **Functional Tests** -- write tests for handlers with InMemory/Fake dependencies
+3. **Integration Tests** -- write tests for repository and infrastructure contracts
+4. **Unit Tests** -- only if there is complex isolated pure logic
+5. **End-to-End Tests** -- only for critical scenarios
+6. **Mutation Tests** -- verify `composer in:ps` passes
+
+Don't aim for 100% unit test coverage. Functional + Integration tests provide more confidence with less maintenance cost.
+
 ---
 
 ## BDD Testing (Cli & Web)
+
+*Status: planned. Infrastructure exists, conventions below apply when writing BDD scenarios.*
 
 ### Architecture
 
 ```
 Feature File (*.feature)
-    ↓ Gherkin syntax
+    | Gherkin syntax
 Step Definition (*Steps.php)
-    ↓ thin layer, delegates to traits
+    | thin layer, delegates to traits
 Trait (*Trait.php)
-    ↓ actual implementation, organized by data model
+    | actual implementation, organized by data model
 ```
 
 | Suite | Features              | Steps                                | Traits                      |
