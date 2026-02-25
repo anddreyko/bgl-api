@@ -19,6 +19,6 @@ return [
     },
 
     'logger' => [
-        'file' => __DIR__ . '/../../var/.logs/application.log',
+        'file' => 'php://stderr',
     ],
 ];
