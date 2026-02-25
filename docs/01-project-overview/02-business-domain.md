@@ -520,11 +520,11 @@ Current code uses names and structures that differ from this model:
 
 | Current (code)    | Target (this document) | Action                |
 |-------------------|------------------------|-----------------------|
-| `Domain/Auth/`    | `Domain/Profile/`      | Rename context        |
-| `Session`         | `Play`                 | Rename entity         |
-| `SessionStatus`   | `PlayStatus`           | Rename enum           |
-| `Session::open()` | `Play::open()`         | Rename factory method |
-| `Sessions` (repo) | `Plays` (repo)         | Rename repository     |
+| ~~`Domain/Auth/`~~    | `Domain/Profile/`      | ~~Rename context~~ DONE        |
+| ~~`Session`~~         | `Play`                 | ~~Rename entity~~ DONE         |
+| ~~`SessionStatus`~~   | `PlayStatus`           | ~~Rename enum~~ DONE           |
+| ~~`Session::open()`~~ | `Play::open()`         | ~~Rename factory method~~ DONE |
+| ~~`Sessions` (repo)~~ | `Plays` (repo)         | ~~Rename repository~~ DONE     |
 | Missing           | `Player`               | Create entity         |
 | Missing           | `Mate`                 | Create aggregate      |
 | Missing           | `Location`             | Create aggregate      |

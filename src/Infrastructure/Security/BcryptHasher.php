@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Security;
 
-use Bgl\Core\Security\PasswordHasher;
+use Bgl\Core\Security\Hasher;
 
 /**
  * @psalm-type BcryptOptions = array{cost?: int}
  */
-final readonly class BcryptPasswordHasher implements PasswordHasher
+final readonly class BcryptHasher implements Hasher
 {
     /**
      * @param BcryptOptions $options

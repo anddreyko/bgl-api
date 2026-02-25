@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Core\Security;
 
-interface PasswordHasher
+interface Hasher
 {
     public function hash(string $plainPassword): string;
 

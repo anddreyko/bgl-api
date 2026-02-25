@@ -6,7 +6,7 @@ namespace Bgl\Tests\Functional;
 
 use Bgl\Application\Aspects\Transactional;
 use Bgl\Core\Messages\Envelope;
-use Bgl\Core\Persistence\TransactionManager;
+use Bgl\Core\Persistence\Transactor;
 use Bgl\Tests\Support\FunctionalTester;
 use Bgl\Tests\Support\Messages\Ping;
 use Bgl\Tests\Support\Messages\PingHandler;
@@ -27,7 +27,7 @@ final class TransactionalAspectCest
         /** @var list<string> $calls */
         $calls = [];
 
-        $tm = Stub::makeEmpty(TransactionManager::class, [
+        $tm = Stub::makeEmpty(Transactor::class, [
             'beginTransaction' => static function () use (&$calls): void {
                 $calls[] = 'beginTransaction';
             },
@@ -58,7 +58,7 @@ final class TransactionalAspectCest
         /** @var list<string> $calls */
         $calls = [];
 
-        $tm = Stub::makeEmpty(TransactionManager::class, [
+        $tm = Stub::makeEmpty(Transactor::class, [
             'beginTransaction' => static function () use (&$calls): void {
                 $calls[] = 'beginTransaction';
             },

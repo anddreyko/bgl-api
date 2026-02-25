@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth;
 
-use Bgl\Domain\Profile\Entities\EmailConfirmationToken;
+use Bgl\Infrastructure\Auth\EmailConfirmationToken;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\EntityMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 

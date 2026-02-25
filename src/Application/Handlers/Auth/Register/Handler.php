@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Bgl\Application\Handlers\Auth\Register;
 
+use Bgl\Core\Auth\Confirmer;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
-use Bgl\Core\Security\PasswordHasher;
+use Bgl\Core\Security\Hasher;
 use Bgl\Core\ValueObjects\Email;
-use Bgl\Domain\Profile\Entities\EmailConfirmationToken;
-use Bgl\Domain\Profile\Entities\EmailConfirmationTokens;
 use Bgl\Domain\Profile\Entities\User;
 use Bgl\Domain\Profile\Entities\Users;
 use Bgl\Domain\Profile\Exceptions\UserAlreadyExistsException;
@@ -21,12 +20,10 @@ use Psr\Clock\ClockInterface;
  */
 final readonly class Handler implements MessageHandler
 {
-    private const int TOKEN_TTL_HOURS = 24;
-
     public function __construct(
         private Users $users,
-        private EmailConfirmationTokens $tokens,
-        private PasswordHasher $passwordHasher,
+        private Confirmer $confirmer,
+        private Hasher $passwordHasher,
         private UuidGenerator $uuidGenerator,
         private ClockInterface $clock,
     ) {
@@ -56,14 +53,7 @@ final readonly class Handler implements MessageHandler
 
         $this->users->add($user);
 
-        $token = EmailConfirmationToken::create(
-            id: $this->uuidGenerator->generate(),
-            userId: $user->getId(),
-            token: $this->uuidGenerator->generate()->getValue() ?? '',
-            expiresAt: $now->modify('+' . self::TOKEN_TTL_HOURS . ' hours'),
-        );
-
-        $this->tokens->add($token);
+        $this->confirmer->request($user->getId());
 
         return 'Confirm the specified email';
     }

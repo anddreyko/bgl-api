@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Core\Security;
 
-final readonly class TokenTtlConfig
+final readonly class TokenConfig
 {
     public function __construct(
         public int $accessTtl,

@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Bgl\Application\Handlers\Auth\ConfirmEmail;
 
+use Bgl\Core\Auth\Confirmer;
+use Bgl\Core\Auth\InvalidConfirmationTokenException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
-use Bgl\Domain\Profile\Entities\EmailConfirmationTokens;
 use Bgl\Domain\Profile\Entities\Users;
-use Bgl\Domain\Profile\Exceptions\ExpiredConfirmationTokenException;
-use Bgl\Domain\Profile\Exceptions\InvalidConfirmationTokenException;
-use Psr\Clock\ClockInterface;
 
 /**
  * @implements MessageHandler<string, Command>
@@ -19,8 +17,7 @@ final readonly class Handler implements MessageHandler
 {
     public function __construct(
         private Users $users,
-        private EmailConfirmationTokens $tokens,
-        private ClockInterface $clock,
+        private Confirmer $confirmer,
     ) {
     }
 
@@ -30,26 +27,16 @@ final readonly class Handler implements MessageHandler
         /** @var Command $command */
         $command = $envelope->message;
 
-        $token = $this->tokens->findByToken($command->token);
-        if ($token === null) {
-            throw new InvalidConfirmationTokenException();
-        }
+        $userId = $this->confirmer->confirm($command->token);
 
-        $now = \DateTimeImmutable::createFromInterface($this->clock->now());
-        if ($token->isExpired($now)) {
-            throw new ExpiredConfirmationTokenException();
-        }
-
-        /** @var string $userId */
-        $userId = $token->getUserId()->getValue();
-        $user = $this->users->find($userId);
+        /** @var string $userIdValue */
+        $userIdValue = $userId->getValue();
+        $user = $this->users->find($userIdValue);
         if ($user === null) {
             throw new InvalidConfirmationTokenException();
         }
 
         $user->confirm();
-
-        $this->tokens->remove($token);
 
         return 'Specified email is confirmed';
     }

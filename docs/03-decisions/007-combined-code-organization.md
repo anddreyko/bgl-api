@@ -300,7 +300,7 @@ Domain groupings correspond to Bounded Contexts from DDD:
 
 | Directory       | Bounded Context | Responsibility                              |
 |-----------------|-----------------|---------------------------------------------|
-| `Domain/Auth/`  | Auth Context    | Authentication, authorization               |
+| `Domain/Profile/` | Profile Context | User identity, profile, settings          |
 | `Domain/Games/` | Games Context   | Game catalog                                |
 | `Domain/Plays/` | Plays Context   | Session logging                             |
 | `Domain/Stats/` | Stats Context   | Analytics, reports                          |

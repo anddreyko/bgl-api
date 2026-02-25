@@ -12,9 +12,9 @@ use Bgl\Core\Auth\InvalidCredentialsException;
 use Bgl\Core\Auth\InvalidRefreshTokenException;
 use Bgl\Core\Auth\TokenPair;
 use Bgl\Core\Auth\UserNotActiveException;
-use Bgl\Core\Security\PasswordHasher;
+use Bgl\Core\Security\Hasher;
 use Bgl\Core\Security\Tokenizer;
-use Bgl\Core\Security\TokenTtlConfig;
+use Bgl\Core\Security\TokenConfig;
 use Bgl\Domain\Profile\Entities\User;
 use Bgl\Domain\Profile\Entities\Users;
 use Bgl\Domain\Profile\Entities\UserStatus;
@@ -27,8 +27,8 @@ final readonly class JwtAuthenticator implements Authenticator
     public function __construct(
         private Tokenizer $tokenizer,
         private Users $users,
-        private PasswordHasher $passwordHasher,
-        private TokenTtlConfig $tokenTtlConfig,
+        private Hasher $passwordHasher,
+        private TokenConfig $tokenTtlConfig,
     ) {
     }
 

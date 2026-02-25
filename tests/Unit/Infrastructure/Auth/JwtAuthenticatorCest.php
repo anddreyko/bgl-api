@@ -11,9 +11,9 @@ use Bgl\Core\Auth\InvalidCredentialsException;
 use Bgl\Core\Auth\InvalidRefreshTokenException;
 use Bgl\Core\Auth\TokenPair;
 use Bgl\Core\Auth\UserNotActiveException;
-use Bgl\Core\Security\PasswordHasher;
+use Bgl\Core\Security\Hasher;
 use Bgl\Core\Security\Tokenizer;
-use Bgl\Core\Security\TokenTtlConfig;
+use Bgl\Core\Security\TokenConfig;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Profile\Entities\User;
@@ -30,11 +30,11 @@ use Codeception\Stub;
 #[Group('auth')]
 final class JwtAuthenticatorCest
 {
-    private TokenTtlConfig $ttlConfig;
+    private TokenConfig $ttlConfig;
 
     public function _before(): void
     {
-        $this->ttlConfig = new TokenTtlConfig(7200, 2592000);
+        $this->ttlConfig = new TokenConfig(7200, 2592000);
     }
 
     private function makeUser(UserStatus $status = UserStatus::Active, int $tokenVersion = 1): User
@@ -67,7 +67,7 @@ final class JwtAuthenticatorCest
             users: Stub::makeEmpty(Users::class, [
                 'findByEmail' => static fn(): User => $user,
             ]),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class, [
+            passwordHasher: Stub::makeEmpty(Hasher::class, [
                 'verify' => static fn(): bool => true,
             ]),
             tokenTtlConfig: $this->ttlConfig,
@@ -88,7 +88,7 @@ final class JwtAuthenticatorCest
             users: Stub::makeEmpty(Users::class, [
                 'findByEmail' => static fn(): ?User => null,
             ]),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 
@@ -107,7 +107,7 @@ final class JwtAuthenticatorCest
             users: Stub::makeEmpty(Users::class, [
                 'findByEmail' => fn(): User => $this->makeUser(),
             ]),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class, [
+            passwordHasher: Stub::makeEmpty(Hasher::class, [
                 'verify' => static fn(): bool => false,
             ]),
             tokenTtlConfig: $this->ttlConfig,
@@ -128,7 +128,7 @@ final class JwtAuthenticatorCest
             users: Stub::makeEmpty(Users::class, [
                 'findByEmail' => fn(): User => $this->makeUser(UserStatus::Inactive),
             ]),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class, [
+            passwordHasher: Stub::makeEmpty(Hasher::class, [
                 'verify' => static fn(): bool => true,
             ]),
             tokenTtlConfig: $this->ttlConfig,
@@ -160,7 +160,7 @@ final class JwtAuthenticatorCest
             users: Stub::makeEmpty(Users::class, [
                 'find' => static fn(): User => $user,
             ]),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 
@@ -181,7 +181,7 @@ final class JwtAuthenticatorCest
                 },
             ]),
             users: Stub::makeEmpty(Users::class),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 
@@ -203,7 +203,7 @@ final class JwtAuthenticatorCest
                 ],
             ]),
             users: Stub::makeEmpty(Users::class),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 
@@ -222,7 +222,7 @@ final class JwtAuthenticatorCest
                 'verify' => static fn(): array => ['userId' => 'user-id-123'],
             ]),
             users: Stub::makeEmpty(Users::class),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 
@@ -247,7 +247,7 @@ final class JwtAuthenticatorCest
             users: Stub::makeEmpty(Users::class, [
                 'find' => static fn(): ?User => null,
             ]),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 
@@ -272,7 +272,7 @@ final class JwtAuthenticatorCest
             users: Stub::makeEmpty(Users::class, [
                 'find' => fn(): User => $this->makeUser(UserStatus::Inactive),
             ]),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 
@@ -297,7 +297,7 @@ final class JwtAuthenticatorCest
             users: Stub::makeEmpty(Users::class, [
                 'find' => fn(): User => $this->makeUser(),
             ]),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 
@@ -321,7 +321,7 @@ final class JwtAuthenticatorCest
             users: Stub::makeEmpty(Users::class, [
                 'find' => static fn(): User => $user,
             ]),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 
@@ -337,7 +337,7 @@ final class JwtAuthenticatorCest
             users: Stub::makeEmpty(Users::class, [
                 'find' => static fn(): ?User => null,
             ]),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 
@@ -364,7 +364,7 @@ final class JwtAuthenticatorCest
             users: Stub::makeEmpty(Users::class, [
                 'find' => fn(): User => $this->makeUser(),
             ]),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 
@@ -383,7 +383,7 @@ final class JwtAuthenticatorCest
                 },
             ]),
             users: Stub::makeEmpty(Users::class),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 
@@ -406,7 +406,7 @@ final class JwtAuthenticatorCest
                 ],
             ]),
             users: Stub::makeEmpty(Users::class),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 
@@ -430,7 +430,7 @@ final class JwtAuthenticatorCest
             users: Stub::makeEmpty(Users::class, [
                 'find' => fn(): User => $this->makeUser(),
             ]),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 
@@ -446,7 +446,7 @@ final class JwtAuthenticatorCest
                 'verify' => static fn(): array => ['type' => 'access'],
             ]),
             users: Stub::makeEmpty(Users::class),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 
@@ -471,7 +471,7 @@ final class JwtAuthenticatorCest
             users: Stub::makeEmpty(Users::class, [
                 'find' => static fn(): ?User => null,
             ]),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 
@@ -496,7 +496,7 @@ final class JwtAuthenticatorCest
             users: Stub::makeEmpty(Users::class, [
                 'find' => fn(): User => $this->makeUser(UserStatus::Inactive),
             ]),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 
@@ -521,7 +521,7 @@ final class JwtAuthenticatorCest
             users: Stub::makeEmpty(Users::class, [
                 'find' => fn(): User => $this->makeUser(tokenVersion: 2),
             ]),
-            passwordHasher: Stub::makeEmpty(PasswordHasher::class),
+            passwordHasher: Stub::makeEmpty(Hasher::class),
             tokenTtlConfig: $this->ttlConfig,
         );
 

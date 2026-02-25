@@ -262,8 +262,8 @@ Passkey (FIDO2/WebAuthn) -- alternative passwordless authentication. After passk
 
 | File | Reuse Pattern |
 |---|---|
-| `src/Domain/Auth/Entities/User.php` | Entity pattern |
-| `src/Domain/Auth/Entities/Users.php` | Repository + Searchable pattern |
+| `src/Domain/Profile/Entities/User.php` | Entity pattern |
+| `src/Domain/Profile/Entities/Users.php` | Repository + Searchable pattern |
 | `src/Infrastructure/Persistence/Doctrine/Users.php` | Doctrine repo (extends DoctrineRepository) |
 | `src/Infrastructure/Persistence/Doctrine/Mapping/Auth/UserMapping.php` | Mapping pattern |
 | `src/Infrastructure/Persistence/InMemory/Users.php` | InMemory repo pattern |

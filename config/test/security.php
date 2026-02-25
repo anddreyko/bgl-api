@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Bgl\Infrastructure\Security\BcryptPasswordHasher;
+use Bgl\Infrastructure\Security\BcryptHasher;
 
 return [
-    BcryptPasswordHasher::class => static fn(): BcryptPasswordHasher => new BcryptPasswordHasher(['cost' => 4]),
+    BcryptHasher::class => static fn(): BcryptHasher => new BcryptHasher(['cost' => 4]),
 ];

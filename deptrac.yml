@@ -41,6 +41,6 @@ deptrac:
   ruleset:
     Core: [ ]
     Domain: [ Core ]
+    Application: [ Domain, Core ]
     Infrastructure: [ Vendor, Domain, Core ]
-    Application: [ Infrastructure, Domain, Core ]
     Presentation: [ Vendor, Application, Domain, Core ]

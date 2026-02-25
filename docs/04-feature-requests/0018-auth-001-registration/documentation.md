@@ -12,20 +12,20 @@ Implemented user registration via email and password with email confirmation flo
 | File | Purpose |
 |------|---------|
 | `src/Domain/Profile/Entities/User.php` | Modified to add passwordHash field and register/confirm methods |
-| `src/Domain/Profile/Entities/EmailConfirmationToken.php` | Confirmation token entity with expiry (24h TTL) |
-| `src/Domain/Profile/Entities/EmailConfirmationTokens.php` | Token repository interface |
 | `src/Domain/Profile/Entities/Users.php` | Modified to add findByEmail method |
 | `src/Domain/Profile/Exceptions/UserAlreadyExistsException.php` | Exception for duplicate email |
-| `src/Domain/Profile/Exceptions/InvalidConfirmationTokenException.php` | Exception for token not found |
-| `src/Domain/Profile/Exceptions/ExpiredConfirmationTokenException.php` | Exception for expired token |
-| `src/Infrastructure/Persistence/Doctrine/Mapping/Profile/UserMapping.php` | Updated with passwordHash mapping |
-| `src/Infrastructure/Persistence/Doctrine/Mapping/Profile/EmailConfirmationTokenMapping.php` | ORM mapping for token entity |
+| `src/Core/Auth/Confirmer.php` | Facade interface for email confirmation (request/confirm) |
+| `src/Core/Auth/InvalidConfirmationTokenException.php` | Exception for token not found |
+| `src/Core/Auth/ExpiredConfirmationTokenException.php` | Exception for expired token |
+| `src/Infrastructure/Auth/DoctrineConfirmer.php` | Confirmer implementation using Doctrine |
+| `src/Infrastructure/Auth/EmailConfirmationToken.php` | Confirmation token entity (infrastructure detail) |
+| `src/Infrastructure/Persistence/Doctrine/Mapping/Auth/UserMapping.php` | Updated with passwordHash mapping |
+| `src/Infrastructure/Persistence/Doctrine/Mapping/Auth/EmailConfirmationTokenMapping.php` | ORM mapping for token entity |
 | `src/Infrastructure/Persistence/Doctrine/Users.php` | Updated with findByEmail implementation |
-| `src/Infrastructure/Persistence/Doctrine/EmailConfirmationTokens.php` | Doctrine repository for tokens |
-| `src/Application/Handlers/Profile/Register/Command.php` | Registration command |
-| `src/Application/Handlers/Profile/Register/Handler.php` | Registration handler with uniqueness check |
-| `src/Application/Handlers/Profile/ConfirmEmail/Command.php` | Confirmation command |
-| `src/Application/Handlers/Profile/ConfirmEmail/Handler.php` | Confirmation handler with expiry check |
+| `src/Application/Handlers/Auth/Register/Command.php` | Registration command |
+| `src/Application/Handlers/Auth/Register/Handler.php` | Registration handler with uniqueness check |
+| `src/Application/Handlers/Auth/ConfirmEmail/Command.php` | Confirmation command |
+| `src/Application/Handlers/Auth/ConfirmEmail/Handler.php` | Confirmation handler via Confirmer service |
 | `tests/Unit/Application/Handlers/Auth/Register/HandlerCest.php` | Registration tests |
 | `config/common/openapi/auth.php` | POST /v1/auth/sign-up and GET /v1/auth/confirm/{token} endpoints |
 
@@ -36,19 +36,16 @@ Registration flow:
 2. Handler validates email uniqueness (409 if duplicate)
 3. Handler hashes password using PasswordHasher
 4. Handler creates User entity with Inactive status
-5. Handler generates UUID confirmation token with 24h expiry
-6. Handler persists User and EmailConfirmationToken
-7. Handler returns success message
-8. MVP: Confirmation URL logged (future: send email)
+5. Handler calls Confirmer::request() to generate confirmation token
+6. Handler returns success message
+7. MVP: Confirmation URL logged (future: send email)
 
 Confirmation flow:
 1. Client sends GET /v1/auth/confirm/{token}
-2. Handler finds token in repository (400 if not found)
-3. Handler checks token expiration (409 if expired)
-4. Handler loads User and calls confirm() method
-5. confirm() sets User status to Active
-6. Handler deletes used token
-7. Handler returns success message
+2. Handler calls Confirmer::confirm() which validates and returns userId
+3. Handler loads User and calls confirm() method
+4. confirm() sets User status to Active
+5. Handler returns success message
 
 Database changes:
 - auth_user table: added password_hash column

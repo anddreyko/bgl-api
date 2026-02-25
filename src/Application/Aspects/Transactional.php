@@ -7,14 +7,14 @@ namespace Bgl\Application\Aspects;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Core\Messages\MessageMiddleware;
-use Bgl\Core\Persistence\TransactionManager;
+use Bgl\Core\Persistence\Transactor;
 
 /**
  * @see \Bgl\Tests\Functional\TransactionalAspectCest
  */
 final readonly class Transactional implements MessageMiddleware
 {
-    public function __construct(private TransactionManager $transactionManager)
+    public function __construct(private Transactor $transactionManager)
     {
     }
 

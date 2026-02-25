@@ -37,12 +37,12 @@ Implemented a Ports & Adapters password hashing component: a `PasswordHasher` in
 Inject `PasswordHasher` interface via DI:
 
 ```php
-use Bgl\Core\Security\PasswordHasher;
+use Bgl\Core\Security\Hasher;
 
 final readonly class SomeHandler
 {
     public function __construct(
-        private PasswordHasher $hasher,
+        private Hasher $hasher,
     ) {}
 
     public function handle(string $plainPassword): string

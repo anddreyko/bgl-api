@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Unit\Infrastructure\Security;
 
-use Bgl\Infrastructure\Security\BcryptPasswordHasher;
+use Bgl\Infrastructure\Security\BcryptHasher;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 
 /**
- * @covers \Bgl\Infrastructure\Security\BcryptPasswordHasher
+ * @covers \Bgl\Infrastructure\Security\BcryptHasher
  */
 #[Group('core', 'security', 'passwordHasher')]
 final class BcryptPasswordHasherCest
 {
-    private BcryptPasswordHasher $hasher;
+    private BcryptHasher $hasher;
 
     public function _before(): void
     {
-        $this->hasher = new BcryptPasswordHasher(['cost' => 4]);
+        $this->hasher = new BcryptHasher(['cost' => 4]);
     }
 
     public function testHashReturnsNonEmptyString(UnitTester $i): void
@@ -60,10 +60,10 @@ final class BcryptPasswordHasherCest
 
     public function testNeedsRehashReturnsTrueForDifferentCost(UnitTester $i): void
     {
-        $lowCostHasher = new BcryptPasswordHasher(['cost' => 4]);
+        $lowCostHasher = new BcryptHasher(['cost' => 4]);
         $hash = $lowCostHasher->hash('password123');
 
-        $highCostHasher = new BcryptPasswordHasher(['cost' => 10]);
+        $highCostHasher = new BcryptHasher(['cost' => 10]);
 
         $i->assertTrue($highCostHasher->needsRehash($hash));
     }

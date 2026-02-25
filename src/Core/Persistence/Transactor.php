@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Core\Persistence;
 
-interface TransactionManager
+interface Transactor
 {
     public function beginTransaction(): void;
 

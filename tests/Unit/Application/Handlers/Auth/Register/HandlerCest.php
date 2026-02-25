@@ -6,12 +6,12 @@ namespace Bgl\Tests\Unit\Application\Handlers\Auth\Register;
 
 use Bgl\Application\Handlers\Auth\Register\Command;
 use Bgl\Application\Handlers\Auth\Register\Handler;
+use Bgl\Core\Auth\Confirmer;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
-use Bgl\Core\Security\PasswordHasher;
+use Bgl\Core\Security\Hasher;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Profile\Entities\EmailConfirmationTokens;
 use Bgl\Domain\Profile\Entities\User;
 use Bgl\Domain\Profile\Entities\Users;
 use Bgl\Domain\Profile\Exceptions\UserAlreadyExistsException;
@@ -34,12 +34,12 @@ final class HandlerCest
             },
         ]);
 
-        $tokens = Stub::makeEmpty(EmailConfirmationTokens::class, [
-            'add' => static function (): void {
+        $confirmer = Stub::makeEmpty(Confirmer::class, [
+            'request' => static function (): void {
             },
         ]);
 
-        $passwordHasher = Stub::makeEmpty(PasswordHasher::class, [
+        $passwordHasher = Stub::makeEmpty(Hasher::class, [
             'hash' => static fn(): string => 'hashed_password',
         ]);
 
@@ -51,7 +51,7 @@ final class HandlerCest
             'now' => static fn(): \DateTimeImmutable => new \DateTimeImmutable('2024-01-01 12:00:00'),
         ]);
 
-        $handler = new Handler($users, $tokens, $passwordHasher, $uuidGenerator, $clock);
+        $handler = new Handler($users, $confirmer, $passwordHasher, $uuidGenerator, $clock);
 
         $command = new Command(email: 'test@example.com', password: 'secret123');
         $envelope = new Envelope($command, 'msg-1');
@@ -74,9 +74,9 @@ final class HandlerCest
             'findByEmail' => static fn(): User => $existingUser,
         ]);
 
-        $tokens = Stub::makeEmpty(EmailConfirmationTokens::class);
+        $confirmer = Stub::makeEmpty(Confirmer::class);
 
-        $passwordHasher = Stub::makeEmpty(PasswordHasher::class);
+        $passwordHasher = Stub::makeEmpty(Hasher::class);
 
         $uuidGenerator = Stub::makeEmpty(UuidGenerator::class);
 
@@ -84,7 +84,7 @@ final class HandlerCest
             'now' => static fn(): \DateTimeImmutable => new \DateTimeImmutable('2024-01-01 12:00:00'),
         ]);
 
-        $handler = new Handler($users, $tokens, $passwordHasher, $uuidGenerator, $clock);
+        $handler = new Handler($users, $confirmer, $passwordHasher, $uuidGenerator, $clock);
 
         $command = new Command(email: 'existing@example.com', password: 'secret123');
         $envelope = new Envelope($command, 'msg-2');
@@ -102,12 +102,12 @@ final class HandlerCest
             },
         ]);
 
-        $tokens = Stub::makeEmpty(EmailConfirmationTokens::class, [
-            'add' => static function (): void {
+        $confirmer = Stub::makeEmpty(Confirmer::class, [
+            'request' => static function (): void {
             },
         ]);
 
-        $passwordHasher = Stub::makeEmpty(PasswordHasher::class, [
+        $passwordHasher = Stub::makeEmpty(Hasher::class, [
             'hash' => static fn(): string => 'hashed_password',
         ]);
 
@@ -119,7 +119,7 @@ final class HandlerCest
             'now' => static fn(): \DateTimeImmutable => new \DateTimeImmutable('2024-01-01 12:00:00'),
         ]);
 
-        $handler = new Handler($users, $tokens, $passwordHasher, $uuidGenerator, $clock);
+        $handler = new Handler($users, $confirmer, $passwordHasher, $uuidGenerator, $clock);
 
         $command = new Command(email: 'test@example.com', password: 'secret123', name: 'Bob');
         $envelope = new Envelope($command, 'msg-3');

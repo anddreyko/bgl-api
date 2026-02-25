@@ -6,20 +6,18 @@ namespace Bgl\Tests\Unit\Application\Handlers\Auth\ConfirmEmail;
 
 use Bgl\Application\Handlers\Auth\ConfirmEmail\Command;
 use Bgl\Application\Handlers\Auth\ConfirmEmail\Handler;
+use Bgl\Core\Auth\Confirmer;
+use Bgl\Core\Auth\ExpiredConfirmationTokenException;
+use Bgl\Core\Auth\InvalidConfirmationTokenException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Profile\Entities\EmailConfirmationToken;
-use Bgl\Domain\Profile\Entities\EmailConfirmationTokens;
 use Bgl\Domain\Profile\Entities\User;
 use Bgl\Domain\Profile\Entities\UserStatus;
 use Bgl\Domain\Profile\Entities\Users;
-use Bgl\Domain\Profile\Exceptions\ExpiredConfirmationTokenException;
-use Bgl\Domain\Profile\Exceptions\InvalidConfirmationTokenException;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 use Codeception\Stub;
-use Psr\Clock\ClockInterface;
 
 /**
  * @covers \Bgl\Application\Handlers\Auth\ConfirmEmail\Handler
@@ -29,38 +27,24 @@ final class HandlerCest
 {
     public function testSuccessfulConfirmation(UnitTester $i): void
     {
-        $now = new \DateTimeImmutable('2024-01-01 12:00:00');
         $userId = new Uuid('user-uuid-1');
-
-        $token = EmailConfirmationToken::create(
-            id: new Uuid('token-uuid-1'),
-            userId: $userId,
-            token: 'valid-token',
-            expiresAt: $now->modify('+24 hours'),
-        );
 
         $user = User::register(
             id: $userId,
             email: new Email('test@example.com'),
             passwordHash: 'hashed',
-            createdAt: $now,
+            createdAt: new \DateTimeImmutable('2024-01-01 12:00:00'),
         );
 
-        $tokens = Stub::makeEmpty(EmailConfirmationTokens::class, [
-            'findByToken' => static fn(): EmailConfirmationToken => $token,
-            'remove' => static function (): void {
-            },
+        $confirmer = Stub::makeEmpty(Confirmer::class, [
+            'confirm' => static fn(): Uuid => $userId,
         ]);
 
         $users = Stub::makeEmpty(Users::class, [
             'find' => static fn(): User => $user,
         ]);
 
-        $clock = Stub::makeEmpty(ClockInterface::class, [
-            'now' => static fn(): \DateTimeImmutable => $now,
-        ]);
-
-        $handler = new Handler($users, $tokens, $clock);
+        $handler = new Handler($users, $confirmer);
 
         $command = new Command(token: 'valid-token');
         $envelope = new Envelope($command, 'msg-1');
@@ -73,17 +57,15 @@ final class HandlerCest
 
     public function testInvalidTokenThrowsException(UnitTester $i): void
     {
-        $tokens = Stub::makeEmpty(EmailConfirmationTokens::class, [
-            'findByToken' => static fn(): ?EmailConfirmationToken => null,
+        $confirmer = Stub::makeEmpty(Confirmer::class, [
+            'confirm' => static function (): never {
+                throw new InvalidConfirmationTokenException();
+            },
         ]);
 
         $users = Stub::makeEmpty(Users::class);
 
-        $clock = Stub::makeEmpty(ClockInterface::class, [
-            'now' => static fn(): \DateTimeImmutable => new \DateTimeImmutable('2024-01-01 12:00:00'),
-        ]);
-
-        $handler = new Handler($users, $tokens, $clock);
+        $handler = new Handler($users, $confirmer);
 
         $command = new Command(token: 'invalid-token');
         $envelope = new Envelope($command, 'msg-2');
@@ -95,26 +77,15 @@ final class HandlerCest
 
     public function testExpiredTokenThrowsException(UnitTester $i): void
     {
-        $now = new \DateTimeImmutable('2024-01-02 13:00:00');
-
-        $token = EmailConfirmationToken::create(
-            id: new Uuid('token-uuid-1'),
-            userId: new Uuid('user-uuid-1'),
-            token: 'expired-token',
-            expiresAt: new \DateTimeImmutable('2024-01-02 12:00:00'),
-        );
-
-        $tokens = Stub::makeEmpty(EmailConfirmationTokens::class, [
-            'findByToken' => static fn(): EmailConfirmationToken => $token,
+        $confirmer = Stub::makeEmpty(Confirmer::class, [
+            'confirm' => static function (): never {
+                throw new ExpiredConfirmationTokenException();
+            },
         ]);
 
         $users = Stub::makeEmpty(Users::class);
 
-        $clock = Stub::makeEmpty(ClockInterface::class, [
-            'now' => static fn(): \DateTimeImmutable => $now,
-        ]);
-
-        $handler = new Handler($users, $tokens, $clock);
+        $handler = new Handler($users, $confirmer);
 
         $command = new Command(token: 'expired-token');
         $envelope = new Envelope($command, 'msg-3');

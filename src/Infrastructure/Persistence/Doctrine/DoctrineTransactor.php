@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\Doctrine;
 
-use Bgl\Core\Persistence\TransactionManager;
+use Bgl\Core\Persistence\Transactor;
 use Doctrine\ORM\EntityManagerInterface;
 
-final readonly class DoctrineTransactionManager implements TransactionManager
+final readonly class DoctrineTransactor implements Transactor
 {
     public function __construct(private EntityManagerInterface $em)
     {

@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Tests\Unit\Domain\Profile\Entities;
+namespace Bgl\Tests\Unit\Infrastructure\Auth;
 
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Profile\Entities\EmailConfirmationToken;
+use Bgl\Infrastructure\Auth\EmailConfirmationToken;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 
 /**
- * @covers \Bgl\Domain\Profile\Entities\EmailConfirmationToken
+ * @covers \Bgl\Infrastructure\Auth\EmailConfirmationToken
  */
-#[Group('auth', 'domain', 'entity')]
+#[Group('auth', 'infrastructure')]
 final class EmailConfirmationTokenCest
 {
     public function testIsExpiredReturnsFalseWhenNotExpired(UnitTester $i): void
