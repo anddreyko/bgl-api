@@ -61,11 +61,11 @@ return [
             'charset' => 'utf-8',
         ],
         'mapping' => new PhpMappingDriver([
-            UserMapping::class,
-            EmailConfirmationTokenMapping::class,
-            PasskeyMapping::class,
-            PasskeyChallengeMapping::class,
-            PlayMapping::class,
+            new UserMapping(),
+            new EmailConfirmationTokenMapping(),
+            new PasskeyMapping(),
+            new PasskeyChallengeMapping(),
+            new PlayMapping(),
         ]),
     ],
 ];
