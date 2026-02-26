@@ -6,6 +6,10 @@ deptrac:
 
   exclude_files:
     - '#vendor/psr/.*#'
+    - '#vendor/.*/stubs/Attribute\.php#'
+    - '#vendor/.*/stubs/Stringable\.php#'
+
+  ignore_uncovered_internal_classes: true
 
   layers:
     - name: Core
