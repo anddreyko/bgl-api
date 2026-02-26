@@ -8,12 +8,17 @@ use Psr\Container\ContainerInterface;
 
 final class DiHelper
 {
+    private static ?ContainerInterface $container = null;
+
     public static function container(): ContainerInterface
     {
-        static $container;
+        self::$container ??= require __DIR__ . '/../../config/container.php';
 
-        $container ??= require __DIR__ . '/../../config/container.php';
+        return self::$container;
+    }
 
-        return $container;
+    public static function reset(): void
+    {
+        self::$container = null;
     }
 }

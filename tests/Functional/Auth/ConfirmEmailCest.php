@@ -15,11 +15,10 @@ use Bgl\Core\ValueObjects\Email;
 use Bgl\Domain\Profile\Entities\User;
 use Bgl\Domain\Profile\Entities\Users;
 use Bgl\Domain\Profile\Entities\UserStatus;
-use Bgl\Infrastructure\Auth\EmailConfirmationToken;
 use Bgl\Tests\Support\DiHelper;
+use Bgl\Tests\Support\Dummy\FakeConfirmer;
 use Bgl\Tests\Support\FunctionalTester;
 use Codeception\Attribute\Group;
-use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * @covers \Bgl\Application\Handlers\Auth\ConfirmEmail\Handler
@@ -27,18 +26,14 @@ use Doctrine\ORM\EntityManagerInterface;
 #[Group('application', 'handler', 'auth', 'confirmation')]
 final class ConfirmEmailCest
 {
-    private EntityManagerInterface $em;
     private Handler $handler;
     private Users $users;
-    private Confirmer $confirmer;
+    private FakeConfirmer $confirmer;
     private UuidGenerator $uuidGenerator;
 
     public function _before(): void
     {
         $container = DiHelper::container();
-
-        /** @var EntityManagerInterface $em */
-        $this->em = $container->get(EntityManagerInterface::class);
 
         /** @var Handler $handler */
         $this->handler = $container->get(Handler::class);
@@ -46,8 +41,9 @@ final class ConfirmEmailCest
         /** @var Users $users */
         $this->users = $container->get(Users::class);
 
-        /** @var Confirmer $confirmer */
-        $this->confirmer = $container->get(Confirmer::class);
+        $confirmer = $container->get(Confirmer::class);
+        \assert($confirmer instanceof FakeConfirmer);
+        $this->confirmer = $confirmer;
 
         /** @var UuidGenerator $uuidGenerator */
         $this->uuidGenerator = $container->get(UuidGenerator::class);
@@ -64,28 +60,19 @@ final class ConfirmEmailCest
             createdAt: new \DateTimeImmutable(),
         );
         $this->users->add($user);
-        $this->em->flush();
 
         $this->confirmer->request($userId);
-        $this->em->flush();
 
-        // Find the token that was created
-        $tokens = $this->em->getRepository(EmailConfirmationToken::class)->findBy(['userId' => $userId]);
-        $i->assertCount(1, $tokens);
-
-        /** @var EmailConfirmationToken $token */
-        $token = $tokens[0];
+        $token = $this->confirmer->getLastToken();
+        $i->assertNotNull($token);
 
         $result = ($this->handler)(new Envelope(
-            message: new Command(token: $token->getToken()),
+            message: new Command(token: $token),
             messageId: 'msg-1',
         ));
 
-        $this->em->flush();
-
         $i->assertSame('Specified email is confirmed', $result);
 
-        $this->em->clear();
         $confirmed = $this->users->find((string) $userId);
         $i->assertNotNull($confirmed);
         $i->assertSame(UserStatus::Active, $confirmed->getStatus());
@@ -110,31 +97,16 @@ final class ConfirmEmailCest
             createdAt: new \DateTimeImmutable(),
         );
         $this->users->add($user);
-        $this->em->flush();
 
         $this->confirmer->request($userId);
-        $this->em->flush();
 
-        // Expire the token manually
-        $tokens = $this->em->getRepository(EmailConfirmationToken::class)->findBy(['userId' => $userId]);
+        $token = $this->confirmer->getLastToken();
+        \assert($token !== null);
 
-        /** @var EmailConfirmationToken $token */
-        $token = $tokens[0];
-        $tokenValue = $token->getToken();
-
-        $this->em->createQueryBuilder()
-            ->update(EmailConfirmationToken::class, 't')
-            ->set('t.expiresAt', ':expired')
-            ->where('t.userId = :userId')
-            ->setParameter('expired', new \DateTimeImmutable('-1 hour'))
-            ->setParameter('userId', $userId)
-            ->getQuery()
-            ->execute();
-
-        $this->em->clear();
+        $this->confirmer->expireToken($token);
 
         $i->expectThrowable(ExpiredConfirmationTokenException::class, fn () => ($this->handler)(new Envelope(
-            message: new Command(token: $tokenValue),
+            message: new Command(token: $token),
             messageId: 'msg-3',
         )));
     }

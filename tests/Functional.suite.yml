@@ -4,3 +4,4 @@ modules:
   enabled:
     - Asserts
     - Bgl\Tests\Support\Modules\PsrLoggerModule
+    - Bgl\Tests\Support\Modules\FunctionalPersistenceModule
