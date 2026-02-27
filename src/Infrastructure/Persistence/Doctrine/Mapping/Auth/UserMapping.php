@@ -64,5 +64,13 @@ final class UserMapping implements EntityMapping
             'columnName' => 'token_version',
             'options' => ['default' => 1],
         ]);
+
+        $metadata->mapField([
+            'fieldName' => 'version',
+            'type' => 'integer',
+            'options' => ['default' => 1],
+        ]);
+        $metadata->setVersioned(true);
+        $metadata->setVersionField('version');
     }
 }
