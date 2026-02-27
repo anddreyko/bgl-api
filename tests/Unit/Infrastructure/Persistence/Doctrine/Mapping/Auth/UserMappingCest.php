@@ -106,6 +106,6 @@ class UserMappingCest
         $fieldNames = $metadata->getFieldNames();
         sort($fieldNames);
 
-        $i->assertSame(['createdAt', 'email', 'id', 'name', 'passwordHash', 'status', 'tokenVersion', 'version'], $fieldNames);
+        $i->assertSame(['createdAt', 'email', 'id', 'name', 'passwordHash', 'status', 'tokenVersion'], $fieldNames);
     }
 }

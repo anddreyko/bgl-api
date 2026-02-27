@@ -17,7 +17,6 @@ final class User
         private UserStatus $status,
         private int $tokenVersion = 1,
         private readonly ?string $name = null,
-        private int $version = 1,
     ) {
     }
 
