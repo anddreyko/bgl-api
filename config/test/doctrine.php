@@ -7,6 +7,8 @@ use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\PasskeyChallengeMapping
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\PasskeyMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\UserMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\PhpMappingDriver;
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Games\GameMapping;
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Mates\MateMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\PlayMapping;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
@@ -18,6 +20,8 @@ $chain->addDriver(
         new PasskeyMapping(),
         new PasskeyChallengeMapping(),
         new PlayMapping(),
+        new MateMapping(),
+        new GameMapping(),
     ]),
     'Bgl\\Domain'
 );
