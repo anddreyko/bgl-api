@@ -41,17 +41,18 @@ final readonly class CompiledRouteMap
                 } else {
                     /** @var list<string> $paramNames */
                     $paramNames = [];
-                    $regex = preg_replace_callback(
-                        '/\{([^}]+)}/',
-                        static function (array $m) use (&$paramNames): string {
-                            $paramNames[] = $m[1];
-
-                            return '([^/]+)';
-                        },
-                        $pattern,
-                    );
-                    if (!is_string($regex)) {
+                    $segments = preg_split('/(\{[^}]+})/', $pattern, -1, PREG_SPLIT_DELIM_CAPTURE);
+                    if (!is_array($segments)) {
                         continue;
+                    }
+                    $regex = '';
+                    foreach ($segments as $segment) {
+                        if (str_starts_with($segment, '{') && str_ends_with($segment, '}')) {
+                            $paramNames[] = substr($segment, 1, -1);
+                            $regex .= '([^/]+)';
+                        } else {
+                            $regex .= preg_quote($segment, '~');
+                        }
                     }
                     $mark = 'r' . $markIndex++;
                     $dynamicEntries[] = $methodUpper . ' ' . $regex . '(*MARK:' . $mark . ')';
