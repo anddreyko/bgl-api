@@ -73,11 +73,7 @@ final readonly class ApiAction
 
         $request = $this->interceptorPipeline->process($request, $operation->interceptors);
 
-        $validationErrors = $this->requestValidator->validate(
-            $request,
-            $operation->openApiSchema,
-            $matchResult->pathParams,
-        );
+        $validationErrors = $this->requestValidator->validate($request);
 
         if ($validationErrors !== []) {
             return $this->jsonResponse(

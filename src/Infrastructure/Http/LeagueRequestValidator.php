@@ -19,7 +19,7 @@ final readonly class LeagueRequestValidator implements RequestValidator
     }
 
     #[\Override]
-    public function validate(ServerRequestInterface $request, array $operation, array $pathParams = []): array
+    public function validate(ServerRequestInterface $request): array
     {
         try {
             $this->validator->validate($request);
@@ -60,7 +60,7 @@ final readonly class LeagueRequestValidator implements RequestValidator
         $breadCrumb = $exception->dataBreadCrumb();
         $chain = $breadCrumb !== null ? $breadCrumb->buildChain() : [];
 
-        $field = $chain !== [] ? (string) end($chain) : $exception->keyword();
+        $field = $chain !== [] ? (string)end($chain) : $exception->keyword();
 
         $errors[$field][] = $exception->getMessage();
 

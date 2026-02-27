@@ -91,7 +91,7 @@ final class LeagueRequestValidatorCest
             'password' => 'secret123456',
         ]);
 
-        $errors = $this->validator->validate($request, []);
+        $errors = $this->validator->validate($request);
 
         $i->assertSame([], $errors);
     }
@@ -102,7 +102,7 @@ final class LeagueRequestValidatorCest
             'email' => 'user@example.com',
         ]);
 
-        $errors = $this->validator->validate($request, []);
+        $errors = $this->validator->validate($request);
 
         $i->assertNotEmpty($errors);
     }
@@ -114,7 +114,7 @@ final class LeagueRequestValidatorCest
             'password' => 'secret123456',
         ]);
 
-        $errors = $this->validator->validate($request, []);
+        $errors = $this->validator->validate($request);
 
         $i->assertNotEmpty($errors);
     }
@@ -126,7 +126,7 @@ final class LeagueRequestValidatorCest
             'password' => 'short',
         ]);
 
-        $errors = $this->validator->validate($request, []);
+        $errors = $this->validator->validate($request);
 
         $i->assertNotEmpty($errors);
     }
@@ -135,7 +135,7 @@ final class LeagueRequestValidatorCest
     {
         $request = new ServerRequest('GET', '/ping');
 
-        $errors = $this->validator->validate($request, []);
+        $errors = $this->validator->validate($request);
 
         $i->assertSame([], $errors);
     }
@@ -144,7 +144,7 @@ final class LeagueRequestValidatorCest
     {
         $request = new ServerRequest('GET', '/unknown/path');
 
-        $errors = $this->validator->validate($request, []);
+        $errors = $this->validator->validate($request);
 
         $i->assertSame([], $errors);
     }
@@ -153,7 +153,7 @@ final class LeagueRequestValidatorCest
     {
         $request = new ServerRequest('GET', '/v1/users/some-id');
 
-        $errors = $this->validator->validate($request, []);
+        $errors = $this->validator->validate($request);
 
         $i->assertSame([], $errors);
     }
@@ -165,7 +165,7 @@ final class LeagueRequestValidatorCest
             'password' => 'secret123456',
         ]);
 
-        $errors = $this->validator->validate($request, []);
+        $errors = $this->validator->validate($request);
 
         $i->assertNotEmpty($errors);
     }
