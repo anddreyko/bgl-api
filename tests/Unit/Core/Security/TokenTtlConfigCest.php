@@ -29,4 +29,32 @@ final class TokenTtlConfigCest
         $i->assertSame(3600, $config->accessTtl);
         $i->assertSame(86400, $config->refreshTtl);
     }
+
+    public function testAccessTtlBelowMinimumThrows(UnitTester $i): void
+    {
+        $i->expectThrowable(\InvalidArgumentException::class, static fn() => new TokenConfig(10, 86400));
+    }
+
+    public function testAccessTtlAboveMaximumThrows(UnitTester $i): void
+    {
+        $i->expectThrowable(\InvalidArgumentException::class, static fn() => new TokenConfig(3_000_000, 86400));
+    }
+
+    public function testRefreshTtlBelowMinimumThrows(UnitTester $i): void
+    {
+        $i->expectThrowable(\InvalidArgumentException::class, static fn() => new TokenConfig(3600, 30));
+    }
+
+    public function testRefreshTtlMustBeGreaterThanAccessTtl(UnitTester $i): void
+    {
+        $i->expectThrowable(\InvalidArgumentException::class, static fn() => new TokenConfig(3600, 3600));
+    }
+
+    public function testBoundaryMinimumValues(UnitTester $i): void
+    {
+        $config = new TokenConfig(60, 61);
+
+        $i->assertSame(60, $config->accessTtl);
+        $i->assertSame(61, $config->refreshTtl);
+    }
 }
