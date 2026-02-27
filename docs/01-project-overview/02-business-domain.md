@@ -75,6 +75,7 @@ Manages user identity, profile information, and personal settings.
 | defaultVisibility | Visibility        | no       | Default for new plays           |
 | avatar            | string            | no       | Future                          |
 | tokenVersion      | int               | yes      | Incremented on token revocation |
+| passkeys          | Passkey[]         | no       | WebAuthn credentials            |
 | createdAt         | DateTimeImmutable | yes      |                                 |
 
 **Invariants:**
@@ -84,6 +85,21 @@ Manages user identity, profile information, and personal settings.
 - Name is required (auto-generated if not provided at registration)
 - BGG username is unique across the system if set
 - Password minimum 8 characters (validated at creation/change)
+
+### 3.2 Passkey (Value Object, child of User)
+
+WebAuthn credential owned by User. Immutable -- counter update returns new instance.
+
+| Attribute      | Type              | Required | Constraint                |
+|----------------|-------------------|----------|---------------------------|
+| credentialId   | string            | yes      | Unique, WebAuthn protocol |
+| credentialData | string            | yes      | Encrypted credential      |
+| counter        | int               | yes      | Replay attack prevention  |
+| createdAt      | DateTimeImmutable | yes      |                           |
+| label          | string            | no       | User-friendly name        |
+
+**Not a domain object:** PasskeyChallenge is an ephemeral infrastructure artifact of the WebAuthn protocol (TTL ~5 min).
+Stored in `Infrastructure/`, not in `Domain/`.
 
 **State Machine (UserStatus):**
 

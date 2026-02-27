@@ -85,6 +85,7 @@ Infrastructure/Auth/WebAuthnPasskeyVerifier -- lbuchs/webauthn adapter
 Core/Auth/PasskeyOptions                  -- DTO for options JSON + challenge
 ```
 
-Passkey entities stored in `Domain/Profile/Entities/` (user owns passkeys).
+Passkey is a Value Object within User aggregate (`Domain/Profile/ValueObjects/`).
+PasskeyChallenge is an ephemeral infrastructure object (`Infrastructure/Auth/`), not a domain entity.
 Doctrine mappings in `Infrastructure/Persistence/Doctrine/Mapping/Auth/` (auth convention).
 Database tables: `auth_passkey`, `auth_passkey_challenge`.

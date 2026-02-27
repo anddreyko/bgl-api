@@ -137,9 +137,12 @@ PlayerAdded { playId, mateId }
 A cluster of domain objects that can be treated as a single unit. In DDD context, an aggregate has a root entity (
 Aggregate Root) and consistency boundaries.
 
+Aggregate roots implement `Core\Aggregate\AggregateRoot` interface with domain event support via `Core\Aggregate\Emits`
+trait (composition, no inheritance).
+
 **Aggregate Roots in BGL:**
 
-- **Profile context:** User
+- **Profile context:** User (with Passkey VO)
 - **Plays context:** Play (with Player children), Mate, Location
 - **Games context:** Game
 
@@ -165,10 +168,12 @@ are equal.
 
 **Examples in BGL:**
 
-- `User` -- identified by Uuid (Profile context)
-- `Play` -- identified by Uuid (Plays context)
-- `Player` -- identified by Uuid, child of Play (Plays context)
-- `Game` -- identified by Uuid (Games context)
+- `User` -- aggregate root, identified by Uuid (Profile context)
+- `Play` -- aggregate root, identified by Uuid (Plays context)
+- `Player` -- child entity of Play, identified by Uuid (Plays context)
+- `Mate` -- aggregate root, identified by Uuid (Plays context)
+- `Location` -- aggregate root, identified by Uuid (Plays context)
+- `Game` -- aggregate root, identified by Uuid (Games context)
 
 ---
 
