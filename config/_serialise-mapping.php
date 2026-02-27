@@ -58,4 +58,33 @@ return [
         'started_at' => $model->startedAt,
         'finished_at' => $model->finishedAt,
     ],
+    Handlers\Mates\CreateMate\Result::class => static fn(Handlers\Mates\CreateMate\Result $model) => [
+        'id' => $model->id,
+        'name' => $model->name,
+        'notes' => $model->notes,
+        'created_at' => $model->createdAt,
+    ],
+    Handlers\Mates\GetMate\Result::class => static fn(Handlers\Mates\GetMate\Result $model) => [
+        'id' => $model->id,
+        'name' => $model->name,
+        'notes' => $model->notes,
+        'created_at' => $model->createdAt,
+    ],
+    Handlers\Mates\UpdateMate\Result::class => static fn(Handlers\Mates\UpdateMate\Result $model) => [
+        'id' => $model->id,
+        'name' => $model->name,
+        'notes' => $model->notes,
+    ],
+    Handlers\Mates\ListMates\Result::class => static fn(Handlers\Mates\ListMates\Result $model) => [
+        'items' => $model->data,
+        'total' => $model->total,
+        'page' => $model->page,
+        'size' => $model->size,
+    ],
+    Handlers\Games\SearchGames\Result::class => static fn(Handlers\Games\SearchGames\Result $model) => [
+        'items' => $model->data,
+        'total' => $model->total,
+        'page' => $model->page,
+        'size' => $model->size,
+    ],
 ];
