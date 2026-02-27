@@ -96,6 +96,16 @@ abstract class InMemoryRepository implements Repository, Searchable
         );
     }
 
+    #[\Override]
+    public function count(Filter $filter = All::Filter): int
+    {
+        if ($filter === All::Filter) {
+            return \count($this->entities);
+        }
+
+        return \count(array_filter($this->entities, $filter->accept(new InMemoryFilter($this->accessor))));
+    }
+
     /**
      * @return array<string, mixed>
      */

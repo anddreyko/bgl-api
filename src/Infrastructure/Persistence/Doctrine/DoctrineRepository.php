@@ -6,6 +6,7 @@ namespace Bgl\Infrastructure\Persistence\Doctrine;
 
 use Bgl\Core\Collections\Repository;
 use Bgl\Core\Listing\Filter;
+use Bgl\Core\Listing\Filter\All;
 use Bgl\Core\Listing\Filter\None;
 use Bgl\Core\Listing\Page\PageNumber;
 use Bgl\Core\Listing\Page\PageSize;
@@ -107,5 +108,23 @@ abstract class DoctrineRepository implements Repository, Searchable
 
         /** @var list<array<string, mixed>> */
         return $qb->getQuery()->getArrayResult();
+    }
+
+    #[\Override]
+    public function count(Filter $filter = All::Filter): int
+    {
+        $alias = $this->getAlias();
+        $qb = $this->em->createQueryBuilder()
+            ->select("COUNT({$alias})")
+            ->from($this->getType(), $alias);
+
+        $visitor = new DoctrineFilter($qb, $alias);
+        $condition = $filter->accept($visitor);
+        if ($condition !== null) {
+            $qb->andWhere($condition);
+        }
+
+        /** @var int<0, max> */
+        return (int)$qb->getQuery()->getSingleScalarResult();
     }
 }

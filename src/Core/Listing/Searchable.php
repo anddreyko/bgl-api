@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Core\Listing;
 
+use Bgl\Core\Listing\Filter\All;
 use Bgl\Core\Listing\Filter\None;
 use Bgl\Core\Listing\Page\PageNumber;
 use Bgl\Core\Listing\Page\PageSize;
@@ -20,4 +21,9 @@ interface Searchable
         PageNumber $number = new PageNumber(1),
         PageSort $sort = new PageSort([])
     ): iterable;
+
+    /**
+     * @return non-negative-int
+     */
+    public function count(Filter $filter = All::Filter): int;
 }
