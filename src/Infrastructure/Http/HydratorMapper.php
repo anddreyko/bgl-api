@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Http;
 
+use Bgl\Core\Http\ParameterConflictException;
 use Bgl\Core\Http\SchemaMapper;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -21,7 +22,7 @@ final readonly class HydratorMapper implements SchemaMapper
 
         // 1. Body params
         /** @var array<string, mixed> $body */
-        $body = (array) ($request->getParsedBody() ?? []);
+        $body = (array)($request->getParsedBody() ?? []);
         $data = array_merge($data, $body);
 
         // 2. Query params
@@ -32,6 +33,9 @@ final readonly class HydratorMapper implements SchemaMapper
         // 3. Path params with x-map renames
         foreach ($pathParams as $key => $value) {
             $mappedKey = $paramMap[$key] ?? $key;
+            if (array_key_exists($mappedKey, $data)) {
+                throw ParameterConflictException::fromPath($mappedKey);
+            }
             $data[$mappedKey] = $value;
         }
 
@@ -40,6 +44,9 @@ final readonly class HydratorMapper implements SchemaMapper
             /** @var string|null $attrValue */
             $attrValue = $request->getAttribute('auth.' . $paramName);
             if ($attrValue !== null) {
+                if (array_key_exists($paramName, $data)) {
+                    throw ParameterConflictException::fromAuth($paramName);
+                }
                 $data[$paramName] = $attrValue;
             }
         }

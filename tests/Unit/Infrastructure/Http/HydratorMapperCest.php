@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Unit\Infrastructure\Http;
 
+use Bgl\Core\Http\ParameterConflictException;
 use Bgl\Infrastructure\Http\HydratorMapper;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
@@ -121,5 +122,29 @@ final class HydratorMapperCest
         $result = $this->mapper->map($request);
 
         $i->assertSame([], $result);
+    }
+
+    public function testPathParamConflictWithBodyThrows(UnitTester $i): void
+    {
+        $request = new ServerRequest('POST', '/v1/test');
+        $request = $request->withParsedBody(['id' => 'from-body']);
+
+        $i->expectThrowable(ParameterConflictException::class, fn() => $this->mapper->map(
+            $request,
+            pathParams: ['id' => 'from-path'],
+        ));
+    }
+
+    public function testAuthParamConflictWithBodyThrows(UnitTester $i): void
+    {
+        $request = new ServerRequest('POST', '/v1/test');
+        $request = $request
+            ->withParsedBody(['userId' => 'from-body'])
+            ->withAttribute('auth.userId', 'from-auth');
+
+        $i->expectThrowable(ParameterConflictException::class, fn() => $this->mapper->map(
+            $request,
+            authParams: ['userId'],
+        ));
     }
 }
