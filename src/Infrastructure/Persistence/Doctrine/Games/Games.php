@@ -1,0 +1,47 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Bgl\Infrastructure\Persistence\Doctrine\Games;
+
+use Bgl\Domain\Games\Entities\Game;
+use Bgl\Domain\Games\Entities\Games as DomainGames;
+use Bgl\Infrastructure\Persistence\Doctrine\DoctrineRepository;
+
+/**
+ * @extends DoctrineRepository<Game>
+ */
+final class Games extends DoctrineRepository implements DomainGames
+{
+    #[\Override]
+    public function getType(): string
+    {
+        return Game::class;
+    }
+
+    #[\Override]
+    public function getAlias(): string
+    {
+        return 'g';
+    }
+
+    #[\Override]
+    public function getKeys(): array
+    {
+        return ['id'];
+    }
+
+    #[\Override]
+    public function findByBggId(int $bggId): ?Game
+    {
+        /** @var Game|null */
+        return $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select('g')
+            ->from(Game::class, 'g')
+            ->where('g.bggId = :bggId')
+            ->setParameter('bggId', $bggId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+}
