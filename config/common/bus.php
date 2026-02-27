@@ -5,6 +5,8 @@ declare(strict_types=1);
 use Bgl\Application\Aspects;
 use Bgl\Application\Handlers;
 use Bgl\Application\Handlers\Auth;
+use Bgl\Application\Handlers\Games;
+use Bgl\Application\Handlers\Mates;
 use Bgl\Application\Handlers\Plays;
 use Bgl\Application\Handlers\User;
 use Bgl\Core\Messages\Dispatcher;
@@ -48,6 +50,12 @@ return [
             [User\GetUser\Query::class, User\GetUser\Handler::class],
             [Plays\OpenSession\Command::class, Plays\OpenSession\Handler::class],
             [Plays\CloseSession\Command::class, Plays\CloseSession\Handler::class],
+            [Mates\CreateMate\Command::class, Mates\CreateMate\Handler::class],
+            [Mates\ListMates\Query::class, Mates\ListMates\Handler::class],
+            [Mates\GetMate\Query::class, Mates\GetMate\Handler::class],
+            [Mates\UpdateMate\Command::class, Mates\UpdateMate\Handler::class],
+            [Mates\DeleteMate\Command::class, Mates\DeleteMate\Handler::class],
+            [Games\SearchGames\Query::class, Games\SearchGames\Handler::class],
         ],
         'middleware' => [
             Aspects\Logging::class,
