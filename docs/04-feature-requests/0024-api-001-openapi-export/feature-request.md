@@ -2,7 +2,7 @@
 
 **Task:** bgl-2si
 **Date:** 2026-02-23
-**Status:** Open
+**Status:** Done
 **Priority:** P2
 **Depends on:** bgl-aqk (CORE-009)
 
