@@ -19,6 +19,8 @@ return [
             '/v1/auth/sign-up' => [
                 'post' => [
                     'summary' => 'Register new user',
+                    'operationId' => 'registerUser',
+                    'tags' => ['Auth'],
                     'x-message' => Register\Command::class,
                     'requestBody' => [
                         'required' => true,
@@ -36,11 +38,19 @@ return [
                             ],
                         ],
                     ],
+                    'responses' => [
+                        '200' => ['$ref' => '#/components/responses/StringSuccess'],
+                        '400' => ['$ref' => '#/components/responses/BadRequest'],
+                        '422' => ['$ref' => '#/components/responses/ValidationError'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
+                    ],
                 ],
             ],
             '/v1/auth/sign-in' => [
                 'post' => [
                     'summary' => 'Login with credentials',
+                    'operationId' => 'loginByCredentials',
+                    'tags' => ['Auth'],
                     'x-message' => LoginByCredentials\Command::class,
                     'requestBody' => [
                         'required' => true,
@@ -57,11 +67,19 @@ return [
                             ],
                         ],
                     ],
+                    'responses' => [
+                        '200' => ['$ref' => '#/components/responses/TokenPairSuccess'],
+                        '400' => ['$ref' => '#/components/responses/BadRequest'],
+                        '422' => ['$ref' => '#/components/responses/ValidationError'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
+                    ],
                 ],
             ],
             '/v1/auth/confirm/{token}' => [
                 'get' => [
                     'summary' => 'Confirm email',
+                    'operationId' => 'confirmEmail',
+                    'tags' => ['Auth'],
                     'x-message' => ConfirmEmail\Command::class,
                     'parameters' => [
                         [
@@ -71,11 +89,19 @@ return [
                             'schema' => ['type' => 'string'],
                         ],
                     ],
+                    'responses' => [
+                        '200' => ['$ref' => '#/components/responses/StringSuccess'],
+                        '400' => ['$ref' => '#/components/responses/BadRequest'],
+                        '422' => ['$ref' => '#/components/responses/ValidationError'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
+                    ],
                 ],
             ],
             '/v1/auth/refresh' => [
                 'post' => [
                     'summary' => 'Refresh token pair',
+                    'operationId' => 'refreshToken',
+                    'tags' => ['Auth'],
                     'x-message' => RefreshToken\Command::class,
                     'requestBody' => [
                         'required' => true,
@@ -91,30 +117,55 @@ return [
                             ],
                         ],
                     ],
+                    'responses' => [
+                        '200' => ['$ref' => '#/components/responses/TokenPairSuccess'],
+                        '400' => ['$ref' => '#/components/responses/BadRequest'],
+                        '422' => ['$ref' => '#/components/responses/ValidationError'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
+                    ],
                 ],
             ],
             '/v1/auth/sign-out' => [
                 'post' => [
                     'summary' => 'Sign out',
+                    'operationId' => 'signOut',
+                    'tags' => ['Auth'],
                     'x-message' => SignOut\Command::class,
                     'x-interceptors' => [AuthInterceptor::class],
                     'x-auth' => ['userId'],
+                    'security' => [['BearerAuth' => []]],
+                    'responses' => [
+                        '200' => ['$ref' => '#/components/responses/StringSuccess'],
+                        '401' => ['$ref' => '#/components/responses/Unauthorized'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
+                    ],
                 ],
             ],
             '/v1/auth/passkey/register' => [
                 'post' => [
                     'summary' => 'Get passkey registration options',
+                    'operationId' => 'registerPasskeyOptions',
+                    'tags' => ['Auth'],
                     'x-message' => RegisterPasskeyOptions\Command::class,
                     'x-interceptors' => [AuthInterceptor::class],
                     'x-auth' => ['userId'],
+                    'security' => [['BearerAuth' => []]],
+                    'responses' => [
+                        '200' => ['$ref' => '#/components/responses/PasskeyOptionsSuccess'],
+                        '401' => ['$ref' => '#/components/responses/Unauthorized'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
+                    ],
                 ],
             ],
             '/v1/auth/passkey/register/verify' => [
                 'post' => [
                     'summary' => 'Verify passkey registration',
+                    'operationId' => 'registerPasskeyVerify',
+                    'tags' => ['Auth'],
                     'x-message' => RegisterPasskeyVerify\Command::class,
                     'x-interceptors' => [AuthInterceptor::class],
                     'x-auth' => ['userId'],
+                    'security' => [['BearerAuth' => []]],
                     'requestBody' => [
                         'required' => true,
                         'content' => [
@@ -130,17 +181,30 @@ return [
                             ],
                         ],
                     ],
+                    'responses' => [
+                        '200' => ['$ref' => '#/components/responses/StringSuccess'],
+                        '401' => ['$ref' => '#/components/responses/Unauthorized'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
+                    ],
                 ],
             ],
             '/v1/auth/passkey/sign-in' => [
                 'post' => [
                     'summary' => 'Get passkey sign-in options',
+                    'operationId' => 'passkeySignInOptions',
+                    'tags' => ['Auth'],
                     'x-message' => PasskeySignInOptions\Command::class,
+                    'responses' => [
+                        '200' => ['$ref' => '#/components/responses/PasskeyOptionsSuccess'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
+                    ],
                 ],
             ],
             '/v1/auth/passkey/sign-in/verify' => [
                 'post' => [
                     'summary' => 'Verify passkey sign-in',
+                    'operationId' => 'passkeySignInVerify',
+                    'tags' => ['Auth'],
                     'x-message' => PasskeySignInVerify\Command::class,
                     'requestBody' => [
                         'required' => true,
@@ -155,6 +219,10 @@ return [
                                 ],
                             ],
                         ],
+                    ],
+                    'responses' => [
+                        '200' => ['$ref' => '#/components/responses/TokenPairSuccess'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
                     ],
                 ],
             ],

@@ -11,6 +11,9 @@ return [
             '/v1/user/{id}' => [
                 'get' => [
                     'summary' => 'Get user info',
+                    'operationId' => 'getUser',
+                    'tags' => ['User'],
+                    'security' => [['BearerAuth' => []]],
                     'x-message' => GetUser\Query::class,
                     'x-interceptors' => [AuthInterceptor::class],
                     'x-map' => ['id' => 'userId'],
@@ -21,6 +24,11 @@ return [
                             'required' => true,
                             'schema' => ['type' => 'string'],
                         ],
+                    ],
+                    'responses' => [
+                        '200' => ['$ref' => '#/components/responses/UserSuccess'],
+                        '401' => ['$ref' => '#/components/responses/Unauthorized'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
                     ],
                 ],
             ],

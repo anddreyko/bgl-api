@@ -15,6 +15,9 @@ return [
             '/v1/mates' => [
                 'post' => [
                     'summary' => 'Create mate',
+                    'operationId' => 'createMate',
+                    'tags' => ['Mates'],
+                    'security' => [['BearerAuth' => []]],
                     'x-message' => CreateMate\Command::class,
                     'x-interceptors' => [AuthInterceptor::class],
                     'x-auth' => ['userId'],
@@ -33,9 +36,19 @@ return [
                             ],
                         ],
                     ],
+                    'responses' => [
+                        '200' => ['$ref' => '#/components/responses/MateSuccess'],
+                        '400' => ['$ref' => '#/components/responses/BadRequest'],
+                        '401' => ['$ref' => '#/components/responses/Unauthorized'],
+                        '422' => ['$ref' => '#/components/responses/ValidationError'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
+                    ],
                 ],
                 'get' => [
                     'summary' => 'List mates',
+                    'operationId' => 'listMates',
+                    'tags' => ['Mates'],
+                    'security' => [['BearerAuth' => []]],
                     'x-message' => ListMates\Query::class,
                     'x-interceptors' => [AuthInterceptor::class],
                     'x-auth' => ['userId'],
@@ -61,11 +74,43 @@ return [
                             'schema' => ['type' => 'string', 'enum' => ['asc', 'desc'], 'default' => 'asc'],
                         ],
                     ],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Successful operation',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'code' => ['type' => 'integer', 'example' => 0],
+                                            'data' => [
+                                                'type' => 'object',
+                                                'properties' => [
+                                                    'items' => [
+                                                        'type' => 'array',
+                                                        'items' => ['$ref' => '#/components/schemas/Mate'],
+                                                    ],
+                                                    'total' => ['type' => 'integer'],
+                                                    'page' => ['type' => 'integer'],
+                                                    'size' => ['type' => 'integer'],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        '401' => ['$ref' => '#/components/responses/Unauthorized'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
+                    ],
                 ],
             ],
             '/v1/mates/{id}' => [
                 'get' => [
                     'summary' => 'Get mate',
+                    'operationId' => 'getMate',
+                    'tags' => ['Mates'],
+                    'security' => [['BearerAuth' => []]],
                     'x-message' => GetMate\Query::class,
                     'x-interceptors' => [AuthInterceptor::class],
                     'x-auth' => ['userId'],
@@ -78,9 +123,17 @@ return [
                             'schema' => ['type' => 'string'],
                         ],
                     ],
+                    'responses' => [
+                        '200' => ['$ref' => '#/components/responses/MateSuccess'],
+                        '401' => ['$ref' => '#/components/responses/Unauthorized'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
+                    ],
                 ],
                 'put' => [
                     'summary' => 'Update mate',
+                    'operationId' => 'updateMate',
+                    'tags' => ['Mates'],
+                    'security' => [['BearerAuth' => []]],
                     'x-message' => UpdateMate\Command::class,
                     'x-interceptors' => [AuthInterceptor::class],
                     'x-auth' => ['userId'],
@@ -108,9 +161,19 @@ return [
                             ],
                         ],
                     ],
+                    'responses' => [
+                        '200' => ['$ref' => '#/components/responses/MateSuccess'],
+                        '400' => ['$ref' => '#/components/responses/BadRequest'],
+                        '401' => ['$ref' => '#/components/responses/Unauthorized'],
+                        '422' => ['$ref' => '#/components/responses/ValidationError'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
+                    ],
                 ],
                 'delete' => [
                     'summary' => 'Delete mate',
+                    'operationId' => 'deleteMate',
+                    'tags' => ['Mates'],
+                    'security' => [['BearerAuth' => []]],
                     'x-message' => DeleteMate\Command::class,
                     'x-interceptors' => [AuthInterceptor::class],
                     'x-auth' => ['userId'],
@@ -122,6 +185,11 @@ return [
                             'required' => true,
                             'schema' => ['type' => 'string'],
                         ],
+                    ],
+                    'responses' => [
+                        '200' => ['$ref' => '#/components/responses/NullSuccess'],
+                        '401' => ['$ref' => '#/components/responses/Unauthorized'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
                     ],
                 ],
             ],
