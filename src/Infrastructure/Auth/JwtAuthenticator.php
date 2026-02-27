@@ -85,6 +85,7 @@ final readonly class JwtAuthenticator implements Authenticator
         }
 
         $user->incrementTokenVersion();
+        $this->users->add($user);
     }
 
     #[\Override]
@@ -115,7 +116,7 @@ final readonly class JwtAuthenticator implements Authenticator
         try {
             return $this->tokenizer->verify($token);
         } catch (\RuntimeException $e) {
-            throw new AuthenticationException($e->getMessage(), (int) $e->getCode(), $e);
+            throw new AuthenticationException($e->getMessage(), (int)$e->getCode(), $e);
         }
     }
 
