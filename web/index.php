@@ -39,6 +39,8 @@ $app->add(function (ServerRequestInterface $request, RequestHandlerInterface $ha
     return $handler->handle($request);
 });
 
+$app->add(new \Bgl\Presentation\Api\Middleware\TrimStringsMiddleware());
+
 $app->any('/{path:.*}', function (
     ServerRequestInterface $request,
     ResponseInterface $response,
