@@ -9,6 +9,7 @@ use Bgl\Core\Listing\Fields\AnyFieldAccessor;
 use Bgl\Core\Listing\Fields\FieldAccessor;
 use Bgl\Core\Listing\Filter\All;
 use Bgl\Core\Listing\Filter\AndX;
+use Bgl\Core\Listing\Filter\Contains;
 use Bgl\Core\Listing\Filter\Equals;
 use Bgl\Core\Listing\Filter\Greater;
 use Bgl\Core\Listing\Filter\Less;
@@ -76,6 +77,15 @@ final readonly class InMemoryFilter implements FilterVisitor
     public function not(Not $filter): mixed
     {
         return fn(array|object $entity): bool => !$filter->filter->accept($this)($entity);
+    }
+
+    #[\Override]
+    public function contains(Contains $filter): mixed
+    {
+        return fn(array|object $entity): bool => str_contains(
+            mb_strtolower((string)$this->resolve($entity, $filter->left)),
+            mb_strtolower((string)$filter->right)
+        );
     }
 
     private function resolve(array|object $entity, mixed $value): mixed

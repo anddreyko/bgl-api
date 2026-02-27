@@ -7,6 +7,7 @@ namespace Bgl\Infrastructure\Persistence\Doctrine;
 use Bgl\Core\Listing\Field;
 use Bgl\Core\Listing\Filter\All;
 use Bgl\Core\Listing\Filter\AndX;
+use Bgl\Core\Listing\Filter\Contains;
 use Bgl\Core\Listing\Filter\Equals;
 use Bgl\Core\Listing\Filter\Greater;
 use Bgl\Core\Listing\Filter\Less;
@@ -108,6 +109,18 @@ final class DoctrineFilter implements FilterVisitor
         }
 
         return "NOT({$innerCondition})";
+    }
+
+    #[\Override]
+    public function contains(Contains $filter): mixed
+    {
+        $left = $this->resolve($filter->left);
+
+        $paramName = 'param_' . $this->counter++;
+        $escaped = str_replace(['%', '_'], ['\\%', '\\_'], (string)$filter->right);
+        $this->qb->setParameter($paramName, '%' . $escaped . '%');
+
+        return "LOWER({$left}) LIKE LOWER(:{$paramName})";
     }
 
     private function resolve(mixed $value): string

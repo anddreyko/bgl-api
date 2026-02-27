@@ -10,6 +10,7 @@ use Bgl\Core\Listing\Filter\Equals;
 use Bgl\Core\Listing\Filter\Greater;
 use Bgl\Core\Listing\Filter\Less;
 use Bgl\Core\Listing\Filter\Not;
+use Bgl\Core\Listing\Filter\Contains;
 use Bgl\Core\Listing\Filter\OrX;
 
 /**
@@ -51,4 +52,9 @@ interface FilterVisitor
      * @return TResult
      */
     public function not(Not $filter): mixed;
+
+    /**
+     * @return TResult
+     */
+    public function contains(Contains $filter): mixed;
 }
