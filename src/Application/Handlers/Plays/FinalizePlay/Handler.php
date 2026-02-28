@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Bgl\Application\Handlers\Plays\FinalizePlay;
 
+use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Domain\Plays\Entities\Play;
 use Bgl\Domain\Plays\Entities\Plays;
 use Psr\Clock\ClockInterface;
@@ -28,25 +30,24 @@ final readonly class Handler implements MessageHandler
         $command = $envelope->message;
 
         /** @var Play|null $play */
-        $play = $this->plays->find($command->sessionId);
+        $play = $this->plays->find((string)$command->sessionId);
 
         if ($play === null) {
-            throw new \DomainException('Play not found');
+            throw new NotFoundException('Play not found');
         }
 
-        if ($play->getUserId()->getValue() !== $command->userId) {
+        if ((string)$play->getUserId() !== (string)$command->userId) {
             throw new \DomainException('Access denied');
         }
 
-        $finishedAt = $command->finishedAt
-            ?? \DateTimeImmutable::createFromInterface($this->clock->now());
+        $finishedAt = $command->finishedAt ?? new DateTime($this->clock->now());
 
-        $play->close($finishedAt);
+        $play->finalize($finishedAt);
 
         return new Result(
-            sessionId: $play->getId()->getValue() ?? '',
-            startedAt: $play->getStartedAt()->format('c'),
-            finishedAt: $finishedAt->format('c'),
+            sessionId: (string)$play->getId(),
+            startedAt: $play->getStartedAt()->getFormattedValue('c'),
+            finishedAt: $finishedAt->getFormattedValue('c'),
         );
     }
 }

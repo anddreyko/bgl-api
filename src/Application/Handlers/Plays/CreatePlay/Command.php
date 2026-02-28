@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Bgl\Application\Handlers\Plays\CreatePlay;
 
 use Bgl\Core\Messages\Message;
+use Bgl\Core\ValueObjects\DateTime;
+use Bgl\Core\ValueObjects\Uuid;
 
 /**
  * @implements Message<Result>
@@ -12,16 +14,15 @@ use Bgl\Core\Messages\Message;
 final readonly class Command implements Message
 {
     /**
-     * @param non-empty-string $userId
      * @param list<array{mate_id: non-empty-string, score?: ?int, is_winner?: ?bool, color?: ?string}> $players
      */
     public function __construct(
-        public string $userId,
+        public Uuid $userId,
         public ?string $name = null,
         public array $players = [],
-        public ?string $gameId = null,
-        public ?string $startedAt = null,
-        public ?string $finishedAt = null,
+        public ?Uuid $gameId = null,
+        public ?DateTime $startedAt = null,
+        public ?DateTime $finishedAt = null,
         public string $visibility = 'private',
     ) {
     }

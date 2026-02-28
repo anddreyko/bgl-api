@@ -8,11 +8,13 @@ use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Games\Entities\Games;
 use Bgl\Domain\Mates\Entities\Mates;
 use Bgl\Domain\Plays\Entities\Play;
 use Bgl\Domain\Plays\Entities\Player;
+use Bgl\Domain\Plays\Entities\Players;
 use Bgl\Domain\Plays\Entities\Plays;
 use Bgl\Domain\Plays\Entities\Visibility;
 use Psr\Clock\ClockInterface;
@@ -24,6 +26,7 @@ final readonly class Handler implements MessageHandler
 {
     public function __construct(
         private Plays $plays,
+        private Players $players,
         private Mates $mates,
         private Games $games,
         private UuidGenerator $uuidGenerator,
@@ -37,73 +40,56 @@ final readonly class Handler implements MessageHandler
         /** @var Command $command */
         $command = $envelope->message;
 
-        $userId = new Uuid($command->userId);
-
         if ($command->players !== []) {
-            $this->validatePlayers($command->players, $userId);
+            $this->validatePlayers($command->players, $command->userId);
         }
 
-        $gameId = $this->resolveGameId($command->gameId);
-
-        $now = \DateTimeImmutable::createFromInterface($this->clock->now());
-        $startedAt = $this->resolveDateTime($command->startedAt, 'startedAt') ?? $now;
-        $finishedAt = $this->resolveDateTime($command->finishedAt, 'finishedAt');
+        if ($command->gameId !== null) {
+            $this->assertGameExists($command->gameId);
+        }
 
         $play = Play::create(
             id: $this->uuidGenerator->generate(),
-            userId: $userId,
+            userId: $command->userId,
             name: $command->name,
-            startedAt: $startedAt,
-            gameId: $gameId,
+            startedAt: $command->startedAt ?? new DateTime($this->clock->now()),
+            players: $this->players,
+            gameId: $command->gameId,
             visibility: Visibility::from($command->visibility),
         );
 
-        foreach ($command->players as $p) {
-            $play->addPlayer(Player::create(
-                id: $this->uuidGenerator->generate(),
-                play: $play,
-                mateId: new Uuid($p['mate_id']),
-                score: $p['score'] ?? null,
-                isWinner: $p['is_winner'] ?? false,
-                color: $p['color'] ?? null,
-            ));
-        }
+        $this->addPlayers($play, $command->players);
 
-        if ($finishedAt !== null) {
-            $play->close($finishedAt);
+        if ($command->finishedAt !== null) {
+            $play->finalize($command->finishedAt);
         }
 
         $this->plays->add($play);
 
-        return new Result(
-            sessionId: (string)$play->getId(),
-        );
+        return new Result(sessionId: (string)$play->getId());
     }
 
-    private function resolveGameId(?string $gameId): ?Uuid
+    /**
+     * @param list<array{mate_id: non-empty-string, score?: ?int, is_winner?: ?bool, color?: ?string}> $players
+     */
+    private function addPlayers(Play $play, array $players): void
     {
-        if ($gameId === null || $gameId === '') {
-            return null;
+        foreach ($players as $player) {
+            $play->addPlayer(Player::create(
+                id: $this->uuidGenerator->generate(),
+                play: $play,
+                mateId: new Uuid($player['mate_id']),
+                score: $player['score'] ?? null,
+                isWinner: $player['is_winner'] ?? false,
+                color: $player['color'] ?? null,
+            ));
         }
+    }
 
-        $game = $this->games->find($gameId);
-        if ($game === null) {
+    private function assertGameExists(Uuid $gameId): void
+    {
+        if ($this->games->find((string)$gameId) === null) {
             throw new NotFoundException('Game not found');
-        }
-
-        return new Uuid($gameId);
-    }
-
-    private function resolveDateTime(?string $value, string $field): ?\DateTimeImmutable
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        try {
-            return new \DateTimeImmutable($value);
-        } catch (\DateMalformedStringException) {
-            throw new \DomainException("Invalid {$field} datetime format");
         }
     }
 

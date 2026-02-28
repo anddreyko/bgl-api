@@ -31,21 +31,23 @@ final readonly class Handler implements MessageHandler
         $command = $envelope->message;
 
         /** @var Play|null $play */
-        $play = $this->plays->find($command->sessionId);
+        $play = $this->plays->find((string)$command->sessionId);
 
         if ($play === null) {
-            throw new \DomainException('Play not found');
+            throw new NotFoundException('Play not found');
         }
 
-        if ($play->getUserId()->getValue() !== $command->userId) {
+        if ((string)$play->getUserId() !== (string)$command->userId) {
             throw new \DomainException('Access denied');
         }
 
-        $gameId = $this->resolveGameId($command->gameId);
+        if ($command->gameId !== null) {
+            $this->assertGameExists($command->gameId);
+        }
 
         $play->update(
             $command->name,
-            $gameId,
+            $command->gameId,
             Visibility::from($command->visibility),
         );
 
@@ -54,17 +56,10 @@ final readonly class Handler implements MessageHandler
         );
     }
 
-    private function resolveGameId(?string $gameId): ?Uuid
+    private function assertGameExists(Uuid $gameId): void
     {
-        if ($gameId === null || $gameId === '') {
-            return null;
-        }
-
-        $game = $this->games->find($gameId);
-        if ($game === null) {
+        if ($this->games->find((string)$gameId) === null) {
             throw new NotFoundException('Game not found');
         }
-
-        return new Uuid($gameId);
     }
 }
