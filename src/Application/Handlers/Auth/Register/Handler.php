@@ -13,6 +13,7 @@ use Bgl\Core\ValueObjects\Email;
 use Bgl\Domain\Profile\Entities\User;
 use Bgl\Domain\Profile\Entities\Users;
 use Bgl\Domain\Profile\Exceptions\UserAlreadyExistsException;
+use Bgl\Core\ValueObjects\DateTime;
 use Psr\Clock\ClockInterface;
 
 /**
@@ -41,7 +42,7 @@ final readonly class Handler implements MessageHandler
         }
 
         $passwordHash = $this->passwordHasher->hash($command->password);
-        $now = \DateTimeImmutable::createFromInterface($this->clock->now());
+        $now = new DateTime($this->clock->now());
 
         $user = User::register(
             id: $this->uuidGenerator->generate(),

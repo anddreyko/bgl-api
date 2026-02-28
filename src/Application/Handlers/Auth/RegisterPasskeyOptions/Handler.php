@@ -6,6 +6,7 @@ namespace Bgl\Application\Handlers\Auth\RegisterPasskeyOptions;
 
 use Bgl\Core\Auth\AuthenticationException;
 use Bgl\Core\Auth\PasskeyVerifier;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
@@ -49,7 +50,7 @@ final readonly class Handler implements MessageHandler
         $challenge = PasskeyChallenge::forRegistration(
             id: $this->uuidGenerator->generate(),
             challenge: $passkeyOptions->challenge,
-            expiresAt: new \DateTimeImmutable('+' . self::CHALLENGE_TTL_SECONDS . ' seconds'),
+            expiresAt: new DateTime('+' . self::CHALLENGE_TTL_SECONDS . ' seconds'),
             userId: $user->getId(),
         );
 

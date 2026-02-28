@@ -36,7 +36,7 @@ final readonly class Handler implements MessageHandler
             id: (string)$mate->getId(),
             name: $mate->getName(),
             notes: $mate->getNotes(),
-            createdAt: $mate->getCreatedAt()->format('c'),
+            createdAt: $mate->getCreatedAt()->getFormattedValue('c'),
         );
     }
 }

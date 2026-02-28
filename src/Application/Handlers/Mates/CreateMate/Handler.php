@@ -7,6 +7,7 @@ namespace Bgl\Application\Handlers\Mates\CreateMate;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Mates\Entities\Mate;
 use Bgl\Domain\Mates\Entities\Mates;
@@ -38,7 +39,7 @@ final readonly class Handler implements MessageHandler
             throw new \DomainException('Mate with this name already exists');
         }
 
-        $now = \DateTimeImmutable::createFromInterface($this->clock->now());
+        $now = new DateTime($this->clock->now());
 
         $mate = Mate::create(
             id: $this->uuidGenerator->generate(),
@@ -54,7 +55,7 @@ final readonly class Handler implements MessageHandler
             id: (string)$mate->getId(),
             name: $mate->getName(),
             notes: $mate->getNotes(),
-            createdAt: $now->format('c'),
+            createdAt: $now->getFormattedValue('c'),
         );
     }
 }

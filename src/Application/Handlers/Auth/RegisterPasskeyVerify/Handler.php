@@ -10,6 +10,7 @@ use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Listing\Filter\All;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Profile\Entities\Passkey;
 use Bgl\Domain\Profile\Entities\PasskeyChallenges;
@@ -50,7 +51,7 @@ final readonly class Handler implements MessageHandler
             userId: new Uuid($userId),
             credentialId: $result->credentialId,
             credentialData: $result->credentialData,
-            createdAt: $this->clock->now(),
+            createdAt: new DateTime($this->clock->now()),
             label: $command->label,
         );
 
@@ -77,7 +78,7 @@ final readonly class Handler implements MessageHandler
 
             $challengeUserId = $entity->getUserId();
             if ($challengeUserId !== null && (string)$challengeUserId === $userId) {
-                if ($entity->isExpired($this->clock->now())) {
+                if ($entity->isExpired(new DateTime($this->clock->now()))) {
                     $this->challenges->remove($entity);
                     throw new AuthenticationException('Challenge expired');
                 }

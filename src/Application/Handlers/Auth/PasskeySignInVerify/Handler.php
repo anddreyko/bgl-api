@@ -31,17 +31,10 @@ final readonly class Handler implements MessageHandler
         /** @var Command $command */
         $command = $envelope->message;
 
-        $decoded = json_decode($command->response, true);
-        if (!is_array($decoded) || !isset($decoded['id']) || !is_string($decoded['id'])) {
-            throw new AuthenticationException('Invalid response format');
-        }
+        $decoded = $this->decodeResponse($command->response);
 
-        $credentialId = $decoded['id'];
-
-        $passkey = $this->passkeys->findByCredentialId($credentialId);
-        if ($passkey === null) {
-            throw new AuthenticationException('Passkey not found');
-        }
+        $passkey = $this->passkeys->findByCredentialId($decoded['id'])
+            ?? throw new AuthenticationException('Passkey not found');
 
         $challenge = $this->findValidChallenge($decoded);
 
@@ -52,13 +45,10 @@ final readonly class Handler implements MessageHandler
         );
 
         $passkey->updateCounter($newCounter);
-
         $this->challenges->remove($challenge);
 
-        $userId = $passkey->getUserId()->getValue();
-        if ($userId === null) {
-            throw new AuthenticationException('Unauthorized');
-        }
+        $userId = $passkey->getUserId()->getValue()
+            ?? throw new AuthenticationException('Unauthorized');
 
         $tokenPair = $this->tokenIssuer->issue($userId);
 
@@ -67,6 +57,19 @@ final readonly class Handler implements MessageHandler
             refreshToken: $tokenPair->refreshToken,
             expiresIn: $tokenPair->expiresIn,
         );
+    }
+
+    /**
+     * @return array{id: string}&array<array-key, mixed>
+     */
+    private function decodeResponse(string $response): array
+    {
+        $decoded = json_decode($response, true);
+        if (!is_array($decoded) || !isset($decoded['id']) || !is_string($decoded['id'])) {
+            throw new AuthenticationException('Invalid response format');
+        }
+
+        return $decoded;
     }
 
     /**

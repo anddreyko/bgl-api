@@ -6,6 +6,7 @@ namespace Bgl\Application\Handlers\Mates\DeleteMate;
 
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Domain\Mates\Entities\Mate;
 use Bgl\Domain\Mates\Entities\Mates;
 use Psr\Clock\ClockInterface;
@@ -34,7 +35,7 @@ final readonly class Handler implements MessageHandler
             throw new \DomainException('Not Found');
         }
 
-        $mate->softDelete(\DateTimeImmutable::createFromInterface($this->clock->now()));
+        $mate->softDelete(new DateTime($this->clock->now()));
 
         return null;
     }
