@@ -208,4 +208,4 @@ CREATE INDEX idx_session_started ON records_session (started_at DESC);
 
 ## Next Steps
 
-Run `/fr:plan` to generate implementation stages.
+Create implementation plan (master-checklist.md + stage files).

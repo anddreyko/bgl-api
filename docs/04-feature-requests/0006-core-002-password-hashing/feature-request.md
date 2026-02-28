@@ -1,6 +1,5 @@
 # Feature Request: Password Hashing Contract and Component (CORE-002)
 
-**Beads ID:** bgl-w52
 **Date:** 2026-02-22
 **Status:** In Progress
 **Priority:** P1 (Foundation)

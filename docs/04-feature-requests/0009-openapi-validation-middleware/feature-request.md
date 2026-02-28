@@ -189,4 +189,4 @@ config/common/
 
 ## Next Steps
 
-Run `/fr:plan` to generate implementation stages.
+Create implementation plan (master-checklist.md + stage files).

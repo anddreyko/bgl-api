@@ -140,4 +140,4 @@ config/common/openapi/
 
 ## Next Steps
 
-Run `/fr:plan` to generate implementation stages.
+Create implementation plan (master-checklist.md + stage files).

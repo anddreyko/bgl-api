@@ -1,6 +1,5 @@
 # Feature Request: Schema-Based Request Mapping (CORE-001 Part 2)
 
-**Beads ID:** bgl-3cg
 **Date:** 2026-02-22
 **Status:** In Progress
 **Priority:** P0 (Foundation)

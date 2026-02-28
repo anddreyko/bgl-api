@@ -1,6 +1,5 @@
 # Master Checklist: Schema-Based Request Mapping (CORE-001 Part 2)
 
-> Beads: bgl-3cg
 > Status: **DONE**
 
 ---

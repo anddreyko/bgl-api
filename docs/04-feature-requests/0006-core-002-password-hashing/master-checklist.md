@@ -1,6 +1,5 @@
 # Master Checklist: Password Hashing Contract and Component (CORE-002)
 
-> Beads: bgl-w52
 > Status: **COMPLETE**
 
 ---
