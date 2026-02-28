@@ -11,6 +11,7 @@ use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\PlayMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Profile\PasskeyChallengeMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Profile\PasskeyMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Profile\UserMapping;
+use Bgl\Infrastructure\Persistence\Doctrine\Type\DateTimeType;
 use Bgl\Infrastructure\Persistence\Doctrine\Type\EmailType;
 use Bgl\Infrastructure\Persistence\Doctrine\Type\UuidType;
 use Doctrine\DBAL\DriverManager;
@@ -31,6 +32,7 @@ return [
         if (!Type::hasType('email_vo')) {
             Type::addType('email_vo', EmailType::class);
         }
+        Type::overrideType('datetime_immutable', DateTimeType::class);
 
         /** @var array{db: array{driver: string}, mapping: MappingDriver, proxy_dir: string} $config */
         $config = $container->get('doctrine');
