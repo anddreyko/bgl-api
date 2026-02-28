@@ -80,7 +80,7 @@ final class OpenApiExportCommandCest
                 '/v1/plays/sessions/{id}' => [
                     'patch' => [
                         'summary' => 'Close play session',
-                        'x-message' => 'CloseSession\\Command',
+                        'x-message' => 'FinalizePlay\\Command',
                         'x-map' => ['id' => 'sessionId'],
                         'parameters' => [
                             ['name' => 'id', 'in' => 'path'],

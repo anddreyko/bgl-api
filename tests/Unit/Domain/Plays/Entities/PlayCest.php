@@ -140,6 +140,61 @@ final class PlayCest
         $i->assertSame($player, $play->getPlayers()[0]);
     }
 
+    public function testUpdateChangesFields(UnitTester $i): void
+    {
+        $play = Play::create(
+            new Uuid('play-id'),
+            new Uuid('user-123'),
+            'Old name',
+            new \DateTimeImmutable('2024-06-15 20:00:00'),
+            new Uuid('game-old'),
+            Visibility::Private,
+        );
+
+        $newGameId = new Uuid('game-new');
+        $play->update('New name', $newGameId, Visibility::Friends);
+
+        $i->assertSame('New name', $play->getName());
+        $i->assertSame($newGameId, $play->getGameId());
+        $i->assertSame(Visibility::Friends, $play->getVisibility());
+    }
+
+    public function testUpdateWithNulls(UnitTester $i): void
+    {
+        $play = Play::create(
+            new Uuid('play-id'),
+            new Uuid('user-123'),
+            'Some name',
+            new \DateTimeImmutable('2024-06-15 20:00:00'),
+            new Uuid('game-id'),
+        );
+
+        $play->update(null, null, Visibility::Public);
+
+        $i->assertNull($play->getName());
+        $i->assertNull($play->getGameId());
+        $i->assertSame(Visibility::Public, $play->getVisibility());
+    }
+
+    public function testUpdateThrowsWhenNotDraft(UnitTester $i): void
+    {
+        $play = Play::create(
+            new Uuid('play-id'),
+            new Uuid('user-123'),
+            null,
+            new \DateTimeImmutable('2024-06-15 20:00:00'),
+        );
+
+        $play->close(new \DateTimeImmutable('2024-06-15 23:00:00'));
+
+        $i->expectThrowable(
+            new \DomainException('Play can only be updated in draft status'),
+            static function () use ($play): void {
+                $play->update('name', null, Visibility::Private);
+            },
+        );
+    }
+
     public function testCreateWithDefaults(UnitTester $i): void
     {
         $play = Play::create(

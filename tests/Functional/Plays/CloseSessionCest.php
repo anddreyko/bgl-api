@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Functional\Plays;
 
-use Bgl\Application\Handlers\Plays\CloseSession\Command;
-use Bgl\Application\Handlers\Plays\CloseSession\Handler;
-use Bgl\Application\Handlers\Plays\CloseSession\Result;
+use Bgl\Application\Handlers\Plays\FinalizePlay\Command;
+use Bgl\Application\Handlers\Plays\FinalizePlay\Handler;
+use Bgl\Application\Handlers\Plays\FinalizePlay\Result;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\ValueObjects\Uuid;
@@ -19,7 +19,7 @@ use Codeception\Attribute\Group;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * @covers \Bgl\Application\Handlers\Plays\CloseSession\Handler
+ * @covers \Bgl\Application\Handlers\Plays\FinalizePlay\Handler
  */
 #[Group('application', 'handler', 'plays', 'close-session')]
 final class CloseSessionCest

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Functional\Plays;
 
-use Bgl\Application\Handlers\Plays\OpenSession\Command;
-use Bgl\Application\Handlers\Plays\OpenSession\Handler;
-use Bgl\Application\Handlers\Plays\OpenSession\Result;
+use Bgl\Application\Handlers\Plays\CreatePlay\Command;
+use Bgl\Application\Handlers\Plays\CreatePlay\Handler;
+use Bgl\Application\Handlers\Plays\CreatePlay\Result;
 use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
@@ -15,14 +15,14 @@ use Bgl\Domain\Games\Entities\Game;
 use Bgl\Domain\Games\Entities\Games;
 use Bgl\Domain\Mates\Entities\Mate;
 use Bgl\Domain\Mates\Entities\Mates;
-use Bgl\Domain\Plays\Entities\PlayStatus;
 use Bgl\Domain\Plays\Entities\Plays;
+use Bgl\Domain\Plays\Entities\PlayStatus;
 use Bgl\Tests\Support\DiHelper;
 use Bgl\Tests\Support\FunctionalTester;
 use Codeception\Attribute\Group;
 
 /**
- * @covers \Bgl\Application\Handlers\Plays\OpenSession\Handler
+ * @covers \Bgl\Application\Handlers\Plays\CreatePlay\Handler
  */
 #[Group('application', 'handler', 'plays', 'open-session')]
 final class OpenSessionCest

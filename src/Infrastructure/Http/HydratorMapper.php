@@ -17,20 +17,24 @@ final readonly class HydratorMapper implements SchemaMapper
         array $authParams = [],
         array $paramMap = [],
     ): array {
-        /** @var array<string, mixed> $data */
-        $data = [];
-
-        // 1. Body params
         /** @var array<string, mixed> $body */
         $body = (array)($request->getParsedBody() ?? []);
-        $data = array_merge($data, $body);
+        /** @var array<string, mixed> $data */
+        $data = array_merge($body, $request->getQueryParams());
 
-        // 2. Query params
-        /** @var array<string, string> $queryParams */
-        $queryParams = $request->getQueryParams();
-        $data = array_merge($data, $queryParams);
+        $this->mergePathParams($data, $pathParams, $paramMap);
+        $this->mergeAuthParams($data, $request, $authParams);
 
-        // 3. Path params with x-map renames
+        return $data;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @param array<string, string> $pathParams
+     * @param array<string, string> $paramMap
+     */
+    private function mergePathParams(array &$data, array $pathParams, array $paramMap): void
+    {
         foreach ($pathParams as $key => $value) {
             $mappedKey = $paramMap[$key] ?? $key;
             if (array_key_exists($mappedKey, $data)) {
@@ -38,8 +42,14 @@ final readonly class HydratorMapper implements SchemaMapper
             }
             $data[$mappedKey] = $value;
         }
+    }
 
-        // 4. Auth params from request attributes
+    /**
+     * @param array<string, mixed> $data
+     * @param list<string> $authParams
+     */
+    private function mergeAuthParams(array &$data, ServerRequestInterface $request, array $authParams): void
+    {
         foreach ($authParams as $paramName) {
             /** @var string|null $attrValue */
             $attrValue = $request->getAttribute('auth.' . $paramName);
@@ -50,7 +60,5 @@ final readonly class HydratorMapper implements SchemaMapper
                 $data[$paramName] = $attrValue;
             }
         }
-
-        return $data;
     }
 }

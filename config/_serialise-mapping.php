@@ -50,10 +50,13 @@ return [
         'is_active' => $model->isActive,
         'created_at' => $model->createdAt,
     ],
-    Handlers\Plays\OpenSession\Result::class => static fn(Handlers\Plays\OpenSession\Result $model) => [
+    Handlers\Plays\CreatePlay\Result::class => static fn(Handlers\Plays\CreatePlay\Result $model) => [
         'session_id' => $model->sessionId,
     ],
-    Handlers\Plays\CloseSession\Result::class => static fn(Handlers\Plays\CloseSession\Result $model) => [
+    Handlers\Plays\UpdatePlay\Result::class => static fn(Handlers\Plays\UpdatePlay\Result $model) => [
+        'session_id' => $model->sessionId,
+    ],
+    Handlers\Plays\FinalizePlay\Result::class => static fn(Handlers\Plays\FinalizePlay\Result $model) => [
         'session_id' => $model->sessionId,
         'started_at' => $model->startedAt,
         'finished_at' => $model->finishedAt,

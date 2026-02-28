@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-use Bgl\Application\Handlers\Plays\CloseSession;
-use Bgl\Application\Handlers\Plays\OpenSession;
+use Bgl\Application\Handlers\Plays\FinalizePlay;
+use Bgl\Application\Handlers\Plays\CreatePlay;
+use Bgl\Application\Handlers\Plays\UpdatePlay;
 use Bgl\Presentation\Api\Interceptors\AuthInterceptor;
 
 return [
@@ -15,7 +16,7 @@ return [
                     'operationId' => 'openSession',
                     'tags' => ['Plays'],
                     'security' => [['BearerAuth' => []]],
-                    'x-message' => OpenSession\Command::class,
+                    'x-message' => CreatePlay\Command::class,
                     'x-interceptors' => [AuthInterceptor::class],
                     'x-auth' => ['userId'],
                     'requestBody' => [
@@ -81,12 +82,74 @@ return [
                 ],
             ],
             '/v1/plays/sessions/{id}' => [
+                'put' => [
+                    'summary' => 'Update play session',
+                    'operationId' => 'updateSession',
+                    'tags' => ['Plays'],
+                    'security' => [['BearerAuth' => []]],
+                    'x-message' => UpdatePlay\Command::class,
+                    'x-interceptors' => [AuthInterceptor::class],
+                    'x-map' => ['id' => 'sessionId'],
+                    'x-auth' => ['userId'],
+                    'parameters' => [
+                        [
+                            'name' => 'id',
+                            'in' => 'path',
+                            'required' => true,
+                            'schema' => ['type' => 'string'],
+                        ],
+                    ],
+                    'requestBody' => [
+                        'required' => false,
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'name' => ['type' => 'string', 'maxLength' => 255, 'nullable' => true],
+                                        'game_id' => ['type' => 'string', 'format' => 'uuid', 'nullable' => true],
+                                        'visibility' => [
+                                            'type' => 'string',
+                                            'enum' => ['private', 'link', 'friends', 'registered', 'public'],
+                                            'default' => 'private',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Successful operation',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'code' => ['type' => 'integer', 'example' => 0],
+                                            'data' => [
+                                                'type' => 'object',
+                                                'properties' => [
+                                                    'session_id' => ['type' => 'string'],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        '400' => ['$ref' => '#/components/responses/BadRequest'],
+                        '401' => ['$ref' => '#/components/responses/Unauthorized'],
+                        '404' => ['$ref' => '#/components/responses/NotFound'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
+                    ],
+                ],
                 'patch' => [
                     'summary' => 'Close play session',
                     'operationId' => 'closeSession',
                     'tags' => ['Plays'],
                     'security' => [['BearerAuth' => []]],
-                    'x-message' => CloseSession\Command::class,
+                    'x-message' => FinalizePlay\Command::class,
                     'x-interceptors' => [AuthInterceptor::class],
                     'x-map' => ['id' => 'sessionId'],
                     'x-auth' => ['userId'],
