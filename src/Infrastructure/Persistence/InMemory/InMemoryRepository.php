@@ -38,6 +38,11 @@ abstract class InMemoryRepository implements Repository, Searchable
         return $this->entities;
     }
 
+    public function clear(): void
+    {
+        $this->entities = [];
+    }
+
     /**
      * @return list<string> Key field names
      */

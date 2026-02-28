@@ -17,6 +17,7 @@ use Bgl\Infrastructure\Persistence\InMemory\InMemoryMates;
 use Bgl\Infrastructure\Persistence\InMemory\InMemoryPasskeyChallenges;
 use Bgl\Infrastructure\Persistence\InMemory\InMemoryPasskeys;
 use Bgl\Infrastructure\Persistence\InMemory\InMemoryPlays;
+use Bgl\Infrastructure\Persistence\InMemory\InMemoryRepository;
 use Bgl\Infrastructure\Persistence\InMemory\InMemoryUsers;
 use Bgl\Tests\Support\DiHelper;
 use Bgl\Tests\Support\Dummy\FakeConfirmer;
@@ -40,6 +41,19 @@ final class FunctionalPersistenceModule extends Module
         $container->set(PasskeyChallenges::class, new InMemoryPasskeyChallenges());
         $container->set(Transactor::class, new NullTransactor());
         $container->set(Confirmer::class, new FakeConfirmer());
+    }
+
+    #[\Override]
+    public function _before(\Codeception\TestInterface $test): void
+    {
+        $container = DiHelper::container();
+
+        foreach ([Users::class, Plays::class, Mates::class, Games::class, Passkeys::class, PasskeyChallenges::class] as $repoInterface) {
+            $repo = $container->get($repoInterface);
+            if ($repo instanceof InMemoryRepository) {
+                $repo->clear();
+            }
+        }
     }
 
     #[\Override]
