@@ -4,37 +4,30 @@ declare(strict_types=1);
 
 namespace Bgl\Domain\Plays\Entities;
 
-use Bgl\Core\Collections\ArrayCollection;
-use Bgl\Core\Collections\Collection;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 
 final class Play
 {
-    /**
-     * @var Collection<Player>
-     * @psalm-var Collection<Player>
-     */
-    private $players;
-
     public function __construct(
         private readonly Uuid $id,
         private readonly Uuid $userId,
         private ?string $name,
         private PlayStatus $status,
-        private readonly \DateTimeImmutable $startedAt,
-        private ?\DateTimeImmutable $finishedAt,
+        private readonly DateTime $startedAt,
+        private ?DateTime $finishedAt,
+        private readonly Players $players,
         private ?Uuid $gameId = null,
         private Visibility $visibility = Visibility::Private,
     ) {
-        /** @var ArrayCollection<Player> */
-        $this->players = new ArrayCollection();
     }
 
     public static function create(
         Uuid $id,
         Uuid $userId,
         ?string $name,
-        \DateTimeImmutable $startedAt,
+        DateTime $startedAt,
+        Players $players,
         ?Uuid $gameId = null,
         Visibility $visibility = Visibility::Private,
     ): self {
@@ -45,6 +38,7 @@ final class Play
             PlayStatus::Draft,
             $startedAt,
             null,
+            $players,
             $gameId,
             $visibility,
         );
@@ -70,12 +64,12 @@ final class Play
         return $this->status;
     }
 
-    public function getStartedAt(): \DateTimeImmutable
+    public function getStartedAt(): DateTime
     {
         return $this->startedAt;
     }
 
-    public function getFinishedAt(): ?\DateTimeImmutable
+    public function getFinishedAt(): ?DateTime
     {
         return $this->finishedAt;
     }
@@ -115,21 +109,18 @@ final class Play
         $this->players->add($player);
     }
 
-    /**
-     * @return array<int, Player>
-     */
-    public function getPlayers(): array
+    public function getPlayers(): Players
     {
-        return $this->players->toArray();
+        return $this->players;
     }
 
-    public function close(\DateTimeImmutable $finishedAt): void
+    public function finalize(DateTime $finishedAt): void
     {
         if ($this->status !== PlayStatus::Draft) {
-            throw new \DomainException('Play can only be closed from draft status');
+            throw new \DomainException('Play can only be finalized from draft status');
         }
 
-        if ($finishedAt <= $this->startedAt) {
+        if ($finishedAt->getValue() <= $this->startedAt->getValue()) {
             throw new \DomainException('finishedAt must be after startedAt');
         }
 
