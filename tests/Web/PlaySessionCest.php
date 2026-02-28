@@ -15,6 +15,22 @@ final class PlaySessionCest
         $i->haveHttpHeader('Content-Type', 'application/json');
     }
 
+    public function testOpenSessionWithoutTokenReturns401(WebTester $i): void
+    {
+        $i->sendPost('/v1/plays/sessions', [
+            'players' => [
+                ['mate_id' => '00000000-0000-0000-0000-000000000001'],
+            ],
+        ]);
+        $i->seeResponseCodeIs(401);
+    }
+
+    public function testOpenSessionWithoutBodyReturns401(WebTester $i): void
+    {
+        $i->sendPost('/v1/plays/sessions');
+        $i->seeResponseCodeIs(401);
+    }
+
     #[Group('smoke')]
     public function testOpenAndCloseSession(WebTester $i, AuthModule $auth): void
     {

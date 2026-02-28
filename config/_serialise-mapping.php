@@ -81,6 +81,12 @@ return [
         'page' => $model->page,
         'size' => $model->size,
     ],
+    Handlers\Games\GetGame\Result::class => static fn(Handlers\Games\GetGame\Result $model) => [
+        'id' => $model->id,
+        'bgg_id' => $model->bggId,
+        'name' => $model->name,
+        'year_published' => $model->yearPublished,
+    ],
     Handlers\Games\SearchGames\Result::class => static fn(Handlers\Games\SearchGames\Result $model) => [
         'items' => $model->data,
         'total' => $model->total,

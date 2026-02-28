@@ -108,6 +108,29 @@ final class PlayMappingCest
         $fieldNames = $metadata->getFieldNames();
         sort($fieldNames);
 
-        $i->assertSame(['finishedAt', 'id', 'name', 'startedAt', 'status', 'userId'], $fieldNames);
+        $i->assertSame(['finishedAt', 'gameId', 'id', 'name', 'startedAt', 'status', 'userId', 'visibility'], $fieldNames);
+    }
+
+    public function testConfigureSetsGameIdField(UnitTester $i): void
+    {
+        $mapping = new PlayMapping();
+        $metadata = new ClassMetadata(Play::class);
+
+        $mapping->configure($metadata);
+
+        $i->assertSame('uuid_vo', $metadata->getTypeOfField('gameId'));
+        $i->assertSame('game_id', $metadata->getColumnName('gameId'));
+        $i->assertTrue($metadata->fieldMappings['gameId']['nullable']);
+    }
+
+    public function testConfigureSetsVisibilityField(UnitTester $i): void
+    {
+        $mapping = new PlayMapping();
+        $metadata = new ClassMetadata(Play::class);
+
+        $mapping->configure($metadata);
+
+        $i->assertSame('string', $metadata->getTypeOfField('visibility'));
+        $i->assertSame('private', $metadata->fieldMappings['visibility']['options']['default']);
     }
 }

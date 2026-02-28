@@ -25,7 +25,29 @@ return [
                                 'schema' => [
                                     'type' => 'object',
                                     'properties' => [
-                                        'name' => ['type' => 'string'],
+                                        'game_id' => ['type' => 'string', 'format' => 'uuid'],
+                                        'name' => ['type' => 'string', 'maxLength' => 255],
+                                        'started_at' => ['type' => 'string', 'format' => 'date-time'],
+                                        'finished_at' => ['type' => 'string', 'format' => 'date-time'],
+                                        'visibility' => [
+                                            'type' => 'string',
+                                            'enum' => ['private', 'link', 'friends', 'registered', 'public'],
+                                            'default' => 'private',
+                                        ],
+                                        'players' => [
+                                            'type' => 'array',
+                                            'minItems' => 1,
+                                            'items' => [
+                                                'type' => 'object',
+                                                'required' => ['mate_id'],
+                                                'properties' => [
+                                                    'mate_id' => ['type' => 'string', 'format' => 'uuid'],
+                                                    'score' => ['type' => 'integer', 'nullable' => true],
+                                                    'is_winner' => ['type' => 'boolean', 'default' => false],
+                                                    'color' => ['type' => 'string', 'maxLength' => 50],
+                                                ],
+                                            ],
+                                        ],
                                     ],
                                 ],
                             ],
@@ -51,7 +73,9 @@ return [
                                 ],
                             ],
                         ],
+                        '400' => ['$ref' => '#/components/responses/BadRequest'],
                         '401' => ['$ref' => '#/components/responses/Unauthorized'],
+                        '422' => ['$ref' => '#/components/responses/ValidationError'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
                     ],
                 ],

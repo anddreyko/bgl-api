@@ -51,7 +51,7 @@ final class CloseSessionCest
         $sessionId = $this->uuidGenerator->generate();
         $userId = 'user-123';
 
-        $play = Play::open(
+        $play = Play::create(
             $sessionId,
             new Uuid($userId),
             'Game night',
@@ -93,7 +93,7 @@ final class CloseSessionCest
     {
         $sessionId = $this->uuidGenerator->generate();
 
-        $play = Play::open(
+        $play = Play::create(
             $sessionId,
             new Uuid('user-owner'),
             null,
