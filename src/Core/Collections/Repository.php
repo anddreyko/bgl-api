@@ -7,7 +7,7 @@ namespace Bgl\Core\Collections;
 /**
  * @template TEntity of object
  */
-interface Repository
+interface Repository extends \Countable
 {
     /**
      * @param TEntity $entity

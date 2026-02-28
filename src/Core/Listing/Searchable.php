@@ -21,9 +21,4 @@ interface Searchable
         PageNumber $number = new PageNumber(1),
         PageSort $sort = new PageSort([])
     ): iterable;
-
-    /**
-     * @return non-negative-int
-     */
-    public function count(Filter $filter = All::Filter): int;
 }
