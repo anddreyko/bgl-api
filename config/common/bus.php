@@ -56,6 +56,7 @@ return [
             [Mates\UpdateMate\Command::class, Mates\UpdateMate\Handler::class],
             [Mates\DeleteMate\Command::class, Mates\DeleteMate\Handler::class],
             [Games\SearchGames\Query::class, Games\SearchGames\Handler::class],
+            [Games\GetGame\Query::class, Games\GetGame\Handler::class],
         ],
         'middleware' => [
             Aspects\Logging::class,

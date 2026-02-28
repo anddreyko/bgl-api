@@ -23,4 +23,10 @@ final class GamesCest
         $i->sendGet('/v1/games/search?q=ab');
         $i->seeResponseCodeIs(422);
     }
+
+    public function testGetGameNotFoundReturns404(WebTester $i): void
+    {
+        $i->sendGet('/v1/games/00000000-0000-0000-0000-000000000000');
+        $i->seeResponseCodeIs(404);
+    }
 }

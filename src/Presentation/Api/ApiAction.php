@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bgl\Presentation\Api;
 
 use Bgl\Core\Auth\AuthenticationException;
+use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Http\RequestValidator;
 use Bgl\Core\Http\SchemaMapper;
 use Bgl\Core\Messages\Dispatcher;
@@ -38,6 +39,10 @@ final readonly class ApiAction
         } catch (AuthenticationException $e) {
             return $this->jsonResponse(
                 new ErrorResponse(message: $e->getMessage(), httpStatus: 401),
+            );
+        } catch (NotFoundException $e) {
+            return $this->jsonResponse(
+                new ErrorResponse(message: $e->getMessage(), httpStatus: 404),
             );
         } catch (\DomainException $e) {
             return $this->jsonResponse(

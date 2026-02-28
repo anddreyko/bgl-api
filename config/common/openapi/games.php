@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Bgl\Application\Handlers\Games\GetGame;
 use Bgl\Application\Handlers\Games\SearchGames;
 
 return [
@@ -58,6 +59,49 @@ return [
                             ],
                         ],
                         '400' => ['$ref' => '#/components/responses/BadRequest'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
+                    ],
+                ],
+            ],
+            '/v1/games/{id}' => [
+                'get' => [
+                    'summary' => 'Get game details',
+                    'operationId' => 'getGame',
+                    'tags' => ['Games'],
+                    'x-message' => GetGame\Query::class,
+                    'x-map' => ['id' => 'gameId'],
+                    'parameters' => [
+                        [
+                            'name' => 'id',
+                            'in' => 'path',
+                            'required' => true,
+                            'schema' => ['type' => 'string', 'format' => 'uuid'],
+                        ],
+                    ],
+                    'responses' => [
+                        '200' => [
+                            'description' => 'Successful operation',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'code' => ['type' => 'integer', 'example' => 0],
+                                            'data' => [
+                                                'type' => 'object',
+                                                'properties' => [
+                                                    'id' => ['type' => 'string', 'format' => 'uuid'],
+                                                    'bgg_id' => ['type' => 'integer'],
+                                                    'name' => ['type' => 'string'],
+                                                    'year_published' => ['type' => 'integer', 'nullable' => true],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        '404' => ['$ref' => '#/components/responses/NotFound'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
                     ],
                 ],
