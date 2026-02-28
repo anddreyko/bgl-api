@@ -6,9 +6,14 @@ use Bgl\Core\Http\RequestValidator;
 use Bgl\Core\Http\SchemaMapper;
 use Bgl\Core\Messages\Dispatcher;
 use Bgl\Core\Serialization\Serializer;
+use Bgl\Core\ValueObjects\DateTime;
+use Bgl\Core\ValueObjects\Uuid;
+use Bgl\Infrastructure\Serialization\CastToDateTime;
+use Bgl\Infrastructure\Serialization\CastToUuid;
 use Bgl\Presentation\Api\ApiAction;
 use Bgl\Presentation\Api\CompiledRouteMap;
 use Bgl\Presentation\Api\InterceptorPipeline;
+use EventSauce\ObjectHydrator\DefaultCasterRepository;
 use EventSauce\ObjectHydrator\DefinitionProvider;
 use EventSauce\ObjectHydrator\KeyFormatterWithoutConversion;
 use EventSauce\ObjectHydrator\ObjectMapper;
@@ -27,9 +32,18 @@ return [
     },
     InterceptorPipeline::class => static fn(ContainerInterface $container): InterceptorPipeline
         => new InterceptorPipeline($container),
-    ObjectMapper::class => static fn(): ObjectMapper => new ObjectMapperUsingReflection(
-        new DefinitionProvider(keyFormatter: new KeyFormatterWithoutConversion()),
-    ),
+    ObjectMapper::class => static function (): ObjectMapper {
+        $casters = DefaultCasterRepository::builtIn();
+        $casters->registerDefaultCaster(Uuid::class, CastToUuid::class);
+        $casters->registerDefaultCaster(DateTime::class, CastToDateTime::class);
+
+        return new ObjectMapperUsingReflection(
+            new DefinitionProvider(
+                defaultCasterRepository: $casters,
+                keyFormatter: new KeyFormatterWithoutConversion(),
+            ),
+        );
+    },
     ApiAction::class => static function (ContainerInterface $container): ApiAction {
         /** @var CompiledRouteMap $routeMap */
         $routeMap = $container->get(CompiledRouteMap::class);

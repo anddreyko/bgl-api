@@ -89,6 +89,7 @@ return [
                                             'code' => ['type' => 'integer', 'example' => 0],
                                             'data' => [
                                                 'type' => 'object',
+                                                'required' => ['id', 'bgg_id', 'name'],
                                                 'properties' => [
                                                     'id' => ['type' => 'string', 'format' => 'uuid'],
                                                     'bgg_id' => ['type' => 'integer'],

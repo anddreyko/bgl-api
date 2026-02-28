@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Bgl\Application\Handlers\Plays\FinalizePlay;
 use Bgl\Application\Handlers\Plays\CreatePlay;
+use Bgl\Application\Handlers\Plays\FinalizePlay;
 use Bgl\Application\Handlers\Plays\UpdatePlay;
 use Bgl\Presentation\Api\Interceptors\AuthInterceptor;
 
@@ -83,7 +83,9 @@ return [
             ],
             '/v1/plays/sessions/{id}' => [
                 'put' => [
-                    'summary' => 'Update play session',
+                    'summary' => 'Update play session (full replace)',
+                    'description' => 'Replaces all mutable fields. ' .
+                        'Omitted fields will be set to their defaults (name=null, game_id=null, visibility=private).',
                     'operationId' => 'updateSession',
                     'tags' => ['Plays'],
                     'security' => [['BearerAuth' => []]],
@@ -168,7 +170,7 @@ return [
                                 'schema' => [
                                     'type' => 'object',
                                     'properties' => [
-                                        'finishedAt' => [
+                                        'finished_at' => [
                                             'type' => 'string',
                                             'format' => 'date-time',
                                         ],
@@ -199,7 +201,9 @@ return [
                                 ],
                             ],
                         ],
+                        '400' => ['$ref' => '#/components/responses/BadRequest'],
                         '401' => ['$ref' => '#/components/responses/Unauthorized'],
+                        '404' => ['$ref' => '#/components/responses/NotFound'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
                     ],
                 ],

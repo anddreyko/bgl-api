@@ -39,24 +39,11 @@ final readonly class CompiledRouteMap
                 if (!str_contains($pattern, '{')) {
                     $staticMap[$methodUpper . ' ' . $pattern] = $compiledOp;
                 } else {
-                    /** @var list<string> $paramNames */
-                    $paramNames = [];
-                    $segments = preg_split('/(\{[^}]+})/', $pattern, -1, PREG_SPLIT_DELIM_CAPTURE);
-                    if (!is_array($segments)) {
-                        continue;
+                    $dynamic = self::compileDynamicRoute($pattern, $compiledOp, $methodUpper, $markIndex++);
+                    if ($dynamic !== null) {
+                        $dynamicEntries[] = $dynamic['entry'];
+                        $dynamicMap[$dynamic['mark']] = $dynamic['mapping'];
                     }
-                    $regex = '';
-                    foreach ($segments as $segment) {
-                        if (str_starts_with($segment, '{') && str_ends_with($segment, '}')) {
-                            $paramNames[] = substr($segment, 1, -1);
-                            $regex .= '([^/]+)';
-                        } else {
-                            $regex .= preg_quote($segment, '~');
-                        }
-                    }
-                    $mark = 'r' . $markIndex++;
-                    $dynamicEntries[] = $methodUpper . ' ' . $regex . '(*MARK:' . $mark . ')';
-                    $dynamicMap[$mark] = ['operation' => $compiledOp, 'paramNames' => $paramNames];
                 }
             }
         }
@@ -66,6 +53,42 @@ final readonly class CompiledRouteMap
             ? '~^(?|' . implode('|', $dynamicEntries) . ')$~'
             : '~^$~';
         $this->dynamicMap = $dynamicMap;
+    }
+
+    /**
+     * @return array{entry: string, mark: string, mapping: array{operation: CompiledOperation, paramNames:
+     *     list<string>}}|null
+     */
+    private static function compileDynamicRoute(
+        string $pattern,
+        CompiledOperation $op,
+        string $method,
+        int $markIndex
+    ): ?array {
+        $segments = preg_split('/(\{[^}]+})/', $pattern, -1, PREG_SPLIT_DELIM_CAPTURE);
+        if (!is_array($segments)) {
+            return null;
+        }
+
+        /** @var list<string> $paramNames */
+        $paramNames = [];
+        $regex = '';
+        foreach ($segments as $segment) {
+            if (str_starts_with($segment, '{') && str_ends_with($segment, '}')) {
+                $paramNames[] = substr($segment, 1, -1);
+                $regex .= '([^/]+)';
+            } else {
+                $regex .= preg_quote($segment, '~');
+            }
+        }
+
+        $mark = 'r' . $markIndex;
+
+        return [
+            'entry' => $method . ' ' . $regex . '(*MARK:' . $mark . ')',
+            'mark' => $mark,
+            'mapping' => ['operation' => $op, 'paramNames' => $paramNames],
+        ];
     }
 
     public function match(string $method, string $path): ?MatchResult

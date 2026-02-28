@@ -63,26 +63,18 @@ final readonly class ApiAction
 
     private function doHandle(ServerRequestInterface $request): ResponseInterface
     {
-        $matchResult = $this->routeMap->match(
-            $request->getMethod(),
-            $request->getUri()->getPath(),
-        );
-
+        $matchResult = $this->routeMap->match($request->getMethod(), $request->getUri()->getPath());
         if ($matchResult === null) {
-            return $this->jsonResponse(
-                new ErrorResponse(message: 'Not Found', httpStatus: 404),
-            );
+            return $this->jsonResponse(new ErrorResponse(message: 'Not Found', httpStatus: 404));
         }
 
         $operation = $matchResult->operation;
-
         $request = $this->interceptorPipeline->process($request, $operation->interceptors);
 
         $validationErrors = $this->requestValidator->validate($request);
-
         if ($validationErrors !== []) {
             return $this->jsonResponse(
-                ErrorResponse::validation(message: 'Validation failed', errors: $validationErrors),
+                ErrorResponse::validation(message: 'Validation failed', errors: $validationErrors)
             );
         }
 
@@ -90,21 +82,27 @@ final readonly class ApiAction
             $request,
             $matchResult->pathParams,
             $operation->authParams,
-            $operation->paramMap,
+            $operation->paramMap
         );
 
+        return $this->dispatchAndRespond($operation->messageClass, $data);
+    }
+
+    /**
+     * @param class-string<\Bgl\Core\Messages\Message> $messageClass
+     * @param array<string, mixed> $data
+     */
+    private function dispatchAndRespond(string $messageClass, array $data): ResponseInterface
+    {
         /** @var \Bgl\Core\Messages\Message $message */
-        $message = $this->hydrator->hydrateObject($operation->messageClass, $data);
+        $message = $this->hydrator->hydrateObject($messageClass, $data);
         /** @var mixed $result */
         $result = $this->dispatcher->dispatch($message);
 
-        if (is_object($result)) {
-            $serialized = $this->serializer->serialize($result);
+        /** @var mixed $responseData */
+        $responseData = is_object($result) ? $this->serializer->serialize($result) : $result;
 
-            return $this->jsonResponse(new SuccessResponse(data: $serialized));
-        }
-
-        return $this->jsonResponse(new SuccessResponse(data: $result));
+        return $this->jsonResponse(new SuccessResponse(data: $responseData));
     }
 
     private function jsonResponse(SuccessResponse|ErrorResponse $responseData): ResponseInterface
