@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Application\Handlers\Plays\OpenSession;
+namespace Bgl\Application\Handlers\Plays\CreatePlay;
 
 final readonly class Result
 {

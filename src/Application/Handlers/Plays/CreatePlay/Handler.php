@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Application\Handlers\Plays\OpenSession;
+namespace Bgl\Application\Handlers\Plays\CreatePlay;
 
 use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Identity\UuidGenerator;

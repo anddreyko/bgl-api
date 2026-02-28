@@ -2,13 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Application\Handlers\Plays\FinalizePlay;
+namespace Bgl\Application\Handlers\Plays\UpdatePlay;
 
+use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
+use Bgl\Core\ValueObjects\Uuid;
+use Bgl\Domain\Games\Entities\Games;
 use Bgl\Domain\Plays\Entities\Play;
 use Bgl\Domain\Plays\Entities\Plays;
-use Psr\Clock\ClockInterface;
+use Bgl\Domain\Plays\Entities\Visibility;
 
 /**
  * @implements MessageHandler<Result, Command>
@@ -17,7 +20,7 @@ final readonly class Handler implements MessageHandler
 {
     public function __construct(
         private Plays $plays,
-        private ClockInterface $clock,
+        private Games $games,
     ) {
     }
 
@@ -38,15 +41,30 @@ final readonly class Handler implements MessageHandler
             throw new \DomainException('Access denied');
         }
 
-        $finishedAt = $command->finishedAt
-            ?? \DateTimeImmutable::createFromInterface($this->clock->now());
+        $gameId = $this->resolveGameId($command->gameId);
 
-        $play->close($finishedAt);
+        $play->update(
+            $command->name,
+            $gameId,
+            Visibility::from($command->visibility),
+        );
 
         return new Result(
-            sessionId: $play->getId()->getValue() ?? '',
-            startedAt: $play->getStartedAt()->format('c'),
-            finishedAt: $finishedAt->format('c'),
+            sessionId: (string)$play->getId(),
         );
+    }
+
+    private function resolveGameId(?string $gameId): ?Uuid
+    {
+        if ($gameId === null || $gameId === '') {
+            return null;
+        }
+
+        $game = $this->games->find($gameId);
+        if ($game === null) {
+            throw new NotFoundException('Game not found');
+        }
+
+        return new Uuid($gameId);
     }
 }

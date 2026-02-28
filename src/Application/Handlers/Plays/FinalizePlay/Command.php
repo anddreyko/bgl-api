@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Application\Handlers\Plays\CloseSession;
+namespace Bgl\Application\Handlers\Plays\FinalizePlay;
 
 use Bgl\Core\Messages\Message;
 
