@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Games\Entities\Game;
 
@@ -13,8 +14,8 @@ return [
         yearPublished: isset($data['yearPublished']) && (int)$data['yearPublished'] !== 0
             ? (int)$data['yearPublished']
             : null,
-        createdAt: $data['createdAt'] instanceof DateTimeImmutable
+        createdAt: $data['createdAt'] instanceof DateTime
             ? $data['createdAt']
-            : new DateTimeImmutable((string)$data['createdAt']),
+            : new DateTime((string)$data['createdAt']),
     ),
 ];

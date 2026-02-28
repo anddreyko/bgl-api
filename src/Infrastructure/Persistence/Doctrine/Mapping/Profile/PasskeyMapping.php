@@ -20,49 +20,21 @@ final class PasskeyMapping implements EntityMapping
     public function configure(ClassMetadata $metadata): void
     {
         $metadata->setPrimaryTable(['name' => 'auth_passkey']);
-
-        $metadata->mapField([
-            'fieldName' => 'id',
-            'type' => 'uuid_vo',
-            'id' => true,
-        ]);
+        $metadata->mapField(['fieldName' => 'id', 'type' => 'uuid_vo', 'id' => true]);
         $metadata->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_NONE);
 
-        $metadata->mapField([
-            'fieldName' => 'userId',
-            'type' => 'uuid_vo',
-            'columnName' => 'user_id',
-        ]);
+        $this->configureFields($metadata);
+    }
 
-        $metadata->mapField([
-            'fieldName' => 'credentialId',
-            'type' => 'string',
-            'columnName' => 'credential_id',
-            'unique' => true,
-        ]);
-
-        $metadata->mapField([
-            'fieldName' => 'credentialData',
-            'type' => 'text',
-            'columnName' => 'credential_data',
-        ]);
-
-        $metadata->mapField([
-            'fieldName' => 'counter',
-            'type' => 'integer',
-            'options' => ['default' => 0],
-        ]);
-
-        $metadata->mapField([
-            'fieldName' => 'createdAt',
-            'type' => 'datetime_immutable',
-            'columnName' => 'created_at',
-        ]);
-
-        $metadata->mapField([
-            'fieldName' => 'label',
-            'type' => 'string',
-            'nullable' => true,
-        ]);
+    private function configureFields(ClassMetadata $metadata): void
+    {
+        $metadata->mapField(['fieldName' => 'userId', 'type' => 'uuid_vo', 'columnName' => 'user_id']);
+        $metadata->mapField(
+            ['fieldName' => 'credentialId', 'type' => 'string', 'columnName' => 'credential_id', 'unique' => true]
+        );
+        $metadata->mapField(['fieldName' => 'credentialData', 'type' => 'text', 'columnName' => 'credential_data']);
+        $metadata->mapField(['fieldName' => 'counter', 'type' => 'integer', 'options' => ['default' => 0]]);
+        $metadata->mapField(['fieldName' => 'createdAt', 'type' => 'datetime_immutable', 'columnName' => 'created_at']);
+        $metadata->mapField(['fieldName' => 'label', 'type' => 'string', 'nullable' => true]);
     }
 }

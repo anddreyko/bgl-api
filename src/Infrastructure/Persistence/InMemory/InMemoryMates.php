@@ -58,8 +58,8 @@ final class InMemoryMates extends InMemoryRepository implements Mates
         }
 
         usort($matches, static function (Mate $a, Mate $b) use ($sortField, $sortDir): int {
-            $aVal = $sortField === 'createdAt' ? $a->getCreatedAt()->getTimestamp() : $a->getName();
-            $bVal = $sortField === 'createdAt' ? $b->getCreatedAt()->getTimestamp() : $b->getName();
+            $aVal = $sortField === 'createdAt' ? $a->getCreatedAt()->getValue()->getTimestamp() : $a->getName();
+            $bVal = $sortField === 'createdAt' ? $b->getCreatedAt()->getValue()->getTimestamp() : $b->getName();
             $cmp = $aVal <=> $bVal;
 
             return strtolower($sortDir) === 'desc' ? -$cmp : $cmp;

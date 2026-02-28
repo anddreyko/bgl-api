@@ -67,47 +67,47 @@ abstract class DoctrineRepository implements Repository, Searchable
         PageNumber $number = new PageNumber(1),
         PageSort $sort = new PageSort([])
     ): iterable {
-        $alias = $this->getAlias();
-        $keys = $this->getKeys();
-
-        // Build SELECT clause for key fields only
-        $select = implode(
-            ', ',
-            array_map(
-                fn(string $key): string => "{$alias}.{$key}",
-                $keys
-            )
-        );
-
-        $qb = $this->em->createQueryBuilder()
-            ->select($select)
-            ->from($this->getType(), $alias);
-
-        $visitor = new DoctrineFilter($qb, $alias);
-        $condition = $filter->accept($visitor);
-        if ($condition !== null) {
-            $qb->andWhere($condition);
-        }
-
-        foreach ($sort->fields as $field => $direction) {
-            $order = $direction === SortDirection::Asc ? 'ASC' : 'DESC';
-            $qb->addOrderBy("{$alias}.{$field}", $order);
-        }
-
         $limit = $size->getValue();
-
         if ($limit === 0) {
             return [];
         }
 
-        if ($limit !== null) {
-            $offset = ($number->getValue() - 1) * $limit;
-            $qb->setFirstResult($offset)
-                ->setMaxResults($limit);
-        }
+        $alias = $this->getAlias();
+        $qb = $this->buildSearchQuery($alias, $filter);
+
+        $this->applySorting($qb, $alias, $sort);
+        $this->applyPagination($qb, $limit, $number);
 
         /** @var list<array<string, mixed>> */
         return $qb->getQuery()->getArrayResult();
+    }
+
+    private function buildSearchQuery(string $alias, Filter $filter): \Doctrine\ORM\QueryBuilder
+    {
+        $select = implode(', ', array_map(fn(string $key): string => "{$alias}.{$key}", $this->getKeys()));
+
+        $qb = $this->em->createQueryBuilder()->select($select)->from($this->getType(), $alias);
+
+        $condition = $filter->accept(new DoctrineFilter($qb, $alias));
+        if ($condition !== null) {
+            $qb->andWhere($condition);
+        }
+
+        return $qb;
+    }
+
+    private function applySorting(\Doctrine\ORM\QueryBuilder $qb, string $alias, PageSort $sort): void
+    {
+        foreach ($sort->fields as $field => $direction) {
+            $qb->addOrderBy("{$alias}.{$field}", $direction === SortDirection::Asc ? 'ASC' : 'DESC');
+        }
+    }
+
+    private function applyPagination(\Doctrine\ORM\QueryBuilder $qb, ?int $limit, PageNumber $number): void
+    {
+        if ($limit !== null) {
+            $qb->setFirstResult(($number->getValue() - 1) * $limit)->setMaxResults($limit);
+        }
     }
 
     #[\Override]

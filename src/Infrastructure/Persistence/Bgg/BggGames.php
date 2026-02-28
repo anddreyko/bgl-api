@@ -112,7 +112,7 @@ final class BggGames implements Games
             return [];
         }
 
-        $now = \DateTimeImmutable::createFromInterface($this->clock->now());
+        $now = new \Bgl\Core\ValueObjects\DateTime($this->clock->now());
         $games = [];
         foreach ($xml as $item) {
             $data = $this->denormalizer->denormalize(

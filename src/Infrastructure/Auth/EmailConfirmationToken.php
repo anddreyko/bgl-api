@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Auth;
 
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 
 final class EmailConfirmationToken
@@ -12,7 +13,7 @@ final class EmailConfirmationToken
         public Uuid $id,
         private readonly Uuid $userId,
         private readonly string $token,
-        private readonly \DateTimeImmutable $expiresAt,
+        private readonly DateTime $expiresAt,
     ) {
     }
 
@@ -20,14 +21,14 @@ final class EmailConfirmationToken
         Uuid $id,
         Uuid $userId,
         string $token,
-        \DateTimeImmutable $expiresAt,
+        DateTime $expiresAt,
     ): self {
         return new self($id, $userId, $token, $expiresAt);
     }
 
-    public function isExpired(\DateTimeImmutable $now): bool
+    public function isExpired(DateTime $now): bool
     {
-        return $now > $this->expiresAt;
+        return $now->getValue() > $this->expiresAt->getValue();
     }
 
     public function getId(): Uuid
@@ -45,7 +46,7 @@ final class EmailConfirmationToken
         return $this->token;
     }
 
-    public function getExpiresAt(): \DateTimeImmutable
+    public function getExpiresAt(): DateTime
     {
         return $this->expiresAt;
     }

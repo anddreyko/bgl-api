@@ -21,48 +21,26 @@ final class UserMapping implements EntityMapping
     public function configure(ClassMetadata $metadata): void
     {
         $metadata->setPrimaryTable(['name' => 'auth_user']);
-
-        $metadata->mapField([
-            'fieldName' => 'id',
-            'type' => 'uuid_vo',
-            'id' => true,
-        ]);
+        $metadata->mapField(['fieldName' => 'id', 'type' => 'uuid_vo', 'id' => true]);
         $metadata->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_NONE);
 
-        $metadata->mapField([
-            'fieldName' => 'email',
-            'type' => 'email_vo',
-            'unique' => true,
-        ]);
+        $this->configureFields($metadata);
+    }
 
-        $metadata->mapField([
-            'fieldName' => 'passwordHash',
-            'type' => 'string',
-            'columnName' => 'password_hash',
-        ]);
-
-        $metadata->mapField([
-            'fieldName' => 'createdAt',
-            'type' => 'datetime_immutable',
-        ]);
-
-        $metadata->mapField([
-            'fieldName' => 'status',
-            'type' => 'string',
-            'enumType' => UserStatus::class,
-        ]);
-
-        $metadata->mapField([
-            'fieldName' => 'name',
-            'type' => 'string',
-            'nullable' => true,
-        ]);
-
-        $metadata->mapField([
-            'fieldName' => 'tokenVersion',
-            'type' => 'integer',
-            'columnName' => 'token_version',
-            'options' => ['default' => 1],
-        ]);
+    private function configureFields(ClassMetadata $metadata): void
+    {
+        $metadata->mapField(['fieldName' => 'email', 'type' => 'email_vo', 'unique' => true]);
+        $metadata->mapField(['fieldName' => 'passwordHash', 'type' => 'string', 'columnName' => 'password_hash']);
+        $metadata->mapField(['fieldName' => 'createdAt', 'type' => 'datetime_immutable']);
+        $metadata->mapField(['fieldName' => 'status', 'type' => 'string', 'enumType' => UserStatus::class]);
+        $metadata->mapField(['fieldName' => 'name', 'type' => 'string', 'nullable' => true]);
+        $metadata->mapField(
+            [
+                'fieldName' => 'tokenVersion',
+                'type' => 'integer',
+                'columnName' => 'token_version',
+                'options' => ['default' => 1],
+            ]
+        );
     }
 }

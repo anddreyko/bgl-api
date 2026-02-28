@@ -8,6 +8,7 @@ use Bgl\Core\Auth\Confirmer;
 use Bgl\Core\Auth\ExpiredConfirmationTokenException;
 use Bgl\Core\Auth\InvalidConfirmationTokenException;
 use Bgl\Core\Identity\UuidGenerator;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Clock\ClockInterface;
@@ -26,13 +27,11 @@ final readonly class DoctrineConfirmer implements Confirmer
     #[\Override]
     public function request(Uuid $userId): void
     {
-        $now = \DateTimeImmutable::createFromInterface($this->clock->now());
-
         $token = EmailConfirmationToken::create(
             id: $this->uuidGenerator->generate(),
             userId: $userId,
             token: $this->uuidGenerator->generate()->getValue() ?? '',
-            expiresAt: $now->modify('+' . self::TOKEN_TTL_HOURS . ' hours'),
+            expiresAt: new DateTime('+' . self::TOKEN_TTL_HOURS . ' hours'),
         );
 
         $this->em->persist($token);
@@ -46,8 +45,7 @@ final readonly class DoctrineConfirmer implements Confirmer
             throw new InvalidConfirmationTokenException();
         }
 
-        $now = \DateTimeImmutable::createFromInterface($this->clock->now());
-        if ($entity->isExpired($now)) {
+        if ($entity->isExpired(new DateTime($this->clock->now()))) {
             throw new ExpiredConfirmationTokenException();
         }
 
