@@ -131,9 +131,9 @@ cd: ## Check composer dependencies
 	$(APP) composer cd:run
 .PHONY: cd
 
-pdepend: ## Code metrics (PDepend)
-	$(APP) composer pdepend:check
-.PHONY: pdepend
+pd: ## Code metrics (PDepend)
+	$(APP) composer pd:check
+.PHONY: pd
 
 ##
 ## Testing

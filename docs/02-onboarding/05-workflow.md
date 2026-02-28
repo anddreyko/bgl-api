@@ -101,7 +101,7 @@ Run full validation:
 composer scan:all  # MANDATORY - full check
 ```
 
-This runs: lint, psalm, deptrac, composer check, and all tests.
+This runs: lint, psalm, pdepend, deptrac, composer check, and all tests.
 
 **Do not push if `composer scan:all` fails.**
 
@@ -121,7 +121,7 @@ Create PR to `develop` branch:
 When implementing features, follow this order:
 
 ```
-1. Static Analysis    composer lp:run, composer ps:run, composer dt:run
+1. Static Analysis    composer lp:run, composer ps:run, composer pd:check, composer dt:run
          |
 2. Integration Tests  composer test:intg, composer test:func  <- MAIN FOCUS
          |
@@ -153,6 +153,7 @@ Before pushing your branch:
 
 - [ ] `composer lp:run` passes (syntax)
 - [ ] `composer ps:run` passes (static analysis)
+- [ ] `composer pd:check` passes (complexity: CCN <= 8, NPath <= 100, LOC <= 40, WMC <= 50)
 - [ ] `composer dt:run` passes (architecture)
 - [ ] `composer scan:all` passes (full validation)
 - [ ] Integration tests written for new code

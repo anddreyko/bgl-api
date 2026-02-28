@@ -19,10 +19,38 @@ composer ps             # Psalm — static analysis
 composer dt             # Deptrac — architectural dependency check
 
 composer scan:style     # PHP-CS-Fixer + Rector (modifies code)
-composer scan:php       # Lint + Psalm
+composer scan:php       # Lint + Psalm + PDepend
 composer scan:depend    # Deptrac + Composer dependencies
 composer scan:all       # scan:php + scan:depend + test:all (without scan:style)
 ```
+
+### PDepend Complexity Thresholds
+
+PDepend (`composer pd:check`) enforces code complexity limits. Build fails if any threshold is exceeded.
+
+**Method-level thresholds:**
+
+| Metric | Threshold | Description                                                       |
+|--------|-----------|-------------------------------------------------------------------|
+| CCN    | > 8       | Cyclomatic Complexity -- number of independent paths through code |
+| NPath  | > 100     | NPath Complexity -- number of possible execution paths            |
+| LOC    | > 40      | Lines of Code per method -- method length                         |
+
+**Class-level thresholds:**
+
+| Metric | Threshold | Description                                                         |
+|--------|-----------|---------------------------------------------------------------------|
+| WMC    | > 50      | Weighted Methods per Class -- sum of CCN for all methods in a class |
+
+Thresholds are configured in `composer.json` (`pd:check` script) and can be overridden via CLI:
+
+```bash
+composer pd:check                                          # use configured thresholds
+php bin/pdepend-check.php --ccn=10 --npath=200 --loc=50    # custom thresholds
+```
+
+**Known limitation:** PDepend 2.16 does not support PHP 8.4 syntax (property hooks, asymmetric visibility). Files with
+unsupported syntax are skipped; the check script reports the count.
 
 ### Makefile (Docker wrapper)
 
@@ -62,13 +90,14 @@ vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix
 | `composer lp` | PHP Lint     | PHP syntax check               |
 | `composer ps` | Psalm        | Static type analysis           |
 | `composer dt` | Deptrac      | Architectural dependency check |
+| `composer pd` | PDepend      | Code complexity metrics        |
 
 ### Check Groups
 
 | Command                | Contents                          | Purpose                                  |
 |------------------------|-----------------------------------|------------------------------------------|
 | `composer scan:style`  | PHP-CS-Fixer + Rector             | Fix style (modifies code)                |
-| `composer scan:php`    | Lint + Psalm                      | Syntax and type check                    |
+| `composer scan:php`    | Lint + Psalm + PDepend            | Syntax, type, and complexity check       |
 | `composer scan:depend` | Deptrac + Composer deps           | Architecture and dependencies            |
 | `composer scan:all`    | scan:php + scan:depend + test:all | Full pre-push check (without scan:style) |
 
@@ -149,6 +178,7 @@ Service startup order is enforced via `depends_on` with health conditions: `db-p
 | `vendor-bin/codeception/`  | Codeception  | Testing framework          |
 | `vendor-bin/deptrac/`      | Deptrac      | Architectural dependencies |
 | `vendor-bin/infection/`    | Infection    | Mutation testing           |
+| `vendor-bin/pdepend/`      | PDepend      | Code complexity metrics    |
 
 ### Update Individual Tool
 

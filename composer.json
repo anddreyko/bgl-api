@@ -94,7 +94,8 @@
         ],
         "scan:php": [
             "@lp:run",
-            "@ps:run"
+            "@ps:run",
+            "@pd:check"
         ],
         "scan:style": [
             "@rc:run",
@@ -152,6 +153,12 @@
             "@test:web -x smoke",
             "@test:cli -x smoke"
         ],
+        "pd": "vendor-bin/pdepend/vendor/bin/pdepend",
+        "pd:run": "sh -c 'vendor-bin/pdepend/vendor/bin/pdepend --summary-xml=var/pdepend-summary.xml --suffix=php src/ >/dev/null 2>&1 || true'",
+        "pd:check": [
+            "@pd:run",
+            "php bin/pdepend-check.php --ccn=8 --npath=100 --loc=40 --wmc=50"
+        ],
         "oa": "vendor/devizzent/cebe-php-openapi/bin/php-openapi",
         "oa:v": "@oa validate --read-json web/openapi.json",
         "oa:run": [
@@ -197,6 +204,9 @@
         "test:rebuild": "Clean cache and build helpers",
         "test:all": "Run all tests",
         "test:coverage": "Show covarege tests",
+        "pd": "Alias PDepend",
+        "pd:run": "Generate PDepend summary XML",
+        "pd:check": "Run PDepend and check complexity thresholds (CCN > 8, NPath > 100, LOC > 40, WMC > 50)",
         "oa": "Alias php-openapi CLI",
         "oa:v": "Validate OpenAPI spec (web/openapi.json) against OpenAPI 3.x schema",
         "oa:run": "Export OpenAPI spec + validate against OpenAPI 3.x schema",

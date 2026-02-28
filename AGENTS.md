@@ -25,6 +25,7 @@ Principles
 | `composer rc:run`   | Apply automated refactoring (Rector)              |
 | `composer lp:run`   | PHP syntax check (Lint)                           |
 | `composer ps:run`   | Static type analysis (Psalm)                      |
+| `composer pd:check` | Code complexity check (PDepend)                   |
 | `composer dt:run`   | Architecture dependency check (Deptrac) — **LAW** |
 | `composer cd:run`   | Check composer dependencies                       |
 | `composer scan:all` | **MANDATORY before push.** Full validation.       |
