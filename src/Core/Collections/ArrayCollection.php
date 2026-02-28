@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Bgl\Core\Collections;
 
 /**
- * Simple array-backed collection for domain use and tests.
- *
  * @template T of object
  * @implements Collection<T>
  */

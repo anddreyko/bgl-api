@@ -4,25 +4,29 @@ declare(strict_types=1);
 
 namespace Bgl\Domain\Plays\Entities;
 
+use Bgl\Core\Collections\ArrayCollection;
+use Bgl\Core\Collections\Collection;
 use Bgl\Core\ValueObjects\Uuid;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
 final class Play
 {
-    /** @var Collection<int, Player> */
-    private Collection $players;
+    /**
+     * @var Collection<Player>
+     * @psalm-var Collection<Player>
+     */
+    private $players;
 
     public function __construct(
         private readonly Uuid $id,
         private readonly Uuid $userId,
-        private readonly ?string $name,
+        private ?string $name,
         private PlayStatus $status,
         private readonly \DateTimeImmutable $startedAt,
         private ?\DateTimeImmutable $finishedAt,
-        private readonly ?Uuid $gameId = null,
+        private ?Uuid $gameId = null,
         private Visibility $visibility = Visibility::Private,
     ) {
+        /** @var ArrayCollection<Player> */
         $this->players = new ArrayCollection();
     }
 
@@ -84,6 +88,17 @@ final class Play
     public function getVisibility(): Visibility
     {
         return $this->visibility;
+    }
+
+    public function update(?string $name, ?Uuid $gameId, Visibility $visibility): void
+    {
+        if ($this->status !== PlayStatus::Draft) {
+            throw new \DomainException('Play can only be updated in draft status');
+        }
+
+        $this->name = $name;
+        $this->gameId = $gameId;
+        $this->visibility = $visibility;
     }
 
     public function changeVisibility(Visibility $visibility): void

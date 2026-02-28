@@ -6,7 +6,6 @@ use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\CodingStyle\Rector\ClassLike\NewlineBetweenClassLikeStmtsRector;
 use Rector\Config\RectorConfig;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
-use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictConstructorRector;
 
@@ -21,9 +20,6 @@ return RectorConfig::configure()
         __DIR__ . '/vendor',
         __DIR__ . '/vendor-bin',
         NewlineBetweenClassLikeStmtsRector::class,
-        ReadOnlyPropertyRector::class => [
-            __DIR__ . '/src/Domain/Plays/Entities/Play.php',
-        ],
     ])
     ->withCache(__DIR__ . '/var/.rector.cache', FileCacheStorage::class)
     ->withPhpSets(php85: true)
