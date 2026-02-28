@@ -88,39 +88,30 @@ final class DateInterval
 
     public function getIso(): ?string
     {
-        $value = null;
+        if ($this->value === null) {
+            return null;
+        }
 
-        if ($this->value) {
-            $value = 'P';
-            if ($this->value->y) {
-                $value .= $this->value->y . 'Y';
-            }
-            if ($this->value->m) {
-                $value .= $this->value->m . 'M';
-            }
-            if ($this->value->d) {
-                $value .= $this->value->d . 'D';
-            }
+        $date = self::joinParts([[$this->value->y, 'Y'], [$this->value->m, 'M'], [$this->value->d, 'D']]);
+        $time = self::joinParts([[$this->value->h, 'H'], [$this->value->i, 'M'], [$this->value->s, 'S']]);
 
-            $time = '';
-            if ($this->value->h) {
-                $time .= $this->value->h . 'H';
-            }
-            if ($this->value->i) {
-                $time .= $this->value->i . 'M';
-            }
-            if ($this->value->s) {
-                $time .= $this->value->s . 'S';
-            }
-            if ($time) {
-                $value .= 'T' . $time;
-            }
+        $iso = 'P' . $date . ($time !== '' ? 'T' . $time : '');
 
-            if ('P' === $value) {
-                $value .= 'T0S';
+        return $iso === 'P' ? 'PT0S' : $iso;
+    }
+
+    /**
+     * @param list<array{int, string}> $parts
+     */
+    private static function joinParts(array $parts): string
+    {
+        $result = '';
+        foreach ($parts as [$val, $suffix]) {
+            if ($val) {
+                $result .= $val . $suffix;
             }
         }
 
-        return $value;
+        return $result;
     }
 }

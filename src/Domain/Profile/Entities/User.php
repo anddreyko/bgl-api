@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Domain\Profile\Entities;
 
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Core\ValueObjects\Uuid;
 
@@ -13,7 +14,7 @@ final class User
         public Uuid $id,
         private readonly Email $email,
         private readonly string $passwordHash,
-        private readonly \DateTimeImmutable $createdAt,
+        private readonly DateTime $createdAt,
         private UserStatus $status,
         private int $tokenVersion = 1,
         private readonly ?string $name = null,
@@ -24,7 +25,7 @@ final class User
         Uuid $id,
         Email $email,
         string $passwordHash,
-        \DateTimeImmutable $createdAt,
+        DateTime $createdAt,
         ?string $name = null,
     ): self {
         return new self(
@@ -66,7 +67,7 @@ final class User
         return $this->passwordHash;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTime
     {
         return $this->createdAt;
     }

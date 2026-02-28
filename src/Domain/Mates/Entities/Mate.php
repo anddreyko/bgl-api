@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Domain\Mates\Entities;
 
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 
 final class Mate
@@ -13,8 +14,8 @@ final class Mate
         private readonly Uuid $userId,
         private string $name,
         private ?string $notes,
-        private ?\DateTimeImmutable $deletedAt,
-        private readonly \DateTimeImmutable $createdAt,
+        private ?DateTime $deletedAt,
+        private readonly DateTime $createdAt,
     ) {
     }
 
@@ -23,7 +24,7 @@ final class Mate
         Uuid $userId,
         string $name,
         ?string $notes,
-        \DateTimeImmutable $createdAt,
+        DateTime $createdAt,
     ): self {
         return new self($id, $userId, $name, $notes, null, $createdAt);
     }
@@ -48,12 +49,12 @@ final class Mate
         return $this->notes;
     }
 
-    public function getDeletedAt(): ?\DateTimeImmutable
+    public function getDeletedAt(): ?DateTime
     {
         return $this->deletedAt;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTime
     {
         return $this->createdAt;
     }
@@ -64,7 +65,7 @@ final class Mate
         $this->notes = $notes;
     }
 
-    public function softDelete(\DateTimeImmutable $deletedAt): void
+    public function softDelete(DateTime $deletedAt): void
     {
         if ($this->deletedAt !== null) {
             throw new \DomainException('Mate is already deleted');

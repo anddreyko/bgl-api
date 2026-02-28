@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Domain\Profile\Entities;
 
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 
 final class PasskeyChallenge
@@ -11,7 +12,7 @@ final class PasskeyChallenge
     private function __construct(
         public Uuid $id,
         private readonly string $challenge,
-        private readonly \DateTimeImmutable $expiresAt,
+        private readonly DateTime $expiresAt,
         private readonly ?Uuid $userId = null,
     ) {
     }
@@ -19,7 +20,7 @@ final class PasskeyChallenge
     public static function forRegistration(
         Uuid $id,
         string $challenge,
-        \DateTimeImmutable $expiresAt,
+        DateTime $expiresAt,
         Uuid $userId,
     ): self {
         return new self($id, $challenge, $expiresAt, $userId);
@@ -28,12 +29,12 @@ final class PasskeyChallenge
     public static function forLogin(
         Uuid $id,
         string $challenge,
-        \DateTimeImmutable $expiresAt,
+        DateTime $expiresAt,
     ): self {
         return new self($id, $challenge, $expiresAt);
     }
 
-    public function isExpired(\DateTimeImmutable $now): bool
+    public function isExpired(DateTime $now): bool
     {
         return $now >= $this->expiresAt;
     }
@@ -48,7 +49,7 @@ final class PasskeyChallenge
         return $this->challenge;
     }
 
-    public function getExpiresAt(): \DateTimeImmutable
+    public function getExpiresAt(): DateTime
     {
         return $this->expiresAt;
     }

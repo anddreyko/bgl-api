@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Domain\Games\Entities;
 
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 
 final class Game
@@ -13,8 +14,8 @@ final class Game
         private readonly int $bggId,
         private string $name,
         private ?int $yearPublished,
-        private readonly \DateTimeImmutable $createdAt,
-        private \DateTimeImmutable $updatedAt,
+        private readonly DateTime $createdAt,
+        private DateTime $updatedAt,
     ) {
     }
 
@@ -23,7 +24,7 @@ final class Game
         int $bggId,
         string $name,
         ?int $yearPublished,
-        \DateTimeImmutable $createdAt,
+        DateTime $createdAt,
     ): self {
         return new self($id, $bggId, $name, $yearPublished, $createdAt, $createdAt);
     }
@@ -48,17 +49,17 @@ final class Game
         return $this->yearPublished;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTime
     {
         return $this->createdAt;
     }
 
-    public function getUpdatedAt(): \DateTimeImmutable
+    public function getUpdatedAt(): DateTime
     {
         return $this->updatedAt;
     }
 
-    public function updateFromCatalog(string $name, ?int $yearPublished, \DateTimeImmutable $updatedAt): void
+    public function updateFromCatalog(string $name, ?int $yearPublished, DateTime $updatedAt): void
     {
         $this->name = $name;
         $this->yearPublished = $yearPublished;

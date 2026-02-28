@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Domain\Profile\Entities;
 
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 
 final class Passkey
@@ -14,7 +15,7 @@ final class Passkey
         private readonly string $credentialId,
         private readonly string $credentialData,
         private int $counter,
-        private readonly \DateTimeImmutable $createdAt,
+        private readonly DateTime $createdAt,
         private readonly ?string $label = null,
     ) {
     }
@@ -24,7 +25,7 @@ final class Passkey
         Uuid $userId,
         string $credentialId,
         string $credentialData,
-        \DateTimeImmutable $createdAt,
+        DateTime $createdAt,
         ?string $label = null,
     ): self {
         return new self($id, $userId, $credentialId, $credentialData, 0, $createdAt, $label);
@@ -60,7 +61,7 @@ final class Passkey
         return $this->counter;
     }
 
-    public function getCreatedAt(): \DateTimeImmutable
+    public function getCreatedAt(): DateTime
     {
         return $this->createdAt;
     }
