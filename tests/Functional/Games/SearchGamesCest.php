@@ -8,6 +8,7 @@ use Bgl\Application\Handlers\Games\SearchGames\Handler;
 use Bgl\Application\Handlers\Games\SearchGames\Query;
 use Bgl\Application\Handlers\Games\SearchGames\Result;
 use Bgl\Core\Messages\Envelope;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Games\Entities\Game;
 use Bgl\Domain\Games\Entities\Games;
@@ -92,7 +93,7 @@ final class SearchGamesCest
 
     private function seedGames(): void
     {
-        $now = new \DateTimeImmutable();
+        $now = new DateTime();
         $this->games()->add(Game::create(new Uuid('g1'), 13, 'Catan', 1995, $now));
         $this->games()->add(Game::create(new Uuid('g2'), 27710, 'Catan: Cities & Knights', 1998, $now));
         $this->games()->add(Game::create(new Uuid('g3'), 174430, 'Gloomhaven', 2017, $now));

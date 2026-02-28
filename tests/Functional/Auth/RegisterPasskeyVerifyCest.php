@@ -11,6 +11,7 @@ use Bgl\Application\Handlers\Auth\RegisterPasskeyVerify\Handler;
 use Bgl\Core\Auth\AuthenticationException;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Domain\Profile\Entities\Passkeys;
 use Bgl\Domain\Profile\Entities\User;
@@ -108,7 +109,7 @@ final class RegisterPasskeyVerifyCest
             id: $userId,
             email: new Email('passkey-verify-' . uniqid() . '@test.local'),
             passwordHash: 'hashed',
-            createdAt: new \DateTimeImmutable(),
+            createdAt: new DateTime(),
             status: UserStatus::Active,
             name: 'Test User',
         );

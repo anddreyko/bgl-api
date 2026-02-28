@@ -8,6 +8,7 @@ use Bgl\Application\Handlers\Auth\Register\Command;
 use Bgl\Application\Handlers\Auth\Register\Handler;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Domain\Profile\Entities\User;
 use Bgl\Domain\Profile\Entities\Users;
@@ -68,7 +69,7 @@ final class RegisterCest
             id: $this->uuidGenerator->generate(),
             email: new Email($email),
             passwordHash: 'hashed',
-            createdAt: new \DateTimeImmutable(),
+            createdAt: new DateTime(),
         );
         $this->users->add($user);
         $this->em->flush();

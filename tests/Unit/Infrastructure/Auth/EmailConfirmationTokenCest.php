@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Unit\Infrastructure\Auth;
 
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Infrastructure\Auth\EmailConfirmationToken;
 use Bgl\Tests\Support\UnitTester;
@@ -17,8 +18,8 @@ final class EmailConfirmationTokenCest
 {
     public function testIsExpiredReturnsFalseWhenNotExpired(UnitTester $i): void
     {
-        $expiresAt = new \DateTimeImmutable('2024-01-02 12:00:00');
-        $now = new \DateTimeImmutable('2024-01-01 12:00:00');
+        $expiresAt = new DateTime('2024-01-02 12:00:00');
+        $now = new DateTime('2024-01-01 12:00:00');
 
         $token = EmailConfirmationToken::create(
             id: new Uuid('token-id'),
@@ -32,8 +33,8 @@ final class EmailConfirmationTokenCest
 
     public function testIsExpiredReturnsTrueWhenExpired(UnitTester $i): void
     {
-        $expiresAt = new \DateTimeImmutable('2024-01-01 12:00:00');
-        $now = new \DateTimeImmutable('2024-01-02 12:00:00');
+        $expiresAt = new DateTime('2024-01-01 12:00:00');
+        $now = new DateTime('2024-01-02 12:00:00');
 
         $token = EmailConfirmationToken::create(
             id: new Uuid('token-id'),
@@ -47,8 +48,8 @@ final class EmailConfirmationTokenCest
 
     public function testIsExpiredReturnsFalseWhenExactlyAtExpiry(UnitTester $i): void
     {
-        $expiresAt = new \DateTimeImmutable('2024-01-01 12:00:00');
-        $now = new \DateTimeImmutable('2024-01-01 12:00:00');
+        $expiresAt = new DateTime('2024-01-01 12:00:00');
+        $now = new DateTime('2024-01-01 12:00:00');
 
         $token = EmailConfirmationToken::create(
             id: new Uuid('token-id'),

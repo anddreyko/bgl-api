@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Unit\Domain\Profile\Entities;
 
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Profile\Entities\PasskeyChallenge;
 use Bgl\Tests\Support\UnitTester;
@@ -19,7 +20,7 @@ final class PasskeyChallengeCest
     {
         $id = new Uuid('challenge-id-1');
         $userId = new Uuid('user-id-1');
-        $expiresAt = new \DateTimeImmutable('2026-01-15 10:05:00');
+        $expiresAt = new DateTime('2026-01-15 10:05:00');
 
         $challenge = PasskeyChallenge::forRegistration(
             id: $id,
@@ -39,7 +40,7 @@ final class PasskeyChallengeCest
         $challenge = PasskeyChallenge::forLogin(
             id: new Uuid('challenge-id-2'),
             challenge: 'login-challenge',
-            expiresAt: new \DateTimeImmutable('2026-01-15 10:05:00'),
+            expiresAt: new DateTime('2026-01-15 10:05:00'),
         );
 
         $i->assertNull($challenge->getUserId());
@@ -50,17 +51,17 @@ final class PasskeyChallengeCest
         $challenge = PasskeyChallenge::forLogin(
             id: new Uuid('challenge-id-3'),
             challenge: 'test',
-            expiresAt: new \DateTimeImmutable('2026-01-15 10:05:00'),
+            expiresAt: new DateTime('2026-01-15 10:05:00'),
         );
 
-        $now = new \DateTimeImmutable('2026-01-15 10:04:59');
+        $now = new DateTime('2026-01-15 10:04:59');
 
         $i->assertFalse($challenge->isExpired($now));
     }
 
     public function testIsExpiredReturnsTrueAtExpiry(UnitTester $i): void
     {
-        $expiresAt = new \DateTimeImmutable('2026-01-15 10:05:00');
+        $expiresAt = new DateTime('2026-01-15 10:05:00');
 
         $challenge = PasskeyChallenge::forLogin(
             id: new Uuid('challenge-id-4'),
@@ -76,10 +77,10 @@ final class PasskeyChallengeCest
         $challenge = PasskeyChallenge::forLogin(
             id: new Uuid('challenge-id-5'),
             challenge: 'test',
-            expiresAt: new \DateTimeImmutable('2026-01-15 10:05:00'),
+            expiresAt: new DateTime('2026-01-15 10:05:00'),
         );
 
-        $now = new \DateTimeImmutable('2026-01-15 10:06:00');
+        $now = new DateTime('2026-01-15 10:06:00');
 
         $i->assertTrue($challenge->isExpired($now));
     }

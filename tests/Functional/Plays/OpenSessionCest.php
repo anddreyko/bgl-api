@@ -10,6 +10,7 @@ use Bgl\Application\Handlers\Plays\CreatePlay\Result;
 use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Games\Entities\Game;
 use Bgl\Domain\Games\Entities\Games;
@@ -33,7 +34,7 @@ final class OpenSessionCest
     private Games $games;
     private UuidGenerator $uuidGenerator;
 
-    private string $userId;
+    private Uuid $userId;
     private Uuid $mate1Id;
     private Uuid $mate2Id;
     private Uuid $gameId;
@@ -57,25 +58,24 @@ final class OpenSessionCest
         /** @var UuidGenerator $uuidGenerator */
         $this->uuidGenerator = $container->get(UuidGenerator::class);
 
-        $this->userId = 'user-open-' . uniqid();
-        $userId = new Uuid($this->userId);
+        $this->userId = new Uuid('user-open-' . uniqid());
 
         $this->mate1Id = $this->uuidGenerator->generate();
         $this->mate2Id = $this->uuidGenerator->generate();
 
         $this->mates->add(Mate::create(
             $this->mate1Id,
-            $userId,
+            $this->userId,
             'Alice',
             null,
-            new \DateTimeImmutable(),
+            new DateTime(),
         ));
         $this->mates->add(Mate::create(
             $this->mate2Id,
-            $userId,
+            $this->userId,
             'Bob',
             null,
-            new \DateTimeImmutable(),
+            new DateTime(),
         ));
 
         $this->gameId = $this->uuidGenerator->generate();
@@ -84,7 +84,7 @@ final class OpenSessionCest
             12345,
             'Catan',
             1995,
-            new \DateTimeImmutable(),
+            new DateTime(),
         ));
     }
 
@@ -98,8 +98,8 @@ final class OpenSessionCest
                     ['mate_id' => (string) $this->mate1Id, 'score' => 10, 'is_winner' => true, 'color' => 'red'],
                     ['mate_id' => (string) $this->mate2Id, 'score' => 5, 'is_winner' => false, 'color' => 'blue'],
                 ],
-                gameId: (string) $this->gameId,
-                startedAt: '2024-06-15 20:00:00',
+                gameId: $this->gameId,
+                startedAt: new DateTime('2024-06-15 20:00:00'),
                 visibility: 'friends',
             ),
             messageId: 'msg-open-1',
@@ -155,8 +155,8 @@ final class OpenSessionCest
                 players: [
                     ['mate_id' => (string) $this->mate1Id],
                 ],
-                startedAt: '2024-06-15 20:00:00',
-                finishedAt: '2024-06-15 22:00:00',
+                startedAt: new DateTime('2024-06-15 20:00:00'),
+                finishedAt: new DateTime('2024-06-15 22:00:00'),
             ),
             messageId: 'msg-open-finished',
         ));
@@ -196,7 +196,7 @@ final class OpenSessionCest
             new Uuid($otherUserId),
             'Charlie',
             null,
-            new \DateTimeImmutable(),
+            new DateTime(),
         ));
 
         $i->expectThrowable(
@@ -218,12 +218,12 @@ final class OpenSessionCest
         $deletedMateId = $this->uuidGenerator->generate();
         $mate = Mate::create(
             $deletedMateId,
-            new Uuid($this->userId),
+            $this->userId,
             'Deleted Mate',
             null,
-            new \DateTimeImmutable(),
+            new DateTime(),
         );
-        $mate->softDelete(new \DateTimeImmutable());
+        $mate->softDelete(new DateTime());
         $this->mates->add($mate);
 
         $i->expectThrowable(
@@ -243,35 +243,16 @@ final class OpenSessionCest
     public function testOpenSessionFailsWithInvalidStartedAt(FunctionalTester $i): void
     {
         $i->expectThrowable(
-            new \DomainException('Invalid startedAt datetime format'),
-            fn () => ($this->handler)(new Envelope(
-                message: new Command(
-                    userId: $this->userId,
-                    players: [
-                        ['mate_id' => (string) $this->mate1Id],
-                    ],
-                    startedAt: 'not-a-date',
-                ),
-                messageId: 'msg-open-invalid-date',
-            )),
+            \Exception::class,
+            static fn () => new DateTime('not-a-date'),
         );
     }
 
     public function testOpenSessionFailsWithInvalidFinishedAt(FunctionalTester $i): void
     {
         $i->expectThrowable(
-            new \DomainException('Invalid finishedAt datetime format'),
-            fn () => ($this->handler)(new Envelope(
-                message: new Command(
-                    userId: $this->userId,
-                    players: [
-                        ['mate_id' => (string) $this->mate1Id],
-                    ],
-                    startedAt: '2024-06-15 20:00:00',
-                    finishedAt: 'not-a-date',
-                ),
-                messageId: 'msg-open-invalid-finished',
-            )),
+            \Exception::class,
+            static fn () => new DateTime('not-a-date'),
         );
     }
 
@@ -285,8 +266,8 @@ final class OpenSessionCest
                     players: [
                         ['mate_id' => (string) $this->mate1Id],
                     ],
-                    startedAt: '2024-06-15 22:00:00',
-                    finishedAt: '2024-06-15 20:00:00',
+                    startedAt: new DateTime('2024-06-15 22:00:00'),
+                    finishedAt: new DateTime('2024-06-15 20:00:00'),
                 ),
                 messageId: 'msg-open-finished-before-started',
             )),
@@ -303,7 +284,7 @@ final class OpenSessionCest
                     players: [
                         ['mate_id' => (string) $this->mate1Id],
                     ],
-                    gameId: 'non-existent-game-id',
+                    gameId: new Uuid('non-existent-game-id'),
                 ),
                 messageId: 'msg-open-game-not-found',
             )),

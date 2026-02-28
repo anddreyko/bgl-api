@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Unit\Domain\Games\Entities;
 
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Games\Entities\Game;
 use Bgl\Tests\Support\UnitTester;
@@ -21,7 +22,7 @@ final class GameCest
         $bggId = 13;
         $name = 'Catan';
         $yearPublished = 1995;
-        $createdAt = new \DateTimeImmutable('2026-01-15 20:00:00');
+        $createdAt = new DateTime('2026-01-15 20:00:00');
 
         $game = Game::create($id, $bggId, $name, $yearPublished, $createdAt);
 
@@ -40,7 +41,7 @@ final class GameCest
             42,
             'Unknown Game',
             null,
-            new \DateTimeImmutable(),
+            new DateTime(),
         );
 
         $i->assertNull($game->getYearPublished());
@@ -53,10 +54,10 @@ final class GameCest
             13,
             'Catan',
             1995,
-            new \DateTimeImmutable('2026-01-01 00:00:00'),
+            new DateTime('2026-01-01 00:00:00'),
         );
 
-        $updatedAt = new \DateTimeImmutable('2026-02-01 12:00:00');
+        $updatedAt = new DateTime('2026-02-01 12:00:00');
         $game->updateFromCatalog('Catan (6th Edition)', 2024, $updatedAt);
 
         $i->assertSame('Catan (6th Edition)', $game->getName());

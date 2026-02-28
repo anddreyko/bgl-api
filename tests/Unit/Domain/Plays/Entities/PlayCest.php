@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Unit\Domain\Plays\Entities;
 
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Plays\Entities\Play;
 use Bgl\Domain\Plays\Entities\Player;
 use Bgl\Domain\Plays\Entities\PlayStatus;
 use Bgl\Domain\Plays\Entities\Visibility;
+use Bgl\Infrastructure\Persistence\InMemory\InMemoryPlayers;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 
@@ -23,9 +25,9 @@ final class PlayCest
         $id = new Uuid('play-id');
         $userId = new Uuid('user-123');
         $name = 'Friday night game';
-        $startedAt = new \DateTimeImmutable('2024-06-15 20:00:00');
+        $startedAt = new DateTime('2024-06-15 20:00:00');
 
-        $play = Play::create($id, $userId, $name, $startedAt);
+        $play = Play::create($id, $userId, $name, $startedAt, new InMemoryPlayers());
 
         $i->assertSame($id, $play->getId());
         $i->assertSame($userId, $play->getUserId());
@@ -39,9 +41,9 @@ final class PlayCest
     {
         $id = new Uuid('play-id');
         $userId = new Uuid('user-456');
-        $startedAt = new \DateTimeImmutable('2024-06-15 20:00:00');
+        $startedAt = new DateTime('2024-06-15 20:00:00');
 
-        $play = Play::create($id, $userId, null, $startedAt);
+        $play = Play::create($id, $userId, null, $startedAt, new InMemoryPlayers());
 
         $i->assertNull($play->getName());
         $i->assertSame(PlayStatus::Draft, $play->getStatus());
@@ -50,7 +52,7 @@ final class PlayCest
     public function testGetIdReturnsUuid(UnitTester $i): void
     {
         $id = new Uuid('test-uuid');
-        $play = Play::create($id, new Uuid('user-1'), null, new \DateTimeImmutable());
+        $play = Play::create($id, new Uuid('user-1'), null, new DateTime('now'), new InMemoryPlayers());
 
         $i->assertSame('test-uuid', $play->getId()->getValue());
     }
@@ -61,43 +63,46 @@ final class PlayCest
             new Uuid('id'),
             new Uuid('user-abc'),
             null,
-            new \DateTimeImmutable(),
+            new DateTime('now'),
+            new InMemoryPlayers(),
         );
 
         $i->assertSame('user-abc', $play->getUserId()->getValue());
     }
 
-    public function testCloseChangesStatusToPublishedAndSetsFinishedAt(UnitTester $i): void
+    public function testFinalizeChangesStatusToPublishedAndSetsFinishedAt(UnitTester $i): void
     {
         $play = Play::create(
             new Uuid('play-id'),
             new Uuid('user-123'),
             'Game night',
-            new \DateTimeImmutable('2024-06-15 20:00:00'),
+            new DateTime('2024-06-15 20:00:00'),
+            new InMemoryPlayers(),
         );
 
-        $finishedAt = new \DateTimeImmutable('2024-06-15 23:00:00');
-        $play->close($finishedAt);
+        $finishedAt = new DateTime('2024-06-15 23:00:00');
+        $play->finalize($finishedAt);
 
         $i->assertSame(PlayStatus::Published, $play->getStatus());
         $i->assertSame($finishedAt, $play->getFinishedAt());
     }
 
-    public function testCloseThrowsWhenPlayIsNotDraft(UnitTester $i): void
+    public function testFinalizeThrowsWhenPlayIsNotDraft(UnitTester $i): void
     {
         $play = Play::create(
             new Uuid('play-id'),
             new Uuid('user-123'),
             null,
-            new \DateTimeImmutable('2024-06-15 20:00:00'),
+            new DateTime('2024-06-15 20:00:00'),
+            new InMemoryPlayers(),
         );
 
-        $play->close(new \DateTimeImmutable('2024-06-15 23:00:00'));
+        $play->finalize(new DateTime('2024-06-15 23:00:00'));
 
         $i->expectThrowable(
-            new \DomainException('Play can only be closed from draft status'),
+            new \DomainException('Play can only be finalized from draft status'),
             static function () use ($play): void {
-                $play->close(new \DateTimeImmutable('2024-06-16 00:00:00'));
+                $play->finalize(new DateTime('2024-06-16 00:00:00'));
             },
         );
     }
@@ -107,13 +112,15 @@ final class PlayCest
         $id = new Uuid('play-id');
         $userId = new Uuid('user-123');
         $gameId = new Uuid('game-456');
-        $startedAt = new \DateTimeImmutable('2024-06-15 20:00:00');
+        $startedAt = new DateTime('2024-06-15 20:00:00');
+        $players = new InMemoryPlayers();
 
         $play = Play::create(
             $id,
             $userId,
             'Game night',
             $startedAt,
+            $players,
             $gameId,
             Visibility::Friends,
         );
@@ -136,8 +143,8 @@ final class PlayCest
         $i->assertNull($play->getFinishedAt());
         $i->assertSame($gameId, $play->getGameId());
         $i->assertSame(Visibility::Friends, $play->getVisibility());
-        $i->assertCount(1, $play->getPlayers());
-        $i->assertSame($player, $play->getPlayers()[0]);
+        $i->assertSame(1, $play->getPlayers()->count());
+        $i->assertSame($player, $play->getPlayers()->find((string) $player->getId()));
     }
 
     public function testUpdateChangesFields(UnitTester $i): void
@@ -146,7 +153,8 @@ final class PlayCest
             new Uuid('play-id'),
             new Uuid('user-123'),
             'Old name',
-            new \DateTimeImmutable('2024-06-15 20:00:00'),
+            new DateTime('2024-06-15 20:00:00'),
+            new InMemoryPlayers(),
             new Uuid('game-old'),
             Visibility::Private,
         );
@@ -165,7 +173,8 @@ final class PlayCest
             new Uuid('play-id'),
             new Uuid('user-123'),
             'Some name',
-            new \DateTimeImmutable('2024-06-15 20:00:00'),
+            new DateTime('2024-06-15 20:00:00'),
+            new InMemoryPlayers(),
             new Uuid('game-id'),
         );
 
@@ -182,10 +191,11 @@ final class PlayCest
             new Uuid('play-id'),
             new Uuid('user-123'),
             null,
-            new \DateTimeImmutable('2024-06-15 20:00:00'),
+            new DateTime('2024-06-15 20:00:00'),
+            new InMemoryPlayers(),
         );
 
-        $play->close(new \DateTimeImmutable('2024-06-15 23:00:00'));
+        $play->finalize(new DateTime('2024-06-15 23:00:00'));
 
         $i->expectThrowable(
             new \DomainException('Play can only be updated in draft status'),
@@ -201,11 +211,12 @@ final class PlayCest
             new Uuid('play-id'),
             new Uuid('user-123'),
             null,
-            new \DateTimeImmutable('2024-06-15 20:00:00'),
+            new DateTime('2024-06-15 20:00:00'),
+            new InMemoryPlayers(),
         );
 
         $i->assertNull($play->getGameId());
         $i->assertSame(Visibility::Private, $play->getVisibility());
-        $i->assertCount(0, $play->getPlayers());
+        $i->assertSame(0, $play->getPlayers()->count());
     }
 }

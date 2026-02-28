@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Unit\Domain\Profile\Entities;
 
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Profile\Entities\User;
@@ -23,7 +24,7 @@ final class UserCest
             id: new Uuid('user-id-1'),
             email: new Email('test@example.com'),
             passwordHash: 'hashed',
-            createdAt: new \DateTimeImmutable('2024-01-01 00:00:00'),
+            createdAt: new DateTime('2024-01-01 00:00:00'),
         );
 
         $i->assertSame(UserStatus::Inactive, $user->getStatus());
@@ -35,7 +36,7 @@ final class UserCest
             id: new Uuid('user-id-1'),
             email: new Email('test@example.com'),
             passwordHash: 'hashed',
-            createdAt: new \DateTimeImmutable('2024-01-01 00:00:00'),
+            createdAt: new DateTime('2024-01-01 00:00:00'),
         );
 
         $user->confirm();
@@ -49,7 +50,7 @@ final class UserCest
             id: new Uuid('user-id-1'),
             email: new Email('test@example.com'),
             passwordHash: 'hashed',
-            createdAt: new \DateTimeImmutable('2024-01-01 00:00:00'),
+            createdAt: new DateTime('2024-01-01 00:00:00'),
             status: UserStatus::Active,
         );
 
@@ -64,7 +65,7 @@ final class UserCest
             id: new Uuid('user-id-1'),
             email: new Email('test@example.com'),
             passwordHash: 'hashed',
-            createdAt: new \DateTimeImmutable('2024-01-01 00:00:00'),
+            createdAt: new DateTime('2024-01-01 00:00:00'),
         );
 
         $i->assertSame(1, $user->getTokenVersion());
@@ -76,7 +77,7 @@ final class UserCest
             id: new Uuid('user-id-1'),
             email: new Email('test@example.com'),
             passwordHash: 'hashed',
-            createdAt: new \DateTimeImmutable('2024-01-01 00:00:00'),
+            createdAt: new DateTime('2024-01-01 00:00:00'),
         );
 
         $i->assertSame(1, $user->getTokenVersion());
@@ -96,7 +97,7 @@ final class UserCest
             id: new Uuid('user-id-1'),
             email: new Email('test@example.com'),
             passwordHash: 'hashed',
-            createdAt: new \DateTimeImmutable('2024-01-01 00:00:00'),
+            createdAt: new DateTime('2024-01-01 00:00:00'),
             name: 'Alice',
         );
 
@@ -109,7 +110,7 @@ final class UserCest
             id: new Uuid('user-id-1'),
             email: new Email('test@example.com'),
             passwordHash: 'hashed',
-            createdAt: new \DateTimeImmutable('2024-01-01 00:00:00'),
+            createdAt: new DateTime('2024-01-01 00:00:00'),
         );
 
         $i->assertMatchesRegularExpression('/^User#\d{4}$/', $user->getName());

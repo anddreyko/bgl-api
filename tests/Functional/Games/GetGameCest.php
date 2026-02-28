@@ -9,6 +9,7 @@ use Bgl\Application\Handlers\Games\GetGame\Query;
 use Bgl\Application\Handlers\Games\GetGame\Result;
 use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Messages\Envelope;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Games\Entities\Game;
 use Bgl\Domain\Games\Entities\Games;
@@ -22,8 +23,8 @@ use Codeception\Attribute\Group;
 #[Group('application', 'handler', 'games', 'get-game')]
 final class GetGameCest
 {
-    private Handler $handler;
-    private Games $games;
+    private ?Handler $handler = null;
+    private ?Games $games = null;
 
     public function _before(): void
     {
@@ -36,10 +37,16 @@ final class GetGameCest
         $this->games = $container->get(Games::class);
     }
 
+    public function _after(): void
+    {
+        $this->handler = null;
+        $this->games = null;
+    }
+
     public function testGetGameReturnsResult(FunctionalTester $i): void
     {
         $gameId = new Uuid('g-get-1');
-        $now = new \DateTimeImmutable();
+        $now = new DateTime();
         $this->games->add(Game::create($gameId, 13, 'Catan', 1995, $now));
 
         $result = ($this->handler)(new Envelope(

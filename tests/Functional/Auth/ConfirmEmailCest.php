@@ -11,6 +11,7 @@ use Bgl\Core\Auth\ExpiredConfirmationTokenException;
 use Bgl\Core\Auth\InvalidConfirmationTokenException;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Domain\Profile\Entities\User;
 use Bgl\Domain\Profile\Entities\Users;
@@ -57,7 +58,7 @@ final class ConfirmEmailCest
             id: $userId,
             email: new Email('confirm-' . uniqid() . '@test.local'),
             passwordHash: 'hashed',
-            createdAt: new \DateTimeImmutable(),
+            createdAt: new DateTime(),
         );
         $this->users->add($user);
 
@@ -94,7 +95,7 @@ final class ConfirmEmailCest
             id: $userId,
             email: new Email('expired-' . uniqid() . '@test.local'),
             passwordHash: 'hashed',
-            createdAt: new \DateTimeImmutable(),
+            createdAt: new DateTime(),
         );
         $this->users->add($user);
 

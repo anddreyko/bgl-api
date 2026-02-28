@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Unit\Domain\Profile\Entities;
 
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Profile\Entities\Passkey;
 use Bgl\Tests\Support\UnitTester;
@@ -19,7 +20,7 @@ final class PasskeyCest
     {
         $id = new Uuid('passkey-id-1');
         $userId = new Uuid('user-id-1');
-        $now = new \DateTimeImmutable('2026-01-15 10:00:00');
+        $now = new DateTime('2026-01-15 10:00:00');
 
         $passkey = Passkey::create(
             id: $id,
@@ -46,7 +47,7 @@ final class PasskeyCest
             userId: new Uuid('user-id-1'),
             credentialId: 'cred-def456',
             credentialData: '{}',
-            createdAt: new \DateTimeImmutable('2026-01-15 10:00:00'),
+            createdAt: new DateTime('2026-01-15 10:00:00'),
         );
 
         $i->assertNull($passkey->getLabel());
@@ -59,7 +60,7 @@ final class PasskeyCest
             userId: new Uuid('user-id-1'),
             credentialId: 'cred-ghi789',
             credentialData: '{}',
-            createdAt: new \DateTimeImmutable('2026-01-15 10:00:00'),
+            createdAt: new DateTime('2026-01-15 10:00:00'),
         );
 
         $i->assertSame(0, $passkey->getCounter());
@@ -72,7 +73,7 @@ final class PasskeyCest
             userId: new Uuid('user-id-1'),
             credentialId: 'cred-jkl012',
             credentialData: '{}',
-            createdAt: new \DateTimeImmutable('2026-01-15 10:00:00'),
+            createdAt: new DateTime('2026-01-15 10:00:00'),
         );
 
         $i->assertSame(0, $passkey->getCounter());

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Unit\Domain\Mates\Entities;
 
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Mates\Entities\Mate;
 use Bgl\Tests\Support\UnitTester;
@@ -21,7 +22,7 @@ final class MateCest
         $userId = new Uuid('user-123');
         $name = 'Ivan';
         $notes = 'Likes Carcassonne';
-        $createdAt = new \DateTimeImmutable('2026-01-15 20:00:00');
+        $createdAt = new DateTime('2026-01-15 20:00:00');
 
         $mate = Mate::create($id, $userId, $name, $notes, $createdAt);
 
@@ -41,7 +42,7 @@ final class MateCest
             new Uuid('user-456'),
             'Anna',
             null,
-            new \DateTimeImmutable(),
+            new DateTime(),
         );
 
         $i->assertNull($mate->getNotes());
@@ -54,7 +55,7 @@ final class MateCest
             new Uuid('user-123'),
             'Ivan',
             'Old notes',
-            new \DateTimeImmutable(),
+            new DateTime(),
         );
 
         $mate->update('Ivan Petrov', 'New notes');
@@ -70,10 +71,10 @@ final class MateCest
             new Uuid('user-123'),
             'Ivan',
             null,
-            new \DateTimeImmutable(),
+            new DateTime(),
         );
 
-        $deletedAt = new \DateTimeImmutable('2026-02-20 12:00:00');
+        $deletedAt = new DateTime('2026-02-20 12:00:00');
         $mate->softDelete($deletedAt);
 
         $i->assertTrue($mate->isDeleted());
@@ -87,15 +88,15 @@ final class MateCest
             new Uuid('user-123'),
             'Ivan',
             null,
-            new \DateTimeImmutable(),
+            new DateTime(),
         );
 
-        $mate->softDelete(new \DateTimeImmutable());
+        $mate->softDelete(new DateTime());
 
         $i->expectThrowable(
             new \DomainException('Mate is already deleted'),
             static function () use ($mate): void {
-                $mate->softDelete(new \DateTimeImmutable());
+                $mate->softDelete(new DateTime());
             },
         );
     }

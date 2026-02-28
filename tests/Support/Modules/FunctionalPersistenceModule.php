@@ -8,6 +8,7 @@ use Bgl\Core\Auth\Confirmer;
 use Bgl\Core\Persistence\Transactor;
 use Bgl\Domain\Games\Entities\Games;
 use Bgl\Domain\Mates\Entities\Mates;
+use Bgl\Domain\Plays\Entities\Players;
 use Bgl\Domain\Plays\Entities\Plays;
 use Bgl\Domain\Profile\Entities\PasskeyChallenges;
 use Bgl\Domain\Profile\Entities\Passkeys;
@@ -16,6 +17,7 @@ use Bgl\Infrastructure\Persistence\InMemory\InMemoryGames;
 use Bgl\Infrastructure\Persistence\InMemory\InMemoryMates;
 use Bgl\Infrastructure\Persistence\InMemory\InMemoryPasskeyChallenges;
 use Bgl\Infrastructure\Persistence\InMemory\InMemoryPasskeys;
+use Bgl\Infrastructure\Persistence\InMemory\InMemoryPlayers;
 use Bgl\Infrastructure\Persistence\InMemory\InMemoryPlays;
 use Bgl\Infrastructure\Persistence\InMemory\InMemoryRepository;
 use Bgl\Infrastructure\Persistence\InMemory\InMemoryUsers;
@@ -35,6 +37,7 @@ final class FunctionalPersistenceModule extends Module
 
         $container->set(Users::class, new InMemoryUsers());
         $container->set(Plays::class, new InMemoryPlays());
+        $container->set(Players::class, new InMemoryPlayers());
         $container->set(Mates::class, new InMemoryMates());
         $container->set(Games::class, new InMemoryGames());
         $container->set(Passkeys::class, new InMemoryPasskeys());
@@ -48,7 +51,7 @@ final class FunctionalPersistenceModule extends Module
     {
         $container = DiHelper::container();
 
-        foreach ([Users::class, Plays::class, Mates::class, Games::class, Passkeys::class, PasskeyChallenges::class] as $repoInterface) {
+        foreach ([Users::class, Plays::class, Players::class, Mates::class, Games::class, Passkeys::class, PasskeyChallenges::class] as $repoInterface) {
             $repo = $container->get($repoInterface);
             if ($repo instanceof InMemoryRepository) {
                 $repo->clear();

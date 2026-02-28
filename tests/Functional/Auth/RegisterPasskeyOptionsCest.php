@@ -11,6 +11,7 @@ use Bgl\Core\Auth\AuthenticationException;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Listing\Filter\All;
 use Bgl\Core\Messages\Envelope;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Domain\Profile\Entities\PasskeyChallenges;
 use Bgl\Domain\Profile\Entities\User;
@@ -102,7 +103,7 @@ final class RegisterPasskeyOptionsCest
             id: $userId,
             email: new Email('passkey-' . uniqid() . '@test.local'),
             passwordHash: 'hashed',
-            createdAt: new \DateTimeImmutable(),
+            createdAt: new DateTime(),
             status: UserStatus::Active,
             name: 'Test User',
         );

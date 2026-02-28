@@ -7,10 +7,13 @@ namespace Bgl\Tests\Functional\Plays;
 use Bgl\Application\Handlers\Plays\FinalizePlay\Command;
 use Bgl\Application\Handlers\Plays\FinalizePlay\Handler;
 use Bgl\Application\Handlers\Plays\FinalizePlay\Result;
+use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Plays\Entities\Play;
+use Bgl\Domain\Plays\Entities\Players;
 use Bgl\Domain\Plays\Entities\Plays;
 use Bgl\Domain\Plays\Entities\PlayStatus;
 use Bgl\Tests\Support\DiHelper;
@@ -27,6 +30,7 @@ final class CloseSessionCest
     private EntityManagerInterface $em;
     private Handler $handler;
     private Plays $plays;
+    private Players $players;
     private UuidGenerator $uuidGenerator;
 
     public function _before(): void
@@ -42,6 +46,9 @@ final class CloseSessionCest
         /** @var Plays $plays */
         $this->plays = $container->get(Plays::class);
 
+        /** @var Players $players */
+        $this->players = $container->get(Players::class);
+
         /** @var UuidGenerator $uuidGenerator */
         $this->uuidGenerator = $container->get(UuidGenerator::class);
     }
@@ -49,20 +56,21 @@ final class CloseSessionCest
     public function testSuccessfulClose(FunctionalTester $i): void
     {
         $sessionId = $this->uuidGenerator->generate();
-        $userId = 'user-123';
+        $userId = new Uuid('user-123');
 
         $play = Play::create(
             $sessionId,
-            new Uuid($userId),
+            $userId,
             'Game night',
-            new \DateTimeImmutable('2024-06-15 20:00:00'),
+            new DateTime('2024-06-15 20:00:00'),
+            $this->players,
         );
         $this->plays->add($play);
         $this->em->flush();
         $this->em->clear();
 
         $result = ($this->handler)(new Envelope(
-            message: new Command(sessionId: (string) $sessionId, userId: $userId),
+            message: new Command(sessionId: $sessionId, userId: $userId),
             messageId: 'msg-1',
         ));
 
@@ -78,12 +86,12 @@ final class CloseSessionCest
         $i->assertSame(PlayStatus::Published, $closedPlay->getStatus());
     }
 
-    public function testPlayNotFoundThrowsDomainException(FunctionalTester $i): void
+    public function testPlayNotFoundThrowsNotFoundException(FunctionalTester $i): void
     {
         $i->expectThrowable(
-            new \DomainException('Play not found'),
+            new NotFoundException('Play not found'),
             fn () => ($this->handler)(new Envelope(
-                message: new Command(sessionId: 'non-existent-' . uniqid(), userId: 'user-123'),
+                message: new Command(sessionId: new Uuid('non-existent-' . uniqid()), userId: new Uuid('user-123')),
                 messageId: 'msg-2',
             )),
         );
@@ -97,7 +105,8 @@ final class CloseSessionCest
             $sessionId,
             new Uuid('user-owner'),
             null,
-            new \DateTimeImmutable('2024-06-15 20:00:00'),
+            new DateTime('2024-06-15 20:00:00'),
+            $this->players,
         );
         $this->plays->add($play);
         $this->em->flush();
@@ -106,7 +115,7 @@ final class CloseSessionCest
         $i->expectThrowable(
             new \DomainException('Access denied'),
             fn () => ($this->handler)(new Envelope(
-                message: new Command(sessionId: (string) $sessionId, userId: 'user-other'),
+                message: new Command(sessionId: $sessionId, userId: new Uuid('user-other')),
                 messageId: 'msg-3',
             )),
         );

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Unit\Domain\Plays\Entities;
 
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Plays\Entities\Play;
 use Bgl\Domain\Plays\Entities\Player;
+use Bgl\Infrastructure\Persistence\InMemory\InMemoryPlayers;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 
@@ -24,7 +26,8 @@ final class PlayerCest
             new Uuid('play-1'),
             new Uuid('user-1'),
             null,
-            new \DateTimeImmutable(),
+            new DateTime('now'),
+            new InMemoryPlayers(),
         );
     }
 

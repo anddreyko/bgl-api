@@ -9,6 +9,7 @@ use Bgl\Application\Handlers\User\GetUser\Query;
 use Bgl\Application\Handlers\User\GetUser\Result;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Domain\Profile\Entities\User;
 use Bgl\Domain\Profile\Entities\Users;
@@ -55,7 +56,7 @@ final class GetUserCest
             id: $userId,
             email: new Email($email),
             passwordHash: 'hashed_password',
-            createdAt: new \DateTimeImmutable('2024-01-15 10:30:00'),
+            createdAt: new DateTime('2024-01-15 10:30:00'),
             status: UserStatus::Active,
         );
         $this->users->add($user);

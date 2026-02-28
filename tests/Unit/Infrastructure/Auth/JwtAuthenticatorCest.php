@@ -13,6 +13,7 @@ use Bgl\Core\Auth\TokenPair;
 use Bgl\Core\Auth\UserNotActiveException;
 use Bgl\Core\Security\Hasher;
 use Bgl\Core\Security\Tokenizer;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Profile\Entities\User;
@@ -35,7 +36,7 @@ final class JwtAuthenticatorCest
             id: new Uuid('user-id-123'),
             email: new Email('test@example.com'),
             passwordHash: 'hashed_password',
-            createdAt: new \DateTimeImmutable('2024-01-01 12:00:00'),
+            createdAt: new DateTime('2024-01-01 12:00:00'),
             status: $status,
         );
 
