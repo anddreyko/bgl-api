@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Bgl\Tests\Unit\Infrastructure\Persistence\Doctrine\Mapping;
 
 use Bgl\Domain\Profile\Entities\User;
-use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\UserMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\PhpMappingDriver;
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Profile\UserMapping;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 use Doctrine\ORM\Mapping\ClassMetadata;

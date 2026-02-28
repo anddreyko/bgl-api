@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Infrastructure\Persistence\Doctrine\Games;
+namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Games;
 
 use Bgl\Domain\Games\Entities\Game;
-use Bgl\Domain\Games\Entities\Games as DomainGames;
+use Bgl\Domain\Games\Entities\Games as GameRepository;
 use Bgl\Infrastructure\Persistence\Doctrine\DoctrineRepository;
 
 /**
  * @extends DoctrineRepository<Game>
  */
-final class Games extends DoctrineRepository implements DomainGames
+final class Games extends DoctrineRepository implements GameRepository
 {
     #[\Override]
     public function getType(): string

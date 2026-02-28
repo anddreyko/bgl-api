@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth;
+namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Profile;
 
 use Bgl\Domain\Profile\Entities\Passkey;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\EntityMapping;

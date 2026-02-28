@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Infrastructure\Persistence\Doctrine\Mates;
+namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Mates;
 
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Mates\Entities\Mate;
-use Bgl\Domain\Mates\Entities\Mates as DomainMates;
+use Bgl\Domain\Mates\Entities\Mates as MateRepository;
 use Bgl\Infrastructure\Persistence\Doctrine\DoctrineRepository;
 
 /**
  * @extends DoctrineRepository<Mate>
  */
-final class Mates extends DoctrineRepository implements DomainMates
+final class Mates extends DoctrineRepository implements MateRepository
 {
     #[\Override]
     public function getType(): string

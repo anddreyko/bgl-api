@@ -3,13 +3,14 @@
 declare(strict_types=1);
 
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\EmailConfirmationTokenMapping;
-use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\PasskeyChallengeMapping;
-use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\PasskeyMapping;
-use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\UserMapping;
-use Bgl\Infrastructure\Persistence\Doctrine\Mapping\PhpMappingDriver;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Games\GameMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Mates\MateMapping;
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\PhpMappingDriver;
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\PlayerMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\PlayMapping;
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Profile\PasskeyChallengeMapping;
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Profile\PasskeyMapping;
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Profile\UserMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Type\EmailType;
 use Bgl\Infrastructure\Persistence\Doctrine\Type\UuidType;
 use Doctrine\DBAL\DriverManager;
@@ -71,6 +72,7 @@ return [
                     new PasskeyMapping(),
                     new PasskeyChallengeMapping(),
                     new PlayMapping(),
+                    new PlayerMapping(),
                     new MateMapping(),
                     new GameMapping(),
                 ]),

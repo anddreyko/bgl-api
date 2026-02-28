@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Infrastructure\Persistence\Doctrine;
+namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Profile;
 
 use Bgl\Domain\Profile\Entities\User;
 use Bgl\Domain\Profile\Entities\Users as UserRepository;
+use Bgl\Infrastructure\Persistence\Doctrine\DoctrineRepository;
 
 /**
  * @extends DoctrineRepository<User>
