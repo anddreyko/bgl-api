@@ -14,31 +14,33 @@ information about their board game sessions.
 
 ## 2. Bounded Contexts
 
-| Context | Responsibility                    | Phase | Domain Layer      |
-|---------|-----------------------------------|-------|-------------------|
-| Profile | User identity, profile, settings  | 1+    | `Domain/Profile/` |
-| Plays   | Play logging, players, mates      | 1     | `Domain/Plays/`   |
-| Games   | Game catalog (BGG import)         | 1     | `Domain/Games/`   |
-| Stats   | Analytics and reporting           | 1+    | `Domain/Stats/`   |
-| Access  | Auth methods, device session mgmt | 4     | `Domain/Access/`  |
+| Context | Responsibility                          | Phase | Domain Layer      |
+|---------|----------------------------------------|-------|-------------------|
+| Profile | User identity, profile, settings        | 1+    | `Domain/Profile/` |
+| Plays   | Play logging, players, locations        | 1     | `Domain/Plays/`   |
+| Mates   | Personal co-player directory            | 1     | `Domain/Mates/`   |
+| Games   | Game catalog (on-demand BGG import)     | 1     | `Domain/Games/`   |
+| Stats   | Analytics and reporting                 | 1+    | `Domain/Stats/`   |
+| Access  | Auth methods, passkeys, device sessions | 4     | `Domain/Access/`  |
 
 **Not a bounded context:**
 
 - **Sync** -- external integration ports (`Core/Sync/`) and adapters (`Infrastructure/Sync/`). No domain logic.
 - **Auth** -- authentication/authorization infrastructure. Contracts in `Core/Auth/`, implementations in
-  `Infrastructure/Auth/`.
+  `Infrastructure/Auth/`. Passkey and Password are auth infrastructure, not domain objects.
+  Will migrate to Access Context in Phase 4.
 
 ### Context Map
 
 ```mermaid
 graph LR
     Profile -->|User ID| Plays
+    Profile -->|User ID| Mates
     Profile -->|User ID| Stats
-    Profile -->|User ID| Games
-    Plays -->|Play data| Stats
+    Mates -->|Mate ID| Plays
     Games -->|Game ID| Plays
-    Sync["Sync (Infrastructure)"] -->|import/export| Games
-    Sync -->|import/export| Plays
+    Plays -->|Play data| Stats
+    Sync["Sync (Infrastructure)"] -->|sync plays| Plays
     Auth["Auth (Infrastructure)"] -->|credentials| Profile
     Access -->|auth methods| Profile
 ```
@@ -47,14 +49,15 @@ graph LR
 
 Contexts reference each other only by ID (Uuid). No entity references across boundaries.
 
-| From  | To      | Reference      | Purpose                                |
-|-------|---------|----------------|----------------------------------------|
-| Plays | Profile | User ID (Uuid) | Play owner, Mate owner, Location owner |
-| Plays | Games   | Game ID (Uuid) | Game reference in Play                 |
-| Plays | Plays   | Mate ID (Uuid) | Player -> Mate reference               |
-| Stats | Profile | User ID (Uuid) | Statistics subject                     |
-| Stats | Plays   | Play data      | Source data for analytics              |
-| Stats | Games   | Game ID (Uuid) | Game statistics                        |
+| From  | To      | Reference      | Purpose                     |
+|-------|---------|----------------|-----------------------------|
+| Plays | Profile | User ID (Uuid) | Play owner, Location owner  |
+| Plays | Mates   | Mate ID (Uuid) | Player -> Mate reference    |
+| Plays | Games   | Game ID (Uuid) | Game reference in Play      |
+| Mates | Profile | User ID (Uuid) | Mate directory owner        |
+| Stats | Profile | User ID (Uuid) | Statistics subject          |
+| Stats | Plays   | Play data      | Source data for analytics   |
+| Stats | Games   | Game ID (Uuid) | Game statistics             |
 
 ---
 
@@ -86,20 +89,13 @@ Manages user identity, profile information, and personal settings.
 - BGG username is unique across the system if set
 - Password minimum 8 characters (validated at creation/change)
 
-### 3.2 Passkey (Value Object, child of User)
+### 3.2 Auth Infrastructure (Passkey, Password)
 
-WebAuthn credential owned by User. Immutable -- counter update returns new instance.
+Passkey, PasskeyChallenge, and Password are authentication infrastructure, not domain objects.
+Currently located in `Domain/Profile/` for convenience, but will migrate to Access Context in Phase 4
+when device session management and multi-auth method support are implemented.
 
-| Attribute      | Type              | Required | Constraint                |
-|----------------|-------------------|----------|---------------------------|
-| credentialId   | string            | yes      | Unique, WebAuthn protocol |
-| credentialData | string            | yes      | Encrypted credential      |
-| counter        | int               | yes      | Replay attack prevention  |
-| createdAt      | DateTimeImmutable | yes      |                           |
-| label          | string            | no       | User-friendly name        |
-
-**Not a domain object:** PasskeyChallenge is an ephemeral infrastructure artifact of the WebAuthn protocol (TTL ~5 min).
-Stored in `Infrastructure/`, not in `Domain/`.
+See section 8 (Infrastructure: Auth) for details.
 
 **State Machine (UserStatus):**
 
@@ -119,7 +115,7 @@ Forbidden transition: `Deleted -> Inactive`.
 
 ## 4. Plays Context
 
-Manages play logging, player tracking, mate directory, and location directory.
+Manages play logging, player tracking, and location directory.
 
 ### 4.1 Play (Aggregate Root)
 
@@ -193,9 +189,44 @@ Represents a participant in a specific play.
 - Mate reference is required
 - Score is non-negative (if set)
 
-### 4.3 Mate (Aggregate Root)
+### 4.3 Location (Aggregate Root)
 
-Personal directory of co-players. Each user maintains their own directory.
+Personal directory of places where plays happen.
+
+| Attribute | Type              | Required | Constraint |
+|-----------|-------------------|----------|------------|
+| id        | Uuid              | yes      | Unique     |
+| userId    | Uuid              | yes      | Owner      |
+| name      | string            | yes      |            |
+| createdAt | DateTimeImmutable | yes      |            |
+| icon      | string            | no       | Future     |
+
+**Invariants:**
+
+- Name is required
+- Owner (User ID) is required
+
+### 4.4 Visibility (Enum)
+
+| Level         | Description                                        |
+|---------------|----------------------------------------------------|
+| Private       | Only the author                                    |
+| Participants  | Author + Users linked to Mates in this Play        |
+| Link          | Anyone with a direct link (unlisted)               |
+| Authenticated | All authenticated users                            |
+| Public        | Everyone, including unauthenticated internet users |
+
+Priority: system default (Authenticated) -> profile setting -> per-play setting.
+
+---
+
+## 5. Mates Context
+
+Personal co-player directory. Each user maintains their own list of gaming buddies.
+Separated from Plays Context because Mate has an independent lifecycle (CRUD without any play)
+and cross-context reference is by ID only.
+
+### 5.1 Mate (Aggregate Root)
 
 | Attribute  | Type              | Required | Constraint                   |
 |------------|-------------------|----------|------------------------------|
@@ -218,43 +249,14 @@ Personal directory of co-players. Each user maintains their own directory.
 - **Anonymous** -- unknown/random player
 - **Automa** -- NPC / solo mode opponent
 
-### 4.4 Location (Aggregate Root)
-
-Personal directory of places where plays happen.
-
-| Attribute | Type              | Required | Constraint |
-|-----------|-------------------|----------|------------|
-| id        | Uuid              | yes      | Unique     |
-| userId    | Uuid              | yes      | Owner      |
-| name      | string            | yes      |            |
-| createdAt | DateTimeImmutable | yes      |            |
-| icon      | string            | no       | Future     |
-
-**Invariants:**
-
-- Name is required
-- Owner (User ID) is required
-
-### 4.5 Visibility (Enum)
-
-| Level         | Description                                        |
-|---------------|----------------------------------------------------|
-| Private       | Only the author                                    |
-| Participants  | Author + Users linked to Mates in this Play        |
-| Link          | Anyone with a direct link (unlisted)               |
-| Authenticated | All authenticated users                            |
-| Public        | Everyone, including unauthenticated internet users |
-
-Priority: system default (Authenticated) -> profile setting -> per-play setting.
-
 ---
 
-## 5. Games Context
+## 6. Games Context
 
 Global game catalog. Games are imported from BGG, not created manually by users.
 When a user searches and is connected to BGG, their games are prioritized in results.
 
-### 5.1 Game (Aggregate Root)
+### 6.1 Game (Aggregate Root)
 
 | Attribute        | Type     | Required | Constraint                                      |
 |------------------|----------|----------|-------------------------------------------------|
@@ -287,7 +289,7 @@ When a user searches and is connected to BGG, their games are prioritized in res
 
 ---
 
-## 6. Stats Context
+## 7. Stats Context
 
 Analytics and reporting. Structured as a full bounded context for future extensibility (achievements, ratings), but
 currently operates as a read model over Plays data.
@@ -316,7 +318,7 @@ currently operates as a read model over Plays data.
 
 ---
 
-## 7. Access Context (Phase 4)
+## 8. Access Context (Phase 4)
 
 Authentication methods management and device session control.
 
@@ -331,7 +333,7 @@ Authentication methods management and device session control.
 
 ---
 
-## 8. Infrastructure: Auth
+## 9. Infrastructure: Auth
 
 Authentication and authorization mechanics. Not a bounded context.
 
@@ -349,66 +351,178 @@ Authentication and authorization mechanics. Not a bounded context.
 
 ---
 
-## 9. Infrastructure: Sync
+## 10. Infrastructure: Sync
 
 External system integration. Not a bounded context.
 
 **Core ports:**
 
-- `GameCatalogProvider` -- search and retrieve game information
-- `PlayExporter` -- export plays to external system
-- `PlayImporter` -- import plays from external system
+- `PlaySynchronizer` -- bidirectional sync of plays with external system (BGG)
 
 **Infrastructure adapters:**
 
 - BGG (BoardGameGeek) implementations
 
-**Conflict resolution:** on import conflict, user is notified and resolves manually in Play.
+**Key distinction:**
+
+- **Games** are imported on-demand during search (handled by Games Context, not Sync)
+- **Plays** are synchronized bidirectionally with BGG (import/export)
+
+**Conflict resolution:** on sync conflict, user is notified and resolves manually in Play.
 
 ---
 
-## 10. Domain Events
+## 11. Domain Events
 
-### 10.1 Profile Events
+### 11.1 Profile Events
 
-| Event          | Description         | Payload                  |
-|----------------|---------------------|--------------------------|
-| UserRegistered | New user registered | userId, email, createdAt |
-| UserConfirmed  | Email confirmed     | userId, confirmedAt      |
-| UserDeleted    | Account deleted     | userId, deletedAt        |
-| UserRestored   | Account restored    | userId, restoredAt       |
+| Event             | Description              | Payload                  |
+|-------------------|--------------------------|--------------------------|
+| UserRegistered    | New user registered      | userId, email, createdAt |
+| UserConfirmed     | Email confirmed          | userId, confirmedAt      |
+| UserTokenRevoked  | All tokens invalidated   | userId, revokedAt        |
+| UserDeleted       | Account deleted          | userId, deletedAt        |
+| UserRestored      | Account restored         | userId, restoredAt       |
 
-### 10.2 Plays Events
+### 11.2 Mates Events
 
-| Event         | Description          | Payload                 |
-|---------------|----------------------|-------------------------|
-| PlayCreated   | New play created     | playId, userId, date    |
-| PlayPublished | Play published       | playId, gameId, players |
-| PlayUpdated   | Play edited          | playId, changes         |
-| PlayDeleted   | Play deleted         | playId, deletedAt       |
-| PlayRestored  | Play restored        | playId                  |
-| PlayerAdded   | Player added to play | playId, mateId          |
-| PlayerRemoved | Player removed       | playId, mateId          |
+| Event       | Description        | Payload                |
+|-------------|--------------------|------------------------|
+| MateCreated | New mate added     | mateId, userId, name   |
+| MateUpdated | Mate info updated  | mateId, name           |
+| MateDeleted | Mate soft-deleted  | mateId, deletedAt      |
 
-### 10.3 Games Events
+### 11.3 Plays Events
 
-| Event        | Description            | Payload       |
-|--------------|------------------------|---------------|
-| GameImported | Game imported from BGG | gameId, bggId |
+| Event                 | Description              | Payload                          |
+|-----------------------|--------------------------|----------------------------------|
+| PlayCreated           | New play created         | playId, userId, startedAt        |
+| PlayerAdded           | Player added to play     | playId, mateId, score            |
+| PlayClosed            | Play closed/published    | playId, finishedAt               |
+| PlayVisibilityChanged | Visibility changed       | playId, oldVisibility, newVisibility |
+| PlayDeleted           | Play deleted             | playId, deletedAt                |
+| PlayRestored          | Play restored            | playId                           |
 
-### 10.4 Sync Events
+### 11.4 Games Events
 
-| Event         | Description                 | Payload                 |
-|---------------|-----------------------------|-------------------------|
-| SyncRequested | Synchronization requested   | userId, provider, scope |
-| PlayExported  | Play exported to provider   | playId, providerId      |
-| PlayImported  | Play imported from provider | providerId, playId      |
-| SyncFailed    | Synchronization error       | error, retryAt          |
-| SyncConflict  | Conflict detected on import | playId, providerId      |
+| Event        | Description                       | Payload       |
+|--------------|-----------------------------------|---------------|
+| GameImported | Game imported from BGG on search  | gameId, bggId |
+
+### 11.5 Sync Events (Plays synchronization)
+
+| Event         | Description                     | Payload                 |
+|---------------|---------------------------------|-------------------------|
+| SyncRequested | Play sync with BGG requested    | userId, provider, scope |
+| PlayExported  | Play exported to BGG            | playId, providerId      |
+| PlayImported  | Play imported from BGG          | providerId, playId      |
+| SyncFailed    | Synchronization error           | error, retryAt          |
+| SyncConflict  | Conflict detected on play sync  | playId, providerId      |
+
+### Event Storming Map
+
+```mermaid
+flowchart TB
+    subgraph legend["Legend"]
+        direction LR
+        cmd_l["Command"]:::command
+        agg_l["Aggregate"]:::aggregate
+        evt_l["Domain Event"]:::event
+        policy_l["Policy"]:::policy
+        read_l["Read Model"]:::readmodel
+        ext_l["External System"]:::external
+    end
+
+    subgraph profile["Profile Context"]
+        direction TB
+
+        cmd_register["Register User"]:::command --> agg_user["User"]:::aggregate
+        agg_user --> evt_registered["UserRegistered"]:::event
+
+        cmd_confirm["Confirm Email"]:::command --> agg_user
+        agg_user --> evt_confirmed["UserConfirmed"]:::event
+
+        cmd_signout["Sign Out"]:::command --> agg_user
+        agg_user --> evt_token_revoked["UserTokenRevoked"]:::event
+
+        evt_registered -.-> pol_auto_mate["Create self as Mate"]:::policy
+    end
+
+    subgraph mates["Mates Context"]
+        direction TB
+
+        cmd_add_mate["Add Mate"]:::command --> agg_mate["Mate"]:::aggregate
+        agg_mate --> evt_mate_created["MateCreated"]:::event
+
+        cmd_update_mate["Update Mate"]:::command --> agg_mate
+        agg_mate --> evt_mate_updated["MateUpdated"]:::event
+
+        cmd_delete_mate["Delete Mate"]:::command --> agg_mate
+        agg_mate --> evt_mate_deleted["MateDeleted"]:::event
+    end
+
+    subgraph games["Games Context"]
+        direction TB
+
+        cmd_search["Search Games"]:::command --> agg_game["Game"]:::aggregate
+        agg_game --> evt_imported["GameImported"]:::event
+        ext_bgg_games["BGG API"]:::external -.-> cmd_search
+
+        read_game_details["Game Details"]:::readmodel
+        evt_imported -.-> read_game_details
+    end
+
+    subgraph plays["Plays Context"]
+        direction TB
+
+        cmd_open["Open Session"]:::command --> agg_play["Play"]:::aggregate
+        agg_play --> evt_created["PlayCreated"]:::event
+
+        cmd_add_player["Add Player"]:::command --> agg_play
+        agg_play --> evt_player_added["PlayerAdded"]:::event
+
+        cmd_close["Close Session"]:::command --> agg_play
+        agg_play --> evt_closed["PlayClosed"]:::event
+
+        cmd_visibility["Change Visibility"]:::command --> agg_play
+        agg_play --> evt_visibility["PlayVisibilityChanged"]:::event
+
+        evt_closed -.-> pol_stats["Update Statistics"]:::policy
+        evt_closed -.-> read_play_history["Play History"]:::readmodel
+    end
+
+    subgraph sync["Sync (Infrastructure)"]
+        direction TB
+
+        ext_bgg_sync["BGG API"]:::external --> cmd_sync_plays["Sync Plays"]:::command
+        cmd_sync_plays --> evt_play_synced["PlayImported / PlayExported"]:::event
+        evt_play_synced -.-> pol_create_play["Create/Update Play"]:::policy
+    end
+
+    subgraph stats["Stats Context -- NOT IMPLEMENTED"]
+        direction TB
+        read_stats["Player Statistics"]:::readmodel
+        read_leaderboard["Leaderboard"]:::readmodel
+    end
+
+    %% Cross-context flows
+    pol_auto_mate -.-> cmd_add_mate
+    pol_create_play -.-> cmd_open
+    evt_closed -.-> read_stats
+    evt_player_added -.-> read_stats
+
+    %% Styles
+    classDef command fill:#5b8def,stroke:#3a6bc5,color:#fff,font-weight:bold
+    classDef aggregate fill:#ffd966,stroke:#d4a843,color:#333,font-weight:bold
+    classDef event fill:#ff9248,stroke:#cc6e30,color:#fff,font-weight:bold
+    classDef policy fill:#b088d4,stroke:#8a62ab,color:#fff,font-weight:bold
+    classDef readmodel fill:#6fc98e,stroke:#4fa06c,color:#fff,font-weight:bold
+    classDef external fill:#f28fa2,stroke:#c46e7e,color:#fff,font-weight:bold
+```
 
 ---
 
-## 11. Data Schema
+## 12. Data Schema
 
 ```mermaid
 erDiagram
@@ -480,7 +594,7 @@ erDiagram
 
 ---
 
-## 12. Shared Value Objects (Core)
+## 13. Shared Value Objects (Core)
 
 | Value Object | Location            | Validation                     |
 |--------------|---------------------|--------------------------------|
@@ -493,22 +607,22 @@ erDiagram
 
 ---
 
-## 13. Non-Functional Domain Requirements
+## 14. Non-Functional Domain Requirements
 
-### 13.1 Data Consistency
+### 14.1 Data Consistency
 
 - All play operations are atomic
 - Statistics can be eventually consistent
 - BGG synchronization is asynchronous
 
-### 13.2 Audit
+### 14.2 Audit
 
 - Play changes trigger domain events for reactive updates (statistics, notifications)
 - Events are processed within transactions but not persisted in MVP (see ADR-006)
 - Full event history with state reconstruction planned for later phases if needed
 - Storing metadata about time and author of changes in entity fields
 
-### 13.3 Scalability
+### 14.3 Scalability
 
 - Separate storage for analytical data
 - Game search result caching
@@ -516,21 +630,22 @@ erDiagram
 
 ---
 
-## 14. Naming Decisions
+## 15. Naming Decisions
 
-| Decision               | Chosen      | Rationale                                          |
-|------------------------|-------------|----------------------------------------------------|
-| Session vs Play        | **Play**    | BGG standard, matches Plays context name           |
-| Auth vs Profile        | **Profile** | Auth is infrastructure, Profile is domain          |
-| Mate location          | **Plays**   | Mate is a co-player, exists in gaming context      |
-| User across contexts   | **By ID**   | No entity duplication, reference by Uuid           |
-| EmailConfirmationToken | **Infra**   | Infrastructure mechanism, not domain entity        |
-| Stats as context       | **Yes**     | Future-proof for achievements/ratings/microservice |
-| Sync as context        | **No**      | No domain logic, just ports and adapters           |
+| Decision               | Chosen      | Rationale                                              |
+|------------------------|-------------|--------------------------------------------------------|
+| Session vs Play        | **Play**    | BGG standard, matches Plays context name               |
+| Auth vs Profile        | **Profile** | Auth is infrastructure, Profile is domain              |
+| Mate location          | **Mates**   | Separate BC: independent lifecycle, cross-ref by ID    |
+| Passkey/Password       | **Infra**   | Auth infrastructure, will migrate to Access (Phase 4)  |
+| User across contexts   | **By ID**   | No entity duplication, reference by Uuid               |
+| EmailConfirmationToken | **Infra**   | Infrastructure mechanism, not domain entity            |
+| Stats as context       | **Yes**     | Future-proof for achievements/ratings/microservice     |
+| Sync as context        | **No**      | No domain logic, just ports and adapters               |
 
 ---
 
-## 15. Migration Notes
+## 16. Migration Notes
 
 Current code uses names and structures that differ from this model:
 
