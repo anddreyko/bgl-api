@@ -396,12 +396,13 @@ External system integration. Not a bounded context.
 
 | Event                 | Description              | Payload                          |
 |-----------------------|--------------------------|----------------------------------|
-| PlayCreated           | New play created         | playId, userId, startedAt        |
-| PlayerAdded           | Player added to play     | playId, mateId, score            |
-| PlayClosed            | Play closed/published    | playId, finishedAt               |
+| PlayCreated           | New play created         | playId, userId, startedAt            |
+| PlayUpdated           | Play draft updated       | playId, name, gameId, visibility     |
+| PlayerAdded           | Player added to play     | playId, mateId, score                |
+| PlayClosed            | Play closed/published    | playId, finishedAt                   |
 | PlayVisibilityChanged | Visibility changed       | playId, oldVisibility, newVisibility |
-| PlayDeleted           | Play deleted             | playId, deletedAt                |
-| PlayRestored          | Play restored            | playId                           |
+| PlayDeleted           | Play deleted             | playId, deletedAt                    |
+| PlayRestored          | Play restored            | playId                               |
 
 ### 11.4 Games Events
 
@@ -477,6 +478,9 @@ flowchart TB
 
         cmd_open["Open Session"]:::command --> agg_play["Play"]:::aggregate
         agg_play --> evt_created["PlayCreated"]:::event
+
+        cmd_update["Update Session"]:::command --> agg_play
+        agg_play --> evt_updated["PlayUpdated"]:::event
 
         cmd_add_player["Add Player"]:::command --> agg_play
         agg_play --> evt_player_added["PlayerAdded"]:::event
@@ -656,10 +660,10 @@ Current code uses names and structures that differ from this model:
 | ~~`SessionStatus`~~   | `PlayStatus`           | ~~Rename enum~~ DONE           |
 | ~~`Session::open()`~~ | `Play::open()`         | ~~Rename factory method~~ DONE |
 | ~~`Sessions` (repo)~~ | `Plays` (repo)         | ~~Rename repository~~ DONE     |
-| Missing           | `Player`               | Create entity         |
-| Missing           | `Mate`                 | Create aggregate      |
-| Missing           | `Location`             | Create aggregate      |
-| Missing           | `Game`                 | Create aggregate      |
-| Missing           | `Visibility`           | Create enum           |
-| Missing           | `GameType`             | Create enum           |
-| Missing           | `SyncStatus`           | Create enum           |
+| ~~Missing~~       | `Player`               | ~~Create entity~~ DONE    |
+| ~~Missing~~       | `Mate`                 | ~~Create aggregate~~ DONE |
+| Missing           | `Location`             | Create aggregate          |
+| ~~Missing~~       | `Game`                 | ~~Create aggregate~~ DONE |
+| ~~Missing~~       | `Visibility`           | ~~Create enum~~ DONE      |
+| Missing           | `GameType`             | Create enum               |
+| Missing           | `SyncStatus`           | Create enum               |

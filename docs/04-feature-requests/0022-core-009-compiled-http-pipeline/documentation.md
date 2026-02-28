@@ -15,8 +15,16 @@ Replaced the HTTP-to-Message pipeline with a compiled route map and hydrator-bas
 
 ```php
 '/v1/plays/sessions/{id}' => [
+    'put' => [
+        'x-message' => UpdatePlay\Command::class,
+        'x-interceptors' => [AuthInterceptor::class],
+        'x-auth' => ['userId'],
+        'x-map' => ['id' => 'sessionId'],
+        'requestBody' => [...],
+        'parameters' => [...],
+    ],
     'patch' => [
-        'x-message' => CloseSession\Command::class,
+        'x-message' => FinalizePlay\Command::class,
         'x-interceptors' => [AuthInterceptor::class],
         'x-auth' => ['userId'],           // injected from auth context
         'x-map' => ['id' => 'sessionId'], // explicit renames only
