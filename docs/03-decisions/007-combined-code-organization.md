@@ -313,9 +313,7 @@ in Infrastructure:
 
 ```
 Domain/Sync/
-├── GameCatalogProvider.php        # Game search interface
-├── PlayExporter.php               # Session export interface
-├── PlayImporter.php               # Session import interface
+├── PlaySynchronizer.php           # Play sync interface (bidirectional BGG sync)
 └── Services/
     └── SyncService.php            # Domain sync service
 

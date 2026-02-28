@@ -114,7 +114,7 @@ Depends on `Core`, `Domain`, `Application`, and external libraries.
 
 Ports & Adapters examples:
 
-- `GameCatalogProvider` interface in `Core/Sync/` -> `BggCatalogProvider` in `Infrastructure/Sync/Bgg/`
+- `PlaySynchronizer` interface in `Core/Sync/` -> `BggPlaySynchronizer` in `Infrastructure/Sync/Bgg/`
 - `Authenticator` interface in `Core/Auth/` -> JWT implementation in `Infrastructure/Auth/`
 - `PasswordHasher` interface in `Core/Security/` -> `BcryptPasswordHasher` in `Infrastructure/Security/`
 - `SchemaMapper` interface in `Core/Http/` -> `OpenApiSchemaMapper` in `Infrastructure/Http/`

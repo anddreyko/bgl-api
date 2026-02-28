@@ -76,11 +76,11 @@ src/
 │   └── ValueObjects/
 │
 ├── Domain/                  # Business logic by Bounded Context
-│   ├── Auth/                # Authentication & authorization
 │   ├── Games/               # Game catalog
-│   ├── Plays/               # Session logging
-│   ├── Stats/               # Analytics & statistics
-│   └── Sync/                # External integration ports
+│   ├── Mates/               # Co-player directory
+│   ├── Plays/               # Play logging
+│   ├── Profile/             # User identity & profile
+│   └── Stats/               # Analytics & statistics
 │
 ├── Application/             # Use cases
 │   ├── Aspects/             # Middleware (Logging, Transactional, etc.)
@@ -121,16 +121,17 @@ Presentation  ↗
 
 ## 5. Bounded Contexts
 
-| Context | Responsibility                    | Phase | Location          |
-|---------|-----------------------------------|-------|-------------------|
-| Profile | User identity, profile, settings  | 1+    | `Domain/Profile/` |
-| Plays   | Play logging, players, mates      | 1     | `Domain/Plays/`   |
-| Games   | Game catalog (BGG import)         | 1     | `Domain/Games/`   |
-| Stats   | Analytics and reporting           | 1+    | `Domain/Stats/`   |
-| Access  | Auth methods, device session mgmt | 4     | `Domain/Access/`  |
+| Context | Responsibility                          | Phase | Location          |
+|---------|----------------------------------------|-------|-------------------|
+| Profile | User identity, profile, settings        | 1+    | `Domain/Profile/` |
+| Plays   | Play logging, players, locations        | 1     | `Domain/Plays/`   |
+| Mates   | Personal co-player directory            | 1     | `Domain/Mates/`   |
+| Games   | Game catalog (on-demand BGG import)     | 1     | `Domain/Games/`   |
+| Stats   | Analytics and reporting                 | 1+    | `Domain/Stats/`   |
+| Access  | Auth methods, passkeys, device sessions | 4     | `Domain/Access/`  |
 
 **Not bounded contexts:** Auth (infrastructure: `Core/Auth/` + `Infrastructure/Auth/`), Sync (infrastructure:
-`Core/Sync/` + `Infrastructure/Sync/`).
+`Core/Sync/` + `Infrastructure/Sync/`). Passkey/Password are auth infrastructure, will migrate to Access in Phase 4.
 
 ---
 
@@ -139,7 +140,7 @@ Presentation  ↗
 ### Ports & Adapters
 
 Domain defines interfaces, Infrastructure implements:
-`Domain/Sync/GameCatalogProvider` → `Infrastructure/Sync/Bgg/BggCatalogProvider`
+`Domain/Sync/PlaySynchronizer` → `Infrastructure/Sync/Bgg/BggPlaySynchronizer`
 
 ### Aspects (Middleware)
 
