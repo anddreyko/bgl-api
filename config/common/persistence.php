@@ -8,7 +8,7 @@ use Bgl\Core\Persistence\Transactor;
 use Bgl\Core\Serialization\Deserializer;
 use Bgl\Domain\Games\Entities\Games;
 use Bgl\Domain\Mates\Entities\Mates;
-use Bgl\Domain\Plays\Entities\Players;
+use Bgl\Domain\Plays\Entities\PlayersFactory;
 use Bgl\Domain\Plays\Entities\Plays;
 use Bgl\Domain\Profile\Entities\PasskeyChallenges;
 use Bgl\Domain\Profile\Entities\Passkeys;
@@ -21,7 +21,7 @@ use Bgl\Infrastructure\Persistence\CompositeGames;
 use Bgl\Infrastructure\Persistence\Doctrine\DoctrineTransactor;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Games\Games as DoctrineGames;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Mates\Mates as DoctrineMates;
-use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\Players as DoctrinePlayers;
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\DoctrinePlayersFactory;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\Plays as DoctrinePlays;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Profile\PasskeyChallenges as DoctrineChallenges;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Profile\Passkeys as DoctrinePasskeys;
@@ -37,7 +37,7 @@ return [
     Users::class => static fn(EntityManagerInterface $em): Users => new DoctrineUsers($em),
     Confirmer::class => static fn(DoctrineConfirmer $c): Confirmer => $c,
     Plays::class => static fn(EntityManagerInterface $em): Plays => new DoctrinePlays($em),
-    Players::class => static fn(EntityManagerInterface $em): Players => new DoctrinePlayers($em),
+    PlayersFactory::class => static fn(DoctrinePlayersFactory $f): PlayersFactory => $f,
     Passkeys::class => static fn(EntityManagerInterface $em): Passkeys => new DoctrinePasskeys($em),
     PasskeyChallenges::class => static fn(EntityManagerInterface $em): PasskeyChallenges => new DoctrineChallenges($em),
     Mates::class => static fn(EntityManagerInterface $em): Mates => new DoctrineMates($em),

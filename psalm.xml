@@ -21,4 +21,14 @@
         </ignoreFiles>
     </projectFiles>
 
+    <issueHandlers>
+        <!-- PlayerCollection bridges Repository ($entity) and ArrayCollection ($element/$key) -->
+        <!-- These interfaces define incompatible param names for the same methods -->
+        <ParamNameMismatch>
+            <errorLevel type="suppress">
+                <file name="src/Infrastructure/Persistence/Doctrine/Mapping/Plays/PlayerCollection.php"/>
+            </errorLevel>
+        </ParamNameMismatch>
+    </issueHandlers>
+
 </psalm>
