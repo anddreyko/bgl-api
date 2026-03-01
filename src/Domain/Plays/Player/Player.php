@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Bgl\Domain\Plays\Player;
 
 use Bgl\Core\ValueObjects\Uuid;
+use Bgl\Domain\Plays\ColorTooLongException;
+use Bgl\Domain\Plays\NegativeScoreException;
 use Bgl\Domain\Plays\Play;
 
 final readonly class Player
@@ -28,11 +30,11 @@ final readonly class Player
         ?string $color,
     ): self {
         if ($score !== null && $score < 0) {
-            throw new \DomainException('Score cannot be negative');
+            throw new NegativeScoreException();
         }
 
         if ($color !== null && mb_strlen($color) > 50) {
-            throw new \DomainException('Color is too long');
+            throw new ColorTooLongException();
         }
 
         return new self($id, $play, $mateId, $score, $isWinner, $color);

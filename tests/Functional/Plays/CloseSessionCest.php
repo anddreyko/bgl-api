@@ -9,6 +9,7 @@ use Bgl\Application\Handlers\Plays\FinalizePlay\Handler;
 use Bgl\Application\Handlers\Plays\FinalizePlay\Result;
 use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Identity\UuidGenerator;
+use Bgl\Domain\Plays\PlayAccessDeniedException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
@@ -113,7 +114,7 @@ final class CloseSessionCest
         $this->em->clear();
 
         $i->expectThrowable(
-            new \DomainException('Access denied'),
+            new PlayAccessDeniedException(),
             fn () => ($this->handler)(new Envelope(
                 message: new Command(sessionId: $sessionId, userId: new Uuid('user-other')),
                 messageId: 'msg-3',

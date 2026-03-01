@@ -46,7 +46,7 @@ final class User
     public function confirm(): void
     {
         if ($this->status === UserStatus::Active) {
-            throw new \DomainException('User is already confirmed.');
+            throw new UserAlreadyConfirmedException();
         }
 
         $this->status = UserStatus::Active;

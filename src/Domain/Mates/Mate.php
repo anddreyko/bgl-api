@@ -68,7 +68,7 @@ final class Mate
     public function softDelete(DateTime $deletedAt): void
     {
         if ($this->deletedAt !== null) {
-            throw new \DomainException('Mate is already deleted');
+            throw new MateAlreadyDeletedException();
         }
 
         $this->deletedAt = $deletedAt;

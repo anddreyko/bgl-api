@@ -8,6 +8,7 @@ use Bgl\Application\Handlers\Mates\CreateMate\Command;
 use Bgl\Application\Handlers\Mates\CreateMate\Handler;
 use Bgl\Application\Handlers\Mates\CreateMate\Result;
 use Bgl\Core\Messages\Envelope;
+use Bgl\Domain\Mates\MateAlreadyExistsException;
 use Bgl\Domain\Mates\Mates;
 use Bgl\Tests\Support\DiHelper;
 use Bgl\Tests\Support\FunctionalTester;
@@ -69,7 +70,7 @@ final class CreateMateCest
         ));
 
         $i->expectThrowable(
-            new \DomainException('Mate with this name already exists'),
+            new MateAlreadyExistsException(),
             function () use ($uid): void {
                 ($this->handler)(new Envelope(
                     message: new Command(userId: $uid, name: 'duplicate'),

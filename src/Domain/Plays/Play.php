@@ -95,7 +95,7 @@ final class Play
     public function update(?string $name, ?Uuid $gameId, Visibility $visibility): void
     {
         if ($this->status !== PlayStatus::Draft) {
-            throw new \DomainException('Play can only be updated in draft status');
+            throw new PlayNotDraftException('Play can only be updated in draft status.');
         }
 
         $this->name = $name;
@@ -106,7 +106,7 @@ final class Play
     public function changeVisibility(Visibility $visibility): void
     {
         if ($this->status !== PlayStatus::Draft) {
-            throw new \DomainException('Visibility can only be changed in draft status');
+            throw new PlayNotDraftException('Visibility can only be changed in draft status.');
         }
 
         $this->visibility = $visibility;
@@ -127,11 +127,11 @@ final class Play
     public function finalize(DateTime $finishedAt): void
     {
         if ($this->status !== PlayStatus::Draft) {
-            throw new \DomainException('Play can only be finalized from draft status');
+            throw new PlayNotDraftException('Play can only be finalized from draft status.');
         }
 
         if ($finishedAt->getValue() <= $this->startedAt->getValue()) {
-            throw new \DomainException('finishedAt must be after startedAt');
+            throw new FinishedAtBeforeStartedAtException();
         }
 
         $this->status = PlayStatus::Published;

@@ -103,21 +103,21 @@ final readonly class Handler implements MessageHandler
             $mateId = $playerData['mate_id'];
 
             if (isset($mateIds[$mateId])) {
-                throw new \DomainException('Duplicate player: same mate cannot be added twice');
+                throw new \Bgl\Domain\Plays\DuplicatePlayerException();
             }
             $mateIds[$mateId] = true;
 
             $mate = $this->mates->find($mateId);
             if ($mate === null) {
-                throw new \DomainException('Mate not found: ' . $mateId);
+                throw new NotFoundException('Mate not found: ' . $mateId);
             }
 
             if ((string)$mate->getUserId() !== (string)$userId) {
-                throw new \DomainException('Mate does not belong to user');
+                throw new \Bgl\Domain\Plays\MateNotOwnedByUserException();
             }
 
             if ($mate->isDeleted()) {
-                throw new \DomainException('Mate is deleted: ' . $mateId);
+                throw new NotFoundException('Mate is deleted: ' . $mateId);
             }
         }
     }

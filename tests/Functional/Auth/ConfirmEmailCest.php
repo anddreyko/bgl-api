@@ -6,6 +6,7 @@ namespace Bgl\Tests\Functional\Auth;
 
 use Bgl\Application\Handlers\Auth\ConfirmEmail\Command;
 use Bgl\Application\Handlers\Auth\ConfirmEmail\Handler;
+use Bgl\Application\Handlers\Auth\ConfirmEmail\Result;
 use Bgl\Core\Auth\Confirmer;
 use Bgl\Core\Auth\ExpiredConfirmationTokenException;
 use Bgl\Core\Auth\InvalidConfirmationTokenException;
@@ -72,7 +73,8 @@ final class ConfirmEmailCest
             messageId: 'msg-1',
         ));
 
-        $i->assertSame('Specified email is confirmed', $result);
+        $i->assertInstanceOf(Result::class, $result);
+        $i->assertSame('Specified email is confirmed', $result->message);
 
         $confirmed = $this->users->find((string) $userId);
         $i->assertNotNull($confirmed);

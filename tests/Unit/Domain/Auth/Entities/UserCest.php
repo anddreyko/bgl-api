@@ -8,6 +8,7 @@ use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Profile\User;
+use Bgl\Domain\Profile\UserAlreadyConfirmedException;
 use Bgl\Domain\Profile\UserStatus;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
@@ -54,7 +55,7 @@ final class UserCest
             status: UserStatus::Active,
         );
 
-        $i->expectThrowable(\DomainException::class, static function () use ($user): void {
+        $i->expectThrowable(UserAlreadyConfirmedException::class, static function () use ($user): void {
             $user->confirm();
         });
     }

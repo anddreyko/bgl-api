@@ -38,7 +38,7 @@ final readonly class Handler implements MessageHandler
         }
 
         if ((string)$play->getUserId() !== (string)$command->userId) {
-            throw new \DomainException('Access denied');
+            throw new \Bgl\Domain\Plays\PlayAccessDeniedException();
         }
 
         if ($command->gameId !== null) {

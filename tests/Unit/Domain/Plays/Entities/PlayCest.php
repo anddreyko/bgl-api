@@ -8,6 +8,7 @@ use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Plays\Play;
 use Bgl\Domain\Plays\Player\Player;
+use Bgl\Domain\Plays\PlayNotDraftException;
 use Bgl\Domain\Plays\PlayStatus;
 use Bgl\Domain\Plays\Visibility;
 use Bgl\Infrastructure\Persistence\InMemory\InMemoryPlayers;
@@ -100,7 +101,7 @@ final class PlayCest
         $play->finalize(new DateTime('2024-06-15 23:00:00'));
 
         $i->expectThrowable(
-            new \DomainException('Play can only be finalized from draft status'),
+            new PlayNotDraftException('Play can only be finalized from draft status.'),
             static function () use ($play): void {
                 $play->finalize(new DateTime('2024-06-16 00:00:00'));
             },
@@ -198,7 +199,7 @@ final class PlayCest
         $play->finalize(new DateTime('2024-06-15 23:00:00'));
 
         $i->expectThrowable(
-            new \DomainException('Play can only be updated in draft status'),
+            new PlayNotDraftException('Play can only be updated in draft status.'),
             static function () use ($play): void {
                 $play->update('name', null, Visibility::Private);
             },

@@ -7,6 +7,7 @@ namespace Bgl\Tests\Unit\Domain\Mates\Entities;
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Mates\Mate;
+use Bgl\Domain\Mates\MateAlreadyDeletedException;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 
@@ -94,7 +95,7 @@ final class MateCest
         $mate->softDelete(new DateTime());
 
         $i->expectThrowable(
-            new \DomainException('Mate is already deleted'),
+            new MateAlreadyDeletedException(),
             static function () use ($mate): void {
                 $mate->softDelete(new DateTime());
             },

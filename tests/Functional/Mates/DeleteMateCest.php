@@ -10,6 +10,7 @@ use Bgl\Application\Handlers\Mates\DeleteMate\Command;
 use Bgl\Application\Handlers\Mates\DeleteMate\Handler;
 use Bgl\Application\Handlers\Mates\GetMate\Handler as GetHandler;
 use Bgl\Application\Handlers\Mates\GetMate\Query;
+use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Tests\Support\DiHelper;
 use Bgl\Tests\Support\FunctionalTester;
@@ -53,7 +54,7 @@ final class DeleteMateCest
 
         // After soft delete, get should throw Not Found
         $i->expectThrowable(
-            new \DomainException('Not Found'),
+            new NotFoundException('Mate not found'),
             function () use ($created): void {
                 ($this->getHandler)(new Envelope(
                     message: new Query(userId: 'user-del', mateId: $created->id),
@@ -71,7 +72,7 @@ final class DeleteMateCest
         ));
 
         $i->expectThrowable(
-            new \DomainException('Not Found'),
+            new NotFoundException('Mate not found'),
             function () use ($created): void {
                 ($this->handler)(new Envelope(
                     message: new Command(userId: 'user-other2', mateId: $created->id),
@@ -84,7 +85,7 @@ final class DeleteMateCest
     public function testDeleteNonExistentMateThrows(FunctionalTester $i): void
     {
         $i->expectThrowable(
-            new \DomainException('Not Found'),
+            new NotFoundException('Mate not found'),
             function (): void {
                 ($this->handler)(new Envelope(
                     message: new Command(userId: 'user-del', mateId: 'non-existent'),

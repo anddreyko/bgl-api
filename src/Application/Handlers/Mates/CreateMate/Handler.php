@@ -36,7 +36,7 @@ final readonly class Handler implements MessageHandler
 
         $existing = $this->mates->findByUserAndName($userId, $name);
         if ($existing !== null) {
-            throw new \DomainException('Mate with this name already exists');
+            throw new \Bgl\Domain\Mates\MateAlreadyExistsException();
         }
 
         $now = new DateTime($this->clock->now());

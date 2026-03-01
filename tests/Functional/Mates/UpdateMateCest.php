@@ -9,7 +9,9 @@ use Bgl\Application\Handlers\Mates\CreateMate\Handler as CreateHandler;
 use Bgl\Application\Handlers\Mates\UpdateMate\Command;
 use Bgl\Application\Handlers\Mates\UpdateMate\Handler;
 use Bgl\Application\Handlers\Mates\UpdateMate\Result;
+use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Messages\Envelope;
+use Bgl\Domain\Mates\MateAlreadyExistsException;
 use Bgl\Tests\Support\DiHelper;
 use Bgl\Tests\Support\FunctionalTester;
 use Codeception\Attribute\Group;
@@ -64,7 +66,7 @@ final class UpdateMateCest
         ));
 
         $i->expectThrowable(
-            new \DomainException('Mate with this name already exists'),
+            new MateAlreadyExistsException(),
             function () use ($created2): void {
                 ($this->handler)(new Envelope(
                     message: new Command(userId: 'user-upd2', mateId: $created2->id, name: 'Ivan'),
@@ -82,7 +84,7 @@ final class UpdateMateCest
         ));
 
         $i->expectThrowable(
-            new \DomainException('Not Found'),
+            new NotFoundException('Mate not found'),
             function () use ($created): void {
                 ($this->handler)(new Envelope(
                     message: new Command(userId: 'user-other', mateId: $created->id, name: 'New Name'),

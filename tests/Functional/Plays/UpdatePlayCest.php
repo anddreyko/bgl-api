@@ -9,6 +9,8 @@ use Bgl\Application\Handlers\Plays\UpdatePlay\Handler;
 use Bgl\Application\Handlers\Plays\UpdatePlay\Result;
 use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Identity\UuidGenerator;
+use Bgl\Domain\Plays\PlayAccessDeniedException;
+use Bgl\Domain\Plays\PlayNotDraftException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
@@ -144,7 +146,7 @@ final class UpdatePlayCest
         $this->em->clear();
 
         $i->expectThrowable(
-            new \DomainException('Access denied'),
+            new PlayAccessDeniedException(),
             fn () => ($this->handler)(new Envelope(
                 message: new Command(
                     sessionId: $sessionId,
@@ -172,7 +174,7 @@ final class UpdatePlayCest
         $this->em->clear();
 
         $i->expectThrowable(
-            new \DomainException('Play can only be updated in draft status'),
+            new PlayNotDraftException('Play can only be updated in draft status.'),
             fn () => ($this->handler)(new Envelope(
                 message: new Command(
                     sessionId: $sessionId,

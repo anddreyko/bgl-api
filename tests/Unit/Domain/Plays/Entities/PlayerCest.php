@@ -6,6 +6,8 @@ namespace Bgl\Tests\Unit\Domain\Plays\Entities;
 
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
+use Bgl\Domain\Plays\NegativeScoreException;
+use Bgl\Domain\Plays\ColorTooLongException;
 use Bgl\Domain\Plays\Play;
 use Bgl\Domain\Plays\Player\Player;
 use Bgl\Infrastructure\Persistence\InMemory\InMemoryPlayers;
@@ -65,7 +67,7 @@ final class PlayerCest
     public function testCreateThrowsOnNegativeScore(UnitTester $i): void
     {
         $i->expectThrowable(
-            new \DomainException('Score cannot be negative'),
+            new NegativeScoreException(),
             fn() => Player::create(
                 new Uuid('player-3'),
                 $this->play,
@@ -96,7 +98,7 @@ final class PlayerCest
         $longColor = str_repeat('a', 51);
 
         $i->expectThrowable(
-            new \DomainException('Color is too long'),
+            new ColorTooLongException(),
             fn() => Player::create(
                 new Uuid('player-5'),
                 $this->play,

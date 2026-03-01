@@ -9,6 +9,9 @@ use Bgl\Application\Handlers\Plays\CreatePlay\Handler;
 use Bgl\Application\Handlers\Plays\CreatePlay\Result;
 use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Identity\UuidGenerator;
+use Bgl\Domain\Plays\DuplicatePlayerException;
+use Bgl\Domain\Plays\FinishedAtBeforeStartedAtException;
+use Bgl\Domain\Plays\MateNotOwnedByUserException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
@@ -173,7 +176,7 @@ final class OpenSessionCest
         $fakeMateId = 'non-existent-mate-' . uniqid();
 
         $i->expectThrowable(
-            new \DomainException('Mate not found: ' . $fakeMateId),
+            new NotFoundException('Mate not found: ' . $fakeMateId),
             fn () => ($this->handler)(new Envelope(
                 message: new Command(
                     userId: $this->userId,
@@ -200,7 +203,7 @@ final class OpenSessionCest
         ));
 
         $i->expectThrowable(
-            new \DomainException('Mate does not belong to user'),
+            new MateNotOwnedByUserException(),
             fn () => ($this->handler)(new Envelope(
                 message: new Command(
                     userId: $this->userId,
@@ -227,7 +230,7 @@ final class OpenSessionCest
         $this->mates->add($mate);
 
         $i->expectThrowable(
-            new \DomainException('Mate is deleted: ' . (string) $deletedMateId),
+            new NotFoundException('Mate is deleted: ' . (string) $deletedMateId),
             fn () => ($this->handler)(new Envelope(
                 message: new Command(
                     userId: $this->userId,
@@ -259,7 +262,7 @@ final class OpenSessionCest
     public function testOpenSessionFailsWhenFinishedAtBeforeStartedAt(FunctionalTester $i): void
     {
         $i->expectThrowable(
-            new \DomainException('finishedAt must be after startedAt'),
+            new FinishedAtBeforeStartedAtException(),
             fn () => ($this->handler)(new Envelope(
                 message: new Command(
                     userId: $this->userId,
@@ -296,7 +299,7 @@ final class OpenSessionCest
         $mateIdStr = (string) $this->mate1Id;
 
         $i->expectThrowable(
-            new \DomainException('Duplicate player: same mate cannot be added twice'),
+            new DuplicatePlayerException(),
             fn () => ($this->handler)(new Envelope(
                 message: new Command(
                     userId: $this->userId,
