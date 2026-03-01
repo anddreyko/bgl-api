@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Bgl\Presentation\Api\ApiAction;
+use Bgl\Presentation\Api\Middleware\TrimStringsMiddleware;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -39,7 +40,7 @@ $app->add(function (ServerRequestInterface $request, RequestHandlerInterface $ha
     return $handler->handle($request);
 });
 
-$app->add(new \Bgl\Presentation\Api\Middleware\TrimStringsMiddleware());
+$app->add(new TrimStringsMiddleware());
 
 $app->any('/{path:.*}', function (
     ServerRequestInterface $request,
