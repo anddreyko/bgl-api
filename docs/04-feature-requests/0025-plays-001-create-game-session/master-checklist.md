@@ -6,9 +6,9 @@
 
 ## Overview
 
-**Overall Progress:** 0 of 5 stages completed
+**Overall Progress:** 5 of 5 stages completed
 
-**Current Stage:** Stage 1 - Domain Layer
+**Current Stage:** All stages completed
 
 ---
 
@@ -16,23 +16,25 @@
 
 **Dependencies:** None
 
-- [ ] Create `Visibility` enum in `src/Domain/Plays/Entities/Visibility.php`
+- [x] Create `Visibility` enum in `src/Domain/Plays/Entities/Visibility.php`
   - Values: Private, Link, Friends, Registered, Public (string-backed)
-- [ ] Create `Player` entity in `src/Domain/Plays/Entities/Player.php`
-  - Fields: id (Uuid), playId (Uuid), mateId (Uuid), score (?int), isWinner (bool), color (?string)
+- [x] Create `Player` entity in `src/Domain/Plays/Entities/Player.php`
+  - Fields: id (Uuid), play (Play), mateId (Uuid), score (?int), isWinner (bool), color (?string)
   - Factory method `Player::create(...)`
   - Immutable (readonly)
-- [ ] Create `PlayCreated` domain event in `src/Domain/Plays/Events/PlayCreated.php`
-  - Fields: playId (string), userId (string)
-- [ ] Extend `Play` entity with new fields:
-  - Add `gameId` (?Uuid), `visibility` (Visibility), `players` (array of Player)
-  - New factory method `Play::create(...)` with all fields (keep `Play::open()` for backward compat)
-  - Method `getPlayers()`, `getGameId()`, `getVisibility()`
-  - Emit PlayCreated event via Emits trait
-- [ ] Unit tests for Player entity
-- [ ] Unit tests for Play::create() with players
-- [ ] Unit tests for Visibility enum
-- [ ] Verify: `composer lp:run && composer ps:run`
+- [x] ~~Create `PlayCreated` domain event~~ -- Deferred (no Event Sourcing in MVP, per ADR-006)
+- [x] Create `Players` interface extending Repository in `src/Domain/Plays/Entities/Players.php`
+- [x] Create `PlayersFactory` interface in `src/Domain/Plays/Entities/PlayersFactory.php`
+- [x] Create `EmptyPlayers` null-object in `src/Domain/Plays/Entities/EmptyPlayers.php`
+- [x] Extend `Play` entity with new fields:
+  - Add `gameId` (?Uuid), `visibility` (Visibility), `players` (Players)
+  - New factory method `Play::create(...)` with all fields
+  - Methods: `update()`, `finalize()`, `changeVisibility()`, `addPlayer()`
+  - `$players` property: non-promoted, untyped (Doctrine/Rector compatibility)
+- [x] Unit tests for Player entity
+- [x] Unit tests for Play::create() with players
+- [x] Unit tests for Visibility enum
+- [x] Verify: `composer lp:run && composer ps:run`
 
 Details: [stage-1-domain.md](./stage-1-domain.md)
 
@@ -42,18 +44,22 @@ Details: [stage-1-domain.md](./stage-1-domain.md)
 
 **Dependencies:** Stage 1
 
-- [ ] Create `PlayerMapping.php` in `src/Infrastructure/Persistence/Doctrine/Mapping/Plays/`
+- [x] Create `PlayerMapping.php` in `src/Infrastructure/Persistence/Doctrine/Mapping/Plays/`
   - Table: `plays_player`
   - Map all Player fields
   - ManyToOne relation to Play
-- [ ] Modify `PlayMapping.php`:
+- [x] Create `PlayerCollection.php` -- bridges Domain Players with Doctrine ArrayCollection
+- [x] Create `DoctrinePlayersFactory.php` -- factory creating PlayerCollection instances
+- [x] Modify `PlayMapping.php`:
   - Add `gameId` field (uuid_vo, nullable)
   - Add `visibility` field (string, enum)
   - Add OneToMany relation to Player (cascade: persist, orphanRemoval: true)
-- [ ] Generate migration: `make migrate-gen`
-- [ ] Run migration: `make migrate`
-- [ ] Validate schema: `make validate-schema`
-- [ ] Verify: `composer lp:run && composer ps:run`
+- [x] Generate migration: `make migrate-gen`
+- [x] Run migration: `make migrate`
+- [x] Validate schema: `make validate-schema`
+- [x] Add PlayersFactory DI binding in `config/common/persistence.php`
+- [x] Add ParamNameMismatch suppression in psalm.xml for PlayerCollection
+- [x] Verify: `composer lp:run && composer ps:run`
 
 Details: [stage-2-infrastructure.md](./stage-2-infrastructure.md)
 
@@ -63,21 +69,23 @@ Details: [stage-2-infrastructure.md](./stage-2-infrastructure.md)
 
 **Dependencies:** Stage 2
 
-- [ ] Create `Command.php` in `src/Application/Handlers/Plays/CreateSession/`
-  - Fields: userId (string), gameId (?string), name (?string), startedAt (?string),
-    finishedAt (?string), visibility (?string), players (array)
-  - players: array of arrays with keys: mateId, score, isWinner, color
-- [ ] Create `Handler.php` in `src/Application/Handlers/Plays/CreateSession/`
-  - Inject: Plays, Mates, Games (optional), UuidGenerator, ClockInterface
-  - Validate: players not empty, no duplicate mateIds
-  - Validate: each mateId exists and belongs to userId
+- [x] Rename `OpenSession` to `CreatePlay` in `src/Application/Handlers/Plays/`
+- [x] Create `Command.php` in `src/Application/Handlers/Plays/CreatePlay/`
+  - Fields: userId (Uuid), name (?string), players (array), gameId (?Uuid),
+    startedAt (?DateTime), finishedAt (?DateTime), visibility (string)
+- [x] Create `Handler.php` in `src/Application/Handlers/Plays/CreatePlay/`
+  - Inject: Plays, Mates, Games, PlayersFactory, UuidGenerator, ClockInterface
+  - Validate: no duplicate mateIds, each mate exists and belongs to user, mate not deleted
   - Validate: gameId exists if provided
-  - Build Play::create() with Player entities
+  - Build Play::create() with Player entities via PlayersFactory
+  - If finishedAt provided, immediately finalize
   - Return Result with sessionId
-- [ ] Create `Result.php` in `src/Application/Handlers/Plays/CreateSession/`
-  - Field: sessionId (string)
-- [ ] Register in `config/common/bus.php`
-- [ ] Verify: `composer lp:run && composer ps:run`
+- [x] Create `Result.php` in `src/Application/Handlers/Plays/CreatePlay/`
+- [x] Rename `CloseSession` to `FinalizePlay`
+- [x] Create `FinalizePlay/Handler.php` -- finds play, validates ownership, finalizes
+- [x] Create `UpdatePlay/` -- Command, Handler, Result for updating draft sessions
+- [x] Register all 3 handlers in `config/common/bus.php`
+- [x] Verify: `composer lp:run && composer ps:run`
 
 Details: [stage-3-application.md](./stage-3-application.md)
 
@@ -87,15 +95,17 @@ Details: [stage-3-application.md](./stage-3-application.md)
 
 **Dependencies:** Stage 3
 
-- [ ] Add POST `/v1/plays` to `config/common/openapi/plays.php`
-  - x-message: CreateSession\Command
+- [x] Add POST `/v1/plays/sessions` to `config/common/openapi/plays.php`
+  - x-message: CreatePlay\Command
   - x-interceptors: AuthInterceptor
   - x-auth: userId
   - Request body schema with players array, game_id, visibility, etc.
   - OpenAPI validation for players (minItems: 1)
-- [ ] Add serialization mapping in `config/_serialise-mapping.php`
-  - CreateSession\Result -> {id: sessionId}
-- [ ] Verify: `composer lp:run && composer ps:run`
+- [x] Add PUT `/v1/plays/sessions/{id}` -- UpdatePlay endpoint
+- [x] Add PATCH `/v1/plays/sessions/{id}` -- FinalizePlay endpoint
+- [x] Add serialization mappings in `config/_serialise-mapping.php`
+  - CreatePlay\Result, FinalizePlay\Result, UpdatePlay\Result
+- [x] Verify: `composer lp:run && composer ps:run`
 
 Details: [stage-4-api.md](./stage-4-api.md)
 
@@ -105,21 +115,12 @@ Details: [stage-4-api.md](./stage-4-api.md)
 
 **Dependencies:** All previous stages
 
-- [ ] Functional tests in `tests/Functional/Plays/CreateSessionCest.php`
-  - Success: create with all fields
-  - Success: create with minimal fields (defaults)
-  - Error: empty players array
-  - Error: non-existent mateId
-  - Error: mate belongs to another user
-  - Error: duplicate mateId in players
-- [ ] Web acceptance tests in `tests/Web/PlaysCest.php`
-  - POST /v1/plays with valid data returns 200
-  - POST /v1/plays without token returns 401
-  - POST /v1/plays with empty players returns 422
-- [ ] Run `composer scan:all` (MANDATORY)
-- [ ] Run `composer dt:run` (architecture check)
-- [ ] Run `composer test:func` (functional tests)
-- [ ] Review code for simplification
+- [x] Functional tests: CreatePlayCest, FinalizePlayCest, UpdatePlayCest
+- [x] Web acceptance tests: PlaySessionCest (smoke tests with DB assertions)
+- [x] Run `composer scan:all` (MANDATORY)
+- [x] Run `composer dt:run` (architecture check)
+- [x] Run `composer test:func` (functional tests)
+- [x] Review code for simplification
 
 Details: [stage-5-validation.md](./stage-5-validation.md)
 
@@ -148,19 +149,32 @@ make validate-schema # Validate ORM schema
 |------|--------|-------|
 | `src/Domain/Plays/Entities/Visibility.php` | CREATE | 1 |
 | `src/Domain/Plays/Entities/Player.php` | CREATE | 1 |
-| `src/Domain/Plays/Events/PlayCreated.php` | CREATE | 1 |
+| `src/Domain/Plays/Entities/Players.php` | CREATE | 1 |
+| `src/Domain/Plays/Entities/PlayersFactory.php` | CREATE | 1 |
+| `src/Domain/Plays/Entities/EmptyPlayers.php` | CREATE | 1 |
 | `src/Domain/Plays/Entities/Play.php` | MODIFY | 1 |
 | `src/Infrastructure/.../Mapping/Plays/PlayerMapping.php` | CREATE | 2 |
+| `src/Infrastructure/.../Mapping/Plays/PlayerCollection.php` | CREATE | 2 |
+| `src/Infrastructure/.../Mapping/Plays/DoctrinePlayersFactory.php` | CREATE | 2 |
 | `src/Infrastructure/.../Mapping/Plays/PlayMapping.php` | MODIFY | 2 |
-| `src/Infrastructure/Database/Migrations/VersionXXX.php` | AUTO-GEN | 2 |
-| `src/Application/Handlers/Plays/CreateSession/Command.php` | CREATE | 3 |
-| `src/Application/Handlers/Plays/CreateSession/Handler.php` | CREATE | 3 |
-| `src/Application/Handlers/Plays/CreateSession/Result.php` | CREATE | 3 |
+| `config/common/persistence.php` | MODIFY | 2 |
+| `src/Application/Handlers/Plays/CreatePlay/Command.php` | CREATE (rename) | 3 |
+| `src/Application/Handlers/Plays/CreatePlay/Handler.php` | CREATE (rename) | 3 |
+| `src/Application/Handlers/Plays/CreatePlay/Result.php` | CREATE (rename) | 3 |
+| `src/Application/Handlers/Plays/FinalizePlay/Command.php` | CREATE (rename) | 3 |
+| `src/Application/Handlers/Plays/FinalizePlay/Handler.php` | CREATE (rename) | 3 |
+| `src/Application/Handlers/Plays/FinalizePlay/Result.php` | CREATE (rename) | 3 |
+| `src/Application/Handlers/Plays/UpdatePlay/Command.php` | CREATE | 3 |
+| `src/Application/Handlers/Plays/UpdatePlay/Handler.php` | CREATE | 3 |
+| `src/Application/Handlers/Plays/UpdatePlay/Result.php` | CREATE | 3 |
 | `config/common/bus.php` | MODIFY | 3 |
 | `config/common/openapi/plays.php` | MODIFY | 4 |
 | `config/_serialise-mapping.php` | MODIFY | 4 |
-| `tests/Functional/Plays/CreateSessionCest.php` | CREATE | 5 |
-| `tests/Web/PlaysCest.php` | MODIFY | 5 |
+| `tests/Unit/Domain/Plays/Entities/PlayCest.php` | MODIFY | 5 |
+| `tests/Functional/Plays/CreatePlayCest.php` | CREATE (rename) | 5 |
+| `tests/Functional/Plays/FinalizePlayCest.php` | CREATE (rename) | 5 |
+| `tests/Functional/Plays/UpdatePlayCest.php` | CREATE | 5 |
+| `tests/Web/PlaySessionCest.php` | MODIFY | 5 |
 
 ---
 
@@ -168,18 +182,18 @@ make validate-schema # Validate ORM schema
 
 | Stage | Status | Completed | Notes |
 |-------|--------|-----------|-------|
-| 1 | Not Started | - | |
-| 2 | Not Started | - | |
-| 3 | Not Started | - | |
-| 4 | Not Started | - | |
-| 5 | Not Started | - | |
+| 1 | Done | 2026-03-01 | Domain layer with Player, Visibility, Players, PlayersFactory, EmptyPlayers |
+| 2 | Done | 2026-03-01 | PlayerMapping, PlayerCollection, DoctrinePlayersFactory, migration |
+| 3 | Done | 2026-03-01 | CreatePlay, FinalizePlay, UpdatePlay handlers; OpenSession/CloseSession renamed |
+| 4 | Done | 2026-03-01 | 3 endpoints: POST, PUT, PATCH; serialization mappings |
+| 5 | Done | 2026-03-01 | Unit, functional, web tests; scan:all passed |
 
 ---
 
 ## Checkpoints
 
-- [ ] After Stage 1: `feat(plays): add Player entity and Visibility enum`
-- [ ] After Stage 2: `feat(plays): add Player mapping and migration`
-- [ ] After Stage 3: `feat(plays): add CreateSession handler`
-- [ ] After Stage 4: `feat(plays): add POST /v1/plays endpoint`
-- [ ] After Stage 5: `test(plays): add CreateSession tests`
+- [x] After Stage 1: `feat(plays): add Player entity and Visibility enum`
+- [x] After Stage 2: `feat(plays): add Player mapping and migration`
+- [x] After Stage 3: `feat(plays): add CreatePlay, FinalizePlay, UpdatePlay handlers`
+- [x] After Stage 4: `feat(plays): add play session endpoints`
+- [x] After Stage 5: `test(plays): add play session tests`
