@@ -1,0 +1,12 @@
+{
+    "$schema": "vendor-bin/phpbench/vendor/phpbench/phpbench/phpbench.schema.json",
+    "runner.bootstrap": "vendor/autoload.php",
+    "runner.path": "tests/Benchmark",
+    "runner.file_pattern": "*Bench.php",
+    "runner.iterations": 5,
+    "runner.revs": 100,
+    "runner.retry_threshold": 5,
+    "runner.assert": "mode(variant.time.avg) <= mode(baseline.time.avg) +/- 10%",
+    "storage.driver": "xml",
+    "storage.xml_storage_path": "var/.phpbench"
+}

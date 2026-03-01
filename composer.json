@@ -111,7 +111,8 @@
             "@scan:php",
             "@dt:run",
             "@scan:api",
-            "@test:all"
+            "@test:all",
+            "@bm:check"
         ],
         "cs": "vendor-bin/phpcs/vendor/bin/phpcs",
         "cs:fix": "vendor-bin/phpcs/vendor/bin/phpcbf",
@@ -166,6 +167,10 @@
             "php cli/app openapi:export",
             "@oa:v"
         ],
+        "bm": "vendor-bin/phpbench/vendor/bin/phpbench",
+        "bm:run": "@bm run --report=aggregate",
+        "bm:base": "@bm run --tag=baseline --report=aggregate",
+        "bm:check": "@bm run --ref=baseline --report=aggregate",
         "vi": "vendor-bin/semver/vendor/bin/vs-version-increment",
         "vi:major": "@semver major",
         "vi:minor": "@semver minor",
@@ -211,6 +216,10 @@
         "oa": "Alias php-openapi CLI",
         "oa:v": "Validate OpenAPI spec (web/openapi.json) against OpenAPI 3.x schema",
         "oa:run": "Export OpenAPI spec + validate against OpenAPI 3.x schema",
+        "bm": "Alias PHPBench",
+        "bm:run": "Run benchmarks",
+        "bm:base": "Create performance baseline",
+        "bm:check": "Assert no performance regression vs baseline",
         "vi": "Alias vs-version-increment, auto-detect version increment based on commit analysis",
         "vi:major": "Increment major version and update CHANGELOG.md",
         "vi:minor": "Increment minor version and update CHANGELOG.md",

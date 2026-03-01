@@ -8,3 +8,4 @@
 /vendor-bin/**/composer.lock binary
 /var
 /web/openapi.json
+
