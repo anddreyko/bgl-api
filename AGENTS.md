@@ -139,37 +139,13 @@ Presentation  ↗
 
 ## 6. Key Patterns
 
-**Full guide with examples:** `docs/02-onboarding/08-code-conventions.md` section 12
+**Full guide with examples:** `docs/02-onboarding/08-code-conventions.md`
 
-### Design Patterns
-
-| Pattern       | Where                                                                                  |
-|---------------|----------------------------------------------------------------------------------------|
-| **Decorator** | Aspects (Logging, Transactional) wrap handlers; InterceptorPipeline decorates HTTP req  |
-| **Bridge**    | Ports in Domain/Core, adapters in Infrastructure (Tokenizer, Repositories, Filters)     |
-| **Adapter**   | External libs → domain contracts (Tactician, Valinor, League OpenAPI, Ramsey UUID)      |
-| **Proxy**     | Doctrine lazy-loading collections; test doubles (FakePasskeyVerifier, PlainTokenizer)   |
-| **RAII**      | Transactional aspect manages DB tx lifecycle; handlers never call begin/commit/rollback  |
-
-### Aspects (Middleware)
-
-Configured in DI container as middleware, NOT as attributes:
-
-```php
-$commandBus = new CommandBus([
-    new TacticianWrapMiddleware(Logging::class, $container),
-    new TacticianWrapMiddleware(Transactional::class, $container),
-    new CommandHandlerMiddleware(...),
-]);
-```
-
-### Domain Events
-
-Processed within transactions but NOT stored (no Event Sourcing in MVP). See ADR-006.
-
-### Testing Trophy
-
-Priority: Static Analysis → Integration → Unit → E2E. Integration tests = main confidence source.
+- **Design Patterns:** Decorator (Aspects), Bridge (Ports & Adapters), Adapter (external libs), Proxy (lazy-loading), RAII (Transactional) -- see section 12
+- **Persistence (ORM-agnostic):** zero ORM deps on Entity, mapping in Infrastructure, ORM swappable via DI, lazy loading + batch ops required -- see section 14
+- **Aspects:** configured in DI as middleware, NOT as attributes
+- **Domain Events:** processed within transactions, NOT stored (no Event Sourcing in MVP). See ADR-006
+- **Testing Trophy:** Static Analysis -> Integration -> Unit -> E2E. Integration = main confidence source
 
 ---
 
@@ -227,154 +203,70 @@ No domain services. Cross-context interaction only via Domain Events. See `docs/
 
 ---
 
-## 8. Workflow
+## 8. Workflow & Testing
 
-**See full workflow guide:** `docs/02-onboarding/05-workflow.md`
+**Full guides:** `docs/02-onboarding/05-workflow.md`, `docs/02-onboarding/04-testing.md`
 
-### Quick Reference
+### Quality Gates
 
-| Stage         | Command                              | Required      |
-|---------------|--------------------------------------|---------------|
-| Before commit | `composer lp:run`, `composer ps:run` | Yes           |
-| Before push   | `composer scan:all`                  | **MANDATORY** |
+- **Before commit:** `composer lp:run`, `composer ps:run`
+- **Before push:** `composer scan:all` -- **MANDATORY**
 
 ### Testing Order (Trophy)
 
 1. Static Analysis: `composer lp:run`, `composer ps:run`, `composer dt:run`
-2. Functional & Integration Tests: `composer test:func`, `composer test:intg` — **main focus**
-3. Unit Tests: `composer test:unit` — complex logic only
+2. Functional & Integration Tests: `composer test:func`, `composer test:intg` -- **main focus**
+3. Unit Tests: `composer test:unit` -- complex logic only
 4. Acceptance Tests: `composer test:web`, `composer test:cli`
-5. Mutation Testing: `composer in:ps`
 
-### TDD Rules
+### TDD
 
-| When                                | Approach          |
-|-------------------------------------|-------------------|
-| New functionality OR tests exist    | Use TDD           |
-| Bug fix / refactoring without tests | Write tests after |
+- New functionality OR tests exist -- TDD
+- Bug fix / refactoring without tests -- write tests after
+- **All new classes MUST have test coverage**
 
-### Test Placement
+### BDD (Cli & Web)
 
-See detailed guide: `docs/02-onboarding/04-testing.md` (layer mapping table, test doubles, examples).
-
-**All new classes MUST have test coverage.**
-
----
-
-## 9. BDD Testing (Cli & Web)
-
-See detailed guide: `docs/02-onboarding/04-testing.md` (section "BDD Testing")
-
-**Key points:**
-
-- Register steps in `Cli.suite.yml` / `Web.suite.yml` under `gherkin.contexts.tag`
-- Use explicit data tables in feature files, not hidden data in steps
-- Target 20-30 reusable steps, use `data-test` attributes for selectors
-- Each feature should have 15+ scenarios covering all roles, edge cases, errors
 - Write scenarios BEFORE implementation
+- Register steps in suite configs under `gherkin.contexts.tag`
+- Explicit data tables in feature files, 15+ scenarios per feature
 
 ---
 
 ## 10. Documentation
 
-### Location
+**Location:** `docs/` -- `01-project-overview/`, `02-onboarding/`, `03-decisions/` (ADRs), `04-feature-requests/`
 
-```
-docs/
-├── 01-project-overview/     # Vision, business domain, glossary
-├── 02-onboarding/           # Quick start, tooling, structure, testing, workflow
-├── 03-decisions/            # ADRs (architectural decisions)
-└── 04-feature-requests/     # Task specifications
-```
-
-### MANDATORY: Update Documentation on Changes
-
-**When project structure changes, documentation MUST BE updated:**
-
-| Change Type                              | Files to Update                                              |
-|------------------------------------------|--------------------------------------------------------------|
-| New Bounded Context                      | `02-business-domain.md`, `03-structure.md`, `03-glossary.md` |
-| New Entity/Aggregate                     | `02-business-domain.md`                                      |
-| Architecture decision                    | Create new ADR in `03-decisions/`                            |
-| New tool or command, new composer script | `02-tooling.md`, this file (AGENTS.md)                       |
-| Layer structure change                   | `03-structure.md`                                            |
-| Testing approach change                  | `04-testing.md`                                              |
-| Workflow/Git process change              | `05-workflow.md`                                             |
-| AI commands or build process change      | `06-ai-development.md`                                       |
+**MANDATORY:** When project structure changes, update corresponding docs. Architecture decisions go to `03-decisions/` as ADRs.
 
 ---
 
 ## 11. AI Agent Instructions
 
-### WORKFLOW (follow in order)
+### Workflow
 
-1. **START** — Verify you're in project root directory
+1. Read context: this file, Beads (`bd list`), relevant ADRs
+2. Identify Bounded Context, verify dependency rules (section 4)
+3. Implement: correct layer (section 3), layer rules (section 7), ONLY `composer` commands
+4. Test: Testing Trophy (section 8), integration first
+5. Before commit: `composer lp:run` + `composer ps:run` must pass, `git add` each file
+6. Before push: `composer scan:all` -- **MANDATORY**
+7. After structural changes: update docs (section 10)
 
-2. **READ CONTEXT**
-    - This file (`AGENTS.md`) — architecture, rules, commands
-    - Beads (`bd list`, `bd show {ID}`) — task tracking, descriptions, dependencies
-    - Relevant ADRs in `docs/03-decisions/`
-    - For new agents: `docs/01-project-overview/` (vision, domain, glossary)
+### Constraints
 
-3. **BEFORE CODING**
-    - Identify Bounded Context
-    - Verify dependency rules (section 4)
+- ONLY `composer` commands -- never vendor/bin directly
+- English only in docs, comments, commits. No emojis
+- All new classes MUST have test coverage
+- Dependency law -- outer depends on inner, never reverse
+- Documentation sync -- always update docs when structure changes
 
-4. **IMPLEMENT**
-    - Place code in correct layer (section 3)
-    - Follow layer rules (section 7)
-    - Use ONLY `composer` commands (section 2)
+### Session Completion
 
-5. **TEST** — Follow Testing Trophy (section 8). Integration tests first.
-
-6. **BEFORE COMMIT**
-    - Run `composer lp:run` — must pass
-    - Run `composer ps:run` — must pass
-   - **Add all created/modified files to git:** `git add <file>` for each file
-   - Stage files incrementally as you work, not all at once at the end
-
-7. **BEFORE PUSH**
-    - Run `composer scan:all` — **MANDATORY**, must pass
-
-8. **AFTER STRUCTURAL CHANGES**
-    - Update documentation per section 10
-    - Update this file if commands changed
-
-9. **REVIEW** — Simplify implementation where possible
-
-### CONSTRAINTS
-
-- **ONLY `composer` commands** — never run vendor/bin directly
-- **Git staging required** — always `git add <file>` for created/modified files before commit
-- **Documentation sync** — always update docs when structure changes
-- **English only** — all documentation, comments, and commit messages must be in English
-- **No emojis** — never use emojis in code, documentation, comments, or commit messages
-- **Tests required** — all new classes must have coverage
-- **Dependency law** — outer depends on inner, never reverse
-
----
-
-*This file is the source of truth for AI agents working on BoardGameLog.*
-
-## Landing the Plane (Session Completion)
-
-**When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
-
-**MANDATORY WORKFLOW:**
-
-1. **File issues for remaining work** - Create issues for anything that needs follow-up
-2. **Run quality gates** (if code changed) - Tests, linters, builds
-3. **Update issue status** - Close finished work, update in-progress items
-4. **PUSH TO REMOTE** - This is MANDATORY:
-   ```bash
-   git pull --rebase
-   bd sync
-   git push
-   git status  # MUST show "up to date with origin"
-   ```
-5. **Clean up** - Clear stashes, prune remote branches
-6. **Verify** - All changes committed AND pushed
-7. **Hand off** - Provide context for next session
+1. Create issues for remaining work
+2. Run quality gates
+3. Push: `git pull --rebase && bd sync && git push`
+4. Verify: all changes committed AND pushed
 
 **CRITICAL RULES:**
 
@@ -382,3 +274,7 @@ docs/
 - NEVER stop before pushing - that leaves work stranded locally
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
+
+---
+
+*This file is the source of truth for AI agents working on BoardGameLog.*
