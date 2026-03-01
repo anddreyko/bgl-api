@@ -137,10 +137,17 @@ Presentation  ↗
 
 ## 6. Key Patterns
 
-### Ports & Adapters
+**Full guide with examples:** `docs/02-onboarding/08-code-conventions.md` section 12
 
-Domain defines interfaces, Infrastructure implements:
-`Domain/Sync/PlaySynchronizer` → `Infrastructure/Sync/Bgg/BggPlaySynchronizer`
+### Design Patterns
+
+| Pattern       | Where                                                                                  |
+|---------------|----------------------------------------------------------------------------------------|
+| **Decorator** | Aspects (Logging, Transactional) wrap handlers; InterceptorPipeline decorates HTTP req  |
+| **Bridge**    | Ports in Domain/Core, adapters in Infrastructure (Tokenizer, Repositories, Filters)     |
+| **Adapter**   | External libs → domain contracts (Tactician, Valinor, League OpenAPI, Ramsey UUID)      |
+| **Proxy**     | Doctrine lazy-loading collections; test doubles (FakePasskeyVerifier, PlainTokenizer)   |
+| **RAII**      | Transactional aspect manages DB tx lifecycle; handlers never call begin/commit/rollback  |
 
 ### Aspects (Middleware)
 
@@ -166,22 +173,55 @@ Priority: Static Analysis → Integration → Unit → E2E. Integration tests = 
 
 ## 7. Code Rules
 
+**Full guide with examples:** `docs/02-onboarding/08-code-conventions.md`
+
 ### General
 
 - PSR-12 strictly
 - `declare(strict_types=1);` in every file
 - `PascalCase` classes, `camelCase` methods/variables, `UPPER_SNAKE_CASE` constants
+- `final` for all concrete classes, `readonly` where possible
+- Constructor property promotion, named arguments for 3+ params
+- Interfaces without prefix/suffix: `Mates`, not `MatesInterface`
+- `#[\Override]` on all methods overriding parent/interface
+
+### Type System
+
+- Generics via docblocks: `@template T`, `@extends Repository<Entity>`, `@implements Message<Result>`
+- `non-empty-string` in docblock for strings that must not be empty
+- No `mixed` unless at external library boundaries
+- **No arrays in public contracts** -- use ClassMap, Iterator/IteratorAggregate, typed collections, or readonly DTO
+- `array` allowed only inside `private` implementation details; exceptions only by project owner
+
+### Domain Context Structure
+
+Aggregate root at context root, child entities in subdirectories. No `Entities/` or `Exceptions/` folders.
+No domain services. Cross-context interaction only via Domain Events. See `docs/02-onboarding/08-code-conventions.md` section 13.
 
 ### By Layer
 
-| Layer         | Location                                       | Rules                                                    |
-|---------------|------------------------------------------------|----------------------------------------------------------|
-| Core          | `Core`                                         | Non-domain contracts                                     |
-| Value Objects | `Core/ValueObjects/`, `Domain/*/ValueObjects/` | Immutable, validate in constructor, return new instances |
-| Entities      | `Domain/*/Entities/`                           | Rich objects, private props, no deps except Enums        |
-| Repositories  | Contracts: Domain, Adapters: Infrastructure    | Return Entities/VOs/scalars, no business logic           |
-| Handlers      | `Application/Handlers/`                        | One handler = one use case, coordinate Domain + Infra    |
-| Presentation  | `Presentation/Web/`, `Presentation/Cli/`       | Thin: input → Message → MessageBus → response            |
+| Layer         | Location                                       | Rules                                                              |
+|---------------|------------------------------------------------|--------------------------------------------------------------------|
+| Core          | `Core`                                         | Non-domain contracts, shared Value Objects                         |
+| Value Objects | `Core/ValueObjects/`, `Domain/*/`              | `final readonly`, validate in constructor, immutable               |
+| Entities      | `Domain/*/`, `Domain/*/{ChildEntity}/`         | Private ctor + `static create()`, business methods, no setters     |
+| Enums         | `Domain/*/`                                    | `enum Name: string`, lowercase backing values                      |
+| Repositories  | Contracts: `Domain/*/`, Impl: Infrastructure   | **Collections.** Return Entity/VO/scalar (last resort), no DTO     |
+| Handlers      | `Application/Handlers/`                        | `MessageHandler<R, M>` universal contract, one handler = one case  |
+| Results       | `Application/Handlers/`                        | Type-safe objects (VO, entities), NOT primitives-only              |
+| Presentation  | `Presentation/Api/`, `Presentation/Console/`   | Entity→JSON mapping here (middleware/handler), RESTful strictly    |
+
+### Exceptions (hybrid)
+
+- Core (`\RuntimeException`): `NotFoundException`, `AccessDeniedException`, `AuthenticationException`
+- Domain (`\DomainException`): per-context named subclasses (`PlayNotDraftException`, etc.)
+- **Never** throw bare `\DomainException` or `\RuntimeException`
+
+### RESTful API
+
+- URL: `/v1/{resource}/{id}`, plural nouns, no verbs
+- Response envelope: `{ "code": 0, "data": {...} }` / `{ "code": 1, "message": "..." }`
+- Logging strictly by categories via Logging aspect
 
 ---
 
