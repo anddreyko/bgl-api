@@ -14,7 +14,7 @@ use Bgl\Domain\Games\Entities\Games;
 use Bgl\Domain\Mates\Entities\Mates;
 use Bgl\Domain\Plays\Entities\Play;
 use Bgl\Domain\Plays\Entities\Player;
-use Bgl\Domain\Plays\Entities\Players;
+use Bgl\Domain\Plays\Entities\PlayersFactory;
 use Bgl\Domain\Plays\Entities\Plays;
 use Bgl\Domain\Plays\Entities\Visibility;
 use Psr\Clock\ClockInterface;
@@ -26,9 +26,9 @@ final readonly class Handler implements MessageHandler
 {
     public function __construct(
         private Plays $plays,
-        private Players $players,
         private Mates $mates,
         private Games $games,
+        private PlayersFactory $playersFactory,
         private UuidGenerator $uuidGenerator,
         private ClockInterface $clock,
     ) {
@@ -53,7 +53,7 @@ final readonly class Handler implements MessageHandler
             userId: $command->userId,
             name: $command->name,
             startedAt: $command->startedAt ?? new DateTime($this->clock->now()),
-            players: $this->players,
+            players: $this->playersFactory->createEmpty(),
             gameId: $command->gameId,
             visibility: Visibility::from($command->visibility),
         );
