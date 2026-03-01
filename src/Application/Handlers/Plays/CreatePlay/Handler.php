@@ -106,8 +106,16 @@ final readonly class Handler implements MessageHandler
                 throw new \Bgl\Domain\Plays\DuplicatePlayerException();
             }
             $mateIds[$mateId] = true;
+        }
 
-            $mate = $this->mates->find($mateId);
+        /** @var array<string, \Bgl\Domain\Mates\Mate> $matesById */
+        $matesById = [];
+        foreach ($this->mates->findByIds(array_keys($mateIds)) as $mate) {
+            $matesById[(string)$mate->getId()] = $mate;
+        }
+
+        foreach (array_keys($mateIds) as $mateId) {
+            $mate = $matesById[$mateId] ?? null;
             if ($mate === null) {
                 throw new NotFoundException('Mate not found: ' . $mateId);
             }

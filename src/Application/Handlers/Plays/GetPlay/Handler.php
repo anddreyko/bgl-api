@@ -75,11 +75,15 @@ final readonly class Handler implements MessageHandler
             throw new AuthenticationException('Unauthorized');
         }
 
+        $mateIds = [];
         /** @var Player $player */
         foreach ($play->getPlayers() as $player) {
-            /** @var Mate|null $mate */
-            $mate = $this->mates->find((string)$player->getMateId());
-            if ($mate !== null && (string)$mate->getUserId() === $userId) {
+            $mateIds[] = (string)$player->getMateId();
+        }
+
+        /** @var Mate $mate */
+        foreach ($this->mates->findByIds($mateIds) as $mate) {
+            if ((string)$mate->getUserId() === $userId) {
                 return;
             }
         }

@@ -29,7 +29,7 @@ interface Repository extends \Countable
     /**
      * @param list<string> $ids
      *
-     * @return list<TEntity>
+     * @return list<TEntity> Order is not guaranteed to match input
      */
     public function findByIds(array $ids): array;
 }
