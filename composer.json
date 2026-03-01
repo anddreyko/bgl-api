@@ -32,6 +32,7 @@
         "ext-simplexml": "*",
         "composer": "2.*",
         "devizzent/cebe-php-openapi": "^1.1",
+        "doctrine/collections": "^2.6",
         "doctrine/dbal": "^4.3",
         "doctrine/migrations": "^3.9",
         "doctrine/orm": "^3.5",
