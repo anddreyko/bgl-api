@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Bgl\Infrastructure\Persistence\InMemory;
 
 use Bgl\Core\Listing\Fields\AnyFieldAccessor;
-use Bgl\Domain\Games\Entities\Game;
-use Bgl\Domain\Games\Entities\Games;
+use Bgl\Domain\Games\Game;
+use Bgl\Domain\Games\Games;
 
 /**
  * @extends InMemoryRepository<Game>

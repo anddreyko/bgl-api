@@ -33,14 +33,12 @@ src/
 │   └── ValueObjects/               # Shared Value Objects
 │
 ├── Domain/                         # Business logic (grouped by contexts)
-│   ├── Profile/                    # User identity, profile, settings
-│   │   ├── Entities/
-│   │   └── ValueObjects/
-│   ├── Games/                      # Game catalog (BGG import)
-│   │   └── Entities/
-│   ├── Plays/                      # Play logging, players, mates, locations
-│   │   ├── Entities/
-│   │   └── Events/                 # Domain events
+│   ├── Games/                      # Game catalog (Game, Games)
+│   ├── Mates/                      # Co-player directory (Mate, Mates)
+│   ├── Plays/                      # Play logging (Play, Plays, PlayStatus, Visibility)
+│   │   └── Player/                 # Child entity (Player, Players, PlayersFactory, EmptyPlayers)
+│   ├── Profile/                    # User identity & profile (User, Users, UserId, UserStatus)
+│   │   └── Passkey/                # Child entity (Passkey, Passkeys, PasskeyChallenge, PasskeyChallenges)
 │   ├── Stats/                      # Analytics and reporting
 │   └── Access/                     # Auth methods, device sessions (Phase 4)
 │
@@ -164,10 +162,12 @@ flowchart TD
 
 ## Implementation Rules
 
-### Entities (`Domain/*/Entities/`)
+### Entities (`Domain/{Context}/`)
 
-Rich domain objects with identity and business logic. Depend only on `Core\ValueObjects` and Enums. Properties are
-private, modified through methods. Avoid `null` — use nullable Value Objects or Null-object pattern.
+Rich domain objects with identity and business logic. Aggregate roots and their VOs/enums live at context root
+(`Domain/{Context}/`), child entities in subdirectories (`Domain/{Context}/{ChildEntity}/`). Depend only on
+`Core\ValueObjects` and Enums. Properties are private, modified through methods. Avoid `null` — use nullable Value
+Objects or Null-object pattern.
 
 ```php
 final class Play
@@ -204,7 +204,7 @@ final readonly class Email
 
 ### Repositories
 
-Interface in `Domain/*/Repositories/`. Implementation only in `Infrastructure/Persistence/`. Return Entities, Value
+Interface in `Domain/{Context}/`. Implementation only in `Infrastructure/Persistence/`. Return Entities, Value
 Objects, or scalars. No business logic.
 
 ```php

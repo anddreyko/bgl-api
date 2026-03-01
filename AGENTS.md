@@ -76,10 +76,12 @@ src/
 │   └── ValueObjects/
 │
 ├── Domain/                  # Business logic by Bounded Context
-│   ├── Games/               # Game catalog
-│   ├── Mates/               # Co-player directory
-│   ├── Plays/               # Play logging
-│   ├── Profile/             # User identity & profile
+│   ├── Games/               # Game catalog (Game, Games)
+│   ├── Mates/               # Co-player directory (Mate, Mates)
+│   ├── Plays/               # Play logging (Play, Plays, PlayStatus, Visibility)
+│   │   └── Player/          # Child entity (Player, Players, PlayersFactory, EmptyPlayers)
+│   ├── Profile/             # User identity & profile (User, Users, UserId, UserStatus)
+│   │   └── Passkey/         # Child entity (Passkey, Passkeys, PasskeyChallenge, PasskeyChallenges)
 │   └── Stats/               # Analytics & statistics
 │
 ├── Application/             # Use cases

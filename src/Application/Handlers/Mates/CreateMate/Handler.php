@@ -9,8 +9,8 @@ use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Mates\Entities\Mate;
-use Bgl\Domain\Mates\Entities\Mates;
+use Bgl\Domain\Mates\Mate;
+use Bgl\Domain\Mates\Mates;
 use Psr\Clock\ClockInterface;
 
 /**

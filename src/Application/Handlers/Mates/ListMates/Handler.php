@@ -7,7 +7,7 @@ namespace Bgl\Application\Handlers\Mates\ListMates;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Mates\Entities\Mates;
+use Bgl\Domain\Mates\Mates;
 
 /**
  * @implements MessageHandler<Result, Query>

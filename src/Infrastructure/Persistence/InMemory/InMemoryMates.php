@@ -6,8 +6,8 @@ namespace Bgl\Infrastructure\Persistence\InMemory;
 
 use Bgl\Core\Listing\Fields\AnyFieldAccessor;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Mates\Entities\Mate;
-use Bgl\Domain\Mates\Entities\Mates;
+use Bgl\Domain\Mates\Mate;
+use Bgl\Domain\Mates\Mates;
 
 /**
  * @extends InMemoryRepository<Mate>

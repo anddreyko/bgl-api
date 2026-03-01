@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Domain\Plays\Entities;
+namespace Bgl\Domain\Plays;
 
 /**
  * Play session visibility levels.

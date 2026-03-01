@@ -10,9 +10,9 @@ use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Core\Security\Hasher;
 use Bgl\Core\ValueObjects\Email;
-use Bgl\Domain\Profile\Entities\User;
-use Bgl\Domain\Profile\Entities\Users;
-use Bgl\Domain\Profile\Exceptions\UserAlreadyExistsException;
+use Bgl\Domain\Profile\User;
+use Bgl\Domain\Profile\UserAlreadyExistsException;
+use Bgl\Domain\Profile\Users;
 use Bgl\Core\ValueObjects\DateTime;
 use Psr\Clock\ClockInterface;
 

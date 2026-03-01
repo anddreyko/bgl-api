@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays;
 
-use Bgl\Domain\Plays\Entities\Play;
-use Bgl\Domain\Plays\Entities\Player;
+use Bgl\Domain\Plays\Play;
+use Bgl\Domain\Plays\Player\Player;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\EntityMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 

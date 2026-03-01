@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Domain\Plays\Entities;
+namespace Bgl\Domain\Plays\Player;
 
 use Bgl\Core\ValueObjects\Uuid;
+use Bgl\Domain\Plays\Play;
 
 final readonly class Player
 {

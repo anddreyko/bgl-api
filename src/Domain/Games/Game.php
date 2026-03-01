@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Domain\Games\Entities;
+namespace Bgl\Domain\Games;
 
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;

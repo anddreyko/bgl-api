@@ -9,7 +9,7 @@ use Bgl\Core\Auth\TokenIssuer;
 use Bgl\Core\Auth\TokenPair;
 use Bgl\Core\Security\Tokenizer;
 use Bgl\Core\Security\TokenConfig;
-use Bgl\Domain\Profile\Entities\Users;
+use Bgl\Domain\Profile\Users;
 
 /**
  * @see \Bgl\Tests\Unit\Infrastructure\Auth\JwtTokenIssuerCest

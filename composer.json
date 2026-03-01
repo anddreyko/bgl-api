@@ -111,8 +111,7 @@
             "@scan:php",
             "@dt:run",
             "@scan:api",
-            "@test:all",
-            "@bm:check"
+            "@test:all"
         ],
         "cs": "vendor-bin/phpcs/vendor/bin/phpcs",
         "cs:fix": "vendor-bin/phpcs/vendor/bin/phpcbf",

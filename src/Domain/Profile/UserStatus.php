@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Domain\Profile\Entities;
+namespace Bgl\Domain\Profile;
 
 enum UserStatus: string
 {

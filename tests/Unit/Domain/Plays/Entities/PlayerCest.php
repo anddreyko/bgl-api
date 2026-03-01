@@ -6,14 +6,14 @@ namespace Bgl\Tests\Unit\Domain\Plays\Entities;
 
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Plays\Entities\Play;
-use Bgl\Domain\Plays\Entities\Player;
+use Bgl\Domain\Plays\Play;
+use Bgl\Domain\Plays\Player\Player;
 use Bgl\Infrastructure\Persistence\InMemory\InMemoryPlayers;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 
 /**
- * @covers \Bgl\Domain\Plays\Entities\Player
+ * @covers \Bgl\Domain\Plays\Player\Player
  */
 #[Group('plays', 'player')]
 final class PlayerCest

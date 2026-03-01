@@ -6,7 +6,8 @@ namespace Bgl\Application\Handlers\User\GetUser;
 
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
-use Bgl\Domain\Profile\Entities\Users;
+use Bgl\Domain\Profile\Users;
+use Bgl\Domain\Profile\UserStatus;
 
 /**
  * @implements MessageHandler<Result, Query>
@@ -32,7 +33,7 @@ final readonly class Handler implements MessageHandler
         return new Result(
             id: (string)$user->getId()->getValue(),
             email: $user->getEmail()->getValue() ?? '',
-            isActive: $user->getStatus() === \Bgl\Domain\Profile\Entities\UserStatus::Active,
+            isActive: $user->getStatus() === UserStatus::Active,
             createdAt: $user->getCreatedAt()->getFormattedValue(\DateTimeInterface::ATOM),
             name: $user->getName(),
         );

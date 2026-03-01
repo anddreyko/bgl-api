@@ -12,8 +12,8 @@ use Bgl\Application\Handlers\Mates\UpdateMate;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Mates\Entities\Mate;
-use Bgl\Domain\Mates\Entities\Mates;
+use Bgl\Domain\Mates\Mate;
+use Bgl\Domain\Mates\Mates;
 use Bgl\Tests\Benchmark\BenchHelper;
 use PhpBench\Attributes as Bench;
 

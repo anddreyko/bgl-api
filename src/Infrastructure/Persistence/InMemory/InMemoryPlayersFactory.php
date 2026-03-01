@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\InMemory;
 
-use Bgl\Domain\Plays\Entities\Players;
-use Bgl\Domain\Plays\Entities\PlayersFactory;
+use Bgl\Domain\Plays\Player\Players;
+use Bgl\Domain\Plays\Player\PlayersFactory;
 
 final readonly class InMemoryPlayersFactory implements PlayersFactory
 {

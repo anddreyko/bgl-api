@@ -7,13 +7,13 @@ namespace Bgl\Tests\Unit\Domain\Profile\Entities;
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Profile\Entities\User;
-use Bgl\Domain\Profile\Entities\UserStatus;
+use Bgl\Domain\Profile\User;
+use Bgl\Domain\Profile\UserStatus;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 
 /**
- * @covers \Bgl\Domain\Profile\Entities\User
+ * @covers \Bgl\Domain\Profile\User
  */
 #[Group('auth', 'domain', 'entity')]
 final class UserCest

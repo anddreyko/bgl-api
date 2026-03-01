@@ -10,13 +10,13 @@ use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Games\Entities\Games;
-use Bgl\Domain\Mates\Entities\Mates;
-use Bgl\Domain\Plays\Entities\Play;
-use Bgl\Domain\Plays\Entities\Player;
-use Bgl\Domain\Plays\Entities\PlayersFactory;
-use Bgl\Domain\Plays\Entities\Plays;
-use Bgl\Domain\Plays\Entities\Visibility;
+use Bgl\Domain\Games\Games;
+use Bgl\Domain\Mates\Mates;
+use Bgl\Domain\Plays\Play;
+use Bgl\Domain\Plays\Player\Player;
+use Bgl\Domain\Plays\Player\PlayersFactory;
+use Bgl\Domain\Plays\Plays;
+use Bgl\Domain\Plays\Visibility;
 use Psr\Clock\ClockInterface;
 
 /**

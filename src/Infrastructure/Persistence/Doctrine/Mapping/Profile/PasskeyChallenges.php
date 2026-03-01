@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Profile;
 
-use Bgl\Domain\Profile\Entities\PasskeyChallenge;
-use Bgl\Domain\Profile\Entities\PasskeyChallenges as PasskeyChallengesInterface;
+use Bgl\Domain\Profile\Passkey\PasskeyChallenge;
+use Bgl\Domain\Profile\Passkey\PasskeyChallenges as PasskeyChallengesInterface;
 use Bgl\Infrastructure\Persistence\Doctrine\DoctrineRepository;
 
 /**

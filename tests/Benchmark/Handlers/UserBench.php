@@ -9,8 +9,8 @@ use Bgl\Core\Messages\Envelope;
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Profile\Entities\User;
-use Bgl\Domain\Profile\Entities\Users;
+use Bgl\Domain\Profile\User;
+use Bgl\Domain\Profile\Users;
 use Bgl\Tests\Benchmark\BenchHelper;
 use PhpBench\Attributes as Bench;
 

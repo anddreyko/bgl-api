@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Bgl\Infrastructure\Persistence\InMemory;
 
 use Bgl\Core\Listing\Fields\AnyFieldAccessor;
-use Bgl\Domain\Profile\Entities\User;
-use Bgl\Domain\Profile\Entities\Users;
+use Bgl\Domain\Profile\User;
+use Bgl\Domain\Profile\Users;
 
 /**
  * @extends InMemoryRepository<User>

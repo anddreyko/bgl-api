@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Games\Entities\Game;
+use Bgl\Domain\Games\Game;
 
 return [
     Game::class => static fn(array $data): Game => Game::create(

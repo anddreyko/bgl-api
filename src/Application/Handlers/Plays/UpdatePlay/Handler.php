@@ -8,10 +8,10 @@ use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Games\Entities\Games;
-use Bgl\Domain\Plays\Entities\Play;
-use Bgl\Domain\Plays\Entities\Plays;
-use Bgl\Domain\Plays\Entities\Visibility;
+use Bgl\Domain\Games\Games;
+use Bgl\Domain\Plays\Play;
+use Bgl\Domain\Plays\Plays;
+use Bgl\Domain\Plays\Visibility;
 
 /**
  * @implements MessageHandler<Result, Command>

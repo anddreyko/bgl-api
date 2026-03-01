@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Domain\Profile\Entities;
+namespace Bgl\Domain\Profile\Passkey;
 
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;

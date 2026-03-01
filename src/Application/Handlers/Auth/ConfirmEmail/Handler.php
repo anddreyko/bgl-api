@@ -8,7 +8,7 @@ use Bgl\Core\Auth\Confirmer;
 use Bgl\Core\Auth\InvalidConfirmationTokenException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
-use Bgl\Domain\Profile\Entities\Users;
+use Bgl\Domain\Profile\Users;
 
 /**
  * @implements MessageHandler<string, Command>

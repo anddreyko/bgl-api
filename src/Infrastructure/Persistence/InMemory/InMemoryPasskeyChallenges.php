@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Bgl\Infrastructure\Persistence\InMemory;
 
 use Bgl\Core\Listing\Fields\AnyFieldAccessor;
-use Bgl\Domain\Profile\Entities\PasskeyChallenge;
-use Bgl\Domain\Profile\Entities\PasskeyChallenges;
+use Bgl\Domain\Profile\Passkey\PasskeyChallenge;
+use Bgl\Domain\Profile\Passkey\PasskeyChallenges;
 
 /**
  * @extends InMemoryRepository<PasskeyChallenge>

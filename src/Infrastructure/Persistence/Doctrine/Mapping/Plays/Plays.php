@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays;
 
-use Bgl\Domain\Plays\Entities\Play;
-use Bgl\Domain\Plays\Entities\Plays as PlayRepository;
+use Bgl\Domain\Plays\Play;
+use Bgl\Domain\Plays\Plays as PlayRepository;
 use Bgl\Infrastructure\Persistence\Doctrine\DoctrineRepository;
 
 /**

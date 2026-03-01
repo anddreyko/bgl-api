@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Domain\Mates\Entities;
+namespace Bgl\Domain\Mates;
 
 use Bgl\Core\Collections\Repository;
 use Bgl\Core\Listing\Searchable;

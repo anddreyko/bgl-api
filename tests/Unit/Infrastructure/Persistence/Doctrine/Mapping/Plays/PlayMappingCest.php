@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Unit\Infrastructure\Persistence\Doctrine\Mapping\Plays;
 
-use Bgl\Domain\Plays\Entities\Play;
+use Bgl\Domain\Plays\Play;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\PlayMapping;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;

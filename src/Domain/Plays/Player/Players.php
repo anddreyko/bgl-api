@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Domain\Plays\Entities;
+namespace Bgl\Domain\Plays\Player;
 
 use Bgl\Core\Collections\Repository;
 

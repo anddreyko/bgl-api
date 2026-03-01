@@ -6,8 +6,9 @@ namespace Bgl\Tests\Benchmark\Domain;
 
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Plays\Entities\Play;
-use Bgl\Domain\Plays\Entities\Player;
+use Bgl\Domain\Plays\Play;
+use Bgl\Domain\Plays\Player\Player;
+use Bgl\Domain\Plays\Visibility;
 use Bgl\Infrastructure\Persistence\InMemory\InMemoryPlayers;
 use PhpBench\Attributes as Bench;
 
@@ -113,6 +114,6 @@ final class PlayBench
             players: new InMemoryPlayers(),
         );
 
-        $play->update('Updated name', null, \Bgl\Domain\Plays\Entities\Visibility::Public);
+        $play->update('Updated name', null, Visibility::Public);
     }
 }

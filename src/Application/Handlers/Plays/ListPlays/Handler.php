@@ -17,11 +17,11 @@ use Bgl\Core\Listing\Page\PageSort;
 use Bgl\Core\Listing\Page\SortDirection;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
-use Bgl\Domain\Games\Entities\Game;
-use Bgl\Domain\Games\Entities\Games;
-use Bgl\Domain\Plays\Entities\Play;
-use Bgl\Domain\Plays\Entities\Player;
-use Bgl\Domain\Plays\Entities\Plays;
+use Bgl\Domain\Games\Game;
+use Bgl\Domain\Games\Games;
+use Bgl\Domain\Plays\Play;
+use Bgl\Domain\Plays\Player\Player;
+use Bgl\Domain\Plays\Plays;
 
 /**
  * @implements MessageHandler<Result, Query>

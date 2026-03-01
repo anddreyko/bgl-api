@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Unit\Domain\Plays\Entities;
 
-use Bgl\Domain\Plays\Entities\Visibility;
+use Bgl\Domain\Plays\Visibility;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 
 /**
- * @covers \Bgl\Domain\Plays\Entities\Visibility
+ * @covers \Bgl\Domain\Plays\Visibility
  */
 #[Group('plays', 'visibility')]
 final class VisibilityCest

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Domain\Profile\Entities;
+namespace Bgl\Domain\Profile;
 
 use Bgl\Core\Collections\Repository;
 use Bgl\Core\Listing\Searchable;

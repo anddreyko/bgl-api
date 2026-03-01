@@ -8,7 +8,7 @@ use Bgl\Application\Handlers\Mates\CreateMate\Command;
 use Bgl\Application\Handlers\Mates\CreateMate\Handler;
 use Bgl\Application\Handlers\Mates\CreateMate\Result;
 use Bgl\Core\Messages\Envelope;
-use Bgl\Domain\Mates\Entities\Mates;
+use Bgl\Domain\Mates\Mates;
 use Bgl\Tests\Support\DiHelper;
 use Bgl\Tests\Support\FunctionalTester;
 use Codeception\Attribute\Group;

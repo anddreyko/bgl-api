@@ -9,8 +9,8 @@ use Bgl\Application\Handlers\Games\SearchGames;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Games\Entities\Game;
-use Bgl\Domain\Games\Entities\Games;
+use Bgl\Domain\Games\Game;
+use Bgl\Domain\Games\Games;
 use Bgl\Tests\Benchmark\BenchHelper;
 use PhpBench\Attributes as Bench;
 

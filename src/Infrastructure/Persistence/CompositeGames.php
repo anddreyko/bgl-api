@@ -10,8 +10,8 @@ use Bgl\Core\Listing\Filter\None;
 use Bgl\Core\Listing\Page\PageNumber;
 use Bgl\Core\Listing\Page\PageSize;
 use Bgl\Core\Listing\Page\PageSort;
-use Bgl\Domain\Games\Entities\Game;
-use Bgl\Domain\Games\Entities\Games;
+use Bgl\Domain\Games\Game;
+use Bgl\Domain\Games\Games;
 
 final readonly class CompositeGames implements Games
 {

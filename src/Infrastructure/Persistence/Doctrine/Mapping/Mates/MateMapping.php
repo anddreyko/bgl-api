@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Mates;
 
-use Bgl\Domain\Mates\Entities\Mate;
+use Bgl\Domain\Mates\Mate;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\EntityMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 

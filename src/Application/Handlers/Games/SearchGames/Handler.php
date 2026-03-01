@@ -12,8 +12,8 @@ use Bgl\Core\Listing\Page\PageSort;
 use Bgl\Core\Listing\Page\SortDirection;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
-use Bgl\Domain\Games\Entities\Game;
-use Bgl\Domain\Games\Entities\Games;
+use Bgl\Domain\Games\Game;
+use Bgl\Domain\Games\Games;
 
 /**
  * @implements MessageHandler<Result, Query>

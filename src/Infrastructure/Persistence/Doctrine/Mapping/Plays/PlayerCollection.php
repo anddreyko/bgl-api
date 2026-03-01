@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays;
 
-use Bgl\Domain\Plays\Entities\Player;
-use Bgl\Domain\Plays\Entities\Players;
+use Bgl\Domain\Plays\Player\Player;
+use Bgl\Domain\Plays\Player\Players;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**

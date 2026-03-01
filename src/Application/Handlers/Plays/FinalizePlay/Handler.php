@@ -8,8 +8,8 @@ use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Core\ValueObjects\DateTime;
-use Bgl\Domain\Plays\Entities\Play;
-use Bgl\Domain\Plays\Entities\Plays;
+use Bgl\Domain\Plays\Play;
+use Bgl\Domain\Plays\Plays;
 use Psr\Clock\ClockInterface;
 
 /**

@@ -8,7 +8,7 @@ use Bgl\Core\Auth\TokenIssuer;
 use Bgl\Core\Security\Hasher;
 use Bgl\Core\Security\TokenConfig;
 use Bgl\Core\Security\Tokenizer;
-use Bgl\Domain\Profile\Entities\Users;
+use Bgl\Domain\Profile\Users;
 use Bgl\Infrastructure\Auth\JwtAuthenticator;
 use Bgl\Infrastructure\Auth\JwtTokenIssuer;
 use Bgl\Infrastructure\Auth\WebAuthnPasskeyVerifier;

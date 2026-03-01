@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Profile;
 
-use Bgl\Domain\Profile\Entities\User;
-use Bgl\Domain\Profile\Entities\UserStatus;
+use Bgl\Domain\Profile\User;
+use Bgl\Domain\Profile\UserStatus;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\EntityMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 

@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Domain\Plays\Entities;
+namespace Bgl\Domain\Plays;
 
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
+use Bgl\Domain\Plays\Player\EmptyPlayers;
+use Bgl\Domain\Plays\Player\Player;
+use Bgl\Domain\Plays\Player\Players;
 
 final class Play
 {

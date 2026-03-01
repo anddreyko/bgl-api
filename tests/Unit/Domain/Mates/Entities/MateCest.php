@@ -6,12 +6,12 @@ namespace Bgl\Tests\Unit\Domain\Mates\Entities;
 
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Mates\Entities\Mate;
+use Bgl\Domain\Mates\Mate;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 
 /**
- * @covers \Bgl\Domain\Mates\Entities\Mate
+ * @covers \Bgl\Domain\Mates\Mate
  */
 #[Group('mates', 'mate')]
 final class MateCest

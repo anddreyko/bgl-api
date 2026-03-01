@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Domain\Games\Entities;
+namespace Bgl\Domain\Games;
 
 use Bgl\Core\Collections\Repository;
 use Bgl\Core\Listing\Searchable;

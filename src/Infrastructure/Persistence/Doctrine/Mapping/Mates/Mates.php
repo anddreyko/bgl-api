@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Mates;
 
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Mates\Entities\Mate;
-use Bgl\Domain\Mates\Entities\Mates as MateRepository;
+use Bgl\Domain\Mates\Mate;
+use Bgl\Domain\Mates\Mates as MateRepository;
 use Bgl\Infrastructure\Persistence\Doctrine\DoctrineRepository;
 
 /**

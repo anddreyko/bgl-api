@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Games;
 
-use Bgl\Domain\Games\Entities\Game;
-use Bgl\Domain\Games\Entities\Games as GameRepository;
+use Bgl\Domain\Games\Game;
+use Bgl\Domain\Games\Games as GameRepository;
 use Bgl\Infrastructure\Persistence\Doctrine\DoctrineRepository;
 
 /**

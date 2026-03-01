@@ -6,12 +6,12 @@ namespace Bgl\Tests\Unit\Domain\Profile\Entities;
 
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Profile\Entities\PasskeyChallenge;
+use Bgl\Domain\Profile\Passkey\PasskeyChallenge;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
 
 /**
- * @covers \Bgl\Domain\Profile\Entities\PasskeyChallenge
+ * @covers \Bgl\Domain\Profile\Passkey\PasskeyChallenge
  */
 #[Group('auth', 'domain', 'entity')]
 final class PasskeyChallengeCest

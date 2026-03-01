@@ -6,8 +6,8 @@ namespace Bgl\Application\Handlers\Mates\GetMate;
 
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
-use Bgl\Domain\Mates\Entities\Mate;
-use Bgl\Domain\Mates\Entities\Mates;
+use Bgl\Domain\Mates\Mate;
+use Bgl\Domain\Mates\Mates;
 
 /**
  * @implements MessageHandler<Result, Query>

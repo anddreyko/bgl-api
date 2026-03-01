@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Profile;
 
-use Bgl\Domain\Profile\Entities\PasskeyChallenge;
+use Bgl\Domain\Profile\Passkey\PasskeyChallenge;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\EntityMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 

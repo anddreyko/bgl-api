@@ -12,9 +12,9 @@ use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
-use Bgl\Domain\Profile\Entities\Passkey;
-use Bgl\Domain\Profile\Entities\PasskeyChallenges;
-use Bgl\Domain\Profile\Entities\Passkeys;
+use Bgl\Domain\Profile\Passkey\Passkey;
+use Bgl\Domain\Profile\Passkey\PasskeyChallenges;
+use Bgl\Domain\Profile\Passkey\Passkeys;
 use Psr\Clock\ClockInterface;
 
 /**
@@ -61,7 +61,7 @@ final readonly class Handler implements MessageHandler
         return 'ok';
     }
 
-    private function findChallengeForUser(string $userId): \Bgl\Domain\Profile\Entities\PasskeyChallenge
+    private function findChallengeForUser(string $userId): \Bgl\Domain\Profile\Passkey\PasskeyChallenge
     {
         $challenges = $this->challenges;
         /** @var iterable<array<string, mixed>> $results */

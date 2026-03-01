@@ -9,8 +9,8 @@ use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
-use Bgl\Domain\Profile\Entities\PasskeyChallenge;
-use Bgl\Domain\Profile\Entities\PasskeyChallenges;
+use Bgl\Domain\Profile\Passkey\PasskeyChallenge;
+use Bgl\Domain\Profile\Passkey\PasskeyChallenges;
 
 /**
  * @implements MessageHandler<Result, Command>
