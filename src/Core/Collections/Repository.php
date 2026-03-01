@@ -25,4 +25,11 @@ interface Repository extends \Countable
      * @return TEntity|null
      */
     public function find(string $id): ?object;
+
+    /**
+     * @param list<string> $ids
+     *
+     * @return list<TEntity>
+     */
+    public function findByIds(array $ids): array;
 }

@@ -64,6 +64,25 @@ abstract class DoctrineRepository implements Repository, Searchable
     }
 
     #[\Override]
+    public function findByIds(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        $alias = $this->getAlias();
+
+        /** @var list<TEntity> */
+        return $this->em->createQueryBuilder()
+            ->select($alias)
+            ->from($this->getType(), $alias)
+            ->where("{$alias}.id IN (:ids)")
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult();
+    }
+
+    #[\Override]
     public function search(
         Filter $filter = None::Filter,
         PageSize $size = new PageSize(),

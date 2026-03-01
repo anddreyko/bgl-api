@@ -77,6 +77,23 @@ abstract class InMemoryRepository implements Repository, Searchable
     }
 
     #[\Override]
+    public function findByIds(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($ids as $id) {
+            if (isset($this->entities[$id])) {
+                $result[] = $this->entities[$id];
+            }
+        }
+
+        return $result;
+    }
+
+    #[\Override]
     public function search(
         Filter $filter = None::Filter,
         PageSize $size = new PageSize(),

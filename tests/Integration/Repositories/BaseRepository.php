@@ -42,6 +42,40 @@ abstract class BaseRepository
         $i->assertEquals('1234', $this->getRepository()->find('1234')->getId());
     }
 
+    final public function testFindByIdsReturnsEntities(IntegrationTester $i): void
+    {
+        $entity1 = new TestEntity('1', 'a');
+        $entity2 = new TestEntity('2', 'b');
+        $entity3 = new TestEntity('3', 'c');
+        $repo = $this->getRepository([$entity1, $entity2, $entity3]);
+
+        $result = $repo->findByIds(['1', '3']);
+
+        $i->assertCount(2, $result);
+        $ids = array_map(static fn(object $e): string => $e->getId(), $result);
+        sort($ids);
+        $i->assertEquals(['1', '3'], $ids);
+    }
+
+    final public function testFindByIdsReturnsEmptyForEmptyInput(IntegrationTester $i): void
+    {
+        $repo = $this->getRepository([new TestEntity('1', 'a')]);
+
+        $result = $repo->findByIds([]);
+
+        $i->assertEquals([], $result);
+    }
+
+    final public function testFindByIdsSkipsMissingIds(IntegrationTester $i): void
+    {
+        $repo = $this->getRepository([new TestEntity('1', 'a')]);
+
+        $result = $repo->findByIds(['1', '999']);
+
+        $i->assertCount(1, $result);
+        $i->assertEquals('1', $result[0]->getId());
+    }
+
     final public function testRemove(IntegrationTester $i): void
     {
         $entity = new TestEntity('1234', 'entity 1');

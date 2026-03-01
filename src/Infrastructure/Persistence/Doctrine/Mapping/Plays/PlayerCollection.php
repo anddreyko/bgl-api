@@ -53,4 +53,23 @@ final class PlayerCollection extends ArrayCollection implements Players
 
         return null;
     }
+
+    #[\Override]
+    public function findByIds(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        $idSet = array_flip($ids);
+        $result = [];
+        /** @var Player $player */
+        foreach ($this->toArray() as $player) {
+            if (isset($idSet[(string)$player->getId()])) {
+                $result[] = $player;
+            }
+        }
+
+        return $result;
+    }
 }

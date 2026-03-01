@@ -88,6 +88,24 @@ final class BggGames implements Games
     }
 
     #[\Override]
+    public function findByIds(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($ids as $id) {
+            $game = $this->cache->find($id);
+            if ($game !== null) {
+                $result[] = $game;
+            }
+        }
+
+        return $result;
+    }
+
+    #[\Override]
     public function add(object $entity): void
     {
         throw new \LogicException('BggGames is read-only');

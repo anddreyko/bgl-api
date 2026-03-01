@@ -83,6 +83,12 @@ final readonly class CompositeGames implements Games
     }
 
     #[\Override]
+    public function findByIds(array $ids): array
+    {
+        return $this->local->findByIds($ids);
+    }
+
+    #[\Override]
     public function findByBggId(int $bggId): ?Game
     {
         return $this->local->findByBggId($bggId);

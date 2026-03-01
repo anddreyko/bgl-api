@@ -27,6 +27,12 @@ final class EmptyPlayers implements Players
     }
 
     #[\Override]
+    public function findByIds(array $ids): array
+    {
+        return [];
+    }
+
+    #[\Override]
     public function count(): int
     {
         return 0;
