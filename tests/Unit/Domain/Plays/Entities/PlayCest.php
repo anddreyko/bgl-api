@@ -122,7 +122,7 @@ final class PlayCest
             $startedAt,
             $players,
             $gameId,
-            Visibility::Friends,
+            Visibility::Participants,
         );
 
         $player = Player::create(
@@ -142,7 +142,7 @@ final class PlayCest
         $i->assertSame($startedAt, $play->getStartedAt());
         $i->assertNull($play->getFinishedAt());
         $i->assertSame($gameId, $play->getGameId());
-        $i->assertSame(Visibility::Friends, $play->getVisibility());
+        $i->assertSame(Visibility::Participants, $play->getVisibility());
         $i->assertSame(1, $play->getPlayers()->count());
         $i->assertSame($player, $play->getPlayers()->find((string) $player->getId()));
     }
@@ -160,11 +160,11 @@ final class PlayCest
         );
 
         $newGameId = new Uuid('game-new');
-        $play->update('New name', $newGameId, Visibility::Friends);
+        $play->update('New name', $newGameId, Visibility::Participants);
 
         $i->assertSame('New name', $play->getName());
         $i->assertSame($newGameId, $play->getGameId());
-        $i->assertSame(Visibility::Friends, $play->getVisibility());
+        $i->assertSame(Visibility::Participants, $play->getVisibility());
     }
 
     public function testUpdateWithNulls(UnitTester $i): void

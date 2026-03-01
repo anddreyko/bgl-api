@@ -100,7 +100,7 @@ final class OpenSessionCest
                 ],
                 gameId: $this->gameId,
                 startedAt: new DateTime('2024-06-15 20:00:00'),
-                visibility: 'friends',
+                visibility: 'participants',
             ),
             messageId: 'msg-open-1',
         ));

@@ -32,7 +32,7 @@ return [
                                         'finished_at' => ['type' => 'string', 'format' => 'date-time'],
                                         'visibility' => [
                                             'type' => 'string',
-                                            'enum' => ['private', 'link', 'friends', 'registered', 'public'],
+                                            'enum' => ['private', 'link', 'participants', 'authenticated', 'public'],
                                             'default' => 'private',
                                         ],
                                         'players' => [
@@ -112,7 +112,7 @@ return [
                                         'game_id' => ['type' => 'string', 'format' => 'uuid', 'nullable' => true],
                                         'visibility' => [
                                             'type' => 'string',
-                                            'enum' => ['private', 'link', 'friends', 'registered', 'public'],
+                                            'enum' => ['private', 'link', 'participants', 'authenticated', 'public'],
                                             'default' => 'private',
                                         ],
                                     ],

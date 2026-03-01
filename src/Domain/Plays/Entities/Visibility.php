@@ -15,11 +15,11 @@ enum Visibility: string
     /** Anyone with a direct link can see */
     case Link = 'link';
 
-    /** Owner's mates (co-players) can see */
-    case Friends = 'friends';
+    /** Author + Users linked to Mates in this Play */
+    case Participants = 'participants';
 
-    /** All registered users can see */
-    case Registered = 'registered';
+    /** All authenticated users can see */
+    case Authenticated = 'authenticated';
 
     /** Visible to everyone */
     case Public = 'public';

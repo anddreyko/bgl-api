@@ -80,7 +80,7 @@ final class PlaySessionCest
         // Create play session with players
         $i->sendPost('/v1/plays/sessions', [
             'name' => 'Game night',
-            'visibility' => 'friends',
+            'visibility' => 'participants',
             'players' => [
                 ['mate_id' => $mate1Id, 'score' => 10, 'is_winner' => true, 'color' => 'red'],
                 ['mate_id' => $mate2Id, 'score' => 5, 'is_winner' => false, 'color' => 'blue'],
@@ -95,7 +95,7 @@ final class PlaySessionCest
             'id' => $sessionId,
             'name' => 'Game night',
             'status' => 'draft',
-            'visibility' => 'friends',
+            'visibility' => 'participants',
         ]);
 
         // Verify players persisted in DB via cascade

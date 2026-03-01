@@ -18,8 +18,8 @@ final class VisibilityCest
     {
         $i->assertSame('private', Visibility::Private->value);
         $i->assertSame('link', Visibility::Link->value);
-        $i->assertSame('friends', Visibility::Friends->value);
-        $i->assertSame('registered', Visibility::Registered->value);
+        $i->assertSame('participants', Visibility::Participants->value);
+        $i->assertSame('authenticated', Visibility::Authenticated->value);
         $i->assertSame('public', Visibility::Public->value);
     }
 

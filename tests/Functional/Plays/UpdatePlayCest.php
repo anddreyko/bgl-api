@@ -95,7 +95,7 @@ final class UpdatePlayCest
                 userId: $this->userId,
                 name: 'New name',
                 gameId: $this->gameId,
-                visibility: 'friends',
+                visibility: 'participants',
             ),
             messageId: 'msg-update-1',
         ));
@@ -110,7 +110,7 @@ final class UpdatePlayCest
         $i->assertNotNull($updated);
         $i->assertSame('New name', $updated->getName());
         $i->assertSame((string) $this->gameId, $updated->getGameId()?->getValue());
-        $i->assertSame(Visibility::Friends, $updated->getVisibility());
+        $i->assertSame(Visibility::Participants, $updated->getVisibility());
         $i->assertSame(PlayStatus::Draft, $updated->getStatus());
     }
 
