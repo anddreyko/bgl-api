@@ -26,12 +26,6 @@ final class Passkeys extends DoctrineRepository implements PasskeysInterface
     }
 
     #[\Override]
-    public function getKeys(): array
-    {
-        return ['id'];
-    }
-
-    #[\Override]
     public function findByCredentialId(string $credentialId): ?Passkey
     {
         $qb = $this->getEntityManager()->createQueryBuilder()
@@ -45,7 +39,7 @@ final class Passkeys extends DoctrineRepository implements PasskeysInterface
     }
 
     #[\Override]
-    public function findAllByUserId(string $userId): array
+    public function findAllByUserId(string $userId): iterable
     {
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select('p')

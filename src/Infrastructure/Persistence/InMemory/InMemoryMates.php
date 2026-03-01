@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\InMemory;
 
-use Bgl\Core\Listing\Fields\AnyFieldAccessor;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Mates\Mate;
 use Bgl\Domain\Mates\Mates;
@@ -14,17 +13,6 @@ use Bgl\Domain\Mates\Mates;
  */
 final class InMemoryMates extends InMemoryRepository implements Mates
 {
-    public function __construct()
-    {
-        parent::__construct(new AnyFieldAccessor());
-    }
-
-    #[\Override]
-    public function getKeys(): array
-    {
-        return ['id'];
-    }
-
     #[\Override]
     public function findByUserAndName(Uuid $userId, string $name): ?Mate
     {

@@ -27,12 +27,6 @@ final class Mates extends DoctrineRepository implements MateRepository
     }
 
     #[\Override]
-    public function getKeys(): array
-    {
-        return ['id'];
-    }
-
-    #[\Override]
     public function findByUserAndName(Uuid $userId, string $name): ?Mate
     {
         /** @var Mate|null */

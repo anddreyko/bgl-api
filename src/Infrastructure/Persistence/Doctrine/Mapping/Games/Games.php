@@ -26,12 +26,6 @@ final class Games extends DoctrineRepository implements GameRepository
     }
 
     #[\Override]
-    public function getKeys(): array
-    {
-        return ['id'];
-    }
-
-    #[\Override]
     public function findByBggId(int $bggId): ?Game
     {
         /** @var Game|null */

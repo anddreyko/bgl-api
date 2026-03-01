@@ -26,12 +26,6 @@ final class Users extends DoctrineRepository implements UserRepository
     }
 
     #[\Override]
-    public function getKeys(): array
-    {
-        return ['id'];
-    }
-
-    #[\Override]
     public function findByEmail(string $email): ?User
     {
         $qb = $this->getEntityManager()->createQueryBuilder()

@@ -26,12 +26,6 @@ final class PasskeyChallenges extends DoctrineRepository implements PasskeyChall
     }
 
     #[\Override]
-    public function getKeys(): array
-    {
-        return ['id'];
-    }
-
-    #[\Override]
     public function findByChallenge(string $challenge): ?PasskeyChallenge
     {
         $qb = $this->getEntityManager()->createQueryBuilder()

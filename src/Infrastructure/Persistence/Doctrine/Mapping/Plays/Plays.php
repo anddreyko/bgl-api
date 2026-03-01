@@ -24,10 +24,4 @@ final class Plays extends DoctrineRepository implements PlayRepository
     {
         return 'p';
     }
-
-    #[\Override]
-    public function getKeys(): array
-    {
-        return ['id'];
-    }
 }

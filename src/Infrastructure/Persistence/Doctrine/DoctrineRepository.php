@@ -40,7 +40,10 @@ abstract class DoctrineRepository implements Repository, Searchable
     /**
      * @return list<string> Key field names
      */
-    abstract public function getKeys(): array;
+    public function getKeys(): array
+    {
+        return ['id'];
+    }
 
     #[\Override]
     public function add(object $entity): void
@@ -65,7 +68,7 @@ abstract class DoctrineRepository implements Repository, Searchable
         Filter $filter = None::Filter,
         PageSize $size = new PageSize(),
         PageNumber $number = new PageNumber(1),
-        PageSort $sort = new PageSort([])
+        PageSort $sort = new PageSort()
     ): iterable {
         $limit = $size->getValue();
         if ($limit === 0) {

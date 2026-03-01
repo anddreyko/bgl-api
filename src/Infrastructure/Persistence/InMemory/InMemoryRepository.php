@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bgl\Infrastructure\Persistence\InMemory;
 
 use Bgl\Core\Collections\Repository;
+use Bgl\Core\Listing\Fields\AnyFieldAccessor;
 use Bgl\Core\Listing\Fields\FieldAccessor;
 use Bgl\Core\Listing\Filter;
 use Bgl\Core\Listing\Filter\All;
@@ -26,7 +27,7 @@ abstract class InMemoryRepository implements Repository, Searchable
     private array $entities = [];
 
     public function __construct(
-        private readonly FieldAccessor $accessor
+        private readonly FieldAccessor $accessor = new AnyFieldAccessor(),
     ) {
     }
 
@@ -46,7 +47,10 @@ abstract class InMemoryRepository implements Repository, Searchable
     /**
      * @return list<string> Key field names
      */
-    abstract public function getKeys(): array;
+    public function getKeys(): array
+    {
+        return ['id'];
+    }
 
     #[\Override]
     public function add(object $entity): void
@@ -77,7 +81,7 @@ abstract class InMemoryRepository implements Repository, Searchable
         Filter $filter = None::Filter,
         PageSize $size = new PageSize(),
         PageNumber $number = new PageNumber(1),
-        PageSort $sort = new PageSort([])
+        PageSort $sort = new PageSort()
     ): iterable {
         $entities = $this->entities;
         if ($filter !== All::Filter) {
@@ -130,13 +134,15 @@ abstract class InMemoryRepository implements Repository, Searchable
      */
     private function compare(PageSort $sort): callable
     {
+        $fields = $sort->fields->toArray();
+
         return
             /**
              * @param TEntity $a
              * @param TEntity $b
              */
-            function (array|object $a, array|object $b) use ($sort): int {
-                foreach ($sort->fields as $field => $direction) {
+            function (array|object $a, array|object $b) use ($fields): int {
+                foreach ($fields as $field => $direction) {
                     /** @var string $aValue */
                     $aValue = $this->accessor->get($a, $field);
                     /** @var string $bValue */

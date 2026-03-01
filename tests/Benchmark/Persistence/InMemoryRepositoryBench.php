@@ -11,6 +11,7 @@ use Bgl\Core\Listing\Page\PageNumber;
 use Bgl\Core\Listing\Page\PageSize;
 use Bgl\Core\Listing\Page\PageSort;
 use Bgl\Core\Listing\Page\SortDirection;
+use Bgl\Core\Listing\Page\SortFields;
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Plays\Play;
@@ -71,7 +72,7 @@ final class InMemoryRepositoryBench
         $this->seedPlays(1000);
 
         $filter = new Equals(new Field('userId'), 'bench-user');
-        $sort = new PageSort(['startedAt' => SortDirection::Desc]);
+        $sort = new PageSort(new SortFields(['startedAt' => SortDirection::Desc]));
 
         /** @var iterable<mixed> $results */
         $results = $this->plays->search($filter, new PageSize(20), new PageNumber(1), $sort);

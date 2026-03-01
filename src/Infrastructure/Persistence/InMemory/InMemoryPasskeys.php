@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\InMemory;
 
-use Bgl\Core\Listing\Fields\AnyFieldAccessor;
 use Bgl\Domain\Profile\Passkey\Passkey;
 use Bgl\Domain\Profile\Passkey\Passkeys;
 
@@ -13,17 +12,6 @@ use Bgl\Domain\Profile\Passkey\Passkeys;
  */
 final class InMemoryPasskeys extends InMemoryRepository implements Passkeys
 {
-    public function __construct()
-    {
-        parent::__construct(new AnyFieldAccessor());
-    }
-
-    #[\Override]
-    public function getKeys(): array
-    {
-        return ['id'];
-    }
-
     #[\Override]
     public function findByCredentialId(string $credentialId): ?Passkey
     {
@@ -37,7 +25,7 @@ final class InMemoryPasskeys extends InMemoryRepository implements Passkeys
     }
 
     #[\Override]
-    public function findAllByUserId(string $userId): array
+    public function findAllByUserId(string $userId): iterable
     {
         $result = [];
         foreach ($this->getEntities() as $passkey) {
