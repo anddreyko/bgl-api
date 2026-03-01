@@ -16,6 +16,7 @@ use Bgl\Core\Listing\Filter\Less;
 use Bgl\Core\Listing\Filter\Not;
 use Bgl\Core\Listing\Filter\OrX;
 use Bgl\Core\Listing\FilterVisitor;
+use Bgl\Core\ValueObjects\DateTime;
 
 /**
  * @implements FilterVisitor<\Closure(array|object): bool>
@@ -37,22 +38,22 @@ final readonly class InMemoryFilter implements FilterVisitor
     #[\Override]
     public function equals(Equals $filter): mixed
     {
-        return fn(array|object $entity): bool => $this->resolve($entity, $filter->left)
-            === $this->resolve($entity, $filter->right);
+        return fn(array|object $entity): bool => $this->normalize($this->resolve($entity, $filter->left))
+            === $this->normalize($this->resolve($entity, $filter->right));
     }
 
     #[\Override]
     public function less(Less $filter): mixed
     {
-        return fn(array|object $entity): bool => $this->resolve($entity, $filter->left)
-            < $this->resolve($entity, $filter->right);
+        return fn(array|object $entity): bool => $this->toComparable($this->resolve($entity, $filter->left))
+            < $this->toComparable($this->resolve($entity, $filter->right));
     }
 
     #[\Override]
     public function greater(Greater $filter): mixed
     {
-        return fn(array|object $entity): bool => $this->resolve($entity, $filter->left)
-            > $this->resolve($entity, $filter->right);
+        return fn(array|object $entity): bool => $this->toComparable($this->resolve($entity, $filter->left))
+            > $this->toComparable($this->resolve($entity, $filter->right));
     }
 
     #[\Override]
@@ -92,6 +93,35 @@ final readonly class InMemoryFilter implements FilterVisitor
     {
         if ($value instanceof Field) {
             return $this->accessor->get($entity, $value->field);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Normalize Stringable value objects to string for strict equality.
+     */
+    private function normalize(mixed $value): mixed
+    {
+        if ($value instanceof \Stringable) {
+            return (string)$value;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Convert date/time value objects to timestamps for ordering comparisons.
+     * Non-date values pass through unchanged for native PHP comparison.
+     */
+    private function toComparable(mixed $value): mixed
+    {
+        if ($value instanceof DateTime) {
+            return $value->getNullableValue()?->getTimestamp();
+        }
+
+        if ($value instanceof \DateTimeInterface) {
+            return $value->getTimestamp();
         }
 
         return $value;

@@ -15,6 +15,7 @@ use Bgl\Core\Listing\Page\PageSize;
 use Bgl\Core\Listing\Page\PageSort;
 use Bgl\Core\Serialization\Denormalizer;
 use Bgl\Core\Serialization\Deserializer;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Domain\Games\Entities\Game;
 use Bgl\Domain\Games\Entities\Games;
 use Bgl\Infrastructure\Persistence\InMemory\InMemoryGames;
@@ -112,7 +113,7 @@ final class BggGames implements Games
             return [];
         }
 
-        $now = new \Bgl\Core\ValueObjects\DateTime($this->clock->now());
+        $now = new DateTime($this->clock->now());
         $games = [];
         foreach ($xml as $item) {
             $data = $this->denormalizer->denormalize(

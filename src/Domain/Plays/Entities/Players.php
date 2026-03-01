@@ -8,7 +8,8 @@ use Bgl\Core\Collections\Repository;
 
 /**
  * @extends Repository<Player>
+ * @extends \IteratorAggregate<int, Player>
  */
-interface Players extends Repository
+interface Players extends Repository, \IteratorAggregate
 {
 }

@@ -1,0 +1,141 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Bgl\Application\Handlers\Plays\ListPlays;
+
+use Bgl\Core\Listing\Field;
+use Bgl\Core\Listing\Filter;
+use Bgl\Core\Listing\Filter\AndX;
+use Bgl\Core\Listing\Filter\Equals;
+use Bgl\Core\Listing\Filter\Greater;
+use Bgl\Core\Listing\Filter\Less;
+use Bgl\Core\ValueObjects\DateTime;
+use Bgl\Core\Listing\Page\PageNumber;
+use Bgl\Core\Listing\Page\PageSize;
+use Bgl\Core\Listing\Page\PageSort;
+use Bgl\Core\Listing\Page\SortDirection;
+use Bgl\Core\Messages\Envelope;
+use Bgl\Core\Messages\MessageHandler;
+use Bgl\Domain\Games\Entities\Game;
+use Bgl\Domain\Games\Entities\Games;
+use Bgl\Domain\Plays\Entities\Play;
+use Bgl\Domain\Plays\Entities\Player;
+use Bgl\Domain\Plays\Entities\Plays;
+
+/**
+ * @implements MessageHandler<Result, Query>
+ */
+final readonly class Handler implements MessageHandler
+{
+    public function __construct(
+        private Plays $plays,
+        private Games $games,
+    ) {
+    }
+
+    #[\Override]
+    public function __invoke(Envelope $envelope): Result
+    {
+        /** @var Query $query */
+        $query = $envelope->message;
+
+        $filter = $this->buildFilter($query);
+        $sort = new PageSort(['startedAt' => SortDirection::Desc]);
+
+        $keys = $this->plays->search($filter, new PageSize($query->size), new PageNumber($query->page), $sort);
+        $total = $this->plays->count($filter);
+
+        $data = [];
+        foreach ($keys as $key) {
+            /** @var mixed $rawId */
+            $rawId = $key['id'] ?? null;
+            if ($rawId === null) {
+                continue;
+            }
+
+            /** @var Play|null $play */
+            $play = $this->plays->find((string)$rawId);
+            if ($play === null) {
+                continue;
+            }
+
+            $data[] = $this->transformPlay($play);
+        }
+
+        return new Result(
+            data: $data,
+            total: $total,
+            page: $query->page,
+            size: $query->size,
+        );
+    }
+
+    private function buildFilter(Query $query): Filter
+    {
+        $userFilter = new Equals(new Field('userId'), $query->userId);
+
+        /** @var list<Filter> $extra */
+        $extra = [];
+
+        if ($query->gameId !== null && $query->gameId !== '') {
+            $extra[] = new Equals(new Field('gameId'), $query->gameId);
+        }
+
+        if ($query->from !== null) {
+            $extra[] = new Greater(new Field('startedAt'), new DateTime($query->from));
+        }
+
+        if ($query->to !== null) {
+            $extra[] = new Less(new Field('startedAt'), new DateTime($query->to));
+        }
+
+        if ($extra !== []) {
+            return new AndX([$userFilter, ...$extra]);
+        }
+
+        return $userFilter;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function transformPlay(Play $play): array
+    {
+        $game = null;
+        $gameId = $play->getGameId();
+        if ($gameId !== null) {
+            /** @var Game|null $gameEntity */
+            $gameEntity = $this->games->find((string)$gameId);
+            if ($gameEntity !== null) {
+                $game = [
+                    'id' => (string)$gameEntity->getId(),
+                    'name' => $gameEntity->getName(),
+                ];
+            }
+        }
+
+        $players = [];
+        /** @var Player $player */
+        foreach ($play->getPlayers() as $player) {
+            $players[] = [
+                'id' => (string)$player->getId(),
+                'mate_id' => (string)$player->getMateId(),
+                'score' => $player->getScore(),
+                'is_winner' => $player->isWinner(),
+                'color' => $player->getColor(),
+            ];
+        }
+
+        return [
+            'id' => (string)$play->getId(),
+            'name' => $play->getName(),
+            'status' => $play->getStatus()->value,
+            'visibility' => $play->getVisibility()->value,
+            'started_at' => $play->getStartedAt()->getNullableFormattedValue('c'),
+            'finished_at' => $play->getFinishedAt()?->getNullableFormattedValue('c'),
+            'game' => $game,
+            'players' => $players,
+        ];
+    }
+}

@@ -125,4 +125,34 @@ final class PlaySessionCest
             'status' => 'published',
         ]);
     }
+
+    #[Group('smoke')]
+    public function testListSessionsReturns200(WebTester $i, AuthModule $auth): void
+    {
+        $email = 'plays-list-' . uniqid() . '@test.local';
+        $auth->registerAndLogin($email, 'SecurePass1!');
+
+        // Create a session first
+        $i->sendPost('/v1/plays/sessions');
+        $i->seeResponseCodeIs(200);
+
+        // List sessions
+        $i->sendGet('/v1/plays/sessions');
+        $i->seeResponseCodeIs(200);
+        $i->seeResponseIsJson();
+        $i->seeResponseMatchesJsonType([
+            'data' => [
+                'items' => 'array',
+                'total' => 'integer',
+                'page' => 'integer',
+                'size' => 'integer',
+            ],
+        ]);
+    }
+
+    public function testListSessionsWithoutTokenReturns401(WebTester $i): void
+    {
+        $i->sendGet('/v1/plays/sessions');
+        $i->seeResponseCodeIs(401);
+    }
 }

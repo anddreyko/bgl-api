@@ -31,4 +31,10 @@ final class EmptyPlayers implements Players
     {
         return 0;
     }
+
+    #[\Override]
+    public function getIterator(): \EmptyIterator
+    {
+        return new \EmptyIterator();
+    }
 }

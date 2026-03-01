@@ -23,4 +23,11 @@ final class InMemoryPlayers extends InMemoryRepository implements Players
     {
         return ['id'];
     }
+
+    #[\Override]
+    public function getIterator(): \ArrayIterator
+    {
+        /** @var \ArrayIterator<int, Player> */
+        return new \ArrayIterator(array_values($this->getEntities()));
+    }
 }
