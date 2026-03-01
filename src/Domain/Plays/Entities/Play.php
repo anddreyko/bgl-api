@@ -9,6 +9,9 @@ use Bgl\Core\ValueObjects\Uuid;
 
 final class Play
 {
+    /** @var Players Doctrine replaces with PersistentCollection at hydration */
+    private $players;
+
     public function __construct(
         private readonly Uuid $id,
         private readonly Uuid $userId,
@@ -16,10 +19,10 @@ final class Play
         private PlayStatus $status,
         private readonly DateTime $startedAt,
         private ?DateTime $finishedAt,
-        private readonly Players $players,
         private ?Uuid $gameId = null,
         private Visibility $visibility = Visibility::Private,
     ) {
+        $this->players = new EmptyPlayers();
     }
 
     public static function create(
@@ -31,17 +34,19 @@ final class Play
         ?Uuid $gameId = null,
         Visibility $visibility = Visibility::Private,
     ): self {
-        return new self(
+        $play = new self(
             $id,
             $userId,
             $name,
             PlayStatus::Draft,
             $startedAt,
             null,
-            $players,
             $gameId,
             $visibility,
         );
+        $play->players = $players;
+
+        return $play;
     }
 
     public function getId(): Uuid
