@@ -114,10 +114,12 @@ final class Play
         $this->players->add($player);
     }
 
-    public function getPlayers(): Players
+    /** @return Players */
+    public function getPlayers()
     {
         return $this->players;
     }
+
 
     public function finalize(DateTime $finishedAt): void
     {

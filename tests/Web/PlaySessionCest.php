@@ -32,6 +32,38 @@ final class PlaySessionCest
     }
 
     #[Group('smoke')]
+    public function testGetSessionReturns200ForOwner(WebTester $i, AuthModule $auth): void
+    {
+        $email = 'plays-get-' . uniqid() . '@test.local';
+        $auth->registerAndLogin($email, 'SecurePass1!');
+
+        $i->sendPost('/v1/plays/sessions');
+        $i->seeResponseCodeIs(200);
+        $sessionId = $i->grabDataFromResponseByJsonPath('$.data.session_id')[0];
+
+        $i->sendGet('/v1/plays/sessions/' . $sessionId);
+        $i->seeResponseCodeIs(200);
+        $i->seeResponseIsJson();
+        $i->seeResponseMatchesJsonType([
+            'data' => [
+                'id' => 'string',
+                'status' => 'string',
+                'visibility' => 'string',
+                'started_at' => 'string',
+            ],
+        ]);
+    }
+
+    public function testGetSessionReturns404ForNonExistent(WebTester $i, AuthModule $auth): void
+    {
+        $email = 'plays-get-404-' . uniqid() . '@test.local';
+        $auth->registerAndLogin($email, 'SecurePass1!');
+
+        $i->sendGet('/v1/plays/sessions/00000000-0000-0000-0000-000000000000');
+        $i->seeResponseCodeIs(404);
+    }
+
+    #[Group('smoke')]
     public function testOpenAndCloseSession(WebTester $i, AuthModule $auth): void
     {
         $email = 'plays-' . uniqid() . '@test.local';

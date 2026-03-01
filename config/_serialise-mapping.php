@@ -61,6 +61,16 @@ return [
         'started_at' => $model->startedAt,
         'finished_at' => $model->finishedAt,
     ],
+    Handlers\Plays\GetPlay\Result::class => static fn(Handlers\Plays\GetPlay\Result $model) => [
+        'id' => $model->id,
+        'name' => $model->name,
+        'status' => $model->status,
+        'visibility' => $model->visibility,
+        'started_at' => $model->startedAt,
+        'finished_at' => $model->finishedAt,
+        'game' => $model->game,
+        'players' => $model->players,
+    ],
     Handlers\Mates\CreateMate\Result::class => static fn(Handlers\Mates\CreateMate\Result $model) => [
         'id' => $model->id,
         'name' => $model->name,
