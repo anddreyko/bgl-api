@@ -7,8 +7,9 @@ namespace Bgl\Infrastructure\Auth;
 use Bgl\Core\Auth\AuthenticationException;
 use Bgl\Core\Auth\TokenIssuer;
 use Bgl\Core\Auth\TokenPair;
-use Bgl\Core\Security\Tokenizer;
 use Bgl\Core\Security\TokenConfig;
+use Bgl\Core\Security\Tokenizer;
+use Bgl\Core\Security\TokenPayload;
 use Bgl\Domain\Profile\Users;
 
 /**
@@ -32,12 +33,16 @@ final readonly class JwtTokenIssuer implements TokenIssuer
         }
 
         $accessToken = $this->tokenizer->generate(
-            ['userId' => $userId, 'type' => 'access', 'tokenVersion' => $user->getTokenVersion()],
+            TokenPayload::fromArray(
+                ['userId' => $userId, 'type' => 'access', 'tokenVersion' => $user->getTokenVersion()]
+            ),
             $this->tokenConfig->accessTtl,
         );
 
         $refreshToken = $this->tokenizer->generate(
-            ['userId' => $userId, 'type' => 'refresh', 'tokenVersion' => $user->getTokenVersion()],
+            TokenPayload::fromArray(
+                ['userId' => $userId, 'type' => 'refresh', 'tokenVersion' => $user->getTokenVersion()]
+            ),
             $this->tokenConfig->refreshTtl,
         );
 

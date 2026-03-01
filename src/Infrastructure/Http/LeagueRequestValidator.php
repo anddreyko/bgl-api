@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bgl\Infrastructure\Http;
 
 use Bgl\Core\Http\RequestValidator;
+use Bgl\Core\Validation\ValidationErrors;
 use League\OpenAPIValidation\PSR7\Exception\NoOperation;
 use League\OpenAPIValidation\PSR7\Exception\ValidationFailed;
 use League\OpenAPIValidation\PSR7\ServerRequestValidator as LeagueServerRequestValidator;
@@ -19,24 +20,21 @@ final readonly class LeagueRequestValidator implements RequestValidator
     }
 
     #[\Override]
-    public function validate(ServerRequestInterface $request): array
+    public function validate(ServerRequestInterface $request): ValidationErrors
     {
         try {
             $this->validator->validate($request);
 
-            return [];
+            return ValidationErrors::empty();
         } catch (NoOperation) {
             // Path not in spec -- skip validation (ApiAction handles 404 separately)
-            return [];
+            return ValidationErrors::empty();
         } catch (ValidationFailed $e) {
             return $this->extractErrors($e);
         }
     }
 
-    /**
-     * @return array<string, string[]>
-     */
-    private function extractErrors(ValidationFailed $exception): array
+    private function extractErrors(ValidationFailed $exception): ValidationErrors
     {
         $errors = [];
         $previous = $exception->getPrevious();
@@ -49,11 +47,11 @@ final readonly class LeagueRequestValidator implements RequestValidator
             $errors['_general'][] = $exception->getMessage();
         }
 
-        return $errors;
+        return ValidationErrors::fromArray($errors);
     }
 
     /**
-     * @param array<string, string[]> $errors
+     * @param array<string, list<string>> $errors
      */
     private function collectKeywordErrors(KeywordMismatch $exception, array &$errors): void
     {

@@ -27,7 +27,7 @@ final readonly class Handler implements MessageHandler
 
         $user = $this->users->find($query->userId);
         if ($user === null) {
-            throw new \DomainException('User not found');
+            throw new \Bgl\Core\Exceptions\NotFoundException('User not found');
         }
 
         return new Result(

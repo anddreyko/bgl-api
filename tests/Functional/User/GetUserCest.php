@@ -7,6 +7,7 @@ namespace Bgl\Tests\Functional\User;
 use Bgl\Application\Handlers\User\GetUser\Handler;
 use Bgl\Application\Handlers\User\GetUser\Query;
 use Bgl\Application\Handlers\User\GetUser\Result;
+use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\ValueObjects\DateTime;
@@ -77,7 +78,7 @@ final class GetUserCest
     public function testUserNotFoundThrowsDomainException(FunctionalTester $i): void
     {
         $i->expectThrowable(
-            new \DomainException('User not found'),
+            new NotFoundException('User not found'),
             fn () => ($this->handler)(new Envelope(
                 message: new Query(userId: 'nonexistent-' . uniqid()),
                 messageId: 'msg-2',

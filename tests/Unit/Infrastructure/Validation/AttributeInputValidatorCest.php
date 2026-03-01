@@ -51,7 +51,7 @@ final class AttributeInputValidatorCest
         $result = $this->validator->validate($dto);
 
         $i->assertTrue($result->hasErrors());
-        $i->assertArrayHasKey('name', $result->getErrors());
+        $i->assertTrue($result->getErrors()->hasField('name'));
     }
 
     public function testNotBlankFailsOnWhitespaceOnly(UnitTester $i): void
@@ -66,7 +66,7 @@ final class AttributeInputValidatorCest
         $result = $this->validator->validate($dto);
 
         $i->assertTrue($result->hasErrors());
-        $i->assertArrayHasKey('name', $result->getErrors());
+        $i->assertTrue($result->getErrors()->hasField('name'));
     }
 
     public function testValidEmailFailsOnInvalidEmail(UnitTester $i): void
@@ -81,7 +81,7 @@ final class AttributeInputValidatorCest
         $result = $this->validator->validate($dto);
 
         $i->assertTrue($result->hasErrors());
-        $i->assertArrayHasKey('email', $result->getErrors());
+        $i->assertTrue($result->getErrors()->hasField('email'));
     }
 
     public function testMinLengthFailsOnShortValue(UnitTester $i): void
@@ -96,7 +96,7 @@ final class AttributeInputValidatorCest
         $result = $this->validator->validate($dto);
 
         $i->assertTrue($result->hasErrors());
-        $i->assertArrayHasKey('password', $result->getErrors());
+        $i->assertTrue($result->getErrors()->hasField('password'));
     }
 
     public function testValidUuidFailsOnInvalidUuid(UnitTester $i): void
@@ -111,7 +111,7 @@ final class AttributeInputValidatorCest
         $result = $this->validator->validate($dto);
 
         $i->assertTrue($result->hasErrors());
-        $i->assertArrayHasKey('id', $result->getErrors());
+        $i->assertTrue($result->getErrors()->hasField('id'));
     }
 
     public function testMultipleErrorsAccumulate(UnitTester $i): void
@@ -127,10 +127,10 @@ final class AttributeInputValidatorCest
 
         $i->assertTrue($result->hasErrors());
         $errors = $result->getErrors();
-        $i->assertArrayHasKey('id', $errors);
-        $i->assertArrayHasKey('email', $errors);
-        $i->assertArrayHasKey('name', $errors);
-        $i->assertArrayHasKey('password', $errors);
+        $i->assertTrue($errors->hasField('id'));
+        $i->assertTrue($errors->hasField('email'));
+        $i->assertTrue($errors->hasField('name'));
+        $i->assertTrue($errors->hasField('password'));
     }
 
     public function testObjectWithoutConstructorPasses(UnitTester $i): void
@@ -149,7 +149,7 @@ final class AttributeInputValidatorCest
         $result = $this->validator->validate($dto);
 
         $i->assertTrue($result->hasErrors());
-        $i->assertArrayHasKey('name', $result->getErrors());
+        $i->assertTrue($result->getErrors()->hasField('name'));
     }
 
     public function testMinLengthExactBoundary(UnitTester $i): void

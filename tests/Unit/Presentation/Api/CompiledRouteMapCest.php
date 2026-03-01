@@ -31,7 +31,7 @@ final class CompiledRouteMapCest
 
         $i->assertNotNull($result);
         $i->assertSame(Command::class, $result->operation->messageClass);
-        $i->assertSame([], $result->pathParams);
+        $i->assertSame([], $result->pathParams->toArray());
     }
 
     public function testDynamicRouteMatch(UnitTester $i): void
@@ -48,7 +48,7 @@ final class CompiledRouteMapCest
 
         $i->assertNotNull($result);
         $i->assertSame(Command::class, $result->operation->messageClass);
-        $i->assertSame(['id' => 'abc'], $result->pathParams);
+        $i->assertSame(['id' => 'abc'], $result->pathParams->toArray());
     }
 
     public function testNoMatchReturnsNull(UnitTester $i): void
@@ -95,7 +95,7 @@ final class CompiledRouteMapCest
         $result = $map->match('POST', '/v1/plays/sessions');
 
         $i->assertNotNull($result);
-        $i->assertSame(['userId'], $result->operation->authParams);
+        $i->assertSame(['userId'], $result->operation->authParams->toArray());
     }
 
     public function testParamMapExtracted(UnitTester $i): void
@@ -112,8 +112,8 @@ final class CompiledRouteMapCest
         $result = $map->match('PATCH', '/v1/plays/sessions/abc');
 
         $i->assertNotNull($result);
-        $i->assertSame(['id' => 'sessionId'], $result->operation->paramMap);
-        $i->assertSame(['id' => 'abc'], $result->pathParams);
+        $i->assertSame(['id' => 'sessionId'], $result->operation->paramMap->toArray());
+        $i->assertSame(['id' => 'abc'], $result->pathParams->toArray());
     }
 
     public function testInterceptorsExtracted(UnitTester $i): void

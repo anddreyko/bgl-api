@@ -93,7 +93,7 @@ final class LeagueRequestValidatorCest
 
         $errors = $this->validator->validate($request);
 
-        $i->assertSame([], $errors);
+        $i->assertTrue($errors->isEmpty());
     }
 
     public function testMissingRequiredFieldReturnsError(UnitTester $i): void
@@ -104,7 +104,7 @@ final class LeagueRequestValidatorCest
 
         $errors = $this->validator->validate($request);
 
-        $i->assertNotEmpty($errors);
+        $i->assertFalse($errors->isEmpty());
     }
 
     public function testInvalidEmailFormatReturnsError(UnitTester $i): void
@@ -116,7 +116,7 @@ final class LeagueRequestValidatorCest
 
         $errors = $this->validator->validate($request);
 
-        $i->assertNotEmpty($errors);
+        $i->assertFalse($errors->isEmpty());
     }
 
     public function testMinLengthValidation(UnitTester $i): void
@@ -128,7 +128,7 @@ final class LeagueRequestValidatorCest
 
         $errors = $this->validator->validate($request);
 
-        $i->assertNotEmpty($errors);
+        $i->assertFalse($errors->isEmpty());
     }
 
     public function testOperationWithoutRequestBodyPassesThrough(UnitTester $i): void
@@ -137,7 +137,7 @@ final class LeagueRequestValidatorCest
 
         $errors = $this->validator->validate($request);
 
-        $i->assertSame([], $errors);
+        $i->assertTrue($errors->isEmpty());
     }
 
     public function testUnknownPathSkipsValidation(UnitTester $i): void
@@ -146,7 +146,7 @@ final class LeagueRequestValidatorCest
 
         $errors = $this->validator->validate($request);
 
-        $i->assertSame([], $errors);
+        $i->assertTrue($errors->isEmpty());
     }
 
     public function testPathWithParameterPassesThrough(UnitTester $i): void
@@ -155,7 +155,7 @@ final class LeagueRequestValidatorCest
 
         $errors = $this->validator->validate($request);
 
-        $i->assertSame([], $errors);
+        $i->assertTrue($errors->isEmpty());
     }
 
     public function testTypeValidationForString(UnitTester $i): void
@@ -167,7 +167,7 @@ final class LeagueRequestValidatorCest
 
         $errors = $this->validator->validate($request);
 
-        $i->assertNotEmpty($errors);
+        $i->assertFalse($errors->isEmpty());
     }
 
     /**

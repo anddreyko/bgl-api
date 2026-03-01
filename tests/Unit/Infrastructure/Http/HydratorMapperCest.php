@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Unit\Infrastructure\Http;
 
+use Bgl\Core\Http\AuthParams;
+use Bgl\Core\Http\ParamMap;
 use Bgl\Core\Http\ParameterConflictException;
+use Bgl\Core\Http\PathParams;
 use Bgl\Infrastructure\Http\HydratorMapper;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
@@ -30,8 +33,8 @@ final class HydratorMapperCest
 
         $result = $this->mapper->map($request);
 
-        $i->assertSame('Game Night', $result['name']);
-        $i->assertSame(42, $result['score']);
+        $i->assertSame('Game Night', $result->get('name'));
+        $i->assertSame(42, $result->get('score'));
     }
 
     public function testPathParamsRenamed(UnitTester $i): void
@@ -40,12 +43,12 @@ final class HydratorMapperCest
 
         $result = $this->mapper->map(
             $request,
-            pathParams: ['id' => 'abc'],
-            paramMap: ['id' => 'sessionId'],
+            pathParams: new PathParams(['id' => 'abc']),
+            paramMap: new ParamMap(['id' => 'sessionId']),
         );
 
-        $i->assertSame('abc', $result['sessionId']);
-        $i->assertArrayNotHasKey('id', $result);
+        $i->assertSame('abc', $result->get('sessionId'));
+        $i->assertFalse($result->has('id'));
     }
 
     public function testPathParamsWithoutMapKeepOriginalName(UnitTester $i): void
@@ -54,10 +57,10 @@ final class HydratorMapperCest
 
         $result = $this->mapper->map(
             $request,
-            pathParams: ['token' => 'tok123'],
+            pathParams: new PathParams(['token' => 'tok123']),
         );
 
-        $i->assertSame('tok123', $result['token']);
+        $i->assertSame('tok123', $result->get('token'));
     }
 
     public function testAuthParamsInjected(UnitTester $i): void
@@ -67,10 +70,10 @@ final class HydratorMapperCest
 
         $result = $this->mapper->map(
             $request,
-            authParams: ['userId'],
+            authParams: new AuthParams(['userId']),
         );
 
-        $i->assertSame('user-abc-123', $result['userId']);
+        $i->assertSame('user-abc-123', $result->get('userId'));
     }
 
     public function testAuthParamsNullNotIncluded(UnitTester $i): void
@@ -79,10 +82,10 @@ final class HydratorMapperCest
 
         $result = $this->mapper->map(
             $request,
-            authParams: ['userId'],
+            authParams: new AuthParams(['userId']),
         );
 
-        $i->assertArrayNotHasKey('userId', $result);
+        $i->assertFalse($result->has('userId'));
     }
 
     public function testQueryParamsIncluded(UnitTester $i): void
@@ -92,8 +95,8 @@ final class HydratorMapperCest
 
         $result = $this->mapper->map($request);
 
-        $i->assertSame('2', $result['page']);
-        $i->assertSame('10', $result['limit']);
+        $i->assertSame('2', $result->get('page'));
+        $i->assertSame('10', $result->get('limit'));
     }
 
     public function testAllSourcesCombined(UnitTester $i): void
@@ -105,14 +108,14 @@ final class HydratorMapperCest
 
         $result = $this->mapper->map(
             $request,
-            pathParams: ['id' => 'sess-123'],
-            authParams: ['userId'],
-            paramMap: ['id' => 'sessionId'],
+            pathParams: new PathParams(['id' => 'sess-123']),
+            authParams: new AuthParams(['userId']),
+            paramMap: new ParamMap(['id' => 'sessionId']),
         );
 
-        $i->assertSame('sess-123', $result['sessionId']);
-        $i->assertSame('user-xyz', $result['userId']);
-        $i->assertSame('2025-01-01T12:00:00Z', $result['finishedAt']);
+        $i->assertSame('sess-123', $result->get('sessionId'));
+        $i->assertSame('user-xyz', $result->get('userId'));
+        $i->assertSame('2025-01-01T12:00:00Z', $result->get('finishedAt'));
     }
 
     public function testEmptyRequestReturnsEmpty(UnitTester $i): void
@@ -121,7 +124,7 @@ final class HydratorMapperCest
 
         $result = $this->mapper->map($request);
 
-        $i->assertSame([], $result);
+        $i->assertSame([], $result->toArray());
     }
 
     public function testPathParamConflictWithBodyThrows(UnitTester $i): void
@@ -131,7 +134,7 @@ final class HydratorMapperCest
 
         $i->expectThrowable(ParameterConflictException::class, fn() => $this->mapper->map(
             $request,
-            pathParams: ['id' => 'from-path'],
+            pathParams: new PathParams(['id' => 'from-path']),
         ));
     }
 
@@ -144,7 +147,7 @@ final class HydratorMapperCest
 
         $i->expectThrowable(ParameterConflictException::class, fn() => $this->mapper->map(
             $request,
-            authParams: ['userId'],
+            authParams: new AuthParams(['userId']),
         ));
     }
 }

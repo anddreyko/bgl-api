@@ -110,7 +110,7 @@ final readonly class CompiledRouteMap
                     $params[$name] = $matches[$i + 1] ?? '';
                 }
 
-                return new MatchResult($entry['operation'], $params);
+                return new MatchResult($entry['operation'], new \Bgl\Core\Http\PathParams($params));
             }
         }
 
@@ -143,8 +143,8 @@ final readonly class CompiledRouteMap
         return new CompiledOperation(
             messageClass: $messageClass,
             interceptors: $interceptors,
-            authParams: $authParams,
-            paramMap: $paramMap,
+            authParams: new \Bgl\Core\Http\AuthParams($authParams),
+            paramMap: new \Bgl\Core\Http\ParamMap($paramMap),
             openApiSchema: $operation,
         );
     }

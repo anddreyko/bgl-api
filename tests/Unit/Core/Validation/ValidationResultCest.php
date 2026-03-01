@@ -19,7 +19,8 @@ final class ValidationResultCest
         $result = new ValidationResult();
 
         $i->assertFalse($result->hasErrors());
-        $i->assertSame([], $result->getErrors());
+        $i->assertTrue($result->getErrors()->isEmpty());
+        $i->assertSame([], $result->getErrors()->toArray());
     }
 
     public function testAddErrorReturnsNewInstance(UnitTester $i): void
@@ -44,16 +45,16 @@ final class ValidationResultCest
                 'email' => ['Required', 'Invalid format'],
                 'name' => ['Too short'],
             ],
-            $result->getErrors(),
+            $result->getErrors()->toArray(),
         );
     }
 
     public function testConstructorWithErrors(UnitTester $i): void
     {
         $errors = ['field' => ['Error message']];
-        $result = new ValidationResult($errors);
+        $result = ValidationResult::withErrors($errors);
 
         $i->assertTrue($result->hasErrors());
-        $i->assertSame($errors, $result->getErrors());
+        $i->assertSame($errors, $result->getErrors()->toArray());
     }
 }

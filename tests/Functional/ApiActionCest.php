@@ -7,7 +7,9 @@ namespace Bgl\Tests\Functional;
 use Bgl\Core\Http\RequestValidator;
 use Bgl\Core\Http\SchemaMapper;
 use Bgl\Core\Messages\Dispatcher;
+use Bgl\Core\Serialization\SerializedData;
 use Bgl\Core\Serialization\Serializer;
+use Bgl\Core\Validation\ValidationErrors;
 use Bgl\Presentation\Api\ApiAction;
 use Bgl\Presentation\Api\CompiledRouteMap;
 use Bgl\Presentation\Api\InterceptorPipeline;
@@ -40,7 +42,7 @@ final class ApiActionCest
         $pipeline = new InterceptorPipeline(new Container());
 
         $schemaMapper = Stub::makeEmpty(SchemaMapper::class, [
-            'map' => static fn(): array => ['text' => 'hello'],
+            'map' => static fn(): SerializedData => SerializedData::fromArray(['text' => 'hello']),
         ]);
 
         $dispatcher = Stub::makeEmpty(Dispatcher::class, [
@@ -50,7 +52,7 @@ final class ApiActionCest
         $serializer = Stub::makeEmpty(Serializer::class);
 
         $requestValidator = Stub::makeEmpty(RequestValidator::class, [
-            'validate' => static fn(): array => [],
+            'validate' => ValidationErrors::empty(...),
         ]);
 
         /** @var ObjectMapper $hydrator */
@@ -90,7 +92,7 @@ final class ApiActionCest
         $serializer = Stub::makeEmpty(Serializer::class);
 
         $requestValidator = Stub::makeEmpty(RequestValidator::class, [
-            'validate' => static fn(): array => [],
+            'validate' => ValidationErrors::empty(...),
         ]);
 
         /** @var ObjectMapper $hydrator */
@@ -133,7 +135,7 @@ final class ApiActionCest
         $pipeline = new InterceptorPipeline(new Container());
 
         $schemaMapper = Stub::makeEmpty(SchemaMapper::class, [
-            'map' => static fn(): array => ['text' => 'hello'],
+            'map' => static fn(): SerializedData => SerializedData::fromArray(['text' => 'hello']),
         ]);
 
         $dispatcher = Stub::makeEmpty(Dispatcher::class, [
@@ -145,7 +147,7 @@ final class ApiActionCest
         $serializer = Stub::makeEmpty(Serializer::class);
 
         $requestValidator = Stub::makeEmpty(RequestValidator::class, [
-            'validate' => static fn(): array => [],
+            'validate' => ValidationErrors::empty(...),
         ]);
 
         /** @var ObjectMapper $hydrator */

@@ -19,6 +19,6 @@ interface Searchable
         Filter $filter = None::Filter,
         PageSize $size = new PageSize(),
         PageNumber $number = new PageNumber(1),
-        PageSort $sort = new PageSort([])
+        PageSort $sort = new PageSort()
     ): iterable;
 }

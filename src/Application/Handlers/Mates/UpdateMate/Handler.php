@@ -30,14 +30,14 @@ final readonly class Handler implements MessageHandler
         $mate = $this->mates->find($command->mateId);
 
         if ($mate === null || $mate->isDeleted() || $mate->getUserId()->getValue() !== $command->userId) {
-            throw new \DomainException('Not Found');
+            throw new \Bgl\Core\Exceptions\NotFoundException('Mate not found');
         }
 
         $name = $command->name;
 
         $existing = $this->mates->findByUserAndName(new Uuid($command->userId), $name);
         if ($existing !== null && $existing->getId()->getValue() !== $mate->getId()->getValue()) {
-            throw new \DomainException('Mate with this name already exists');
+            throw new \Bgl\Domain\Mates\MateAlreadyExistsException();
         }
 
         $mate->update($name, $command->notes);

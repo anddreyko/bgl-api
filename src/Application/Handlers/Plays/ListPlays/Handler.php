@@ -15,6 +15,7 @@ use Bgl\Core\Listing\Page\PageNumber;
 use Bgl\Core\Listing\Page\PageSize;
 use Bgl\Core\Listing\Page\PageSort;
 use Bgl\Core\Listing\Page\SortDirection;
+use Bgl\Core\Listing\Page\SortFields;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Domain\Games\Game;
@@ -41,7 +42,7 @@ final readonly class Handler implements MessageHandler
         $query = $envelope->message;
 
         $filter = $this->buildFilter($query);
-        $sort = new PageSort(['startedAt' => SortDirection::Desc]);
+        $sort = new PageSort(new SortFields(['startedAt' => SortDirection::Desc]));
 
         $keys = $this->plays->search($filter, new PageSize($query->size), new PageNumber($query->page), $sort);
         $total = $this->plays->count($filter);

@@ -15,6 +15,9 @@ use Bgl\Core\Listing\Page\PageSize;
 use Bgl\Core\Listing\Page\PageSort;
 use Bgl\Core\Serialization\Denormalizer;
 use Bgl\Core\Serialization\Deserializer;
+use Bgl\Core\Serialization\FieldMapping;
+use Bgl\Core\Serialization\RequiredFields;
+use Bgl\Core\Serialization\SerializedData;
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Domain\Games\Game;
 use Bgl\Domain\Games\Games;
@@ -51,7 +54,7 @@ final class BggGames implements Games
         Filter $filter = None::Filter,
         PageSize $size = new PageSize(),
         PageNumber $number = new PageNumber(1),
-        PageSort $sort = new PageSort([]),
+        PageSort $sort = new PageSort(),
     ): iterable {
         $query = $this->extractSearchQuery($filter);
         if ($query === null) {
@@ -116,20 +119,22 @@ final class BggGames implements Games
         $now = new DateTime($this->clock->now());
         $games = [];
         foreach ($xml as $item) {
-            $data = $this->denormalizer->denormalize(
+            $denormalized = $this->denormalizer->denormalize(
                 $item,
-                $this->searchConfig['mapping'],
-                $this->searchConfig['required'],
+                FieldMapping::fromArray($this->searchConfig['mapping']),
+                RequiredFields::fromArray($this->searchConfig['required']),
             );
-            if ($data === null) {
+            if ($denormalized === null) {
                 continue;
             }
 
-            $data['id'] = $this->uuidGenerator->generate();
-            $data['createdAt'] = $now;
+            $enrichedData = array_merge(
+                $denormalized->toArray(),
+                ['id' => $this->uuidGenerator->generate(), 'createdAt' => $now],
+            );
 
             /** @var Game $game */
-            $game = $this->deserializer->deserialize($data, Game::class);
+            $game = $this->deserializer->deserialize(SerializedData::fromArray($enrichedData), Game::class);
             $games[] = $game;
         }
 

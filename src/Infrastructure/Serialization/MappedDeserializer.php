@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bgl\Infrastructure\Serialization;
 
 use Bgl\Core\Serialization\Deserializer;
+use Bgl\Core\Serialization\SerializedData;
 use EventSauce\ObjectHydrator\ObjectMapper;
 
 final readonly class MappedDeserializer implements Deserializer
@@ -19,14 +20,15 @@ final readonly class MappedDeserializer implements Deserializer
     }
 
     #[\Override]
-    public function deserialize(array $data, string $class): object
+    public function deserialize(SerializedData $data, string $class): object
     {
+        $dataArray = $data->toArray();
         $factory = $this->mapping[$class] ?? null;
         if ($factory !== null) {
             /** @var object */
-            return $factory($data);
+            return $factory($dataArray);
         }
 
-        return $this->hydrator->hydrateObject($class, $data);
+        return $this->hydrator->hydrateObject($class, $dataArray);
     }
 }

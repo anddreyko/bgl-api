@@ -18,6 +18,7 @@ use Bgl\Core\Listing\Page\PageNumber;
 use Bgl\Core\Listing\Page\PageSize;
 use Bgl\Core\Listing\Page\PageSort;
 use Bgl\Core\Listing\Page\SortDirection;
+use Bgl\Core\Listing\Page\SortFields;
 use Bgl\Core\Listing\Searchable;
 use Bgl\Tests\Support\IntegrationTester;
 use Bgl\Tests\Support\Repositories\TestEntity;
@@ -152,7 +153,12 @@ abstract class BaseRepository
             new TestEntity('3', 'c'),
         ]);
 
-        $result = $repository->search(filter: All::Filter, sort: new PageSort(['id' => SortDirection::Desc]));
+        $result = $repository->search(
+            filter: All::Filter,
+            sort: new PageSort(
+            new SortFields(['id' => SortDirection::Desc])
+        )
+        );
 
         $i->assertEquals([
             ['id' => '3'],
@@ -171,7 +177,7 @@ abstract class BaseRepository
 
         $result = $repository->search(
             filter: All::Filter,
-            sort: new PageSort(['value' => SortDirection::Desc, 'id' => SortDirection::Asc])
+            sort: new PageSort(new SortFields(['value' => SortDirection::Desc, 'id' => SortDirection::Asc]))
         );
 
         $i->assertEquals([['id' => '2'], ['id' => '1'], ['id' => '3']], $result);

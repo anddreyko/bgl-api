@@ -14,6 +14,7 @@ use Bgl\Core\Auth\TokenIssuer;
 use Bgl\Core\Auth\TokenPair;
 use Bgl\Core\Auth\UserNotActiveException;
 use Bgl\Core\Security\Hasher;
+use Bgl\Core\Security\TokenPayload;
 use Bgl\Core\Security\Tokenizer;
 use Bgl\Domain\Profile\User;
 use Bgl\Domain\Profile\Users;
@@ -61,7 +62,7 @@ final readonly class JwtAuthenticator implements Authenticator
     {
         $payload = $this->verifyToken($refreshToken);
 
-        if (!isset($payload['type']) || $payload['type'] !== 'refresh') {
+        if ($payload->getString('type') !== 'refresh') {
             throw new InvalidRefreshTokenException();
         }
 
@@ -93,7 +94,8 @@ final readonly class JwtAuthenticator implements Authenticator
     {
         $payload = $this->verifyToken($accessToken);
 
-        if (isset($payload['type']) && $payload['type'] !== 'access') {
+        $type = $payload->getString('type');
+        if ($type !== null && $type !== 'access') {
             throw new AuthenticationException('Unauthorized');
         }
 
@@ -108,10 +110,7 @@ final readonly class JwtAuthenticator implements Authenticator
         return new AuthPayload(userId: $userId);
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    private function verifyToken(string $token): array
+    private function verifyToken(string $token): TokenPayload
     {
         try {
             return $this->tokenizer->verify($token);
@@ -120,16 +119,14 @@ final readonly class JwtAuthenticator implements Authenticator
         }
     }
 
-    /**
-     * @param array<string, mixed> $payload
-     */
-    private function findUserFromPayload(array $payload): User
+    private function findUserFromPayload(TokenPayload $payload): User
     {
-        if (!isset($payload['userId']) || !is_string($payload['userId'])) {
+        $userId = $payload->getString('userId');
+        if ($userId === null) {
             throw new AuthenticationException('Unauthorized');
         }
 
-        $user = $this->users->find($payload['userId']);
+        $user = $this->users->find($userId);
         if ($user === null) {
             throw new AuthenticationException('User not found');
         }
@@ -141,14 +138,9 @@ final readonly class JwtAuthenticator implements Authenticator
         return $user;
     }
 
-    /**
-     * @param array<string, mixed> $payload
-     */
-    private function checkTokenVersion(array $payload, User $user): void
+    private function checkTokenVersion(TokenPayload $payload, User $user): void
     {
-        $payloadVersion = isset($payload['tokenVersion']) && is_int($payload['tokenVersion'])
-            ? $payload['tokenVersion']
-            : 0;
+        $payloadVersion = $payload->getInt('tokenVersion') ?? 0;
 
         if ($payloadVersion !== $user->getTokenVersion()) {
             throw new AuthenticationException('Token has been revoked');

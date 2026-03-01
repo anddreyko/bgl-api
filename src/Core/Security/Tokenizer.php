@@ -6,13 +6,7 @@ namespace Bgl\Core\Security;
 
 interface Tokenizer
 {
-    /**
-     * @param array<string, mixed> $payload
-     */
-    public function generate(array $payload, int $ttlSeconds): string;
+    public function generate(TokenPayload $payload, int $ttlSeconds): string;
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function verify(string $token): array;
+    public function verify(string $token): TokenPayload;
 }

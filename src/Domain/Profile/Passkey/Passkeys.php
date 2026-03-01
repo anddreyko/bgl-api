@@ -15,7 +15,7 @@ interface Passkeys extends Repository, Searchable
     public function findByCredentialId(string $credentialId): ?Passkey;
 
     /**
-     * @return list<Passkey>
+     * @return iterable<Passkey>
      */
-    public function findAllByUserId(string $userId): array;
+    public function findAllByUserId(string $userId): iterable;
 }

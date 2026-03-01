@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Clients\Bgg;
 
+use Bgl\Core\Serialization\DenormalizedData;
 use Bgl\Core\Serialization\Denormalizer;
+use Bgl\Core\Serialization\FieldMapping;
+use Bgl\Core\Serialization\RequiredFields;
 
 final readonly class XmlFieldExtractor implements Denormalizer
 {
     #[\Override]
-    public function denormalize(mixed $source, array $mapping, array $required = []): ?array
-    {
+    public function denormalize(
+        mixed $source,
+        FieldMapping $mapping,
+        RequiredFields $required = new RequiredFields(),
+    ): ?DenormalizedData {
         if (!$source instanceof \SimpleXMLElement) {
             throw new \InvalidArgumentException(
                 sprintf('Expected SimpleXMLElement, got %s', get_debug_type($source)),
@@ -21,13 +27,13 @@ final readonly class XmlFieldExtractor implements Denormalizer
     }
 
     /**
-     * @param array<string, string> $mapping  XML path => field name
-     * @param list<string> $required          Required field names
-     *
-     * @return array<string, string|int|null>|null  null if required fields are missing
+     * @return DenormalizedData|null null if required fields are missing
      */
-    public function extract(\SimpleXMLElement $item, array $mapping, array $required = []): ?array
-    {
+    public function extract(
+        \SimpleXMLElement $item,
+        FieldMapping $mapping,
+        RequiredFields $required = new RequiredFields(),
+    ): ?DenormalizedData {
         $result = [];
         foreach ($mapping as $xmlPath => $fieldName) {
             $result[$fieldName] = $this->resolveXmlPath($item, $xmlPath);
@@ -40,7 +46,7 @@ final readonly class XmlFieldExtractor implements Denormalizer
             }
         }
 
-        return $result;
+        return DenormalizedData::fromArray($result);
     }
 
     private function resolveXmlPath(\SimpleXMLElement $item, string $path): string|int|null

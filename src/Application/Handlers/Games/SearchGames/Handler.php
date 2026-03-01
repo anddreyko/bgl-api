@@ -10,6 +10,7 @@ use Bgl\Core\Listing\Page\PageNumber;
 use Bgl\Core\Listing\Page\PageSize;
 use Bgl\Core\Listing\Page\PageSort;
 use Bgl\Core\Listing\Page\SortDirection;
+use Bgl\Core\Listing\Page\SortFields;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Domain\Games\Game;
@@ -32,7 +33,7 @@ final readonly class Handler implements MessageHandler
         $query = $envelope->message;
 
         $filter = new Contains(new Field('name'), $query->q);
-        $sort = new PageSort(['name' => SortDirection::Asc]);
+        $sort = new PageSort(new SortFields(['name' => SortDirection::Asc]));
 
         $keys = $this->games->search($filter, new PageSize($query->size), new PageNumber($query->page), $sort);
         $total = $this->games->count($filter);

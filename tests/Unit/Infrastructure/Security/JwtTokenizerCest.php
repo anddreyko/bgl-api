@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bgl\Tests\Unit\Infrastructure\Security;
 
 use Bgl\Core\Clock;
+use Bgl\Core\Security\TokenPayload;
 use Bgl\Infrastructure\Security\JwtTokenizer;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
@@ -29,7 +30,7 @@ final class JwtTokenizerCest
 
     public function testGenerateReturnsNonEmptyString(UnitTester $i): void
     {
-        $token = $this->generator->generate(['user_id' => '123'], 3600);
+        $token = $this->generator->generate(TokenPayload::fromArray(['user_id' => '123']), 3600);
 
         $i->assertNotEmpty($token);
         $i->assertIsString($token);
@@ -37,14 +38,14 @@ final class JwtTokenizerCest
 
     public function testGenerateAndVerifyRoundtripReturnsOriginalPayload(UnitTester $i): void
     {
-        $payload = ['user_id' => '123', 'role' => 'admin'];
+        $payload = TokenPayload::fromArray(['user_id' => '123', 'role' => 'admin']);
         $token = $this->generator->generate($payload, 3600);
         $result = $this->generator->verify($token);
 
-        $i->assertArrayHasKey('user_id', $result);
-        $i->assertArrayHasKey('role', $result);
-        $i->assertEquals('123', $result['user_id']);
-        $i->assertEquals('admin', $result['role']);
+        $i->assertTrue($result->has('user_id'));
+        $i->assertTrue($result->has('role'));
+        $i->assertEquals('123', $result->getString('user_id'));
+        $i->assertEquals('admin', $result->getString('role'));
     }
 
     public function testExpiredTokenThrowsException(UnitTester $i): void
@@ -54,7 +55,7 @@ final class JwtTokenizerCest
             secret: 'test-secret-key-that-is-long-enough-for-hmac',
             clock: $pastClock,
         );
-        $token = $pastGenerator->generate(['user_id' => '123'], 60);
+        $token = $pastGenerator->generate(TokenPayload::fromArray(['user_id' => '123']), 60);
 
         $futureClock = new Clock(stub: new \DateTimeImmutable('2024-06-01 00:00:00', new \DateTimeZone('UTC')));
         $futureGenerator = new JwtTokenizer(
@@ -69,7 +70,7 @@ final class JwtTokenizerCest
 
     public function testTamperedTokenThrowsException(UnitTester $i): void
     {
-        $token = $this->generator->generate(['user_id' => '123'], 3600);
+        $token = $this->generator->generate(TokenPayload::fromArray(['user_id' => '123']), 3600);
         $tamperedToken = $token . 'tampered';
 
         $i->expectThrowable(\RuntimeException::class, function () use ($tamperedToken): void {

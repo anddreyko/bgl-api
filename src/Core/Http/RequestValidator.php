@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Core\Http;
 
+use Bgl\Core\Validation\ValidationErrors;
 use Psr\Http\Message\ServerRequestInterface;
 
 interface RequestValidator
@@ -13,7 +14,7 @@ interface RequestValidator
      *
      * @param ServerRequestInterface $request The incoming HTTP request
      *
-     * @return array<string, string[]> Field-level validation errors (empty if valid)
+     * @return ValidationErrors Field-level validation errors (empty if valid)
      */
-    public function validate(ServerRequestInterface $request): array;
+    public function validate(ServerRequestInterface $request): ValidationErrors;
 }

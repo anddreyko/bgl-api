@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Unit\Infrastructure\Clients\Bgg;
 
+use Bgl\Core\Serialization\FieldMapping;
+use Bgl\Core\Serialization\RequiredFields;
 use Bgl\Infrastructure\Clients\Bgg\XmlFieldExtractor;
 use Bgl\Tests\Support\UnitTester;
 use Codeception\Attribute\Group;
@@ -25,27 +27,30 @@ final class XmlFieldExtractorCest
     {
         $xml = new \SimpleXMLElement('<item id="13"><name value="Catan"/><yearpublished value="1995"/></item>');
 
-        $result = $this->extractor->extract($xml, ['@id' => 'bggId']);
+        $result = $this->extractor->extract($xml, FieldMapping::fromArray(['@id' => 'bggId']));
 
-        $i->assertSame(['bggId' => 13], $result);
+        $i->assertNotNull($result);
+        $i->assertSame(['bggId' => 13], $result->toArray());
     }
 
     public function testExtractsAttributeFromChildElement(UnitTester $i): void
     {
         $xml = new \SimpleXMLElement('<item id="13"><name value="Catan"/><yearpublished value="1995"/></item>');
 
-        $result = $this->extractor->extract($xml, ['name@value' => 'name']);
+        $result = $this->extractor->extract($xml, FieldMapping::fromArray(['name@value' => 'name']));
 
-        $i->assertSame(['name' => 'Catan'], $result);
+        $i->assertNotNull($result);
+        $i->assertSame(['name' => 'Catan'], $result->toArray());
     }
 
     public function testReturnsNullForMissingChildElement(UnitTester $i): void
     {
         $xml = new \SimpleXMLElement('<item id="13"><name value="Catan"/></item>');
 
-        $result = $this->extractor->extract($xml, ['description@value' => 'description']);
+        $result = $this->extractor->extract($xml, FieldMapping::fromArray(['description@value' => 'description']));
 
-        $i->assertSame(['description' => null], $result);
+        $i->assertNotNull($result);
+        $i->assertSame(['description' => null], $result->toArray());
     }
 
     public function testReturnsNullWhenRequiredFieldIsMissing(UnitTester $i): void
@@ -54,8 +59,8 @@ final class XmlFieldExtractorCest
 
         $result = $this->extractor->extract(
             $xml,
-            ['description@value' => 'description'],
-            ['description'],
+            FieldMapping::fromArray(['description@value' => 'description']),
+            RequiredFields::fromArray(['description']),
         );
 
         $i->assertNull($result);
@@ -67,8 +72,8 @@ final class XmlFieldExtractorCest
 
         $result = $this->extractor->extract(
             $xml,
-            ['name@value' => 'name'],
-            ['name'],
+            FieldMapping::fromArray(['name@value' => 'name']),
+            RequiredFields::fromArray(['name']),
         );
 
         $i->assertNull($result);
@@ -78,39 +83,42 @@ final class XmlFieldExtractorCest
     {
         $xml = new \SimpleXMLElement('<item id="123"/>');
 
-        $result = $this->extractor->extract($xml, ['@id' => 'bggId']);
+        $result = $this->extractor->extract($xml, FieldMapping::fromArray(['@id' => 'bggId']));
 
-        $i->assertSame(['bggId' => 123], $result);
+        $i->assertNotNull($result);
+        $i->assertSame(['bggId' => 123], $result->toArray());
     }
 
     public function testKeepsNonNumericStringAsString(UnitTester $i): void
     {
         $xml = new \SimpleXMLElement('<item id="13"><name value="Catan"/></item>');
 
-        $result = $this->extractor->extract($xml, ['name@value' => 'name']);
+        $result = $this->extractor->extract($xml, FieldMapping::fromArray(['name@value' => 'name']));
 
-        $i->assertSame(['name' => 'Catan'], $result);
+        $i->assertNotNull($result);
+        $i->assertSame(['name' => 'Catan'], $result->toArray());
     }
 
     public function testFullExtractionMatchingBggSearchConfig(UnitTester $i): void
     {
         $xml = new \SimpleXMLElement('<item id="13"><name value="Catan"/><yearpublished value="1995"/></item>');
 
-        $mapping = [
+        $mapping = FieldMapping::fromArray([
             '@id' => 'bggId',
             'name@value' => 'name',
             'yearpublished@value' => 'yearPublished',
-        ];
+        ]);
 
-        $result = $this->extractor->extract($xml, $mapping, ['bggId', 'name']);
+        $result = $this->extractor->extract($xml, $mapping, RequiredFields::fromArray(['bggId', 'name']));
 
+        $i->assertNotNull($result);
         $i->assertSame(
             [
                 'bggId' => 13,
                 'name' => 'Catan',
                 'yearPublished' => 1995,
             ],
-            $result,
+            $result->toArray(),
         );
     }
 }

@@ -29,7 +29,7 @@ final readonly class Handler implements MessageHandler
         $mate = $this->mates->find($query->mateId);
 
         if ($mate === null || $mate->isDeleted() || $mate->getUserId()->getValue() !== $query->userId) {
-            throw new \DomainException('Not Found');
+            throw new \Bgl\Core\Exceptions\NotFoundException('Mate not found');
         }
 
         return new Result(

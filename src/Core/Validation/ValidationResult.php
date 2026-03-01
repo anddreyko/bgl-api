@@ -6,32 +6,34 @@ namespace Bgl\Core\Validation;
 
 final readonly class ValidationResult
 {
-    /**
-     * @param array<string, list<string>> $errors
-     */
+    private ValidationErrors $errors;
+
     public function __construct(
-        private array $errors = [],
+        ValidationErrors|null $errors = null,
     ) {
+        $this->errors = $errors ?? ValidationErrors::empty();
+    }
+
+    /**
+     * @param array<string, list<string>> $errorsArray
+     */
+    public static function withErrors(array $errorsArray): self
+    {
+        return new self(ValidationErrors::fromArray($errorsArray));
     }
 
     public function hasErrors(): bool
     {
-        return $this->errors !== [];
+        return !$this->errors->isEmpty();
     }
 
-    /**
-     * @return array<string, list<string>>
-     */
-    public function getErrors(): array
+    public function getErrors(): ValidationErrors
     {
         return $this->errors;
     }
 
     public function addError(string $field, string $message): self
     {
-        $errors = $this->errors;
-        $errors[$field][] = $message;
-
-        return new self($errors);
+        return new self($this->errors->withError($field, $message));
     }
 }

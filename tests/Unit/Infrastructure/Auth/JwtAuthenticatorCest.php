@@ -12,6 +12,7 @@ use Bgl\Core\Auth\TokenIssuer;
 use Bgl\Core\Auth\TokenPair;
 use Bgl\Core\Auth\UserNotActiveException;
 use Bgl\Core\Security\Hasher;
+use Bgl\Core\Security\TokenPayload;
 use Bgl\Core\Security\Tokenizer;
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Email;
@@ -143,11 +144,11 @@ final class JwtAuthenticatorCest
 
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
-                'verify' => static fn(): array => [
+                'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
                     'userId' => 'user-id-123',
                     'type' => 'refresh',
                     'tokenVersion' => 1,
-                ],
+                ]),
             ]),
             users: Stub::makeEmpty(Users::class, [
                 'find' => static fn(): User => $user,
@@ -188,10 +189,10 @@ final class JwtAuthenticatorCest
     {
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
-                'verify' => static fn(): array => [
+                'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
                     'userId' => 'user-id-123',
                     'type' => 'access',
-                ],
+                ]),
             ]),
             users: Stub::makeEmpty(Users::class),
             passwordHasher: Stub::makeEmpty(Hasher::class),
@@ -210,7 +211,7 @@ final class JwtAuthenticatorCest
     {
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
-                'verify' => static fn(): array => ['userId' => 'user-id-123'],
+                'verify' => static fn(): TokenPayload => TokenPayload::fromArray(['userId' => 'user-id-123']),
             ]),
             users: Stub::makeEmpty(Users::class),
             passwordHasher: Stub::makeEmpty(Hasher::class),
@@ -229,11 +230,11 @@ final class JwtAuthenticatorCest
     {
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
-                'verify' => static fn(): array => [
+                'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
                     'userId' => 'nonexistent',
                     'type' => 'refresh',
                     'tokenVersion' => 1,
-                ],
+                ]),
             ]),
             users: Stub::makeEmpty(Users::class, [
                 'find' => static fn(): ?User => null,
@@ -254,11 +255,11 @@ final class JwtAuthenticatorCest
     {
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
-                'verify' => static fn(): array => [
+                'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
                     'userId' => 'user-id-123',
                     'type' => 'refresh',
                     'tokenVersion' => 1,
-                ],
+                ]),
             ]),
             users: Stub::makeEmpty(Users::class, [
                 'find' => fn(): User => $this->makeUser(UserStatus::Inactive),
@@ -279,11 +280,11 @@ final class JwtAuthenticatorCest
     {
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
-                'verify' => static fn(): array => [
+                'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
                     'userId' => 'user-id-123',
                     'type' => 'refresh',
                     'tokenVersion' => 5,
-                ],
+                ]),
             ]),
             users: Stub::makeEmpty(Users::class, [
                 'find' => fn(): User => $this->makeUser(),
@@ -342,11 +343,11 @@ final class JwtAuthenticatorCest
     {
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
-                'verify' => static fn(): array => [
+                'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
                     'userId' => 'user-id-123',
                     'type' => 'access',
                     'tokenVersion' => 1,
-                ],
+                ]),
             ]),
             users: Stub::makeEmpty(Users::class, [
                 'find' => fn(): User => $this->makeUser(),
@@ -386,10 +387,10 @@ final class JwtAuthenticatorCest
     {
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
-                'verify' => static fn(): array => [
+                'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
                     'userId' => 'user-id-123',
                     'type' => 'refresh',
-                ],
+                ]),
             ]),
             users: Stub::makeEmpty(Users::class),
             passwordHasher: Stub::makeEmpty(Hasher::class),
@@ -408,10 +409,10 @@ final class JwtAuthenticatorCest
     {
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
-                'verify' => static fn(): array => [
+                'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
                     'userId' => 'user-id-123',
                     'tokenVersion' => 1,
-                ],
+                ]),
             ]),
             users: Stub::makeEmpty(Users::class, [
                 'find' => fn(): User => $this->makeUser(),
@@ -429,7 +430,7 @@ final class JwtAuthenticatorCest
     {
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
-                'verify' => static fn(): array => ['type' => 'access'],
+                'verify' => static fn(): TokenPayload => TokenPayload::fromArray(['type' => 'access']),
             ]),
             users: Stub::makeEmpty(Users::class),
             passwordHasher: Stub::makeEmpty(Hasher::class),
@@ -448,11 +449,11 @@ final class JwtAuthenticatorCest
     {
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
-                'verify' => static fn(): array => [
+                'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
                     'userId' => 'nonexistent',
                     'type' => 'access',
                     'tokenVersion' => 1,
-                ],
+                ]),
             ]),
             users: Stub::makeEmpty(Users::class, [
                 'find' => static fn(): ?User => null,
@@ -473,11 +474,11 @@ final class JwtAuthenticatorCest
     {
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
-                'verify' => static fn(): array => [
+                'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
                     'userId' => 'user-id-123',
                     'type' => 'access',
                     'tokenVersion' => 1,
-                ],
+                ]),
             ]),
             users: Stub::makeEmpty(Users::class, [
                 'find' => fn(): User => $this->makeUser(UserStatus::Inactive),
@@ -498,11 +499,11 @@ final class JwtAuthenticatorCest
     {
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
-                'verify' => static fn(): array => [
+                'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
                     'userId' => 'user-id-123',
                     'type' => 'access',
                     'tokenVersion' => 1,
-                ],
+                ]),
             ]),
             users: Stub::makeEmpty(Users::class, [
                 'find' => fn(): User => $this->makeUser(tokenVersion: 2),

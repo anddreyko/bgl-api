@@ -6,5 +6,5 @@ namespace Bgl\Core\Serialization;
 
 interface Serializer
 {
-    public function serialize(object $data): array;
+    public function serialize(object $data): SerializedData;
 }

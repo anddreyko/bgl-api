@@ -7,8 +7,7 @@ namespace Bgl\Core\Serialization;
 interface Deserializer
 {
     /**
-     * @param array<string, mixed> $data
      * @param class-string $class
      */
-    public function deserialize(array $data, string $class): object;
+    public function deserialize(SerializedData $data, string $class): object;
 }

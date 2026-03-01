@@ -24,11 +24,12 @@ abstract class BaseSerializer
         );
 
         $result = $this->serializer()->serialize($dto);
+        $data = $result->toArray();
 
-        $i->assertIsArray($result);
-        $i->assertEquals('1', $result['id']);
-        $i->assertEquals('John Doe', $result['value']);
-        $i->assertEquals(2, $result['status']);
+        $i->assertIsArray($data);
+        $i->assertEquals('1', $data['id']);
+        $i->assertEquals('John Doe', $data['value']);
+        $i->assertEquals(2, $data['status']);
     }
 
     public function testSerializeObjectWithNullField(IntegrationTester $i): void
@@ -40,11 +41,12 @@ abstract class BaseSerializer
         );
 
         $result = $this->serializer()->serialize($dto);
+        $data = $result->toArray();
 
-        $i->assertIsArray($result);
-        $i->assertEquals('25', $result['id']);
-        $i->assertEquals('Jane Doe', $result['value']);
-        $i->assertNull($result['status']);
+        $i->assertIsArray($data);
+        $i->assertEquals('25', $data['id']);
+        $i->assertEquals('Jane Doe', $data['value']);
+        $i->assertNull($data['status']);
     }
 
     public function testSerializeNestedObject(IntegrationTester $i): void
@@ -60,16 +62,17 @@ abstract class BaseSerializer
         );
 
         $result = $this->serializer()->serialize($dto);
+        $data = $result->toArray();
 
-        $i->assertIsArray($result);
-        $i->assertEquals('1', $result['message_id']);
-        $i->assertEquals('2', $result['parent_id']);
-        $i->assertEquals('3', $result['trace_id']);
-        $i->assertEquals('test', $result['environment']);
-        $i->assertEquals('version', $result['version']);
-        $i->assertEquals('2025-12-31T00:00:00+00:00', $result['datetime']['datetime']);
-        $i->assertEquals('1767139200', $result['datetime']['timestamp']);
-        $i->assertEquals('P7DT5S', $result['delay']['interval']);
-        $i->assertEquals(604805, $result['delay']['seconds']);
+        $i->assertIsArray($data);
+        $i->assertEquals('1', $data['message_id']);
+        $i->assertEquals('2', $data['parent_id']);
+        $i->assertEquals('3', $data['trace_id']);
+        $i->assertEquals('test', $data['environment']);
+        $i->assertEquals('version', $data['version']);
+        $i->assertEquals('2025-12-31T00:00:00+00:00', $data['datetime']['datetime']);
+        $i->assertEquals('1767139200', $data['datetime']['timestamp']);
+        $i->assertEquals('P7DT5S', $data['delay']['interval']);
+        $i->assertEquals(604805, $data['delay']['seconds']);
     }
 }

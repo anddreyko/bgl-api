@@ -9,6 +9,7 @@ use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Http\RequestValidator;
 use Bgl\Core\Http\SchemaMapper;
 use Bgl\Core\Messages\Dispatcher;
+use Bgl\Core\Serialization\SerializedData;
 use Bgl\Core\Serialization\Serializer;
 use Bgl\Presentation\Api\V1\Responses\ErrorResponse;
 use Bgl\Presentation\Api\V1\Responses\SuccessResponse;
@@ -72,9 +73,9 @@ final readonly class ApiAction
         $request = $this->interceptorPipeline->process($request, $operation->interceptors);
 
         $validationErrors = $this->requestValidator->validate($request);
-        if ($validationErrors !== []) {
+        if (!$validationErrors->isEmpty()) {
             return $this->jsonResponse(
-                ErrorResponse::validation(message: 'Validation failed', errors: $validationErrors)
+                ErrorResponse::validation(message: 'Validation failed', errors: $validationErrors->toArray())
             );
         }
 
@@ -90,17 +91,16 @@ final readonly class ApiAction
 
     /**
      * @param class-string<\Bgl\Core\Messages\Message> $messageClass
-     * @param array<string, mixed> $data
      */
-    private function dispatchAndRespond(string $messageClass, array $data): ResponseInterface
+    private function dispatchAndRespond(string $messageClass, SerializedData $data): ResponseInterface
     {
         /** @var \Bgl\Core\Messages\Message $message */
-        $message = $this->hydrator->hydrateObject($messageClass, $data);
+        $message = $this->hydrator->hydrateObject($messageClass, $data->toArray());
         /** @var mixed $result */
         $result = $this->dispatcher->dispatch($message);
 
         /** @var mixed $responseData */
-        $responseData = is_object($result) ? $this->serializer->serialize($result) : $result;
+        $responseData = is_object($result) ? $this->serializer->serialize($result)->toArray() : $result;
 
         return $this->jsonResponse(new SuccessResponse(data: $responseData));
     }

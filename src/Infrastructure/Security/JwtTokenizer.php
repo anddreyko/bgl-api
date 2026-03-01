@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Security;
 
+use Bgl\Core\Security\TokenPayload;
 use Bgl\Core\Security\Tokenizer;
 use Lcobucci\JWT\JwtFacade;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
@@ -32,7 +33,7 @@ final readonly class JwtTokenizer implements Tokenizer
     }
 
     #[\Override]
-    public function generate(array $payload, int $ttlSeconds): string
+    public function generate(TokenPayload $payload, int $ttlSeconds): string
     {
         $facade = new JwtFacade(clock: $this->clock);
 
@@ -64,7 +65,7 @@ final readonly class JwtTokenizer implements Tokenizer
     }
 
     #[\Override]
-    public function verify(string $token): array
+    public function verify(string $token): TokenPayload
     {
         if ($token === '') {
             throw new \RuntimeException('Invalid or expired token: token is empty');
@@ -84,7 +85,7 @@ final readonly class JwtTokenizer implements Tokenizer
 
             $registeredKeys = RegisteredClaims::ALL;
 
-            return array_diff_key($claims, array_flip($registeredKeys));
+            return TokenPayload::fromArray(array_diff_key($claims, array_flip($registeredKeys)));
         } catch (\RuntimeException $exception) {
             throw $exception;
         } catch (\Throwable $exception) {

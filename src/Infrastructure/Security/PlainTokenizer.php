@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Security;
 
+use Bgl\Core\Security\TokenPayload;
 use Bgl\Core\Security\Tokenizer;
 use Psr\Clock\ClockInterface;
 
@@ -18,10 +19,10 @@ final readonly class PlainTokenizer implements Tokenizer
     }
 
     #[\Override]
-    public function generate(array $payload, int $ttlSeconds): string
+    public function generate(TokenPayload $payload, int $ttlSeconds): string
     {
         $data = [
-            'payload' => $payload,
+            'payload' => $payload->toArray(),
             'exp' => $this->clock->now()->getTimestamp() + $ttlSeconds,
         ];
 
@@ -31,7 +32,7 @@ final readonly class PlainTokenizer implements Tokenizer
     }
 
     #[\Override]
-    public function verify(string $token): array
+    public function verify(string $token): TokenPayload
     {
         try {
             $json = base64_decode($token, true);
@@ -53,6 +54,6 @@ final readonly class PlainTokenizer implements Tokenizer
             throw new \RuntimeException('Token has expired');
         }
 
-        return $data['payload'];
+        return TokenPayload::fromArray($data['payload']);
     }
 }
