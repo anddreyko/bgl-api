@@ -9,7 +9,7 @@ use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 
 /**
- * @implements MessageHandler<string, Command>
+ * @implements MessageHandler<Result, Command>
  */
 final readonly class Handler implements MessageHandler
 {
@@ -19,13 +19,13 @@ final readonly class Handler implements MessageHandler
     }
 
     #[\Override]
-    public function __invoke(Envelope $envelope): string
+    public function __invoke(Envelope $envelope): Result
     {
         /** @var Command $command */
         $command = $envelope->message;
 
         $this->authenticator->revoke($command->userId);
 
-        return 'sign out';
+        return new Result(message: 'sign out');
     }
 }

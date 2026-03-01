@@ -7,7 +7,7 @@ namespace Bgl\Application\Handlers\Mates\DeleteMate;
 use Bgl\Core\Messages\Message;
 
 /**
- * @implements Message<null>
+ * @implements Message<Result>
  */
 final readonly class Command implements Message
 {

@@ -17,7 +17,7 @@ use Bgl\Core\ValueObjects\DateTime;
 use Psr\Clock\ClockInterface;
 
 /**
- * @implements MessageHandler<string, Command>
+ * @implements MessageHandler<Result, Command>
  */
 final readonly class Handler implements MessageHandler
 {
@@ -31,7 +31,7 @@ final readonly class Handler implements MessageHandler
     }
 
     #[\Override]
-    public function __invoke(Envelope $envelope): string
+    public function __invoke(Envelope $envelope): Result
     {
         /** @var Command $command */
         $command = $envelope->message;
@@ -56,6 +56,6 @@ final readonly class Handler implements MessageHandler
 
         $this->confirmer->request($user->getId());
 
-        return 'Confirm the specified email';
+        return new Result(message: 'Confirm the specified email');
     }
 }

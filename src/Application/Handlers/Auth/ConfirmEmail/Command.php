@@ -7,7 +7,7 @@ namespace Bgl\Application\Handlers\Auth\ConfirmEmail;
 use Bgl\Core\Messages\Message;
 
 /**
- * @implements Message<string>
+ * @implements Message<Result>
  */
 final class Command implements Message
 {

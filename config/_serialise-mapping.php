@@ -112,4 +112,32 @@ return [
         'page' => $model->page,
         'size' => $model->size,
     ],
+    Handlers\Auth\ConfirmEmail\Result::class => static fn(Handlers\Auth\ConfirmEmail\Result $model) => [
+        'message' => $model->message,
+    ],
+    Handlers\Auth\Register\Result::class => static fn(Handlers\Auth\Register\Result $model) => [
+        'message' => $model->message,
+    ],
+    Handlers\Auth\RegisterPasskeyVerify\Result::class => static fn(Handlers\Auth\RegisterPasskeyVerify\Result $model
+    ) => [
+        'message' => $model->message,
+    ],
+    Handlers\Auth\SignOut\Result::class => static fn(Handlers\Auth\SignOut\Result $model) => [
+        'message' => $model->message,
+    ],
+    Handlers\Mates\DeleteMate\Result::class => static fn(Handlers\Mates\DeleteMate\Result $model) => [
+        'message' => $model->message,
+    ],
+    Handlers\Auth\PasskeySignInOptions\Result::class => static fn(Handlers\Auth\PasskeySignInOptions\Result $model) => [
+        'options' => $model->options,
+    ],
+    Handlers\Auth\PasskeySignInVerify\Result::class => static fn(Handlers\Auth\PasskeySignInVerify\Result $model) => [
+        'access_token' => $model->accessToken,
+        'refresh_token' => $model->refreshToken,
+        'expires_in' => $model->expiresIn,
+    ],
+    Handlers\Auth\RegisterPasskeyOptions\Result::class => static fn(Handlers\Auth\RegisterPasskeyOptions\Result $model
+    ) => [
+        'options' => $model->options,
+    ],
 ];

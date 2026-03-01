@@ -12,7 +12,7 @@ use Bgl\Domain\Mates\Mates;
 use Psr\Clock\ClockInterface;
 
 /**
- * @implements MessageHandler<null, Command>
+ * @implements MessageHandler<Result, Command>
  */
 final readonly class Handler implements MessageHandler
 {
@@ -23,7 +23,7 @@ final readonly class Handler implements MessageHandler
     }
 
     #[\Override]
-    public function __invoke(Envelope $envelope): mixed
+    public function __invoke(Envelope $envelope): Result
     {
         /** @var Command $command */
         $command = $envelope->message;
@@ -32,11 +32,11 @@ final readonly class Handler implements MessageHandler
         $mate = $this->mates->find($command->mateId);
 
         if ($mate === null || $mate->isDeleted() || $mate->getUserId()->getValue() !== $command->userId) {
-            throw new \DomainException('Not Found');
+            throw new \Bgl\Core\Exceptions\NotFoundException('Mate not found');
         }
 
         $mate->softDelete(new DateTime($this->clock->now()));
 
-        return null;
+        return new Result(message: 'deleted');
     }
 }

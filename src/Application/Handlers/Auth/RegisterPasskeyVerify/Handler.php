@@ -18,7 +18,7 @@ use Bgl\Domain\Profile\Passkey\Passkeys;
 use Psr\Clock\ClockInterface;
 
 /**
- * @implements MessageHandler<string, Command>
+ * @implements MessageHandler<Result, Command>
  */
 final readonly class Handler implements MessageHandler
 {
@@ -32,7 +32,7 @@ final readonly class Handler implements MessageHandler
     }
 
     #[\Override]
-    public function __invoke(Envelope $envelope): string
+    public function __invoke(Envelope $envelope): Result
     {
         /** @var Command $command */
         $command = $envelope->message;
@@ -58,7 +58,7 @@ final readonly class Handler implements MessageHandler
         $this->passkeys->add($passkey);
         $this->challenges->remove($challenge);
 
-        return 'ok';
+        return new Result(message: 'ok');
     }
 
     private function findChallengeForUser(string $userId): \Bgl\Domain\Profile\Passkey\PasskeyChallenge

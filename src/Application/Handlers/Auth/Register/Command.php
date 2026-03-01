@@ -9,7 +9,7 @@ use Bgl\Core\ValueObjects\Email;
 use Bgl\Core\ValueObjects\Password;
 
 /**
- * @implements Message<string>
+ * @implements Message<Result>
  */
 final readonly class Command implements Message
 {

@@ -8,6 +8,7 @@ use Bgl\Application\Handlers\Auth\RegisterPasskeyOptions\Command as OptionsComma
 use Bgl\Application\Handlers\Auth\RegisterPasskeyOptions\Handler as OptionsHandler;
 use Bgl\Application\Handlers\Auth\RegisterPasskeyVerify\Command;
 use Bgl\Application\Handlers\Auth\RegisterPasskeyVerify\Handler;
+use Bgl\Application\Handlers\Auth\RegisterPasskeyVerify\Result;
 use Bgl\Core\Auth\AuthenticationException;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
@@ -75,7 +76,8 @@ final class RegisterPasskeyVerifyCest
         ));
         $this->em->flush();
 
-        $i->assertSame('ok', $result);
+        $i->assertInstanceOf(Result::class, $result);
+        $i->assertSame('ok', $result->message);
     }
 
     public function testNoChallengeFoundThrows(FunctionalTester $i): void

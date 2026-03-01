@@ -6,6 +6,7 @@ namespace Bgl\Tests\Functional\Auth;
 
 use Bgl\Application\Handlers\Auth\Register\Command;
 use Bgl\Application\Handlers\Auth\Register\Handler;
+use Bgl\Application\Handlers\Auth\Register\Result;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\ValueObjects\DateTime;
@@ -57,7 +58,8 @@ final class RegisterCest
 
         $this->em->flush();
 
-        $i->assertSame('Confirm the specified email', $result);
+        $i->assertInstanceOf(Result::class, $result);
+        $i->assertSame('Confirm the specified email', $result->message);
         $i->assertNotNull($this->users->findByEmail($email));
     }
 

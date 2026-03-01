@@ -7,7 +7,7 @@ namespace Bgl\Application\Handlers\Auth\RegisterPasskeyVerify;
 use Bgl\Core\Messages\Message;
 
 /**
- * @implements Message<string>
+ * @implements Message<Result>
  */
 final readonly class Command implements Message
 {
