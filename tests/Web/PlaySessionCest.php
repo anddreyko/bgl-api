@@ -61,4 +61,68 @@ final class PlaySessionCest
             ],
         ]);
     }
+
+    #[Group('smoke')]
+    public function testOpenSessionWithPlayersAndClose(WebTester $i, AuthModule $auth): void
+    {
+        $email = 'plays-players-' . uniqid('', true) . '@test.local';
+        $auth->registerAndLogin($email, 'SecurePass1!');
+
+        // Create two mates
+        $i->sendPost('/v1/mates', ['name' => 'Alice']);
+        $i->seeResponseCodeIs(200);
+        $mate1Id = $i->grabDataFromResponseByJsonPath('$.data.id')[0];
+
+        $i->sendPost('/v1/mates', ['name' => 'Bob']);
+        $i->seeResponseCodeIs(200);
+        $mate2Id = $i->grabDataFromResponseByJsonPath('$.data.id')[0];
+
+        // Create play session with players
+        $i->sendPost('/v1/plays/sessions', [
+            'name' => 'Game night',
+            'visibility' => 'friends',
+            'players' => [
+                ['mate_id' => $mate1Id, 'score' => 10, 'is_winner' => true, 'color' => 'red'],
+                ['mate_id' => $mate2Id, 'score' => 5, 'is_winner' => false, 'color' => 'blue'],
+            ],
+        ]);
+        $i->seeResponseCodeIs(200);
+
+        $sessionId = $i->grabDataFromResponseByJsonPath('$.data.session_id')[0];
+
+        // Verify play session persisted in DB
+        $i->seeInDatabase('plays_session', [
+            'id' => $sessionId,
+            'name' => 'Game night',
+            'status' => 'draft',
+            'visibility' => 'friends',
+        ]);
+
+        // Verify players persisted in DB via cascade
+        $i->seeNumRecords(2, 'plays_player', ['play_id' => $sessionId]);
+        $i->seeInDatabase('plays_player', [
+            'play_id' => $sessionId,
+            'mate_id' => $mate1Id,
+            'score' => 10,
+            'is_winner' => true,
+            'color' => 'red',
+        ]);
+        $i->seeInDatabase('plays_player', [
+            'play_id' => $sessionId,
+            'mate_id' => $mate2Id,
+            'score' => 5,
+            'is_winner' => false,
+            'color' => 'blue',
+        ]);
+
+        // Finalize (close) session
+        $i->sendPatch('/v1/plays/sessions/' . $sessionId);
+        $i->seeResponseCodeIs(200);
+
+        // Verify status changed in DB
+        $i->seeInDatabase('plays_session', [
+            'id' => $sessionId,
+            'status' => 'published',
+        ]);
+    }
 }
