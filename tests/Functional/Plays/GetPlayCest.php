@@ -169,7 +169,8 @@ final class GetPlayCest
         );
         $this->finalizeSession($sessionId);
 
-        $i->expectThrowable(AuthenticationException::class, fn() => $this->getPlay($sessionId, null));
+        // Until MATES-002 (mate-to-user linking), participants = owner-only
+        $i->expectThrowable(NotFoundException::class, fn() => $this->getPlay($sessionId, null));
     }
 
     public function testParticipantsVisibilityNonPlayerDenied(FunctionalTester $i): void

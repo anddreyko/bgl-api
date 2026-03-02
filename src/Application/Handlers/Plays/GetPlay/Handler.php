@@ -8,11 +8,8 @@ use Bgl\Core\Auth\AuthenticationException;
 use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
-use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Games\Game;
 use Bgl\Domain\Games\Games;
-use Bgl\Domain\Mates\Mate;
-use Bgl\Domain\Mates\Mates;
 use Bgl\Domain\Plays\Play;
 use Bgl\Domain\Plays\Player\Player;
 use Bgl\Domain\Plays\Plays;
@@ -27,7 +24,6 @@ final readonly class Handler implements MessageHandler
     public function __construct(
         private Plays $plays,
         private Games $games,
-        private Mates $mates,
     ) {
     }
 
@@ -61,34 +57,9 @@ final readonly class Handler implements MessageHandler
             Visibility::Private => $isOwner ? null : throw new NotFoundException('Session not found'),
             Visibility::Link, Visibility::Public => null,
             Visibility::Authenticated => $userId !== null ? null : throw new AuthenticationException('Unauthorized'),
-            Visibility::Participants => $this->checkParticipantsAccess($play, $userId, $isOwner),
+            // TODO: MATES-002 -- full participants check after mate-to-user linking
+            Visibility::Participants => $isOwner ? null : throw new NotFoundException('Session not found'),
         };
-    }
-
-    private function checkParticipantsAccess(Play $play, ?string $userId, bool $isOwner): void
-    {
-        if ($isOwner) {
-            return;
-        }
-
-        if ($userId === null) {
-            throw new AuthenticationException('Unauthorized');
-        }
-
-        $mateIds = [];
-        /** @var Player $player */
-        foreach ($play->getPlayers() as $player) {
-            $mateIds[] = (string)$player->getMateId();
-        }
-
-        /** @var Mate $mate */
-        foreach ($this->mates->findByIds($mateIds) as $mate) {
-            if ((string)$mate->getUserId() === $userId) {
-                return;
-            }
-        }
-
-        throw new NotFoundException('Session not found');
     }
 
     private function transformPlay(Play $play): Result
