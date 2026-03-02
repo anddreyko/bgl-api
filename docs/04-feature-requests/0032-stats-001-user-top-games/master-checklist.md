@@ -1,50 +1,55 @@
-# STATS-001: User's Top Games -- Master Checklist
+# STATS-001: Annual Report (Top Games + Summary) -- Master Checklist
 
-## Stage 1: Domain
+## Stage 1: Domain -- VOs and port [P]
 
-- [ ] Entity `UserGameStats` in `Domain/Stats/` -- user_id, game_id, play_count, last_played_at
-- [ ] Repository interface `UserGameStatsRepository` in `Domain/Stats/` (extends Repository)
-- [ ] Method `findByUser(string $userId, int $limit): list<UserGameStats>`
-- [ ] Method `findByUserAndGame(string $userId, string $gameId): ?UserGameStats`
-- [ ] Methods `increment(UserGameStats $stats, DateTime $playedAt)` and `decrement(UserGameStats $stats)` on entity
+- [ ] VO `GamePlayStats` in `Domain/Stats/` -- final readonly, gameId: Uuid, playCount: int, totalDurationSeconds: int, lastPlayedAt: DateTime
+- [ ] VO `AnnualReport` in `Domain/Stats/` -- final readonly, year: int, totalPlays: int, uniqueGames: int, newGames: int, uniquePlayers: int, totalDurationSeconds: int, playDays: int
+- [ ] Port `StatsReader` interface in `Domain/Stats/`:
+  - `topGamesByYear(Uuid $userId, int $year, int $limit): list<GamePlayStats>`
+  - `annualSummary(Uuid $userId, int $year): AnnualReport`
 
-## Stage 2: Infrastructure
+## Stage 2: Infrastructure -- DoctrineStatsReader
 
-- [ ] Doctrine mapping for UserGameStats -> table `stats_user_game`
-- [ ] Migration: CREATE TABLE stats_user_game (id UUID PK, user_id UUID NOT NULL, game_id UUID NOT NULL, play_count INT NOT NULL DEFAULT 0, last_played_at TIMESTAMP NOT NULL, UNIQUE(user_id, game_id))
-- [ ] Index on (user_id, play_count DESC) for top-games query
-- [ ] DoctrineUserGameStats repository implementation
-- [ ] InMemoryUserGameStats for tests
+- [ ] `DoctrineStatsReader` in `Infrastructure/Persistence/Doctrine/Mapping/Stats/` implements StatsReader
+- [ ] Constructor: `Doctrine\DBAL\Connection $connection`
+- [ ] `topGamesByYear()`: GROUP BY game_id on plays_session WHERE status='published' AND game_id IS NOT NULL AND EXTRACT(YEAR FROM started_at)=?, ORDER BY play_count DESC, LIMIT
+- [ ] `annualSummary()`: COUNT(*) total_plays, COUNT(DISTINCT game_id) unique_games, SUM duration, COUNT(DISTINCT DATE(started_at)) play_days from plays_session; COUNT(DISTINCT mate_id) unique_players from plays_player JOIN plays_session; new_games via NOT EXISTS subquery for prior years
+- [ ] Migration: add index on plays_session (user_id, status, started_at) if not exists
+- [ ] `InMemoryStatsReader` in `Infrastructure/Persistence/InMemory/` for tests
 
-## Stage 3: Write-side -- update stats on play lifecycle
+## Stage 3: Read-side handler
 
-- [ ] FinalizePlay/Handler: after play.finalize(), if gameId not null -> increment stats (find or create UserGameStats, increment play_count, update last_played_at)
-- [ ] DeletePlay/Handler: after play.delete(), if gameId not null and was Published -> decrement stats
+- [ ] `Stats/GetAnnualReport/Query.php` -- implements Message<Result>, fields: string $userId, int $year, int $limit = 10
+- [ ] `Stats/GetAnnualReport/Handler.php` -- implements MessageHandler<Result, Query>:
+  - Call statsReader.topGamesByYear() for top games
+  - Collect gameIds, resolve names via games.findByIds()
+  - Call statsReader.annualSummary() for counters
+  - Return Result
+- [ ] `Stats/GetAnnualReport/Result.php` -- final readonly: int $year, summary array, topGames list with game names
 
-## Stage 4: Read-side -- handler
+## Stage 4: Config + Wiring
 
-- [ ] Stats/GetUserTopGames/Query.php -- `string $userId, int $limit = 10`
-- [ ] Stats/GetUserTopGames/Handler.php -- call statsRepo.findByUser(), resolve game names via games.findByIds()
-- [ ] Stats/GetUserTopGames/Result.php -- `array $data` (list of {game_id, game_name, play_count, last_played_at})
+- [ ] `config/common/persistence.php`: bind StatsReader -> DoctrineStatsReader (via Connection)
+- [ ] `config/common/openapi/stats.php`: GET /v1/stats/annual-report with x-message, x-interceptors [AuthInterceptor], x-auth ['userId'], parameters [year, limit]
+- [ ] `config/common/openapi/v1.php`: include stats.php
+- [ ] `config/common/bus.php`: register Stats\GetAnnualReport\Query -> Handler
+- [ ] `config/_serialise-mapping.php`: add Result mapping
 
-## Stage 5: Config + Wiring
+## Stage 5: Tests
 
-- [ ] config/common/persistence.php: register UserGameStatsRepository
-- [ ] config/common/openapi/stats.php -- GET /v1/stats/top-games with x-message, x-interceptors [AuthInterceptor], x-auth ['userId'], parameters [limit]
-- [ ] config/common/bus.php: register Stats\GetUserTopGames\Query -> Handler
-- [ ] config/_serialise-mapping.php: add Result mapping
-
-## Stage 6: Tests
-
-- [ ] Unit test: UserGameStats.increment() / decrement()
-- [ ] Functional test: FinalizePlay updates stats table
-- [ ] Functional test: DeletePlay decrements stats
-- [ ] Functional test: GetUserTopGames returns correct order and counts
-- [ ] Functional test: GetUserTopGames empty for user without games
-- [ ] Functional test: GetUserTopGames respects limit
-- [ ] Functional test: GetUserTopGames isolates by user
-- [ ] Web test: GET /v1/stats/top-games returns 200 with auth
-- [ ] Web test: GET /v1/stats/top-games without auth returns 401
+- [ ] Unit test: AnnualReport VO construction
+- [ ] Unit test: GamePlayStats VO construction
+- [ ] Functional test: DoctrineStatsReader.topGamesByYear returns correct order and counts
+- [ ] Functional test: DoctrineStatsReader.topGamesByYear excludes Draft/Deleted sessions
+- [ ] Functional test: DoctrineStatsReader.topGamesByYear excludes sessions without game_id
+- [ ] Functional test: DoctrineStatsReader.annualSummary returns correct counters
+- [ ] Functional test: DoctrineStatsReader.annualSummary new_games counts correctly across years
+- [ ] Functional test: GetAnnualReport handler resolves game names
+- [ ] Functional test: GetAnnualReport handler isolates by user
+- [ ] Functional test: GetAnnualReport handler respects limit
+- [ ] Web test: GET /v1/stats/annual-report?year=2025 returns 200 with auth
+- [ ] Web test: GET /v1/stats/annual-report without auth returns 401
+- [ ] Web test: GET /v1/stats/annual-report without year returns 400
 
 ## Validation
 
