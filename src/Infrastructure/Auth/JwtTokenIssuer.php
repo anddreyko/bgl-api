@@ -49,7 +49,6 @@ final readonly class JwtTokenIssuer implements TokenIssuer
         return new TokenPair(
             accessToken: $accessToken,
             refreshToken: $refreshToken,
-            expiresIn: $this->tokenConfig->accessTtl,
         );
     }
 }

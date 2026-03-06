@@ -19,8 +19,20 @@ final class MateMapping implements EntityMapping
     #[\Override]
     public function configure(ClassMetadata $metadata): void
     {
-        $metadata->setPrimaryTable(['name' => 'mates_mate']);
+        $metadata->setPrimaryTable([
+            'name' => 'mates_mate',
+            'indexes' => [
+                'idx_mates_mate_deleted_at' => ['columns' => ['deleted_at']],
+                'idx_mates_user_name' => ['columns' => ['user_id', 'name']],
+            ],
+        ]);
 
+        $this->configureIdentity($metadata);
+        $this->configureFields($metadata);
+    }
+
+    private function configureIdentity(ClassMetadata $metadata): void
+    {
         $metadata->mapField([
             'fieldName' => 'id',
             'type' => 'uuid_vo',
@@ -33,7 +45,10 @@ final class MateMapping implements EntityMapping
             'type' => 'uuid_vo',
             'columnName' => 'user_id',
         ]);
+    }
 
+    private function configureFields(ClassMetadata $metadata): void
+    {
         $metadata->mapField([
             'fieldName' => 'name',
             'type' => 'string',

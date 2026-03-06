@@ -26,10 +26,25 @@ final readonly class HydratorMapper implements SchemaMapper
         /** @var array<string, mixed> $data */
         $data = array_merge($body, $request->getQueryParams());
 
+        $this->applyParamMap($data, $paramMap);
         $this->mergePathParams($data, $pathParams, $paramMap);
         $this->mergeAuthParams($data, $request, $authParams);
 
         return SerializedData::fromArray($data);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function applyParamMap(array &$data, ParamMap $paramMap): void
+    {
+        foreach ($paramMap as $from => $to) {
+            if (array_key_exists($from, $data) && !array_key_exists($to, $data)) {
+                /** @var mixed */
+                $data[$to] = $data[$from];
+                unset($data[$from]);
+            }
+        }
     }
 
     /**

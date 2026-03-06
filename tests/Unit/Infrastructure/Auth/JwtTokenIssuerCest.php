@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Bgl\Tests\Unit\Infrastructure\Auth;
 
 use Bgl\Core\Auth\AuthenticationException;
-use Bgl\Core\Auth\TokenPair;
 use Bgl\Core\Security\Tokenizer;
 use Bgl\Core\Security\TokenConfig;
 use Bgl\Core\ValueObjects\DateTime;
@@ -59,7 +58,6 @@ final class JwtTokenIssuerCest
 
         $i->assertSame('access-token', $result->accessToken);
         $i->assertSame('refresh-token', $result->refreshToken);
-        $i->assertSame(7200, $result->expiresIn);
     }
 
     public function testIssueUserNotFoundThrows(UnitTester $i): void

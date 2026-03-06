@@ -39,7 +39,6 @@ final class AuthFlowCest
             'data' => [
                 'access_token' => 'string',
                 'refresh_token' => 'string',
-                'expires_in' => 'integer',
             ],
         ]);
 
@@ -76,7 +75,7 @@ final class AuthFlowCest
         $refreshToken = $i->grabDataFromResponseByJsonPath('$.data.refresh_token')[0];
 
         $i->sendPost('/v1/auth/refresh', [
-            'refreshToken' => $refreshToken,
+            'refresh_token' => $refreshToken,
         ]);
         $i->seeResponseCodeIs(200);
         $i->seeResponseIsJson();
@@ -84,7 +83,6 @@ final class AuthFlowCest
             'data' => [
                 'access_token' => 'string',
                 'refresh_token' => 'string',
-                'expires_in' => 'integer',
             ],
         ]);
     }

@@ -37,8 +37,13 @@ return [
         /** @var array{db: array{driver: string}, mapping: MappingDriver, proxy_dir: string} $config */
         $config = $container->get('doctrine');
 
+        $dbalConfig = new \Doctrine\DBAL\Configuration();
+        $dbalConfig->setSchemaAssetsFilter(
+            static fn(string $assetName): bool => $assetName !== 'migration',
+        );
+
         /** @psalm-suppress ArgumentTypeCoercion */
-        $connection = DriverManager::getConnection($config['db']);
+        $connection = DriverManager::getConnection($config['db'], $dbalConfig);
 
         $configuration = new Configuration();
         $configuration->setMetadataDriverImpl($config['mapping']);

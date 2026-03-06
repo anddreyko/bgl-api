@@ -20,7 +20,12 @@ final class PlayerMapping implements EntityMapping
     #[\Override]
     public function configure(ClassMetadata $metadata): void
     {
-        $metadata->setPrimaryTable(['name' => 'plays_player']);
+        $metadata->setPrimaryTable([
+            'name' => 'plays_player',
+            'indexes' => [
+                'idx_plays_player_mate_id' => ['columns' => ['mate_id']],
+            ],
+        ]);
 
         $this->configureFields($metadata);
         $this->configureAssociations($metadata);
@@ -71,6 +76,7 @@ final class PlayerMapping implements EntityMapping
             'joinColumns' => [[
                 'name' => 'play_id',
                 'referencedColumnName' => 'id',
+                'nullable' => false,
             ]],
         ]);
     }

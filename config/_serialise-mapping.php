@@ -36,12 +36,10 @@ return [
     Handlers\Auth\LoginByCredentials\Result::class => static fn(Handlers\Auth\LoginByCredentials\Result $model) => [
         'access_token' => $model->accessToken,
         'refresh_token' => $model->refreshToken,
-        'expires_in' => $model->expiresIn,
     ],
     Handlers\Auth\RefreshToken\Result::class => static fn(Handlers\Auth\RefreshToken\Result $model) => [
         'access_token' => $model->accessToken,
         'refresh_token' => $model->refreshToken,
-        'expires_in' => $model->expiresIn,
     ],
     Handlers\User\GetUser\Result::class => static fn(Handlers\User\GetUser\Result $model) => [
         'id' => $model->id,
@@ -134,7 +132,6 @@ return [
     Handlers\Auth\PasskeySignInVerify\Result::class => static fn(Handlers\Auth\PasskeySignInVerify\Result $model) => [
         'access_token' => $model->accessToken,
         'refresh_token' => $model->refreshToken,
-        'expires_in' => $model->expiresIn,
     ],
     Handlers\Auth\RegisterPasskeyOptions\Result::class => static fn(Handlers\Auth\RegisterPasskeyOptions\Result $model
     ) => [

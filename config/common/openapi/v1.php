@@ -48,7 +48,6 @@ return [
                     'properties' => [
                         'access_token' => ['type' => 'string'],
                         'refresh_token' => ['type' => 'string'],
-                        'expires_in' => ['type' => 'integer'],
                     ],
                 ],
                 'Mate' => [

@@ -74,7 +74,6 @@ final class JwtAuthenticatorCest
 
         $i->assertSame('access-token', $result->accessToken);
         $i->assertSame('refresh-token', $result->refreshToken);
-        $i->assertSame(7200, $result->expiresIn);
     }
 
     public function testLoginUserNotFoundThrows(UnitTester $i): void
@@ -161,7 +160,6 @@ final class JwtAuthenticatorCest
 
         $i->assertSame('access-token', $result->accessToken);
         $i->assertSame('refresh-token', $result->refreshToken);
-        $i->assertSame(7200, $result->expiresIn);
     }
 
     public function testRefreshInvalidTokenThrows(UnitTester $i): void

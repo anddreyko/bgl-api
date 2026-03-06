@@ -103,15 +103,16 @@ return [
                     'operationId' => 'refreshToken',
                     'tags' => ['Auth'],
                     'x-message' => RefreshToken\Command::class,
+                    'x-map' => ['refresh_token' => 'refreshToken'],
                     'requestBody' => [
                         'required' => true,
                         'content' => [
                             'application/json' => [
                                 'schema' => [
                                     'type' => 'object',
-                                    'required' => ['refreshToken'],
+                                    'required' => ['refresh_token'],
                                     'properties' => [
-                                        'refreshToken' => ['type' => 'string'],
+                                        'refresh_token' => ['type' => 'string'],
                                     ],
                                 ],
                             ],

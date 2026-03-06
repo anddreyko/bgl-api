@@ -18,8 +18,7 @@ return [
                         [
                             'name' => 'q',
                             'in' => 'query',
-                            'required' => true,
-                            'schema' => ['type' => 'string', 'minLength' => 3],
+                            'schema' => ['type' => 'string'],
                         ],
                         [
                             'name' => 'page',

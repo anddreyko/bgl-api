@@ -13,16 +13,19 @@ final class GamesCest
         $i->haveHttpHeader('Content-Type', 'application/json');
     }
 
-    public function testSearchRequiresQuery(WebTester $i): void
+    public function testSearchWithoutQueryReturnsAll(WebTester $i): void
     {
         $i->sendGet('/v1/games/search');
-        $i->seeResponseCodeIs(422);
-    }
-
-    public function testSearchQueryTooShort(WebTester $i): void
-    {
-        $i->sendGet('/v1/games/search?q=ab');
-        $i->seeResponseCodeIs(422);
+        $i->seeResponseCodeIs(200);
+        $i->seeResponseIsJson();
+        $i->seeResponseMatchesJsonType([
+            'data' => [
+                'items' => 'array',
+                'total' => 'integer',
+                'page' => 'integer',
+                'size' => 'integer',
+            ],
+        ]);
     }
 
     public function testGetGameNotFoundReturns404(WebTester $i): void

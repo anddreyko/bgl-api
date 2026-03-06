@@ -22,7 +22,14 @@ final class PlayMapping implements EntityMapping
     #[\Override]
     public function configure(ClassMetadata $metadata): void
     {
-        $metadata->setPrimaryTable(['name' => 'plays_session']);
+        $metadata->setPrimaryTable([
+            'name' => 'plays_session',
+            'indexes' => [
+                'idx_plays_session_user_id' => ['columns' => ['user_id']],
+                'idx_plays_session_started_at' => ['columns' => ['started_at']],
+                'idx_plays_session_game_id' => ['columns' => ['game_id']],
+            ],
+        ]);
 
         $this->configureIdentity($metadata);
         $this->configureFields($metadata);

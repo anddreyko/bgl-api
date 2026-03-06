@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bgl\Application\Handlers\Games\SearchGames;
 
 use Bgl\Core\Listing\Field;
+use Bgl\Core\Listing\Filter\All;
 use Bgl\Core\Listing\Filter\Contains;
 use Bgl\Core\Listing\Page\PageNumber;
 use Bgl\Core\Listing\Page\PageSize;
@@ -32,7 +33,7 @@ final readonly class Handler implements MessageHandler
         /** @var Query $query */
         $query = $envelope->message;
 
-        $filter = new Contains(new Field('name'), $query->q);
+        $filter = $query->q !== '' ? new Contains(new Field('name'), $query->q) : All::Filter;
         $sort = new PageSort(new SortFields(['name' => SortDirection::Asc]));
 
         $keys = $this->games->search($filter, new PageSize($query->size), new PageNumber($query->page), $sort);

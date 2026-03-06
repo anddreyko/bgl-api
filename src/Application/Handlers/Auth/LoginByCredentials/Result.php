@@ -9,7 +9,6 @@ final readonly class Result
     public function __construct(
         public string $accessToken,
         public string $refreshToken,
-        public int $expiresIn,
     ) {
     }
 }

@@ -78,6 +78,20 @@ final class SearchGamesCest
         $i->assertSame([], $result->data);
     }
 
+    public function testSearchWithoutQueryReturnsAll(FunctionalTester $i): void
+    {
+        $this->seedGames();
+
+        $result = ($this->handler())(new Envelope(
+            message: new Query(),
+            messageId: 'msg-all',
+        ));
+
+        $i->assertInstanceOf(Result::class, $result);
+        $i->assertSame(3, $result->total);
+        $i->assertCount(3, $result->data);
+    }
+
     public function testSearchPagination(FunctionalTester $i): void
     {
         $this->seedGames();

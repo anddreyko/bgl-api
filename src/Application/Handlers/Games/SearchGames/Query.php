@@ -11,11 +11,8 @@ use Bgl\Core\Messages\Message;
  */
 final readonly class Query implements Message
 {
-    /**
-     * @param non-empty-string $q
-     */
     public function __construct(
-        public string $q,
+        public string $q = '',
         public int $page = 1,
         public int $size = 20,
     ) {

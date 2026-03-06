@@ -29,7 +29,6 @@ final readonly class Handler implements MessageHandler
         return new Result(
             accessToken: $tokenPair->accessToken,
             refreshToken: $tokenPair->refreshToken,
-            expiresIn: $tokenPair->expiresIn,
         );
     }
 }
