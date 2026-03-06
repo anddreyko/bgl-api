@@ -280,9 +280,10 @@ PHP-DI `Container::set()` at runtime. This is configured in `Functional.suite.ym
 | `composer test:intg`     | Integration tests    |
 | `composer test:web`      | Acceptance API tests |
 | `composer test:cli`      | Acceptance CLI tests |
-| `composer test:all`      | All tests            |
-| `composer test:coverage` | Coverage report      |
-| `composer in:ps`         | Mutation testing     |
+| `composer test:all`      | All tests + mutation testing |
+| `composer test:coverage` | Coverage report              |
+| `composer in:ps`         | Mutation testing (Psalm)     |
+| `composer in:run`        | Mutation testing (Infection) |
 
 ---
 
@@ -294,7 +295,7 @@ Runs before all tests. Checks types, finds potential bugs, controls architecture
 composer scan:style     # PHP-CS-Fixer + Rector (modifies code)
 composer scan:php       # Lint + Psalm
 composer scan:depend    # Deptrac + Composer dependencies
-composer scan:all       # scan:php + scan:depend + test:all (without scan:style)
+composer scan:all       # scan:php + scan:depend + test:all + in:ps (without scan:style)
 ```
 
 The `scan:all` command intentionally excludes `scan:style` since it modifies code. Run `scan:style` separately first,
@@ -305,17 +306,88 @@ then `scan:all` for verification.
 ## Mutation Tests (Automatic Quality Check)
 
 Mutation testing is an automatic quality check of existing tests. Infection makes small changes (mutations) to the code
-and verifies that tests detect these changes.
+and verifies that tests detect these changes. Uses Roave Infection Static Analysis Plugin (Psalm-based) for enhanced
+detection.
+
+Mutation testing runs **automatically as the last step of `test:all`** (and therefore `scan:all`), after all test suites
+pass. It can also be run standalone:
 
 ```bash
-composer in:ps       # Run mutation testing
+composer in:ps       # Mutation testing with Psalm (recommended)
+composer in:run      # Mutation testing with Infection only (min-msi=70, min-covered-msi=80)
 ```
+
+### Configuration
+
+Configuration file: `infection.json`. Key settings:
+
+| Setting              | Value              | Description                                    |
+|----------------------|--------------------|------------------------------------------------|
+| `threads`            | 2                  | Parallel mutation processes                    |
+| `timeout`            | 10                 | Seconds before killing a mutation run          |
+| `testFramework`      | codeception        | Test framework adapter                         |
+| `testFrameworkOptions` | Unit,Functional  | Test suites used to kill mutants               |
+| `source.directories` | `["src"]`          | Source code directories to mutate              |
+
+Reports are generated in `var/.infections/` (infection.log, summary.log, infection.json, per-mutator.md).
+
+Memory: infection requires ~210MB, configured via `php -d memory_limit=512M` in composer scripts (default PHP
+`memory_limit=128M` is insufficient).
+
+### Workflow
 
 Mutation tests don't need to be written manually. They run automatically based on existing tests. The developer's task
 is to ensure mutation tests pass, meaning existing tests are good enough to "kill" mutations.
 
 If a mutation "survives" (tests don't fail when code changes), it signals insufficient coverage or weak assertions. In
 this case, strengthen existing tests rather than writing new mutation tests.
+
+---
+
+## Performance Benchmarks
+
+PHPBench measures execution time of critical code paths. Benchmarks catch performance regressions before they reach
+production.
+
+### Running Benchmarks
+
+Two modes of operation:
+
+```bash
+composer bm:run     # Quick run -- execute all benchmarks, see current timings
+composer bm:base    # Create baseline snapshot (store current results)
+composer bm:check   # Assert no regression vs baseline (fails if > 10% slower)
+```
+
+The baseline workflow (`bm:base` + `bm:check`) is useful before and after refactoring: create a baseline, make changes,
+then verify no regression.
+
+### Benchmark Categories
+
+| Category    | Location                          | What It Covers                                    |
+|-------------|-----------------------------------|---------------------------------------------------|
+| Core        | `tests/Benchmark/Core/`           | Value Objects creation, validation, comparison     |
+| Domain      | `tests/Benchmark/Domain/`         | Entity creation, business methods, state changes   |
+| Handlers    | `tests/Benchmark/Handlers/`       | Use case execution (handler + dependencies)        |
+| Http        | `tests/Benchmark/Http/`           | Routing, serialization, middleware pipeline         |
+| Persistence | `tests/Benchmark/Persistence/`    | Repository operations, query building, hydration   |
+
+### When to Write Benchmarks
+
+- New handler or use case with performance expectations
+- New repository method (especially with complex queries)
+- New serialization or hydration logic
+- Performance-sensitive domain logic (calculations, collections)
+- New infrastructure adapter (external API clients, cache)
+
+### Configuration
+
+Config file: `phpbench.json`. Key settings:
+
+- **Retry threshold:** 5% -- reruns unstable iterations to reduce noise
+- **Assertion:** baseline +/- 10% -- fails if performance degrades more than 10%
+
+Benchmark files location: `tests/Benchmark/{Layer}/`
 
 ---
 

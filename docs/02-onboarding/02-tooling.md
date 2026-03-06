@@ -21,7 +21,11 @@ composer dt             # Deptrac — architectural dependency check
 composer scan:style     # PHP-CS-Fixer + Rector (modifies code)
 composer scan:php       # Lint + Psalm + PDepend
 composer scan:depend    # Deptrac + Composer dependencies
-composer scan:all       # scan:php + scan:depend + test:all (without scan:style)
+composer scan:all       # scan:php + scan:depend + test:all + in:ps (without scan:style)
+
+composer bm:run         # PHPBench — run benchmarks
+composer bm:base        # PHPBench — create baseline
+composer bm:check       # PHPBench — assert no regression vs baseline
 ```
 
 ### PDepend Complexity Thresholds
@@ -59,6 +63,10 @@ make cs    # runs composer cs:fix inside Docker
 make ps    # runs composer ps:run inside Docker
 make dt    # runs composer dt:run inside Docker
 make scan  # runs composer scan:all inside Docker
+
+make bm         # runs composer bm:run inside Docker
+make bm-base    # runs composer bm:base inside Docker
+make bm-check   # runs composer bm:check inside Docker
 ```
 
 ### Direct Invocation
@@ -91,6 +99,7 @@ vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix
 | `composer ps` | Psalm        | Static type analysis           |
 | `composer dt` | Deptrac      | Architectural dependency check |
 | `composer pd` | PDepend      | Code complexity metrics        |
+| `composer bm` | PHPBench     | Performance benchmarks         |
 
 ### Check Groups
 
@@ -99,10 +108,13 @@ vendor-bin/php-cs-fixer/vendor/bin/php-cs-fixer fix
 | `composer scan:style`  | PHP-CS-Fixer + Rector             | Fix style (modifies code)                |
 | `composer scan:php`    | Lint + Psalm + PDepend            | Syntax, type, and complexity check       |
 | `composer scan:depend` | Deptrac + Composer deps           | Architecture and dependencies            |
-| `composer scan:all`    | scan:php + scan:depend + test:all | Full pre-push check (without scan:style) |
+| `composer scan:all`    | scan:php + scan:depend + test:all + in:ps | Full pre-push check (without scan:style) |
 
 The `scan:all` command intentionally excludes `scan:style` since it modifies code. Run `scan:style` separately first,
 then `scan:all` for verification.
+
+Mutation testing (`in:ps`) runs as the last step of `test:all`, after all test suites pass. Configuration is in
+`infection.json` (threads, timeout, mutators, log paths).
 
 ### Testing
 
@@ -113,9 +125,10 @@ then `scan:all` for verification.
 | `composer test:intg`     | Integration tests        |
 | `composer test:web`      | Acceptance API tests     |
 | `composer test:cli`      | Acceptance CLI tests     |
-| `composer test:all`      | All tests                |
-| `composer test:coverage` | Generate coverage report |
-| `composer in`            | Mutation testing         |
+| `composer test:all`      | All tests + mutation testing |
+| `composer test:coverage` | Generate coverage report     |
+| `composer in:ps`         | Mutation testing (Psalm)     |
+| `composer in:run`        | Mutation testing (Infection) |
 
 ### Database
 
@@ -179,6 +192,7 @@ Service startup order is enforced via `depends_on` with health conditions: `db-p
 | `vendor-bin/deptrac/`      | Deptrac      | Architectural dependencies |
 | `vendor-bin/infection/`    | Infection    | Mutation testing           |
 | `vendor-bin/pdepend/`      | PDepend      | Code complexity metrics    |
+| `vendor-bin/phpbench/`     | PHPBench     | Performance benchmarks     |
 
 ### Update Individual Tool
 

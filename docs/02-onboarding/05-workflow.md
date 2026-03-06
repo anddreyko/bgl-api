@@ -101,7 +101,7 @@ Run full validation:
 composer scan:all  # MANDATORY - full check
 ```
 
-This runs: lint, psalm, pdepend, deptrac, composer check, and all tests.
+This runs: lint, psalm, pdepend, deptrac, composer check, all tests, and mutation testing.
 
 **Do not push if `composer scan:all` fails.**
 
@@ -129,7 +129,9 @@ When implementing features, follow this order:
          |
 4. Acceptance Tests   composer test:web, composer test:cli
          |
-5. Mutation Testing   composer in:ps
+5. Mutation Testing   composer in:ps (runs automatically as part of test:all)
+         |
+6. Benchmarks         composer bm:run (performance-sensitive changes)
 ```
 
 Integration tests are the primary source of confidence. Don't aim for 100% unit test coverage.
@@ -155,8 +157,10 @@ Before pushing your branch:
 - [ ] `composer ps:run` passes (static analysis)
 - [ ] `composer pd:check` passes (complexity: CCN <= 8, NPath <= 100, LOC <= 40, WMC <= 50)
 - [ ] `composer dt:run` passes (architecture)
-- [ ] `composer scan:all` passes (full validation)
+- [ ] `composer scan:all` passes (full validation incl. mutation testing)
 - [ ] Integration tests written for new code
+- [ ] `composer in:ps` passes (mutation testing, included in scan:all)
+- [ ] `composer bm:check` passes (if performance-sensitive changes, optional)
 - [ ] Commits follow Conventional Commits format
 - [ ] No emojis in code, comments, or commits
 
@@ -164,12 +168,14 @@ Before pushing your branch:
 
 ## Quick Reference
 
-| Stage         | Command             | Required      |
-|---------------|---------------------|---------------|
-| Before commit | `composer lp:run`   | Yes           |
-| Before commit | `composer ps:run`   | Yes           |
-| Before push   | `composer scan:all` | **MANDATORY** |
-| CI            | All checks          | Must pass     |
+| Stage         | Command             | Required          |
+|---------------|---------------------|-------------------|
+| Before commit | `composer lp:run`   | Yes               |
+| Before commit | `composer ps:run`   | Yes               |
+| Before push   | `composer scan:all` | **MANDATORY**     |
+| Before push   | `composer in:ps`    | Included in scan:all |
+| Before push   | `composer bm:check` | If perf-sensitive |
+| CI            | All checks          | Must pass         |
 
 ---
 

@@ -19,29 +19,41 @@ Principles
 
 ### Code Quality
 
-| Command             | Purpose                                           |
-|---------------------|---------------------------------------------------|
-| `composer cs:fix`   | Fix code style (PHP-CS-Fixer)                     |
-| `composer rc:run`   | Apply automated refactoring (Rector)              |
-| `composer lp:run`   | PHP syntax check (Lint)                           |
-| `composer ps:run`   | Static type analysis (Psalm)                      |
-| `composer pd:check` | Code complexity check (PDepend)                   |
-| `composer dt:run`   | Architecture dependency check (Deptrac) — **LAW** |
-| `composer cd:run`   | Check composer dependencies                       |
-| `composer scan:all` | **MANDATORY before push.** Full validation.       |
+| Command                | Purpose                                                            |
+|------------------------|--------------------------------------------------------------------|
+| `composer cs:fix`      | Fix code style (PHPCBF / PHP_CodeSniffer)                          |
+| `composer rc:run`      | Apply automated refactoring (Rector)                               |
+| `composer lp:run`      | PHP syntax check (Lint)                                            |
+| `composer ps:run`      | Static type analysis (Psalm)                                       |
+| `composer ps:clean`    | Clear Psalm cache                                                  |
+| `composer pd:check`    | Code complexity check (PDepend: CCN>8, NPath>100)                  |
+| `composer dt:run`      | Architecture dependency check (Deptrac) — **LAW**                  |
+| `composer cd`          | Check composer dependencies                                        |
+| `composer oa:run`      | Export and validate OpenAPI spec                                   |
+| `composer scan:all`    | **MANDATORY before push.** Full validation incl. mutation testing. |
+| `composer scan:php`    | Lint + Psalm + PDepend (PHP validation only)                       |
+| `composer scan:style`  | Rector + PHPCBF (auto-fix style)                                   |
+| `composer scan:depend` | Composer deps + Deptrac (dependency validation)                    |
+| `composer scan:api`    | OpenAPI validation only                                            |
+| `composer bm:run`      | Run performance benchmarks (PHPBench)                              |
+| `composer bm:base`     | Create performance baseline                                        |
+| `composer bm:check`    | Assert no performance regression vs baseline                       |
 
 ### Testing
 
-| Command                  | Purpose                  |
-|--------------------------|--------------------------|
-| `composer test:all`      | Run all test suites      |
-| `composer test:unit`     | Unit tests               |
-| `composer test:func`     | Functional tests         |
-| `composer test:intg`     | Integration tests        |
-| `composer test:web`      | Acceptance API tests     |
-| `composer test:cli`      | Acceptance CLI tests     |
-| `composer test:coverage` | Generate coverage report |
-| `composer in:ps`         | Mutation testing         |
+| Command                  | Purpose                                |
+|--------------------------|----------------------------------------|
+| `composer test:all`      | Run all test suites + mutation testing |
+| `composer test:unit`     | Unit tests                             |
+| `composer test:func`     | Functional tests                       |
+| `composer test:intg`     | Integration tests                      |
+| `composer test:web`      | Acceptance API tests                   |
+| `composer test:cli`      | Acceptance CLI tests                   |
+| `composer test:smoke`    | Smoke tests                            |
+| `composer test:rebuild`  | Clean cache and build helpers          |
+| `composer test:coverage` | Generate coverage report               |
+| `composer in:ps`         | Mutation testing (Psalm)               |
+| `composer in:run`        | Mutation testing (Infection)           |
 
 ### Database
 
@@ -218,6 +230,7 @@ No domain services. Cross-context interaction only via Domain Events. See `docs/
 2. Functional & Integration Tests: `composer test:func`, `composer test:intg` -- **main focus**
 3. Unit Tests: `composer test:unit` -- complex logic only
 4. Acceptance Tests: `composer test:web`, `composer test:cli`
+5. Benchmarks: `composer bm:run` -- performance-sensitive changes
 
 ### TDD
 

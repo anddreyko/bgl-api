@@ -125,9 +125,9 @@
         "cd": "vendor-bin/composer-dependency/vendor/bin/composer-dependency-analyser",
         "dt": "vendor-bin/deptrac/vendor/bin/deptrac",
         "dt:run": "@dt analyse --config-file=deptrac.yml --cache-file=var/.deptrac.cache --no-progress",
-        "in": "APP_ENV=test vendor-bin/codeception/vendor/bin/infection",
-        "in:run": "@in --threads=4 --min-msi=70 --min-covered-msi=80",
-        "in:ps": "APP_ENV=test vendor-bin/codeception/vendor/bin/roave-infection-static-analysis-plugin --threads=4 --psalm-config psalm.xml",
+        "in": "APP_ENV=test php -d memory_limit=512M vendor-bin/codeception/vendor/bin/infection",
+        "in:run": "@in --min-msi=70 --min-covered-msi=80",
+        "in:ps": "APP_ENV=test php -d memory_limit=512M vendor-bin/codeception/vendor/bin/roave-infection-static-analysis-plugin --psalm-config psalm.xml",
         "test": "APP_ENV=test vendor-bin/codeception/vendor/bin/codecept",
         "test:unit": "@test run Unit",
         "test:func": "@test run Functional",
@@ -152,7 +152,8 @@
             "@test:func",
             "@test:smoke",
             "@test:web -x smoke",
-            "@test:cli -x smoke"
+            "@test:cli -x smoke",
+            "@in:ps"
         ],
         "pd": "vendor-bin/pdepend/vendor/bin/pdepend",
         "pd:run": "sh -c 'vendor-bin/pdepend/vendor/bin/pdepend --summary-xml=var/pdepend-summary.xml --suffix=php src/ >/dev/null 2>&1 || true'",
