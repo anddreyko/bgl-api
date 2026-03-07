@@ -55,9 +55,6 @@ return [
         /** @var \Bgl\Core\Serialization\Deserializer $deserializer */
         $deserializer = $c->get(Deserializer::class);
 
-        /** @var Transactor $transactor */
-        $transactor = $c->get(Transactor::class);
-
         $remote = new BggGames(
             new Client(['base_uri' => $bgg['base_url']]),
             new XmlFieldExtractor(),
@@ -70,7 +67,6 @@ return [
         return new CompositeGames(
             new DoctrineGames($em),
             $remote,
-            $transactor,
         );
     },
 ];

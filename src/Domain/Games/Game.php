@@ -12,10 +12,10 @@ final class Game
     private function __construct(
         private readonly Uuid $id,
         private readonly int $bggId,
-        private string $name,
-        private ?int $yearPublished,
+        private readonly string $name,
+        private readonly ?int $yearPublished,
         private readonly DateTime $createdAt,
-        private DateTime $updatedAt,
+        private readonly DateTime $updatedAt,
     ) {
     }
 
@@ -57,12 +57,5 @@ final class Game
     public function getUpdatedAt(): DateTime
     {
         return $this->updatedAt;
-    }
-
-    public function updateFromCatalog(string $name, ?int $yearPublished, DateTime $updatedAt): void
-    {
-        $this->name = $name;
-        $this->yearPublished = $yearPublished;
-        $this->updatedAt = $updatedAt;
     }
 }
