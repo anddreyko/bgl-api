@@ -1,0 +1,17 @@
+{
+  "version": "2",
+  "on": {
+    "method": {
+      "isSameString": "GET"
+    },
+    "url": {
+      "matches": "~.*/xmlapi2/search.*query=unavailable_trigger.*~"
+    }
+  },
+  "then": {
+    "response": {
+      "statusCode": 503,
+      "body": "Service Unavailable"
+    }
+  }
+}

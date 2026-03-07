@@ -10,6 +10,7 @@ use Bgl\Core\Listing\Filter\None;
 use Bgl\Core\Listing\Page\PageNumber;
 use Bgl\Core\Listing\Page\PageSize;
 use Bgl\Core\Listing\Page\PageSort;
+use Bgl\Core\Persistence\Transactor;
 use Bgl\Domain\Games\Game;
 use Bgl\Domain\Games\Games;
 
@@ -18,6 +19,7 @@ final readonly class CompositeGames implements Games
     public function __construct(
         private Games $local,
         private Games $remote,
+        private Transactor $transactor,
     ) {
     }
 
@@ -47,6 +49,10 @@ final readonly class CompositeGames implements Games
             }
         } catch (\Throwable) {
             $bggFailed = true;
+        }
+
+        if (!$bggFailed) {
+            $this->transactor->flush();
         }
 
         $results = $this->local->search($filter, $size, $number, $sort);

@@ -120,6 +120,24 @@ services:
       timeout: 5s
       retries: 3
 
+  bgg-mock:
+    build:
+      context: .docker/dev/phiremock
+    volumes:
+      - ./tests/Support/Data/phiremock:/opt/phiremock/expectation-files:cached
+    ports:
+      - "${PHIREMOCK_EXTERNAL_PORT}:${PHIREMOCK_HTTP_PORT}"
+    networks:
+      bglapinet:
+        ipv4_address: "${PHIREMOCK_NETWORK_IP}"
+        aliases:
+          - bgg-mock
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 -O /dev/null http://127.0.0.1:${PHIREMOCK_HTTP_PORT}/__phiremock/expectations || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
 volumes:
   api-postgres:
   api-redis:
