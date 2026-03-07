@@ -15,32 +15,32 @@ deptrac:
     - name: Core
       collectors:
         - type: directory
-          value: src/Core/.*
+          value: app/src/Core/.*
 
     - name: Domain
       collectors:
         - type: directory
-          value: src/Domain/.*
+          value: app/src/Domain/.*
 
     - name: Application
       collectors:
         - type: directory
-          value: src/Application/.*
+          value: app/src/Application/.*
 
     - name: Infrastructure
       collectors:
         - type: directory
-          value: src/Infrastructure/.*
+          value: app/src/Infrastructure/.*
 
     - name: Presentation
       collectors:
         - type: directory
-          value: src/Presentation/.*
+          value: app/src/Presentation/.*
 
     - name: Vendor
       collectors:
         - type: directory
-          value: vendor/.*
+          value: app/vendor/.*
 
   ruleset:
     Core: [ ]
