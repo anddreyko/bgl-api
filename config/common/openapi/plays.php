@@ -19,11 +19,17 @@ return [
                     'summary' => 'List user play sessions',
                     'operationId' => 'listSessions',
                     'tags' => ['Plays'],
-                    'security' => [['BearerAuth' => []]],
+                    'security' => [['BearerAuth' => []], []],
                     'x-message' => ListPlays\Query::class,
-                    'x-interceptors' => [AuthInterceptor::class],
+                    'x-interceptors' => [OptionalAuthInterceptor::class],
                     'x-auth' => ['userId'],
                     'parameters' => [
+                        [
+                            'name' => 'author_id',
+                            'in' => 'query',
+                            'required' => false,
+                            'schema' => ['type' => 'string', 'format' => 'uuid'],
+                        ],
                         [
                             'name' => 'page',
                             'in' => 'query',

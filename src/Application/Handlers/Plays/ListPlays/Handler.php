@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Application\Handlers\Plays\ListPlays;
 
+use Bgl\Core\Auth\AuthenticationException;
 use Bgl\Core\Listing\Field;
 use Bgl\Core\Listing\Filter;
 use Bgl\Core\Listing\Filter\AndX;
@@ -11,8 +12,7 @@ use Bgl\Core\Listing\Filter\Equals;
 use Bgl\Core\Listing\Filter\Greater;
 use Bgl\Core\Listing\Filter\Less;
 use Bgl\Core\Listing\Filter\Not;
-use Bgl\Domain\Plays\PlayStatus;
-use Bgl\Core\ValueObjects\DateTime;
+use Bgl\Core\Listing\Filter\OrX;
 use Bgl\Core\Listing\Page\PageNumber;
 use Bgl\Core\Listing\Page\PageSize;
 use Bgl\Core\Listing\Page\PageSort;
@@ -20,12 +20,15 @@ use Bgl\Core\Listing\Page\SortDirection;
 use Bgl\Core\Listing\Page\SortFields;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Domain\Games\Game;
 use Bgl\Domain\Games\Games;
 use Bgl\Domain\Plays\Play;
-use Bgl\Domain\Profile\Users;
 use Bgl\Domain\Plays\Player\Player;
 use Bgl\Domain\Plays\Plays;
+use Bgl\Domain\Plays\PlayStatus;
+use Bgl\Domain\Plays\Visibility;
+use Bgl\Domain\Profile\Users;
 
 /**
  * @implements MessageHandler<Result, Query>
@@ -78,26 +81,51 @@ final readonly class Handler implements MessageHandler
 
     private function buildFilter(Query $query): Filter
     {
-        $userFilter = new Equals(new Field('userId'), $query->userId);
+        $targetUserId = $query->authorId ?? $query->userId;
+        if ($targetUserId === null) {
+            throw new AuthenticationException();
+        }
 
-        /** @var list<Filter> $extra */
-        $extra = [
+        $isViewingOther = $query->authorId !== null && $query->authorId !== $query->userId;
+
+        /** @var non-empty-list<Filter> $filters */
+        $filters = [
+            new Equals(new Field('userId'), $targetUserId),
             new Not(new Equals(new Field('status'), PlayStatus::Deleted->value)),
         ];
 
+        if ($isViewingOther) {
+            $filters[] = new Equals(new Field('status'), PlayStatus::Published->value);
+            $filters[] = $this->visibilityFilter($query->userId !== null);
+        }
+
         if ($query->gameId !== null && $query->gameId !== '') {
-            $extra[] = new Equals(new Field('gameId'), $query->gameId);
+            $filters[] = new Equals(new Field('gameId'), $query->gameId);
         }
 
         if ($query->from !== null) {
-            $extra[] = new Greater(new Field('startedAt'), new DateTime($query->from));
+            $filters[] = new Greater(new Field('startedAt'), new DateTime($query->from));
         }
 
         if ($query->to !== null) {
-            $extra[] = new Less(new Field('startedAt'), new DateTime($query->to));
+            $filters[] = new Less(new Field('startedAt'), new DateTime($query->to));
         }
 
-        return new AndX([$userFilter, ...$extra]);
+        return new AndX($filters);
+    }
+
+    private function visibilityFilter(bool $isAuthenticated): OrX
+    {
+        $allowed = $isAuthenticated
+            ? [Visibility::Public, Visibility::Link, Visibility::Authenticated]
+            : [Visibility::Public, Visibility::Link];
+
+        return new OrX(
+            array_map(
+                static fn(Visibility $v): Equals => new Equals(new Field('visibility'), $v->value),
+                $allowed,
+            )
+        );
     }
 
     /**

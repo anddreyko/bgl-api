@@ -6,6 +6,8 @@ namespace Bgl\Tests\Functional\Plays;
 
 use Bgl\Application\Handlers\Plays\CreatePlay;
 use Bgl\Application\Handlers\Plays\ListPlays;
+use Bgl\Application\Handlers\Plays\UpdatePlay;
+use Bgl\Core\Auth\AuthenticationException;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\ValueObjects\DateTime;
@@ -26,6 +28,7 @@ final class ListPlaysCest
 {
     private ListPlays\Handler $handler;
     private CreatePlay\Handler $createHandler;
+    private UpdatePlay\Handler $updateHandler;
     private Mates $mates;
     private Games $games;
     private UuidGenerator $uuidGenerator;
@@ -44,6 +47,9 @@ final class ListPlaysCest
 
         /** @var CreatePlay\Handler $createHandler */
         $this->createHandler = $container->get(CreatePlay\Handler::class);
+
+        /** @var UpdatePlay\Handler $updateHandler */
+        $this->updateHandler = $container->get(UpdatePlay\Handler::class);
 
         /** @var Mates $mates */
         $this->mates = $container->get(Mates::class);
@@ -276,6 +282,114 @@ final class ListPlaysCest
         $i->assertSame('red', $result->data[0]['players'][0]['color']);
     }
 
+    public function testListPlaysByAuthorIdShowsPublicOnly(FunctionalTester $i): void
+    {
+        $otherUserId = new Uuid('author-public-' . uniqid());
+        $otherMateId = $this->uuidGenerator->generate();
+        $this->mates->add(Mate::create($otherMateId, $otherUserId, 'Charlie', null, new DateTime()));
+
+        $publicId = $this->createPlayForUser($otherUserId, 'Public session');
+        $this->publishPlay($publicId, $otherUserId, 'public', 'Public session');
+
+        $linkId = $this->createPlayForUser($otherUserId, 'Link session');
+        $this->publishPlay($linkId, $otherUserId, 'link', 'Link session');
+
+        $authId = $this->createPlayForUser($otherUserId, 'Auth session');
+        $this->publishPlay($authId, $otherUserId, 'authenticated', 'Auth session');
+
+        $privateId = $this->createPlayForUser($otherUserId, 'Private session');
+        $this->publishPlay($privateId, $otherUserId, 'private', 'Private session');
+
+        $result = ($this->handler)(new Envelope(
+            message: new ListPlays\Query(
+                userId: (string)$this->userId,
+                authorId: (string)$otherUserId,
+            ),
+            messageId: 'msg-list-author-public',
+        ));
+
+        $i->assertSame(3, $result->total);
+        $names = array_column($result->data, 'name');
+        $i->assertContains('Public session', $names);
+        $i->assertContains('Link session', $names);
+        $i->assertContains('Auth session', $names);
+        $i->assertNotContains('Private session', $names);
+    }
+
+    public function testListPlaysByAuthorIdHidesDraftAndDeleted(FunctionalTester $i): void
+    {
+        $otherUserId = new Uuid('author-draft-' . uniqid());
+        $otherMateId = $this->uuidGenerator->generate();
+        $this->mates->add(Mate::create($otherMateId, $otherUserId, 'Dave', null, new DateTime()));
+
+        $this->createPlayForUser($otherUserId, 'Draft session');
+
+        $publishedId = $this->createPlayForUser($otherUserId, 'Published session');
+        $this->publishPlay($publishedId, $otherUserId, 'public', 'Published session');
+
+        $result = ($this->handler)(new Envelope(
+            message: new ListPlays\Query(
+                userId: (string)$this->userId,
+                authorId: (string)$otherUserId,
+            ),
+            messageId: 'msg-list-author-no-draft',
+        ));
+
+        $i->assertSame(1, $result->total);
+        $i->assertSame('Published session', $result->data[0]['name']);
+    }
+
+    public function testListPlaysByAuthorIdSelfShowsAll(FunctionalTester $i): void
+    {
+        $this->createPlay('My draft');
+
+        $publishedId = $this->createPlayReturningId('My published');
+        $this->publishPlay($publishedId, $this->userId, 'public', 'My published');
+
+        $result = ($this->handler)(new Envelope(
+            message: new ListPlays\Query(
+                userId: (string)$this->userId,
+                authorId: (string)$this->userId,
+            ),
+            messageId: 'msg-list-author-self',
+        ));
+
+        $i->assertSame(2, $result->total);
+    }
+
+    public function testListPlaysWithoutAuthAndWithoutAuthorIdThrows(FunctionalTester $i): void
+    {
+        $i->expectThrowable(AuthenticationException::class, function (): void {
+            ($this->handler)(new Envelope(
+                message: new ListPlays\Query(),
+                messageId: 'msg-list-no-auth',
+            ));
+        });
+    }
+
+    public function testListPlaysByAuthorIdWithoutAuthShowsPublicAndLinkOnly(FunctionalTester $i): void
+    {
+        $otherUserId = new Uuid('author-noauth-' . uniqid());
+        $otherMateId = $this->uuidGenerator->generate();
+        $this->mates->add(Mate::create($otherMateId, $otherUserId, 'Eve', null, new DateTime()));
+
+        $publicId = $this->createPlayForUser($otherUserId, 'Public play');
+        $this->publishPlay($publicId, $otherUserId, 'public', 'Public play');
+
+        $authId = $this->createPlayForUser($otherUserId, 'Auth play');
+        $this->publishPlay($authId, $otherUserId, 'authenticated', 'Auth play');
+
+        $result = ($this->handler)(new Envelope(
+            message: new ListPlays\Query(
+                authorId: (string)$otherUserId,
+            ),
+            messageId: 'msg-list-author-noauth',
+        ));
+
+        $i->assertSame(1, $result->total);
+        $i->assertSame('Public play', $result->data[0]['name']);
+    }
+
     private function createPlay(
         string $name,
         ?string $gameId = null,
@@ -289,6 +403,47 @@ final class ListPlaysCest
                 startedAt: $startedAt !== null ? new DateTime($startedAt) : null,
             ),
             messageId: 'msg-create-' . uniqid(),
+        ));
+    }
+
+    private function createPlayReturningId(string $name, ?string $gameId = null): Uuid
+    {
+        $result = ($this->createHandler)(new Envelope(
+            message: new CreatePlay\Command(
+                userId: $this->userId,
+                name: $name,
+                gameId: $gameId !== null ? new Uuid($gameId) : null,
+            ),
+            messageId: 'msg-create-' . uniqid(),
+        ));
+
+        return new Uuid($result->id);
+    }
+
+    private function createPlayForUser(Uuid $userId, string $name): Uuid
+    {
+        $result = ($this->createHandler)(new Envelope(
+            message: new CreatePlay\Command(
+                userId: $userId,
+                name: $name,
+            ),
+            messageId: 'msg-create-' . uniqid(),
+        ));
+
+        return new Uuid($result->id);
+    }
+
+    private function publishPlay(Uuid $sessionId, Uuid $userId, string $visibility, string $name = ''): void
+    {
+        ($this->updateHandler)(new Envelope(
+            message: new UpdatePlay\Command(
+                sessionId: $sessionId,
+                userId: $userId,
+                name: $name,
+                visibility: $visibility,
+                status: 'published',
+            ),
+            messageId: 'msg-update-' . uniqid(),
         ));
     }
 }

@@ -12,15 +12,17 @@ use Bgl\Core\Messages\Message;
 final readonly class Query implements Message
 {
     /**
-     * @param non-empty-string $userId
+     * @param ?non-empty-string $userId
+     * @param ?non-empty-string $authorId
      */
     public function __construct(
-        public string $userId,
+        public ?string $userId = null,
         public int $page = 1,
         public int $size = 20,
         public ?string $gameId = null,
         public ?string $from = null,
         public ?string $to = null,
+        public ?string $authorId = null,
     ) {
     }
 }
