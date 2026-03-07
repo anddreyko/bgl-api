@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Bgl\Infrastructure\Http\OpenApiSchemaEnforcer;
 use cebe\openapi\spec\OpenApi;
 use League\OpenAPIValidation\PSR7\ServerRequestValidator as LeagueServerRequestValidator;
 use League\OpenAPIValidation\PSR7\ValidatorBuilder;
@@ -35,6 +36,8 @@ return [
                 $paths[$pathKey][$method] = $operation;
             }
         }
+
+        $paths = OpenApiSchemaEnforcer::denyAdditionalPropertiesInRequests($paths);
 
         $config['paths'] = $paths;
 
