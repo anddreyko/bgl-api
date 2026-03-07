@@ -95,8 +95,18 @@ final class HydratorMapperCest
 
         $result = $this->mapper->map($request);
 
-        $i->assertSame('2', $result->get('page'));
-        $i->assertSame('10', $result->get('limit'));
+        $i->assertSame(2, $result->get('page'));
+        $i->assertSame(10, $result->get('limit'));
+    }
+
+    public function testStringQueryParamsRemainStrings(UnitTester $i): void
+    {
+        $request = new ServerRequest('GET', '/v1/games?q=catan');
+        $request = $request->withQueryParams(['q' => 'catan']);
+
+        $result = $this->mapper->map($request);
+
+        $i->assertSame('catan', $result->get('q'));
     }
 
     public function testAllSourcesCombined(UnitTester $i): void

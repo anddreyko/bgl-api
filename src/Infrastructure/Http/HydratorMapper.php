@@ -23,8 +23,10 @@ final readonly class HydratorMapper implements SchemaMapper
     ): SerializedData {
         /** @var array<string, mixed> $body */
         $body = (array)($request->getParsedBody() ?? []);
+        /** @var array<string, string> $queryParams */
+        $queryParams = $request->getQueryParams();
         /** @var array<string, mixed> $data */
-        $data = array_merge($body, $request->getQueryParams());
+        $data = array_merge($body, $this->castNumericQueryParams($queryParams));
 
         $this->applyParamMap($data, $paramMap);
         $this->mergePathParams($data, $pathParams, $paramMap);
@@ -59,6 +61,20 @@ final readonly class HydratorMapper implements SchemaMapper
             }
             $data[$mappedKey] = $value;
         }
+    }
+
+    /**
+     * @param array<string, string> $params
+     * @return array<string, string|int>
+     */
+    private function castNumericQueryParams(array $params): array
+    {
+        $result = [];
+        foreach ($params as $key => $value) {
+            $result[$key] = ctype_digit($value) ? (int)$value : $value;
+        }
+
+        return $result;
     }
 
     /**
