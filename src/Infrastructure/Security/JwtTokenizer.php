@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Security;
 
-use Bgl\Core\Security\TokenPayload;
 use Bgl\Core\Security\Tokenizer;
+use Bgl\Core\Security\TokenPayload;
+use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\JwtFacade;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Signer\Key\InMemory;
@@ -40,13 +41,7 @@ final readonly class JwtTokenizer implements Tokenizer
         $token = $facade->issue(
             $this->signer,
             $this->key,
-            function (
-                \Lcobucci\JWT\Builder $builder,
-                \DateTimeImmutable $issuedAt,
-            ) use (
-                $payload,
-                $ttlSeconds,
-            ): \Lcobucci\JWT\Builder {
+            function (Builder $builder, \DateTimeImmutable $issuedAt) use ($payload, $ttlSeconds): Builder {
                 $builder = $builder->expiresAt($issuedAt->modify('+' . $ttlSeconds . ' seconds'));
 
                 /**
@@ -54,7 +49,13 @@ final readonly class JwtTokenizer implements Tokenizer
                  * @var mixed $value
                  */
                 foreach ($payload as $name => $value) {
-                    $builder = $builder->withClaim($name, $value);
+                    if ($name === 'sub') {
+                        /** @var non-empty-string $sub */
+                        $sub = (string)$value;
+                        $builder = $builder->relatedTo($sub);
+                    } else {
+                        $builder = $builder->withClaim($name, $value);
+                    }
                 }
 
                 return $builder;
@@ -83,7 +84,7 @@ final readonly class JwtTokenizer implements Tokenizer
             /** @var array<non-empty-string, mixed> $claims */
             $claims = $parsed->claims()->all();
 
-            $registeredKeys = RegisteredClaims::ALL;
+            $registeredKeys = array_diff(RegisteredClaims::ALL, [RegisteredClaims::SUBJECT]);
 
             return TokenPayload::fromArray(array_diff_key($claims, array_flip($registeredKeys)));
         } catch (\RuntimeException $exception) {

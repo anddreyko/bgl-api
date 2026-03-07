@@ -34,14 +34,14 @@ final readonly class JwtTokenIssuer implements TokenIssuer
 
         $accessToken = $this->tokenizer->generate(
             TokenPayload::fromArray(
-                ['userId' => $userId, 'type' => 'access', 'tokenVersion' => $user->getTokenVersion()]
+                ['sub' => $userId, 'type' => 'access', 'tokenVersion' => $user->getTokenVersion()]
             ),
             $this->tokenConfig->accessTtl,
         );
 
         $refreshToken = $this->tokenizer->generate(
             TokenPayload::fromArray(
-                ['userId' => $userId, 'type' => 'refresh', 'tokenVersion' => $user->getTokenVersion()]
+                ['sub' => $userId, 'type' => 'refresh', 'tokenVersion' => $user->getTokenVersion()]
             ),
             $this->tokenConfig->refreshTtl,
         );

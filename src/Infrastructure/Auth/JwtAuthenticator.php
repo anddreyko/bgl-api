@@ -121,7 +121,7 @@ final readonly class JwtAuthenticator implements Authenticator
 
     private function findUserFromPayload(TokenPayload $payload): User
     {
-        $userId = $payload->getString('userId');
+        $userId = $payload->getString('sub');
         if ($userId === null) {
             throw new AuthenticationException('Unauthorized');
         }
