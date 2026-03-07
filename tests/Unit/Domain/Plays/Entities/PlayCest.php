@@ -8,7 +8,7 @@ use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Plays\Play;
 use Bgl\Domain\Plays\Player\Player;
-use Bgl\Domain\Plays\PlayNotDraftException;
+use Bgl\Domain\Plays\PlayDeletedException;
 use Bgl\Domain\Plays\PlayStatus;
 use Bgl\Domain\Plays\Visibility;
 use Bgl\Infrastructure\Persistence\InMemory\InMemoryPlayers;
@@ -71,7 +71,7 @@ final class PlayCest
         $i->assertSame('user-abc', $play->getUserId()->getValue());
     }
 
-    public function testFinalizeChangesStatusToPublishedAndSetsFinishedAt(UnitTester $i): void
+    public function testFinalizeSetsFinishedAtWithoutChangingStatus(UnitTester $i): void
     {
         $play = Play::create(
             new Uuid('play-id'),
@@ -84,26 +84,43 @@ final class PlayCest
         $finishedAt = new DateTime('2024-06-15 23:00:00');
         $play->finalize($finishedAt);
 
+        $i->assertSame(PlayStatus::Draft, $play->getStatus());
+        $i->assertSame($finishedAt, $play->getFinishedAt());
+    }
+
+    public function testFinalizeWorksWhenPublished(UnitTester $i): void
+    {
+        $play = new Play(
+            new Uuid('play-id'),
+            new Uuid('user-123'),
+            null,
+            PlayStatus::Published,
+            new DateTime('2024-06-15 20:00:00'),
+            null,
+        );
+
+        $finishedAt = new DateTime('2024-06-15 23:00:00');
+        $play->finalize($finishedAt);
+
         $i->assertSame(PlayStatus::Published, $play->getStatus());
         $i->assertSame($finishedAt, $play->getFinishedAt());
     }
 
-    public function testFinalizeThrowsWhenPlayIsNotDraft(UnitTester $i): void
+    public function testFinalizeThrowsWhenDeleted(UnitTester $i): void
     {
-        $play = Play::create(
+        $play = new Play(
             new Uuid('play-id'),
             new Uuid('user-123'),
             null,
+            PlayStatus::Deleted,
             new DateTime('2024-06-15 20:00:00'),
-            new InMemoryPlayers(),
+            null,
         );
 
-        $play->finalize(new DateTime('2024-06-15 23:00:00'));
-
         $i->expectThrowable(
-            new PlayNotDraftException('Play can only be finalized from draft status.'),
+            PlayDeletedException::class,
             static function () use ($play): void {
-                $play->finalize(new DateTime('2024-06-16 00:00:00'));
+                $play->finalize(new DateTime('2024-06-15 23:00:00'));
             },
         );
     }
@@ -186,7 +203,46 @@ final class PlayCest
         $i->assertSame(Visibility::Public, $play->getVisibility());
     }
 
-    public function testUpdateThrowsWhenNotDraft(UnitTester $i): void
+    public function testUpdateWorksWhenPublished(UnitTester $i): void
+    {
+        $play = new Play(
+            new Uuid('play-id'),
+            new Uuid('user-123'),
+            null,
+            PlayStatus::Published,
+            new DateTime('2024-06-15 20:00:00'),
+            new DateTime('2024-06-15 23:00:00'),
+        );
+
+        $newGameId = new Uuid('game-new');
+        $play->update('Updated name', $newGameId, Visibility::Public);
+
+        $i->assertSame('Updated name', $play->getName());
+        $i->assertSame($newGameId, $play->getGameId());
+        $i->assertSame(Visibility::Public, $play->getVisibility());
+        $i->assertSame(PlayStatus::Published, $play->getStatus());
+    }
+
+    public function testUpdateThrowsWhenDeleted(UnitTester $i): void
+    {
+        $play = new Play(
+            new Uuid('play-id'),
+            new Uuid('user-123'),
+            null,
+            PlayStatus::Deleted,
+            new DateTime('2024-06-15 20:00:00'),
+            new DateTime('2024-06-15 23:00:00'),
+        );
+
+        $i->expectThrowable(
+            new PlayDeletedException('Deleted play cannot be updated.'),
+            static function () use ($play): void {
+                $play->update('name', null, Visibility::Private);
+            },
+        );
+    }
+
+    public function testUpdateStatusDraftToPublished(UnitTester $i): void
     {
         $play = Play::create(
             new Uuid('play-id'),
@@ -196,12 +252,154 @@ final class PlayCest
             new InMemoryPlayers(),
         );
 
-        $play->finalize(new DateTime('2024-06-15 23:00:00'));
+        $play->update(null, null, Visibility::Private, PlayStatus::Published);
+
+        $i->assertSame(PlayStatus::Published, $play->getStatus());
+    }
+
+    public function testUpdateStatusPublishedToDraft(UnitTester $i): void
+    {
+        $play = new Play(
+            new Uuid('play-id'),
+            new Uuid('user-123'),
+            null,
+            PlayStatus::Published,
+            new DateTime('2024-06-15 20:00:00'),
+            new DateTime('2024-06-15 23:00:00'),
+        );
+
+        $play->update(null, null, Visibility::Private, PlayStatus::Draft);
+
+        $i->assertSame(PlayStatus::Draft, $play->getStatus());
+    }
+
+    public function testUpdateStatusToDeletedThrows(UnitTester $i): void
+    {
+        $play = Play::create(
+            new Uuid('play-id'),
+            new Uuid('user-123'),
+            null,
+            new DateTime('2024-06-15 20:00:00'),
+            new InMemoryPlayers(),
+        );
 
         $i->expectThrowable(
-            new PlayNotDraftException('Play can only be updated in draft status.'),
+            PlayDeletedException::class,
             static function () use ($play): void {
-                $play->update('name', null, Visibility::Private);
+                $play->update(null, null, Visibility::Private, PlayStatus::Deleted);
+            },
+        );
+    }
+
+    public function testUpdateStatusNullKeepsCurrent(UnitTester $i): void
+    {
+        $play = Play::create(
+            new Uuid('play-id'),
+            new Uuid('user-123'),
+            null,
+            new DateTime('2024-06-15 20:00:00'),
+            new InMemoryPlayers(),
+        );
+
+        $play->update('name', null, Visibility::Private);
+
+        $i->assertSame(PlayStatus::Draft, $play->getStatus());
+    }
+
+    public function testDeleteFromDraftChangesStatusToDeleted(UnitTester $i): void
+    {
+        $play = Play::create(
+            new Uuid('play-id'),
+            new Uuid('user-123'),
+            'Game night',
+            new DateTime('2024-06-15 20:00:00'),
+            new InMemoryPlayers(),
+        );
+
+        $play->delete();
+
+        $i->assertSame(PlayStatus::Deleted, $play->getStatus());
+    }
+
+    public function testDeleteFromPublishedChangesStatusToDeleted(UnitTester $i): void
+    {
+        $play = new Play(
+            new Uuid('play-id'),
+            new Uuid('user-123'),
+            null,
+            PlayStatus::Published,
+            new DateTime('2024-06-15 20:00:00'),
+            new DateTime('2024-06-15 23:00:00'),
+        );
+
+        $play->delete();
+
+        $i->assertSame(PlayStatus::Deleted, $play->getStatus());
+    }
+
+    public function testDeleteAlreadyDeletedThrows(UnitTester $i): void
+    {
+        $play = new Play(
+            new Uuid('play-id'),
+            new Uuid('user-123'),
+            null,
+            PlayStatus::Deleted,
+            new DateTime('2024-06-15 20:00:00'),
+            new DateTime('2024-06-15 23:00:00'),
+        );
+
+        $i->expectThrowable(
+            PlayDeletedException::class,
+            static function () use ($play): void {
+                $play->delete();
+            },
+        );
+    }
+
+    public function testReplacePlayersRemovesOldAndAddsNew(UnitTester $i): void
+    {
+        $players = new InMemoryPlayers();
+        $play = Play::create(
+            new Uuid('play-id'),
+            new Uuid('user-123'),
+            'Game night',
+            new DateTime('2024-06-15 20:00:00'),
+            $players,
+        );
+
+        $oldPlayer = Player::create(new Uuid('player-old'), $play, new Uuid('mate-old'), null, false, null);
+        $play->addPlayer($oldPlayer);
+        $i->assertSame(1, $play->getPlayers()->count());
+
+        $newPlayers = new InMemoryPlayers();
+        $newPlayer1 = Player::create(new Uuid('player-new-1'), $play, new Uuid('mate-new-1'), 10, true, 'blue');
+        $newPlayer2 = Player::create(new Uuid('player-new-2'), $play, new Uuid('mate-new-2'), 5, false, 'red');
+        $newPlayers->add($newPlayer1);
+        $newPlayers->add($newPlayer2);
+
+        $play->replacePlayers($newPlayers);
+
+        $i->assertSame(2, $play->getPlayers()->count());
+        $i->assertNull($play->getPlayers()->find((string) $oldPlayer->getId()));
+        $i->assertNotNull($play->getPlayers()->find((string) $newPlayer1->getId()));
+        $i->assertNotNull($play->getPlayers()->find((string) $newPlayer2->getId()));
+    }
+
+    public function testReplacePlayersOnDeletedThrows(UnitTester $i): void
+    {
+        $play = new Play(
+            new Uuid('play-id'),
+            new Uuid('user-123'),
+            null,
+            PlayStatus::Deleted,
+            new DateTime('2024-06-15 20:00:00'),
+            null,
+        );
+
+        $i->expectThrowable(
+            PlayDeletedException::class,
+            static function () use ($play): void {
+                $play->replacePlayers(new InMemoryPlayers());
             },
         );
     }

@@ -92,29 +92,52 @@ final class Play
         return $this->visibility;
     }
 
-    public function update(?string $name, ?Uuid $gameId, Visibility $visibility): void
+    public function delete(): void
     {
-        if ($this->status !== PlayStatus::Draft) {
-            throw new PlayNotDraftException('Play can only be updated in draft status.');
+        if ($this->status === PlayStatus::Deleted) {
+            throw new PlayDeletedException('Play is already deleted.');
+        }
+
+        $this->status = PlayStatus::Deleted;
+    }
+
+    public function update(?string $name, ?Uuid $gameId, Visibility $visibility, ?PlayStatus $status = null): void
+    {
+        if ($this->status === PlayStatus::Deleted) {
+            throw new PlayDeletedException('Deleted play cannot be updated.');
+        }
+
+        if ($status === PlayStatus::Deleted) {
+            throw new PlayDeletedException('Use delete() to delete a play.');
         }
 
         $this->name = $name;
         $this->gameId = $gameId;
         $this->visibility = $visibility;
-    }
 
-    public function changeVisibility(Visibility $visibility): void
-    {
-        if ($this->status !== PlayStatus::Draft) {
-            throw new PlayNotDraftException('Visibility can only be changed in draft status.');
+        if ($status !== null) {
+            $this->status = $status;
         }
-
-        $this->visibility = $visibility;
     }
 
     public function addPlayer(Player $player): void
     {
         $this->players->add($player);
+    }
+
+    public function replacePlayers(Players $newPlayers): void
+    {
+        if ($this->status === PlayStatus::Deleted) {
+            throw new PlayDeletedException('Deleted play cannot have players replaced.');
+        }
+
+        foreach ($this->players as $player) {
+            $this->players->remove($player);
+        }
+
+        foreach ($newPlayers as $player) {
+            $this->players->add($player);
+        }
     }
 
     /** @return Players */
@@ -126,15 +149,14 @@ final class Play
 
     public function finalize(DateTime $finishedAt): void
     {
-        if ($this->status !== PlayStatus::Draft) {
-            throw new PlayNotDraftException('Play can only be finalized from draft status.');
+        if ($this->status === PlayStatus::Deleted) {
+            throw new PlayDeletedException('Deleted play cannot be finalized.');
         }
 
         if ($finishedAt->getValue() <= $this->startedAt->getValue()) {
             throw new FinishedAtBeforeStartedAtException();
         }
 
-        $this->status = PlayStatus::Published;
         $this->finishedAt = $finishedAt;
     }
 }

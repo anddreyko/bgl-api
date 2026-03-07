@@ -55,6 +55,7 @@ return [
             [Plays\CreatePlay\Command::class, Plays\CreatePlay\Handler::class],
             [Plays\FinalizePlay\Command::class, Plays\FinalizePlay\Handler::class],
             [Plays\UpdatePlay\Command::class, Plays\UpdatePlay\Handler::class],
+            [Plays\DeletePlay\Command::class, Plays\DeletePlay\Handler::class],
             [Plays\GetPlay\Query::class, Plays\GetPlay\Handler::class],
             [Plays\ListPlays\Query::class, Plays\ListPlays\Handler::class],
             [Mates\CreateMate\Command::class, Mates\CreateMate\Handler::class],
