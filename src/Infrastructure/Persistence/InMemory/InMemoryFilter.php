@@ -103,6 +103,10 @@ final readonly class InMemoryFilter implements FilterVisitor
      */
     private function normalize(mixed $value): mixed
     {
+        if ($value instanceof \BackedEnum) {
+            return $value->value;
+        }
+
         if ($value instanceof \Stringable) {
             return (string)$value;
         }

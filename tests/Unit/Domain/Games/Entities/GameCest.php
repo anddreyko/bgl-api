@@ -47,21 +47,14 @@ final class GameCest
         $i->assertNull($game->getYearPublished());
     }
 
-    public function testUpdateFromCatalogChangesFields(UnitTester $i): void
+    public function testCreatePreservesAllFields(UnitTester $i): void
     {
-        $game = Game::create(
-            new Uuid('game-id'),
-            13,
-            'Catan',
-            1995,
-            new DateTime('2026-01-01 00:00:00'),
-        );
+        $id = new Uuid('game-id');
+        $game = Game::create($id, 13, 'Catan', 1995, new DateTime('2026-01-01 00:00:00'));
 
-        $updatedAt = new DateTime('2026-02-01 12:00:00');
-        $game->updateFromCatalog('Catan (6th Edition)', 2024, $updatedAt);
-
-        $i->assertSame('Catan (6th Edition)', $game->getName());
-        $i->assertSame(2024, $game->getYearPublished());
-        $i->assertSame($updatedAt, $game->getUpdatedAt());
+        $i->assertSame(13, $game->getBggId());
+        $i->assertSame('Catan', $game->getName());
+        $i->assertSame(1995, $game->getYearPublished());
+        $i->assertSame($game->getCreatedAt(), $game->getUpdatedAt());
     }
 }

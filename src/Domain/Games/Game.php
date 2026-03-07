@@ -7,15 +7,15 @@ namespace Bgl\Domain\Games;
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 
-final class Game
+final readonly class Game
 {
     private function __construct(
-        private readonly Uuid $id,
-        private readonly int $bggId,
-        private readonly string $name,
-        private readonly ?int $yearPublished,
-        private readonly DateTime $createdAt,
-        private readonly DateTime $updatedAt,
+        private Uuid $id,
+        private int $bggId,
+        private string $name,
+        private ?int $yearPublished,
+        private DateTime $createdAt,
+        private DateTime $updatedAt,
     ) {
     }
 
