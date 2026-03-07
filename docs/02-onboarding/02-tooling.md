@@ -209,13 +209,61 @@ composer bin all install
 
 ---
 
-## Pre-Commit Workflow
+## Quality Pipeline
+
+Full validation pipeline. Each step runs only if the previous one passes.
+
+```
+0. Code Style Fix
+   Rector + PHPCBF — modifies code, run FIRST
+   composer scan:style
+   |
+1. Dependency Check
+   Composer Dependency Analyser — composer.json integrity
+   composer cd
+   |
+2. Static Analysis
+   PHP Lint, Psalm, PDepend — syntax, types, complexity
+   composer lp:run, composer ps:run, composer pd:check
+   |
+3. Architecture
+   Deptrac — dependency law enforcement
+   composer dt:run
+   |
+4. API Contract
+   OpenAPI Export + Validate — spec consistency
+   composer oa:run
+   |
+5. Unit Tests
+   Codeception Unit — complex logic only
+   composer test:unit
+   |
+6. Integration Tests — MAIN FOCUS
+   Codeception Integration, Functional
+   composer test:intg, composer test:func
+   |
+7. Acceptance Tests
+   Codeception Smoke, Web, Cli — happy paths + access control
+   composer test:smoke, composer test:web, composer test:cli
+   |
+8. Mutation Testing
+   Infection + Psalm — test quality gate
+   composer in:ps
+   |
+9. Benchmarks (optional)
+   PHPBench — performance regression
+   composer bm:check
+```
+
+Steps 1-8 = `composer scan:all`. Step 0 = `composer scan:style` (run separately before). Step 9 is optional.
+
+### Pre-Commit Workflow
 
 ```bash
 # 1. Fix code style and apply refactoring
 composer scan:style
 
-# 2. Full check: syntax, types, architecture, tests
+# 2. Full check: syntax, types, architecture, tests, mutation testing
 composer scan:all
 
 # 3. Commit

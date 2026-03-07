@@ -393,14 +393,32 @@ Benchmark files location: `tests/Benchmark/{Layer}/`
 
 ## Development Priority
 
-When creating a new feature, follow the Testing Trophy order:
+When creating a new feature, follow the Quality Pipeline order:
 
-1. **Static Analysis** -- ensure `scan:php` and `scan:depend` pass
-2. **Functional Tests** -- write tests for handlers with InMemory/Fake dependencies
-3. **Integration Tests** -- write tests for repository and infrastructure contracts
-4. **Unit Tests** -- only if there is complex isolated pure logic
-5. **End-to-End Tests** -- only for critical scenarios
-6. **Mutation Tests** -- verify `composer in:ps` passes
+```
+0. Code Style Fix       Rector + PHPCBF                                <- modifies code, run FIRST
+         |                composer scan:style
+1. Dependency Check     Composer Dependency Analyser                   <- composer.json integrity
+         |                composer cd
+2. Static Analysis      PHP Lint, Psalm, PDepend                      <- syntax, types, complexity
+         |                composer lp:run, composer ps:run, composer pd:check
+3. Architecture         Deptrac                                        <- dependency law enforcement
+         |                composer dt:run
+4. API Contract         OpenAPI Export + Validate                      <- spec consistency
+         |                composer oa:run
+5. Unit Tests           Codeception Unit                               <- complex logic only
+         |                composer test:unit
+6. Integration Tests    Codeception Integration, Functional            <- MAIN FOCUS
+         |                composer test:intg, composer test:func
+7. Acceptance Tests     Codeception Smoke, Web, Cli                    <- happy paths + access control
+         |                composer test:smoke, composer test:web, composer test:cli
+8. Mutation Testing     Infection + Psalm                              <- test quality gate
+         |                composer in:ps
+9. Benchmarks           PHPBench                                       <- performance regression (optional)
+                          composer bm:check
+```
+
+Steps 1-8 = `composer scan:all`. Step 0 = `composer scan:style` (run separately before). Step 9 is optional.
 
 Don't aim for 100% unit test coverage. Functional + Integration tests provide more confidence with less maintenance cost.
 

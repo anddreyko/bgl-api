@@ -116,23 +116,34 @@ Create PR to `develop` branch:
 
 ---
 
-## Testing Order (Trophy)
+## Quality Pipeline
 
-When implementing features, follow this order:
+Full validation pipeline (`composer scan:style` + `composer scan:all`). Each step runs only if the previous one passes.
 
 ```
-1. Static Analysis    composer lp:run, composer ps:run, composer pd:check, composer dt:run
-         |
-2. Integration Tests  composer test:intg, composer test:func  <- MAIN FOCUS
-         |
-3. Unit Tests         composer test:unit (complex logic only)
-         |
-4. Acceptance Tests   composer test:web, composer test:cli
-         |
-5. Mutation Testing   composer in:ps (runs automatically as part of test:all)
-         |
-6. Benchmarks         composer bm:run (performance-sensitive changes)
+0. Code Style Fix       Rector + PHPCBF                                <- modifies code, run FIRST
+         |                composer scan:style
+1. Dependency Check     Composer Dependency Analyser                   <- composer.json integrity
+         |                composer cd
+2. Static Analysis      PHP Lint, Psalm, PDepend                      <- syntax, types, complexity
+         |                composer lp:run, composer ps:run, composer pd:check
+3. Architecture         Deptrac                                        <- dependency law enforcement
+         |                composer dt:run
+4. API Contract         OpenAPI Export + Validate                      <- spec consistency
+         |                composer oa:run
+5. Unit Tests           Codeception Unit                               <- complex logic only
+         |                composer test:unit
+6. Integration Tests    Codeception Integration, Functional            <- MAIN FOCUS
+         |                composer test:intg, composer test:func
+7. Acceptance Tests     Codeception Smoke, Web, Cli                    <- happy paths + access control
+         |                composer test:smoke, composer test:web, composer test:cli
+8. Mutation Testing     Infection + Psalm                              <- test quality gate
+         |                composer in:ps
+9. Benchmarks           PHPBench                                       <- performance regression (optional)
+                          composer bm:check
 ```
+
+Steps 1-8 = `composer scan:all`. Step 0 = `composer scan:style` (run separately before). Step 9 is optional.
 
 Integration tests are the primary source of confidence. Don't aim for 100% unit test coverage.
 
