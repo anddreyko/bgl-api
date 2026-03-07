@@ -49,18 +49,41 @@ return [
         'created_at' => $model->createdAt,
     ],
     Handlers\Plays\CreatePlay\Result::class => static fn(Handlers\Plays\CreatePlay\Result $model) => [
-        'session_id' => $model->sessionId,
-    ],
-    Handlers\Plays\UpdatePlay\Result::class => static fn(Handlers\Plays\UpdatePlay\Result $model) => [
-        'session_id' => $model->sessionId,
-    ],
-    Handlers\Plays\FinalizePlay\Result::class => static fn(Handlers\Plays\FinalizePlay\Result $model) => [
-        'session_id' => $model->sessionId,
+        'id' => $model->id,
+        'author' => $model->author,
+        'name' => $model->name,
+        'status' => $model->status,
+        'visibility' => $model->visibility,
         'started_at' => $model->startedAt,
         'finished_at' => $model->finishedAt,
+        'game' => $model->game,
+        'players' => $model->players,
+    ],
+    Handlers\Plays\UpdatePlay\Result::class => static fn(Handlers\Plays\UpdatePlay\Result $model) => [
+        'id' => $model->id,
+        'author' => $model->author,
+        'name' => $model->name,
+        'status' => $model->status,
+        'visibility' => $model->visibility,
+        'started_at' => $model->startedAt,
+        'finished_at' => $model->finishedAt,
+        'game' => $model->game,
+        'players' => $model->players,
+    ],
+    Handlers\Plays\FinalizePlay\Result::class => static fn(Handlers\Plays\FinalizePlay\Result $model) => [
+        'id' => $model->id,
+        'author' => $model->author,
+        'name' => $model->name,
+        'status' => $model->status,
+        'visibility' => $model->visibility,
+        'started_at' => $model->startedAt,
+        'finished_at' => $model->finishedAt,
+        'game' => $model->game,
+        'players' => $model->players,
     ],
     Handlers\Plays\GetPlay\Result::class => static fn(Handlers\Plays\GetPlay\Result $model) => [
         'id' => $model->id,
+        'author' => $model->author,
         'name' => $model->name,
         'status' => $model->status,
         'visibility' => $model->visibility,
@@ -85,6 +108,7 @@ return [
         'id' => $model->id,
         'name' => $model->name,
         'notes' => $model->notes,
+        'created_at' => $model->createdAt,
     ],
     Handlers\Mates\ListMates\Result::class => static fn(Handlers\Mates\ListMates\Result $model) => [
         'items' => $model->data,
@@ -121,9 +145,6 @@ return [
         'message' => $model->message,
     ],
     Handlers\Auth\SignOut\Result::class => static fn(Handlers\Auth\SignOut\Result $model) => [
-        'message' => $model->message,
-    ],
-    Handlers\Mates\DeleteMate\Result::class => static fn(Handlers\Mates\DeleteMate\Result $model) => [
         'message' => $model->message,
     ],
     Handlers\Auth\PasskeySignInOptions\Result::class => static fn(Handlers\Auth\PasskeySignInOptions\Result $model) => [

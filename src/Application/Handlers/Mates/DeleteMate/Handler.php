@@ -12,7 +12,7 @@ use Bgl\Domain\Mates\Mates;
 use Psr\Clock\ClockInterface;
 
 /**
- * @implements MessageHandler<Result, Command>
+ * @implements MessageHandler<null, Command>
  */
 final readonly class Handler implements MessageHandler
 {
@@ -23,7 +23,7 @@ final readonly class Handler implements MessageHandler
     }
 
     #[\Override]
-    public function __invoke(Envelope $envelope): Result
+    public function __invoke(Envelope $envelope): null
     {
         /** @var Command $command */
         $command = $envelope->message;
@@ -37,6 +37,6 @@ final readonly class Handler implements MessageHandler
 
         $mate->softDelete(new DateTime($this->clock->now()));
 
-        return new Result(message: 'deleted');
+        return null;
     }
 }

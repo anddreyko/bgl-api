@@ -10,6 +10,7 @@ final readonly class Result
         public string $id,
         public string $name,
         public ?string $notes,
+        public string $createdAt,
     ) {
     }
 }

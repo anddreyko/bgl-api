@@ -12,6 +12,8 @@ use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Games\Games;
 use Bgl\Domain\Mates\Mates;
+use Bgl\Domain\Profile\Users;
+use Bgl\Domain\Games\Game;
 use Bgl\Domain\Plays\Play;
 use Bgl\Domain\Plays\Player\Player;
 use Bgl\Domain\Plays\Player\PlayersFactory;
@@ -28,6 +30,7 @@ final readonly class Handler implements MessageHandler
         private Plays $plays,
         private Mates $mates,
         private Games $games,
+        private Users $users,
         private PlayersFactory $playersFactory,
         private UuidGenerator $uuidGenerator,
         private ClockInterface $clock,
@@ -66,7 +69,7 @@ final readonly class Handler implements MessageHandler
 
         $this->plays->add($play);
 
-        return new Result(sessionId: (string)$play->getId());
+        return $this->transformPlay($play);
     }
 
     /**
@@ -84,6 +87,60 @@ final readonly class Handler implements MessageHandler
                 color: $player['color'] ?? null,
             ));
         }
+    }
+
+    /**
+     * @return array{id: string, name: string}
+     */
+    private function resolveAuthor(Play $play): array
+    {
+        $author = ['id' => (string)$play->getUserId(), 'name' => ''];
+        $user = $this->users->find((string)$play->getUserId());
+        if ($user !== null) {
+            $author['name'] = $user->getName();
+        }
+
+        return $author;
+    }
+
+    private function transformPlay(Play $play): Result
+    {
+        $game = null;
+        $gameId = $play->getGameId();
+        if ($gameId !== null) {
+            /** @var Game|null $gameEntity */
+            $gameEntity = $this->games->find((string)$gameId);
+            if ($gameEntity !== null) {
+                $game = [
+                    'id' => (string)$gameEntity->getId(),
+                    'name' => $gameEntity->getName(),
+                ];
+            }
+        }
+
+        $players = [];
+        /** @var Player $player */
+        foreach ($play->getPlayers() as $player) {
+            $players[] = [
+                'id' => (string)$player->getId(),
+                'mate_id' => (string)$player->getMateId(),
+                'score' => $player->getScore(),
+                'is_winner' => $player->isWinner(),
+                'color' => $player->getColor(),
+            ];
+        }
+
+        return new Result(
+            id: (string)$play->getId(),
+            author: $this->resolveAuthor($play),
+            name: $play->getName(),
+            status: $play->getStatus()->value,
+            visibility: $play->getVisibility()->value,
+            startedAt: $play->getStartedAt()->getNullableFormattedValue('c'),
+            finishedAt: $play->getFinishedAt()?->getNullableFormattedValue('c'),
+            game: $game,
+            players: $players,
+        );
     }
 
     private function assertGameExists(Uuid $gameId): void

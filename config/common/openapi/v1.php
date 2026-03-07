@@ -45,9 +45,22 @@ return [
                 ],
                 'TokenPair' => [
                     'type' => 'object',
+                    'description' => 'Both tokens are JWT (HS256). ' .
+                        'Decoded payload claims: ' .
+                        '`sub` (user ID), ' .
+                        '`type` ("access" | "refresh"), ' .
+                        '`tokenVersion` (int, incremented on sign-out to invalidate old tokens), ' .
+                        '`iat` (issued at, Unix timestamp), ' .
+                        '`exp` (expires at, Unix timestamp).',
                     'properties' => [
-                        'access_token' => ['type' => 'string'],
-                        'refresh_token' => ['type' => 'string'],
+                        'access_token' => [
+                            'type' => 'string',
+                            'description' => 'Short-lived JWT for API authorization (Bearer header).',
+                        ],
+                        'refresh_token' => [
+                            'type' => 'string',
+                            'description' => 'Long-lived JWT for obtaining a new token pair via POST /v1/auth/refresh.',
+                        ],
                     ],
                 ],
                 'Mate' => [
@@ -73,6 +86,55 @@ return [
                     'type' => 'object',
                     'properties' => [
                         'options' => ['type' => 'object'],
+                    ],
+                ],
+                'Player' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'id' => ['type' => 'string'],
+                        'mate_id' => ['type' => 'string'],
+                        'score' => ['type' => 'integer', 'nullable' => true],
+                        'is_winner' => ['type' => 'boolean'],
+                        'color' => ['type' => 'string', 'nullable' => true],
+                    ],
+                ],
+                'Play' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'id' => ['type' => 'string'],
+                        'author' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'id' => ['type' => 'string'],
+                                'name' => ['type' => 'string'],
+                            ],
+                        ],
+                        'name' => ['type' => 'string', 'nullable' => true],
+                        'status' => ['type' => 'string'],
+                        'visibility' => ['type' => 'string'],
+                        'started_at' => ['type' => 'string', 'format' => 'date-time'],
+                        'finished_at' => ['type' => 'string', 'format' => 'date-time', 'nullable' => true],
+                        'game' => [
+                            'type' => 'object',
+                            'nullable' => true,
+                            'properties' => [
+                                'id' => ['type' => 'string'],
+                                'name' => ['type' => 'string'],
+                            ],
+                        ],
+                        'players' => [
+                            'type' => 'array',
+                            'items' => ['$ref' => '#/components/schemas/Player'],
+                        ],
+                    ],
+                ],
+                'Game' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'id' => ['type' => 'string', 'format' => 'uuid'],
+                        'bgg_id' => ['type' => 'integer'],
+                        'name' => ['type' => 'string'],
+                        'year_published' => ['type' => 'integer', 'nullable' => true],
                     ],
                 ],
             ],
@@ -117,17 +179,25 @@ return [
                         ],
                     ],
                 ],
-                'StringSuccess' => $successResponse('Successful operation', ['type' => 'string']),
-                'NullSuccess' => $successResponse('Successful operation', ['type' => 'string', 'nullable' => true]),
-                'TokenPairSuccess' => $successResponse(
+                'String' => $successResponse('Successful operation', ['type' => 'string']),
+                'Null' => $successResponse('Successful operation', ['type' => 'string', 'nullable' => true]),
+                'TokenPair' => $successResponse(
                     'Successful operation',
                     ['$ref' => '#/components/schemas/TokenPair']
                 ),
-                'MateSuccess' => $successResponse('Successful operation', ['$ref' => '#/components/schemas/Mate']),
-                'UserSuccess' => $successResponse('Successful operation', ['$ref' => '#/components/schemas/User']),
-                'PasskeyOptionsSuccess' => $successResponse(
+                'Mate' => $successResponse('Successful operation', ['$ref' => '#/components/schemas/Mate']),
+                'User' => $successResponse('Successful operation', ['$ref' => '#/components/schemas/User']),
+                'PasskeyOptions' => $successResponse(
                     'Successful operation',
                     ['$ref' => '#/components/schemas/PasskeyOptions']
+                ),
+                'Play' => $successResponse(
+                    'Successful operation',
+                    ['$ref' => '#/components/schemas/Play']
+                ),
+                'Game' => $successResponse(
+                    'Successful operation',
+                    ['$ref' => '#/components/schemas/Game']
                 ),
             ],
         ],

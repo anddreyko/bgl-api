@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Bgl\Presentation\Api;
 
+use Bgl\Core\Http\AuthParams;
+use Bgl\Core\Http\ParamMap;
+use Bgl\Core\Http\PathParams;
+
 final readonly class CompiledRouteMap
 {
     /** @var array<string, CompiledOperation> */
@@ -110,7 +114,7 @@ final readonly class CompiledRouteMap
                     $params[$name] = $matches[$i + 1] ?? '';
                 }
 
-                return new MatchResult($entry['operation'], new \Bgl\Core\Http\PathParams($params));
+                return new MatchResult($entry['operation'], new PathParams($params));
             }
         }
 
@@ -143,9 +147,31 @@ final readonly class CompiledRouteMap
         return new CompiledOperation(
             messageClass: $messageClass,
             interceptors: $interceptors,
-            authParams: new \Bgl\Core\Http\AuthParams($authParams),
-            paramMap: new \Bgl\Core\Http\ParamMap($paramMap),
+            authParams: new AuthParams($authParams),
+            paramMap: new ParamMap($paramMap),
             openApiSchema: $operation,
+            successCode: self::resolveSuccessCode($operation),
         );
+    }
+
+    /**
+     * @param array<string, mixed> $operation
+     */
+    private static function resolveSuccessCode(array $operation): HttpCode
+    {
+        if (isset($operation['responses']) && is_array($operation['responses'])) {
+            foreach (array_keys($operation['responses']) as $code) {
+                $httpCode = HttpCode::tryFrom((int)$code);
+                if (
+                    $httpCode !== null &&
+                    $httpCode->value >= HttpCode::Ok->value &&
+                    $httpCode->value < HttpCode::MultipleChoices->value
+                ) {
+                    return $httpCode;
+                }
+            }
+        }
+
+        return HttpCode::Ok;
     }
 }

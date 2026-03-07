@@ -45,7 +45,7 @@ return [
                                                 'properties' => [
                                                     'items' => [
                                                         'type' => 'array',
-                                                        'items' => ['type' => 'object'],
+                                                        'items' => ['$ref' => '#/components/schemas/Game'],
                                                     ],
                                                     'total' => ['type' => 'integer'],
                                                     'page' => ['type' => 'integer'],
@@ -78,29 +78,7 @@ return [
                         ],
                     ],
                     'responses' => [
-                        '200' => [
-                            'description' => 'Successful operation',
-                            'content' => [
-                                'application/json' => [
-                                    'schema' => [
-                                        'type' => 'object',
-                                        'properties' => [
-                                            'code' => ['type' => 'integer', 'example' => 0],
-                                            'data' => [
-                                                'type' => 'object',
-                                                'required' => ['id', 'bgg_id', 'name'],
-                                                'properties' => [
-                                                    'id' => ['type' => 'string', 'format' => 'uuid'],
-                                                    'bgg_id' => ['type' => 'integer'],
-                                                    'name' => ['type' => 'string'],
-                                                    'year_published' => ['type' => 'integer', 'nullable' => true],
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
+                        '200' => ['$ref' => '#/components/responses/Game'],
                         '404' => ['$ref' => '#/components/responses/NotFound'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
                     ],

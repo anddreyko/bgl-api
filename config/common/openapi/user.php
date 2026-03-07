@@ -26,7 +26,7 @@ return [
                         ],
                     ],
                     'responses' => [
-                        '200' => ['$ref' => '#/components/responses/UserSuccess'],
+                        '200' => ['$ref' => '#/components/responses/User'],
                         '401' => ['$ref' => '#/components/responses/Unauthorized'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
                     ],

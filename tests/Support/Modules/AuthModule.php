@@ -23,7 +23,7 @@ final class AuthModule extends Module
             'email' => $email,
             'password' => $password,
         ]);
-        $rest->seeResponseCodeIs(200);
+        $rest->seeResponseCodeIs(201);
 
         $this->getDb()->updateInDatabase(
             'auth_user',

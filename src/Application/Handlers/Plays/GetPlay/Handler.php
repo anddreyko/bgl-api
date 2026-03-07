@@ -11,6 +11,7 @@ use Bgl\Core\Messages\MessageHandler;
 use Bgl\Domain\Games\Game;
 use Bgl\Domain\Games\Games;
 use Bgl\Domain\Plays\Play;
+use Bgl\Domain\Profile\Users;
 use Bgl\Domain\Plays\Player\Player;
 use Bgl\Domain\Plays\Plays;
 use Bgl\Domain\Plays\PlayStatus;
@@ -24,6 +25,7 @@ final readonly class Handler implements MessageHandler
     public function __construct(
         private Plays $plays,
         private Games $games,
+        private Users $users,
     ) {
     }
 
@@ -36,7 +38,7 @@ final readonly class Handler implements MessageHandler
         /** @var Play|null $play */
         $play = $this->plays->find($query->playId);
 
-        if ($play === null) {
+        if ($play === null || $play->getStatus() === PlayStatus::Deleted) {
             throw new NotFoundException('Session not found');
         }
 
@@ -60,6 +62,20 @@ final readonly class Handler implements MessageHandler
             // TODO: MATES-002 -- full participants check after mate-to-user linking
             Visibility::Participants => $isOwner ? null : throw new NotFoundException('Session not found'),
         };
+    }
+
+    /**
+     * @return array{id: string, name: string}
+     */
+    private function resolveAuthor(Play $play): array
+    {
+        $author = ['id' => (string)$play->getUserId(), 'name' => ''];
+        $user = $this->users->find((string)$play->getUserId());
+        if ($user !== null) {
+            $author['name'] = $user->getName();
+        }
+
+        return $author;
     }
 
     private function transformPlay(Play $play): Result
@@ -91,6 +107,7 @@ final readonly class Handler implements MessageHandler
 
         return new Result(
             id: (string)$play->getId(),
+            author: $this->resolveAuthor($play),
             name: $play->getName(),
             status: $play->getStatus()->value,
             visibility: $play->getVisibility()->value,

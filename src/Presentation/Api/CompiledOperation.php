@@ -7,6 +7,7 @@ namespace Bgl\Presentation\Api;
 use Bgl\Core\Http\AuthParams;
 use Bgl\Core\Http\ParamMap;
 use Bgl\Core\Messages\Message;
+use Bgl\Presentation\Api\HttpCode;
 use Bgl\Presentation\Api\Interceptors\Interceptor;
 
 final readonly class CompiledOperation
@@ -22,6 +23,7 @@ final readonly class CompiledOperation
         public AuthParams $authParams = new AuthParams(),
         public ParamMap $paramMap = new ParamMap(),
         public array $openApiSchema = [],
+        public HttpCode $successCode = HttpCode::Ok,
     ) {
     }
 }

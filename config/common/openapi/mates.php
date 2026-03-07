@@ -37,7 +37,7 @@ return [
                         ],
                     ],
                     'responses' => [
-                        '200' => ['$ref' => '#/components/responses/MateSuccess'],
+                        '201' => ['$ref' => '#/components/responses/Mate'],
                         '400' => ['$ref' => '#/components/responses/BadRequest'],
                         '401' => ['$ref' => '#/components/responses/Unauthorized'],
                         '422' => ['$ref' => '#/components/responses/ValidationError'],
@@ -124,7 +124,7 @@ return [
                         ],
                     ],
                     'responses' => [
-                        '200' => ['$ref' => '#/components/responses/MateSuccess'],
+                        '200' => ['$ref' => '#/components/responses/Mate'],
                         '401' => ['$ref' => '#/components/responses/Unauthorized'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
                     ],
@@ -162,7 +162,7 @@ return [
                         ],
                     ],
                     'responses' => [
-                        '200' => ['$ref' => '#/components/responses/MateSuccess'],
+                        '200' => ['$ref' => '#/components/responses/Mate'],
                         '400' => ['$ref' => '#/components/responses/BadRequest'],
                         '401' => ['$ref' => '#/components/responses/Unauthorized'],
                         '422' => ['$ref' => '#/components/responses/ValidationError'],
@@ -187,8 +187,9 @@ return [
                         ],
                     ],
                     'responses' => [
-                        '200' => ['$ref' => '#/components/responses/NullSuccess'],
+                        '204' => ['description' => 'Mate deleted'],
                         '401' => ['$ref' => '#/components/responses/Unauthorized'],
+                        '404' => ['$ref' => '#/components/responses/NotFound'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
                     ],
                 ],

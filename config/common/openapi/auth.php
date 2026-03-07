@@ -39,7 +39,7 @@ return [
                         ],
                     ],
                     'responses' => [
-                        '200' => ['$ref' => '#/components/responses/StringSuccess'],
+                        '201' => ['$ref' => '#/components/responses/String'],
                         '400' => ['$ref' => '#/components/responses/BadRequest'],
                         '422' => ['$ref' => '#/components/responses/ValidationError'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
@@ -69,7 +69,7 @@ return [
                         ],
                     ],
                     'responses' => [
-                        '200' => ['$ref' => '#/components/responses/TokenPairSuccess'],
+                        '200' => ['$ref' => '#/components/responses/TokenPair'],
                         '400' => ['$ref' => '#/components/responses/BadRequest'],
                         '422' => ['$ref' => '#/components/responses/ValidationError'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
@@ -91,7 +91,7 @@ return [
                         ],
                     ],
                     'responses' => [
-                        '200' => ['$ref' => '#/components/responses/StringSuccess'],
+                        '200' => ['$ref' => '#/components/responses/String'],
                         '400' => ['$ref' => '#/components/responses/BadRequest'],
                         '422' => ['$ref' => '#/components/responses/ValidationError'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
@@ -120,7 +120,7 @@ return [
                         ],
                     ],
                     'responses' => [
-                        '200' => ['$ref' => '#/components/responses/TokenPairSuccess'],
+                        '200' => ['$ref' => '#/components/responses/TokenPair'],
                         '400' => ['$ref' => '#/components/responses/BadRequest'],
                         '422' => ['$ref' => '#/components/responses/ValidationError'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
@@ -137,7 +137,7 @@ return [
                     'x-auth' => ['userId'],
                     'security' => [['BearerAuth' => []]],
                     'responses' => [
-                        '200' => ['$ref' => '#/components/responses/StringSuccess'],
+                        '200' => ['$ref' => '#/components/responses/String'],
                         '401' => ['$ref' => '#/components/responses/Unauthorized'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
                     ],
@@ -153,7 +153,7 @@ return [
                     'x-auth' => ['userId'],
                     'security' => [['BearerAuth' => []]],
                     'responses' => [
-                        '200' => ['$ref' => '#/components/responses/PasskeyOptionsSuccess'],
+                        '200' => ['$ref' => '#/components/responses/PasskeyOptions'],
                         '401' => ['$ref' => '#/components/responses/Unauthorized'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
                     ],
@@ -184,7 +184,7 @@ return [
                         ],
                     ],
                     'responses' => [
-                        '200' => ['$ref' => '#/components/responses/StringSuccess'],
+                        '200' => ['$ref' => '#/components/responses/String'],
                         '401' => ['$ref' => '#/components/responses/Unauthorized'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
                     ],
@@ -197,7 +197,7 @@ return [
                     'tags' => ['Auth'],
                     'x-message' => PasskeySignInOptions\Command::class,
                     'responses' => [
-                        '200' => ['$ref' => '#/components/responses/PasskeyOptionsSuccess'],
+                        '200' => ['$ref' => '#/components/responses/PasskeyOptions'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
                     ],
                 ],
@@ -223,7 +223,7 @@ return [
                         ],
                     ],
                     'responses' => [
-                        '200' => ['$ref' => '#/components/responses/TokenPairSuccess'],
+                        '200' => ['$ref' => '#/components/responses/TokenPair'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
                     ],
                 ],

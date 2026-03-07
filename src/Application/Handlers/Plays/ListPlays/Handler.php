@@ -10,6 +10,8 @@ use Bgl\Core\Listing\Filter\AndX;
 use Bgl\Core\Listing\Filter\Equals;
 use Bgl\Core\Listing\Filter\Greater;
 use Bgl\Core\Listing\Filter\Less;
+use Bgl\Core\Listing\Filter\Not;
+use Bgl\Domain\Plays\PlayStatus;
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\Listing\Page\PageNumber;
 use Bgl\Core\Listing\Page\PageSize;
@@ -21,6 +23,7 @@ use Bgl\Core\Messages\MessageHandler;
 use Bgl\Domain\Games\Game;
 use Bgl\Domain\Games\Games;
 use Bgl\Domain\Plays\Play;
+use Bgl\Domain\Profile\Users;
 use Bgl\Domain\Plays\Player\Player;
 use Bgl\Domain\Plays\Plays;
 
@@ -32,6 +35,7 @@ final readonly class Handler implements MessageHandler
     public function __construct(
         private Plays $plays,
         private Games $games,
+        private Users $users,
     ) {
     }
 
@@ -77,7 +81,9 @@ final readonly class Handler implements MessageHandler
         $userFilter = new Equals(new Field('userId'), $query->userId);
 
         /** @var list<Filter> $extra */
-        $extra = [];
+        $extra = [
+            new Not(new Equals(new Field('status'), PlayStatus::Deleted->value)),
+        ];
 
         if ($query->gameId !== null && $query->gameId !== '') {
             $extra[] = new Equals(new Field('gameId'), $query->gameId);
@@ -91,11 +97,24 @@ final readonly class Handler implements MessageHandler
             $extra[] = new Less(new Field('startedAt'), new DateTime($query->to));
         }
 
-        if ($extra !== []) {
-            return new AndX([$userFilter, ...$extra]);
+        return new AndX([$userFilter, ...$extra]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    /**
+     * @return array{id: string, name: string}
+     */
+    private function resolveAuthor(Play $play): array
+    {
+        $author = ['id' => (string)$play->getUserId(), 'name' => ''];
+        $user = $this->users->find((string)$play->getUserId());
+        if ($user !== null) {
+            $author['name'] = $user->getName();
         }
 
-        return $userFilter;
+        return $author;
     }
 
     /**
@@ -130,6 +149,7 @@ final readonly class Handler implements MessageHandler
 
         return [
             'id' => (string)$play->getId(),
+            'author' => $this->resolveAuthor($play),
             'name' => $play->getName(),
             'status' => $play->getStatus()->value,
             'visibility' => $play->getVisibility()->value,

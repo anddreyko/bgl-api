@@ -24,7 +24,7 @@ final class AuthFlowCest
             'email' => $email,
             'password' => $password,
         ]);
-        $i->seeResponseCodeIs(200);
+        $i->seeResponseCodeIs(201);
         $i->seeResponseIsJson();
 
         $i->updateInDatabase('auth_user', ['status' => 'active'], ['email' => $email]);
@@ -62,7 +62,7 @@ final class AuthFlowCest
             'email' => $email,
             'password' => $password,
         ]);
-        $i->seeResponseCodeIs(200);
+        $i->seeResponseCodeIs(201);
 
         $i->updateInDatabase('auth_user', ['status' => 'active'], ['email' => $email]);
 
@@ -97,7 +97,7 @@ final class AuthFlowCest
             'email' => $email,
             'password' => $password,
         ]);
-        $i->seeResponseCodeIs(200);
+        $i->seeResponseCodeIs(201);
 
         $i->updateInDatabase('auth_user', ['status' => 'active'], ['email' => $email]);
 
