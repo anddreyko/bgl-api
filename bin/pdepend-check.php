@@ -43,7 +43,7 @@ foreach ($xml->xpath('//file') as $f) {
 
 foreach ($xml->xpath('//class') as $class) {
     $wmc = (int)$class['wmc'];
-    $className = (string)$class['name'];
+    $className = (string)($class['fqname'] ?? $class['name']);
 
     if ($wmc > $maxWmc) {
         $classViolations[] = [
