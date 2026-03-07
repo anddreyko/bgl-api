@@ -78,13 +78,15 @@ final class CloseSessionCest
         $this->em->flush();
 
         $i->assertInstanceOf(Result::class, $result);
-        $i->assertSame((string) $sessionId, $result->sessionId);
+        $i->assertSame((string) $sessionId, $result->id);
+        $i->assertIsArray($result->author);
+        $i->assertSame((string) $userId, $result->author['id']);
         $i->assertNotNull($result->finishedAt);
 
         $this->em->clear();
         $closedPlay = $this->plays->find((string) $sessionId);
         $i->assertNotNull($closedPlay);
-        $i->assertSame(PlayStatus::Published, $closedPlay->getStatus());
+        $i->assertSame(PlayStatus::Draft, $closedPlay->getStatus());
     }
 
     public function testPlayNotFoundThrowsNotFoundException(FunctionalTester $i): void

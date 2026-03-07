@@ -19,9 +19,12 @@ use Bgl\Domain\Mates\Mate;
 use Bgl\Domain\Mates\Mates;
 use Bgl\Domain\Plays\Play;
 use Bgl\Domain\Plays\Plays;
+use Bgl\Domain\Plays\PlayStatus;
+use Bgl\Domain\Plays\Visibility;
 use Bgl\Tests\Support\DiHelper;
 use Bgl\Tests\Support\FunctionalTester;
 use Codeception\Attribute\Group;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * @covers \Bgl\Application\Handlers\Plays\GetPlay\Handler
@@ -29,6 +32,7 @@ use Codeception\Attribute\Group;
 #[Group('application', 'handler', 'plays', 'get-play')]
 final class GetPlayCest
 {
+    private EntityManagerInterface $em;
     private Handler $handler;
     private CreatePlayHandler $createHandler;
     private Plays $plays;
@@ -43,6 +47,9 @@ final class GetPlayCest
     public function _before(): void
     {
         $container = DiHelper::container();
+
+        /** @var EntityManagerInterface $em */
+        $this->em = $container->get(EntityManagerInterface::class);
 
         /** @var Handler $handler */
         $this->handler = $container->get(Handler::class);
@@ -91,6 +98,8 @@ final class GetPlayCest
 
         $i->assertInstanceOf(Result::class, $result);
         $i->assertSame($sessionId, $result->id);
+        $i->assertIsArray($result->author);
+        $i->assertSame((string)$this->ownerUserId, $result->author['id']);
         $i->assertSame('private', $result->visibility);
     }
 
@@ -256,14 +265,19 @@ final class GetPlayCest
             messageId: 'msg-get-' . uniqid(),
         ));
 
-        return $result->sessionId;
+        return $result->id;
     }
 
     private function finalizeSession(string $sessionId): void
     {
         /** @var Play|null $play */
         $play = $this->plays->find($sessionId);
-        $play?->finalize(new DateTime('2024-06-15 22:00:00'));
+        if ($play === null) {
+            return;
+        }
+        $play->finalize(new DateTime('2024-06-15 22:00:00'));
+        $play->update($play->getName(), $play->getGameId(), $play->getVisibility(), PlayStatus::Published);
+        $this->em->flush();
     }
 
     private function getPlay(string $playId, ?string $userId): Result

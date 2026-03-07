@@ -109,8 +109,10 @@ final class OpenSessionCest
         ));
 
         $i->assertInstanceOf(Result::class, $result);
-        $i->assertNotEmpty($result->sessionId);
-        $i->assertNotNull($this->plays->find($result->sessionId));
+        $i->assertNotEmpty($result->id);
+        $i->assertIsArray($result->author);
+        $i->assertSame((string) $this->userId, $result->author['id']);
+        $i->assertNotNull($this->plays->find($result->id));
     }
 
     public function testOpenSessionWithMinimalFields(FunctionalTester $i): void
@@ -123,9 +125,9 @@ final class OpenSessionCest
         ));
 
         $i->assertInstanceOf(Result::class, $result);
-        $i->assertNotEmpty($result->sessionId);
+        $i->assertNotEmpty($result->id);
 
-        $play = $this->plays->find($result->sessionId);
+        $play = $this->plays->find($result->id);
         $i->assertNotNull($play);
         $i->assertSame(PlayStatus::Draft, $play->getStatus());
     }
@@ -143,9 +145,9 @@ final class OpenSessionCest
         ));
 
         $i->assertInstanceOf(Result::class, $result);
-        $i->assertNotEmpty($result->sessionId);
+        $i->assertNotEmpty($result->id);
 
-        $play = $this->plays->find($result->sessionId);
+        $play = $this->plays->find($result->id);
         $i->assertNotNull($play);
         $i->assertSame(PlayStatus::Draft, $play->getStatus());
     }
@@ -166,9 +168,10 @@ final class OpenSessionCest
 
         $i->assertInstanceOf(Result::class, $result);
 
-        $play = $this->plays->find($result->sessionId);
+        $play = $this->plays->find($result->id);
         $i->assertNotNull($play);
-        $i->assertSame(PlayStatus::Published, $play->getStatus());
+        $i->assertSame(PlayStatus::Draft, $play->getStatus());
+        $i->assertNotNull($play->getFinishedAt());
     }
 
     public function testOpenSessionFailsWithNonExistentMate(FunctionalTester $i): void

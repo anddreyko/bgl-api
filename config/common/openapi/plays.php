@@ -6,6 +6,7 @@ use Bgl\Application\Handlers\Plays\CreatePlay;
 use Bgl\Application\Handlers\Plays\FinalizePlay;
 use Bgl\Application\Handlers\Plays\GetPlay;
 use Bgl\Application\Handlers\Plays\ListPlays;
+use Bgl\Application\Handlers\Plays\DeletePlay;
 use Bgl\Application\Handlers\Plays\UpdatePlay;
 use Bgl\Presentation\Api\Interceptors\AuthInterceptor;
 use Bgl\Presentation\Api\Interceptors\OptionalAuthInterceptor;
@@ -68,51 +69,7 @@ return [
                                                 'properties' => [
                                                     'items' => [
                                                         'type' => 'array',
-                                                        'items' => [
-                                                            'type' => 'object',
-                                                            'properties' => [
-                                                                'id' => ['type' => 'string'],
-                                                                'name' => ['type' => 'string', 'nullable' => true],
-                                                                'status' => ['type' => 'string'],
-                                                                'visibility' => ['type' => 'string'],
-                                                                'started_at' => [
-                                                                    'type' => 'string',
-                                                                    'format' => 'date-time',
-                                                                ],
-                                                                'finished_at' => [
-                                                                    'type' => 'string',
-                                                                    'format' => 'date-time',
-                                                                    'nullable' => true,
-                                                                ],
-                                                                'game' => [
-                                                                    'type' => 'object',
-                                                                    'nullable' => true,
-                                                                    'properties' => [
-                                                                        'id' => ['type' => 'string'],
-                                                                        'name' => ['type' => 'string'],
-                                                                    ],
-                                                                ],
-                                                                'players' => [
-                                                                    'type' => 'array',
-                                                                    'items' => [
-                                                                        'type' => 'object',
-                                                                        'properties' => [
-                                                                            'id' => ['type' => 'string'],
-                                                                            'mate_id' => ['type' => 'string'],
-                                                                            'score' => [
-                                                                                'type' => 'integer',
-                                                                                'nullable' => true,
-                                                                            ],
-                                                                            'is_winner' => ['type' => 'boolean'],
-                                                                            'color' => [
-                                                                                'type' => 'string',
-                                                                                'nullable' => true,
-                                                                            ],
-                                                                        ],
-                                                                    ],
-                                                                ],
-                                                            ],
-                                                        ],
+                                                        'items' => ['$ref' => '#/components/schemas/Play'],
                                                     ],
                                                     'total' => ['type' => 'integer'],
                                                     'page' => ['type' => 'integer'],
@@ -172,25 +129,7 @@ return [
                         ],
                     ],
                     'responses' => [
-                        '200' => [
-                            'description' => 'Successful operation',
-                            'content' => [
-                                'application/json' => [
-                                    'schema' => [
-                                        'type' => 'object',
-                                        'properties' => [
-                                            'code' => ['type' => 'integer', 'example' => 0],
-                                            'data' => [
-                                                'type' => 'object',
-                                                'properties' => [
-                                                    'session_id' => ['type' => 'string'],
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
+                        '201' => ['$ref' => '#/components/responses/Play'],
                         '400' => ['$ref' => '#/components/responses/BadRequest'],
                         '401' => ['$ref' => '#/components/responses/Unauthorized'],
                         '422' => ['$ref' => '#/components/responses/ValidationError'],
@@ -217,55 +156,7 @@ return [
                         ],
                     ],
                     'responses' => [
-                        '200' => [
-                            'description' => 'Successful operation',
-                            'content' => [
-                                'application/json' => [
-                                    'schema' => [
-                                        'type' => 'object',
-                                        'properties' => [
-                                            'code' => ['type' => 'integer', 'example' => 0],
-                                            'data' => [
-                                                'type' => 'object',
-                                                'properties' => [
-                                                    'id' => ['type' => 'string'],
-                                                    'name' => ['type' => 'string', 'nullable' => true],
-                                                    'status' => ['type' => 'string'],
-                                                    'visibility' => ['type' => 'string'],
-                                                    'started_at' => ['type' => 'string', 'format' => 'date-time'],
-                                                    'finished_at' => [
-                                                        'type' => 'string',
-                                                        'format' => 'date-time',
-                                                        'nullable' => true,
-                                                    ],
-                                                    'game' => [
-                                                        'type' => 'object',
-                                                        'nullable' => true,
-                                                        'properties' => [
-                                                            'id' => ['type' => 'string'],
-                                                            'name' => ['type' => 'string'],
-                                                        ],
-                                                    ],
-                                                    'players' => [
-                                                        'type' => 'array',
-                                                        'items' => [
-                                                            'type' => 'object',
-                                                            'properties' => [
-                                                                'id' => ['type' => 'string'],
-                                                                'mate_id' => ['type' => 'string'],
-                                                                'score' => ['type' => 'integer', 'nullable' => true],
-                                                                'is_winner' => ['type' => 'boolean'],
-                                                                'color' => ['type' => 'string', 'nullable' => true],
-                                                            ],
-                                                        ],
-                                                    ],
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
+                        '200' => ['$ref' => '#/components/responses/Play'],
                         '401' => ['$ref' => '#/components/responses/Unauthorized'],
                         '404' => ['$ref' => '#/components/responses/NotFound'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
@@ -304,24 +195,22 @@ return [
                                             'enum' => ['private', 'link', 'participants', 'authenticated', 'public'],
                                             'default' => 'private',
                                         ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                    'responses' => [
-                        '200' => [
-                            'description' => 'Successful operation',
-                            'content' => [
-                                'application/json' => [
-                                    'schema' => [
-                                        'type' => 'object',
-                                        'properties' => [
-                                            'code' => ['type' => 'integer', 'example' => 0],
-                                            'data' => [
+                                        'status' => [
+                                            'type' => 'string',
+                                            'enum' => ['draft', 'published'],
+                                            'nullable' => true,
+                                        ],
+                                        'players' => [
+                                            'type' => 'array',
+                                            'minItems' => 1,
+                                            'items' => [
                                                 'type' => 'object',
+                                                'required' => ['mate_id'],
                                                 'properties' => [
-                                                    'session_id' => ['type' => 'string'],
+                                                    'mate_id' => ['type' => 'string', 'format' => 'uuid'],
+                                                    'score' => ['type' => 'integer', 'nullable' => true],
+                                                    'is_winner' => ['type' => 'boolean', 'default' => false],
+                                                    'color' => ['type' => 'string', 'maxLength' => 50],
                                                 ],
                                             ],
                                         ],
@@ -329,6 +218,9 @@ return [
                                 ],
                             ],
                         ],
+                    ],
+                    'responses' => [
+                        '200' => ['$ref' => '#/components/responses/Play'],
                         '400' => ['$ref' => '#/components/responses/BadRequest'],
                         '401' => ['$ref' => '#/components/responses/Unauthorized'],
                         '404' => ['$ref' => '#/components/responses/NotFound'],
@@ -369,28 +261,32 @@ return [
                         ],
                     ],
                     'responses' => [
-                        '200' => [
-                            'description' => 'Successful operation',
-                            'content' => [
-                                'application/json' => [
-                                    'schema' => [
-                                        'type' => 'object',
-                                        'properties' => [
-                                            'code' => ['type' => 'integer', 'example' => 0],
-                                            'data' => [
-                                                'type' => 'object',
-                                                'properties' => [
-                                                    'session_id' => ['type' => 'string'],
-                                                    'started_at' => ['type' => 'string', 'format' => 'date-time'],
-                                                    'finished_at' => ['type' => 'string', 'format' => 'date-time'],
-                                                ],
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
+                        '200' => ['$ref' => '#/components/responses/Play'],
                         '400' => ['$ref' => '#/components/responses/BadRequest'],
+                        '401' => ['$ref' => '#/components/responses/Unauthorized'],
+                        '404' => ['$ref' => '#/components/responses/NotFound'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
+                    ],
+                ],
+                'delete' => [
+                    'summary' => 'Delete play session',
+                    'operationId' => 'deleteSession',
+                    'tags' => ['Plays'],
+                    'security' => [['BearerAuth' => []]],
+                    'x-message' => DeletePlay\Command::class,
+                    'x-interceptors' => [AuthInterceptor::class],
+                    'x-auth' => ['userId'],
+                    'x-map' => ['id' => 'sessionId'],
+                    'parameters' => [
+                        [
+                            'name' => 'id',
+                            'in' => 'path',
+                            'required' => true,
+                            'schema' => ['type' => 'string'],
+                        ],
+                    ],
+                    'responses' => [
+                        '204' => ['description' => 'Play deleted'],
                         '401' => ['$ref' => '#/components/responses/Unauthorized'],
                         '404' => ['$ref' => '#/components/responses/NotFound'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
