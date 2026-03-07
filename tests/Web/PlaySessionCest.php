@@ -38,8 +38,8 @@ final class PlaySessionCest
         $auth->registerAndLogin($email, 'SecurePass1!');
 
         $i->sendPost('/v1/plays/sessions');
-        $i->seeResponseCodeIs(200);
-        $sessionId = $i->grabDataFromResponseByJsonPath('$.data.session_id')[0];
+        $i->seeResponseCodeIs(201);
+        $sessionId = $i->grabDataFromResponseByJsonPath('$.data.id')[0];
 
         $i->sendGet('/v1/plays/sessions/' . $sessionId);
         $i->seeResponseCodeIs(200);
@@ -47,6 +47,10 @@ final class PlaySessionCest
         $i->seeResponseMatchesJsonType([
             'data' => [
                 'id' => 'string',
+                'author' => [
+                    'id' => 'string',
+                    'name' => 'string',
+                ],
                 'status' => 'string',
                 'visibility' => 'string',
                 'started_at' => 'string',
@@ -72,22 +76,22 @@ final class PlaySessionCest
         $auth->registerAndLogin($email, $password);
 
         $i->sendPost('/v1/plays/sessions');
-        $i->seeResponseCodeIs(200);
+        $i->seeResponseCodeIs(201);
         $i->seeResponseIsJson();
         $i->seeResponseMatchesJsonType([
             'data' => [
-                'session_id' => 'string',
+                'id' => 'string',
             ],
         ]);
 
-        $sessionId = $i->grabDataFromResponseByJsonPath('$.data.session_id')[0];
+        $sessionId = $i->grabDataFromResponseByJsonPath('$.data.id')[0];
 
         $i->sendPatch('/v1/plays/sessions/' . $sessionId);
         $i->seeResponseCodeIs(200);
         $i->seeResponseIsJson();
         $i->seeResponseMatchesJsonType([
             'data' => [
-                'session_id' => 'string',
+                'id' => 'string',
                 'started_at' => 'string',
                 'finished_at' => 'string',
             ],
@@ -102,11 +106,11 @@ final class PlaySessionCest
 
         // Create two mates
         $i->sendPost('/v1/mates', ['name' => 'Alice']);
-        $i->seeResponseCodeIs(200);
+        $i->seeResponseCodeIs(201);
         $mate1Id = $i->grabDataFromResponseByJsonPath('$.data.id')[0];
 
         $i->sendPost('/v1/mates', ['name' => 'Bob']);
-        $i->seeResponseCodeIs(200);
+        $i->seeResponseCodeIs(201);
         $mate2Id = $i->grabDataFromResponseByJsonPath('$.data.id')[0];
 
         // Create play session with players
@@ -118,9 +122,9 @@ final class PlaySessionCest
                 ['mate_id' => $mate2Id, 'score' => 5, 'is_winner' => false, 'color' => 'blue'],
             ],
         ]);
-        $i->seeResponseCodeIs(200);
+        $i->seeResponseCodeIs(201);
 
-        $sessionId = $i->grabDataFromResponseByJsonPath('$.data.session_id')[0];
+        $sessionId = $i->grabDataFromResponseByJsonPath('$.data.id')[0];
 
         // Verify play session persisted in DB
         $i->seeInDatabase('plays_session', [
@@ -154,7 +158,7 @@ final class PlaySessionCest
         // Verify status changed in DB
         $i->seeInDatabase('plays_session', [
             'id' => $sessionId,
-            'status' => 'published',
+            'status' => 'draft',
         ]);
     }
 
@@ -166,7 +170,7 @@ final class PlaySessionCest
 
         // Create a session first
         $i->sendPost('/v1/plays/sessions');
-        $i->seeResponseCodeIs(200);
+        $i->seeResponseCodeIs(201);
 
         // List sessions
         $i->sendGet('/v1/plays/sessions');

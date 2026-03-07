@@ -23,7 +23,7 @@ final class MatesCest
 
         // Create mate
         $i->sendPost('/v1/mates', ['name' => 'Ivan', 'notes' => 'Likes Carcassonne']);
-        $i->seeResponseCodeIs(200);
+        $i->seeResponseCodeIs(201);
         $i->seeResponseIsJson();
         $i->seeResponseMatchesJsonType([
             'data' => [
@@ -71,7 +71,7 @@ final class MatesCest
 
         // Delete mate
         $i->sendDelete('/v1/mates/' . $mateId);
-        $i->seeResponseCodeIs(200);
+        $i->seeResponseCodeIs(204);
     }
 
     public function testCreateMateRequiresAuth(WebTester $i): void

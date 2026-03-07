@@ -39,15 +39,15 @@ final readonly class ApiAction
             return $this->doHandle($request);
         } catch (AuthenticationException $e) {
             return $this->jsonResponse(
-                new ErrorResponse(message: $e->getMessage(), httpStatus: 401),
+                new ErrorResponse(message: $e->getMessage(), httpCode: HttpCode::Unauthorized),
             );
         } catch (NotFoundException $e) {
             return $this->jsonResponse(
-                new ErrorResponse(message: $e->getMessage(), httpStatus: 404),
+                new ErrorResponse(message: $e->getMessage(), httpCode: HttpCode::NotFound),
             );
         } catch (\DomainException $e) {
             return $this->jsonResponse(
-                new ErrorResponse(message: $e->getMessage(), httpStatus: 400),
+                new ErrorResponse(message: $e->getMessage(), httpCode: HttpCode::BadRequest),
             );
         } catch (\InvalidArgumentException $e) {
             return $this->jsonResponse(
@@ -56,7 +56,7 @@ final readonly class ApiAction
         } catch (\Throwable $e) {
             $error = $this->debugMode
                 ? ErrorResponse::serverError(message: $e->getMessage(), exception: $e)
-                : new ErrorResponse(message: 'Internal Server Error', httpStatus: 500);
+                : new ErrorResponse(message: 'Internal Server Error', httpCode: HttpCode::InternalServerError);
 
             return $this->jsonResponse($error);
         }
@@ -66,7 +66,7 @@ final readonly class ApiAction
     {
         $matchResult = $this->routeMap->match($request->getMethod(), $request->getUri()->getPath());
         if ($matchResult === null) {
-            return $this->jsonResponse(new ErrorResponse(message: 'Not Found', httpStatus: 404));
+            return $this->jsonResponse(new ErrorResponse(message: 'Not Found', httpCode: HttpCode::NotFound));
         }
 
         $operation = $matchResult->operation;
@@ -86,28 +86,32 @@ final readonly class ApiAction
             $operation->paramMap
         );
 
-        return $this->dispatchAndRespond($operation->messageClass, $data);
+        return $this->dispatchAndRespond($operation->messageClass, $data, $operation->successCode);
     }
 
     /**
      * @param class-string<\Bgl\Core\Messages\Message> $messageClass
      */
-    private function dispatchAndRespond(string $messageClass, SerializedData $data): ResponseInterface
+    private function dispatchAndRespond(string $messageClass, SerializedData $data, HttpCode $successCode): ResponseInterface
     {
         /** @var \Bgl\Core\Messages\Message $message */
         $message = $this->hydrator->hydrateObject($messageClass, $data->toArray());
         /** @var mixed $result */
         $result = $this->dispatcher->dispatch($message);
 
+        if ($result === null) {
+            return $this->responseFactory->createResponse(HttpCode::NoContent->value);
+        }
+
         /** @var mixed $responseData */
         $responseData = is_object($result) ? $this->serializer->serialize($result)->toArray() : $result;
 
-        return $this->jsonResponse(new SuccessResponse(data: $responseData));
+        return $this->jsonResponse(new SuccessResponse(data: $responseData, httpCode: $successCode));
     }
 
     private function jsonResponse(SuccessResponse|ErrorResponse $responseData): ResponseInterface
     {
-        $response = $this->responseFactory->createResponse($responseData->httpStatus);
+        $response = $this->responseFactory->createResponse($responseData->httpCode->value);
         $response = $response->withHeader('Content-Type', 'application/json');
 
         $payload = self::buildPayload($responseData);

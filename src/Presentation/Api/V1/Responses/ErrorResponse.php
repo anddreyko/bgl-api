@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Bgl\Presentation\Api\V1\Responses;
 
+use Bgl\Presentation\Api\HttpCode;
+
 final readonly class ErrorResponse
 {
     public int $code;
@@ -15,7 +17,7 @@ final readonly class ErrorResponse
      */
     public function __construct(
         public string $message,
-        public int $httpStatus = 400,
+        public HttpCode $httpCode = HttpCode::BadRequest,
         public array $errors = [],
         public ?\Throwable $exception = null,
     ) {
@@ -31,7 +33,7 @@ final readonly class ErrorResponse
     {
         return new self(
             message: $message,
-            httpStatus: 422,
+            httpCode: HttpCode::ValidationError,
             errors: $errors,
         );
     }
@@ -43,7 +45,7 @@ final readonly class ErrorResponse
     {
         return new self(
             message: $message,
-            httpStatus: 500,
+            httpCode: HttpCode::InternalServerError,
             exception: $exception,
         );
     }
