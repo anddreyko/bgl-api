@@ -108,7 +108,7 @@ final class PlayMappingCest
         $fieldNames = $metadata->getFieldNames();
         sort($fieldNames);
 
-        $i->assertSame(['finishedAt', 'gameId', 'id', 'name', 'startedAt', 'status', 'userId', 'visibility'], $fieldNames);
+        $i->assertSame(['finishedAt', 'gameId', 'id', 'locationId', 'name', 'notes', 'startedAt', 'status', 'userId', 'visibility'], $fieldNames);
     }
 
     public function testConfigureSetsGameIdField(UnitTester $i): void

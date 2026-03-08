@@ -115,6 +115,38 @@ final class OpenSessionCest
         $i->assertNotNull($this->plays->find($result->id));
     }
 
+    public function testOpenSessionWithNotes(FunctionalTester $i): void
+    {
+        $result = ($this->handler)(new Envelope(
+            message: new Command(
+                userId: $this->userId,
+                name: 'Game with notes',
+                notes: 'We played on the terrace, great weather!',
+            ),
+            messageId: 'msg-open-notes',
+        ));
+
+        $i->assertInstanceOf(Result::class, $result);
+        $i->assertSame('We played on the terrace, great weather!', $result->notes);
+
+        $play = $this->plays->find($result->id);
+        $i->assertNotNull($play);
+        $i->assertSame('We played on the terrace, great weather!', $play->getNotes());
+    }
+
+    public function testOpenSessionWithoutNotesReturnsNull(FunctionalTester $i): void
+    {
+        $result = ($this->handler)(new Envelope(
+            message: new Command(
+                userId: $this->userId,
+            ),
+            messageId: 'msg-open-no-notes',
+        ));
+
+        $i->assertInstanceOf(Result::class, $result);
+        $i->assertNull($result->notes);
+    }
+
     public function testOpenSessionWithMinimalFields(FunctionalTester $i): void
     {
         $result = ($this->handler)(new Envelope(
@@ -172,6 +204,31 @@ final class OpenSessionCest
         $i->assertNotNull($play);
         $i->assertSame(PlayStatus::Draft, $play->getStatus());
         $i->assertNotNull($play->getFinishedAt());
+    }
+
+    public function testOpenSessionWithSystemMate(FunctionalTester $i): void
+    {
+        $systemMateId = $this->uuidGenerator->generate();
+        $this->mates->add(Mate::createSystem(
+            $systemMateId,
+            'Anonymous',
+            new DateTime('now'),
+        ));
+
+        $result = ($this->handler)(new Envelope(
+            message: new Command(
+                userId: $this->userId,
+                players: [
+                    ['mate_id' => (string) $this->mate1Id],
+                    ['mate_id' => (string) $systemMateId],
+                ],
+            ),
+            messageId: 'msg-open-system-mate',
+        ));
+
+        $i->assertInstanceOf(Result::class, $result);
+        $i->assertNotEmpty($result->id);
+        $i->assertCount(2, $result->players);
     }
 
     public function testOpenSessionFailsWithNonExistentMate(FunctionalTester $i): void

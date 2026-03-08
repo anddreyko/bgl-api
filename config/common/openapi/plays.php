@@ -108,7 +108,9 @@ return [
                                     'type' => 'object',
                                     'properties' => [
                                         'game_id' => ['type' => 'string', 'format' => 'uuid'],
+                                        'location_id' => ['type' => 'string', 'format' => 'uuid', 'nullable' => true],
                                         'name' => ['type' => 'string', 'maxLength' => 255],
+                                        'notes' => ['type' => 'string', 'nullable' => true],
                                         'started_at' => ['type' => 'string', 'format' => 'date-time'],
                                         'finished_at' => ['type' => 'string', 'format' => 'date-time'],
                                         'visibility' => [
@@ -127,6 +129,8 @@ return [
                                                     'score' => ['type' => 'integer', 'nullable' => true],
                                                     'is_winner' => ['type' => 'boolean', 'default' => false],
                                                     'color' => ['type' => 'string', 'maxLength' => 50, 'nullable' => true],
+                                                    'team_tag' => ['type' => 'string', 'maxLength' => 50, 'nullable' => true],
+                                                    'number' => ['type' => 'integer', 'minimum' => 0, 'nullable' => true],
                                                 ],
                                             ],
                                         ],
@@ -197,6 +201,7 @@ return [
                                     'properties' => [
                                         'name' => ['type' => 'string', 'maxLength' => 255, 'nullable' => true],
                                         'game_id' => ['type' => 'string', 'format' => 'uuid', 'nullable' => true],
+                                        'location_id' => ['type' => 'string', 'format' => 'uuid', 'nullable' => true],
                                         'visibility' => [
                                             'type' => 'string',
                                             'enum' => ['private', 'link', 'participants', 'authenticated', 'public'],
@@ -207,6 +212,7 @@ return [
                                             'enum' => ['draft', 'published'],
                                             'nullable' => true,
                                         ],
+                                        'notes' => ['type' => 'string', 'nullable' => true],
                                         'players' => [
                                             'type' => 'array',
                                             'minItems' => 1,
@@ -218,6 +224,8 @@ return [
                                                     'score' => ['type' => 'integer', 'nullable' => true],
                                                     'is_winner' => ['type' => 'boolean', 'default' => false],
                                                     'color' => ['type' => 'string', 'maxLength' => 50, 'nullable' => true],
+                                                    'team_tag' => ['type' => 'string', 'maxLength' => 50, 'nullable' => true],
+                                                    'number' => ['type' => 'integer', 'minimum' => 0, 'nullable' => true],
                                                 ],
                                             ],
                                         ],

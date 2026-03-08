@@ -65,6 +65,8 @@ final readonly class Handler implements MessageHandler
             $command->gameId,
             Visibility::from($command->visibility),
             $command->status !== null ? PlayStatus::from($command->status) : null,
+            locationId: $command->locationId,
+            notes: $command->notes,
         );
 
         if ($command->players !== []) {
@@ -88,21 +90,29 @@ final readonly class Handler implements MessageHandler
         return $author;
     }
 
-    private function transformPlay(Play $play): Result
+    /**
+     * @return ?array{id: string, name: string}
+     */
+    private function resolveGame(Play $play): ?array
     {
-        $game = null;
         $gameId = $play->getGameId();
-        if ($gameId !== null) {
-            /** @var Game|null $gameEntity */
-            $gameEntity = $this->games->find((string)$gameId);
-            if ($gameEntity !== null) {
-                $game = [
-                    'id' => (string)$gameEntity->getId(),
-                    'name' => $gameEntity->getName(),
-                ];
-            }
+        if ($gameId === null) {
+            return null;
         }
 
+        /** @var Game|null $gameEntity */
+        $gameEntity = $this->games->find((string)$gameId);
+
+        return $gameEntity !== null
+            ? ['id' => (string)$gameEntity->getId(), 'name' => $gameEntity->getName()]
+            : null;
+    }
+
+    /**
+     * @return list<array{id: string, mate_id: string, score: ?int, is_winner: bool, color: ?string, team_tag: ?string, number: ?int}>
+     */
+    private function transformPlayers(Play $play): array
+    {
         $players = [];
         /** @var Player $player */
         foreach ($play->getPlayers() as $player) {
@@ -112,9 +122,16 @@ final readonly class Handler implements MessageHandler
                 'score' => $player->getScore(),
                 'is_winner' => $player->isWinner(),
                 'color' => $player->getColor(),
+                'team_tag' => $player->getTeamTag(),
+                'number' => $player->getNumber(),
             ];
         }
 
+        return $players;
+    }
+
+    private function transformPlay(Play $play): Result
+    {
         return new Result(
             id: (string)$play->getId(),
             author: $this->resolveAuthor($play),
@@ -123,13 +140,15 @@ final readonly class Handler implements MessageHandler
             visibility: $play->getVisibility()->value,
             startedAt: $play->getStartedAt()->getNullableFormattedValue('c'),
             finishedAt: $play->getFinishedAt()?->getNullableFormattedValue('c'),
-            game: $game,
-            players: $players,
+            game: $this->resolveGame($play),
+            players: $this->transformPlayers($play),
+            notes: $play->getNotes(),
+            locationId: $play->getLocationId() !== null ? (string)$play->getLocationId() : null,
         );
     }
 
     /**
-     * @param list<array{mate_id: non-empty-string, score?: ?int, is_winner?: ?bool, color?: ?string}> $players
+     * @param list<array{mate_id: non-empty-string, score?: ?int, is_winner?: ?bool, color?: ?string, team_tag?: ?string, number?: ?int}> $players
      */
     private function replacePlayers(Play $play, array $players): void
     {
@@ -142,6 +161,8 @@ final readonly class Handler implements MessageHandler
                 score: $playerData['score'] ?? null,
                 isWinner: $playerData['is_winner'] ?? false,
                 color: $playerData['color'] ?? null,
+                teamTag: $playerData['team_tag'] ?? null,
+                number: $playerData['number'] ?? null,
             ));
         }
         $play->replacePlayers($newPlayers);
@@ -155,7 +176,7 @@ final readonly class Handler implements MessageHandler
     }
 
     /**
-     * @param list<array{mate_id: non-empty-string, score?: ?int, is_winner?: ?bool, color?: ?string}> $players
+     * @param list<array{mate_id: non-empty-string, score?: ?int, is_winner?: ?bool, color?: ?string, team_tag?: ?string, number?: ?int}> $players
      */
     private function validatePlayers(array $players, Uuid $userId): void
     {
@@ -181,7 +202,7 @@ final readonly class Handler implements MessageHandler
                 throw new NotFoundException('Mate not found: ' . $mateId);
             }
 
-            if ((string)$mate->getUserId() !== (string)$userId) {
+            if ($mate->getUserId() !== null && (string)$mate->getUserId() !== (string)$userId) {
                 throw new \Bgl\Domain\Plays\MateNotOwnedByUserException();
             }
 

@@ -69,6 +69,18 @@ return [
                         'id' => ['type' => 'string'],
                         'name' => ['type' => 'string'],
                         'notes' => ['type' => 'string', 'nullable' => true],
+                        'is_system' => ['type' => 'boolean'],
+                        'created_at' => ['type' => 'string', 'format' => 'date-time'],
+                    ],
+                ],
+                'Location' => [
+                    'type' => 'object',
+                    'properties' => [
+                        'id' => ['type' => 'string'],
+                        'name' => ['type' => 'string'],
+                        'address' => ['type' => 'string', 'nullable' => true],
+                        'notes' => ['type' => 'string', 'nullable' => true],
+                        'url' => ['type' => 'string', 'nullable' => true],
                         'created_at' => ['type' => 'string', 'format' => 'date-time'],
                     ],
                 ],
@@ -96,6 +108,8 @@ return [
                         'score' => ['type' => 'integer', 'nullable' => true],
                         'is_winner' => ['type' => 'boolean'],
                         'color' => ['type' => 'string', 'nullable' => true],
+                        'team_tag' => ['type' => 'string', 'maxLength' => 50, 'nullable' => true],
+                        'number' => ['type' => 'integer', 'minimum' => 0, 'nullable' => true],
                     ],
                 ],
                 'Play' => [
@@ -126,6 +140,8 @@ return [
                             'type' => 'array',
                             'items' => ['$ref' => '#/components/schemas/Player'],
                         ],
+                        'notes' => ['type' => 'string', 'nullable' => true],
+                        'location_id' => ['type' => 'string', 'format' => 'uuid', 'nullable' => true],
                     ],
                 ],
                 'Game' => [
@@ -186,6 +202,7 @@ return [
                     ['$ref' => '#/components/schemas/TokenPair']
                 ),
                 'Mate' => $successResponse('Successful operation', ['$ref' => '#/components/schemas/Mate']),
+                'Location' => $successResponse('Successful operation', ['$ref' => '#/components/schemas/Location']),
                 'User' => $successResponse('Successful operation', ['$ref' => '#/components/schemas/User']),
                 'PasskeyOptions' => $successResponse(
                     'Successful operation',

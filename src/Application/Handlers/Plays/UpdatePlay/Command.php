@@ -13,7 +13,7 @@ use Bgl\Core\ValueObjects\Uuid;
 final readonly class Command implements Message
 {
     /**
-     * @param list<array{mate_id: non-empty-string, score?: ?int, is_winner?: ?bool, color?: ?string}> $players
+     * @param list<array{mate_id: non-empty-string, score?: ?int, is_winner?: ?bool, color?: ?string, team_tag?: ?string, number?: ?int}> $players
      */
     public function __construct(
         public Uuid $sessionId,
@@ -23,6 +23,8 @@ final readonly class Command implements Message
         public string $visibility = 'private',
         public ?string $status = null,
         public array $players = [],
+        public ?Uuid $locationId = null,
+        public ?string $notes = null,
     ) {
     }
 }

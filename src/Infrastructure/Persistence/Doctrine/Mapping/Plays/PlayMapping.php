@@ -33,6 +33,7 @@ final class PlayMapping implements EntityMapping
 
         $this->configureIdentity($metadata);
         $this->configureFields($metadata);
+        $this->configureOptionalFields($metadata);
         $this->configureAssociations($metadata);
     }
 
@@ -89,6 +90,22 @@ final class PlayMapping implements EntityMapping
             'type' => 'string',
             'enumType' => Visibility::class,
             'options' => ['default' => 'private'],
+        ]);
+    }
+
+    private function configureOptionalFields(ClassMetadata $metadata): void
+    {
+        $metadata->mapField([
+            'fieldName' => 'locationId',
+            'type' => 'uuid_vo',
+            'columnName' => 'location_id',
+            'nullable' => true,
+        ]);
+
+        $metadata->mapField([
+            'fieldName' => 'notes',
+            'type' => 'text',
+            'nullable' => true,
         ]);
     }
 

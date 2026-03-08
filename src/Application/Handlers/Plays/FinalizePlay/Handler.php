@@ -67,21 +67,29 @@ final readonly class Handler implements MessageHandler
         return $author;
     }
 
-    private function transformPlay(Play $play): Result
+    /**
+     * @return ?array{id: string, name: string}
+     */
+    private function resolveGame(Play $play): ?array
     {
-        $game = null;
         $gameId = $play->getGameId();
-        if ($gameId !== null) {
-            /** @var Game|null $gameEntity */
-            $gameEntity = $this->games->find((string)$gameId);
-            if ($gameEntity !== null) {
-                $game = [
-                    'id' => (string)$gameEntity->getId(),
-                    'name' => $gameEntity->getName(),
-                ];
-            }
+        if ($gameId === null) {
+            return null;
         }
 
+        /** @var Game|null $gameEntity */
+        $gameEntity = $this->games->find((string)$gameId);
+
+        return $gameEntity !== null
+            ? ['id' => (string)$gameEntity->getId(), 'name' => $gameEntity->getName()]
+            : null;
+    }
+
+    /**
+     * @return list<array{id: string, mate_id: string, score: ?int, is_winner: bool, color: ?string, team_tag: ?string, number: ?int}>
+     */
+    private function transformPlayers(Play $play): array
+    {
         $players = [];
         /** @var Player $player */
         foreach ($play->getPlayers() as $player) {
@@ -91,9 +99,16 @@ final readonly class Handler implements MessageHandler
                 'score' => $player->getScore(),
                 'is_winner' => $player->isWinner(),
                 'color' => $player->getColor(),
+                'team_tag' => $player->getTeamTag(),
+                'number' => $player->getNumber(),
             ];
         }
 
+        return $players;
+    }
+
+    private function transformPlay(Play $play): Result
+    {
         return new Result(
             id: (string)$play->getId(),
             author: $this->resolveAuthor($play),
@@ -102,8 +117,9 @@ final readonly class Handler implements MessageHandler
             visibility: $play->getVisibility()->value,
             startedAt: $play->getStartedAt()->getNullableFormattedValue('c'),
             finishedAt: $play->getFinishedAt()?->getNullableFormattedValue('c'),
-            game: $game,
-            players: $players,
+            game: $this->resolveGame($play),
+            players: $this->transformPlayers($play),
+            notes: $play->getNotes(),
         );
     }
 }

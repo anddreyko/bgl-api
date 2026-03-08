@@ -24,6 +24,8 @@ final class Play
         private ?DateTime $finishedAt,
         private ?Uuid $gameId = null,
         private Visibility $visibility = Visibility::Private,
+        private ?Uuid $locationId = null,
+        private ?string $notes = null,
     ) {
         $this->players = new EmptyPlayers();
     }
@@ -36,6 +38,8 @@ final class Play
         Players $players,
         ?Uuid $gameId = null,
         Visibility $visibility = Visibility::Private,
+        ?Uuid $locationId = null,
+        ?string $notes = null,
     ): self {
         $play = new self(
             $id,
@@ -46,6 +50,8 @@ final class Play
             null,
             $gameId,
             $visibility,
+            $locationId,
+            $notes,
         );
         $play->players = $players;
 
@@ -92,6 +98,16 @@ final class Play
         return $this->visibility;
     }
 
+    public function getLocationId(): ?Uuid
+    {
+        return $this->locationId;
+    }
+
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
     public function delete(): void
     {
         if ($this->status === PlayStatus::Deleted) {
@@ -101,8 +117,14 @@ final class Play
         $this->status = PlayStatus::Deleted;
     }
 
-    public function update(?string $name, ?Uuid $gameId, Visibility $visibility, ?PlayStatus $status = null): void
-    {
+    public function update(
+        ?string $name,
+        ?Uuid $gameId,
+        Visibility $visibility,
+        ?PlayStatus $status = null,
+        ?Uuid $locationId = null,
+        ?string $notes = null,
+    ): void {
         if ($this->status === PlayStatus::Deleted) {
             throw new PlayDeletedException('Deleted play cannot be updated.');
         }
@@ -114,6 +136,8 @@ final class Play
         $this->name = $name;
         $this->gameId = $gameId;
         $this->visibility = $visibility;
+        $this->locationId = $locationId;
+        $this->notes = $notes;
 
         if ($status !== null) {
             $this->status = $status;

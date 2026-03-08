@@ -9,7 +9,7 @@ final readonly class Result
     /**
      * @param array{id: string, name: string} $author
      * @param ?array{id: string, name: string} $game
-     * @param list<array{id: string, mate_id: string, score: ?int, is_winner: bool, color: ?string}> $players
+     * @param list<array{id: string, mate_id: string, score: ?int, is_winner: bool, color: ?string, team_tag: ?string, number: ?int}> $players
      */
     public function __construct(
         public string $id,
@@ -21,6 +21,7 @@ final readonly class Result
         public ?string $finishedAt,
         public ?array $game,
         public array $players,
+        public ?string $notes = null,
     ) {
     }
 }

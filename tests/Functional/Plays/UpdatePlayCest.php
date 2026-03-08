@@ -137,6 +137,78 @@ final class UpdatePlayCest
         $i->assertSame(PlayStatus::Draft, $updated->getStatus());
     }
 
+    public function testUpdateWithNotes(FunctionalTester $i): void
+    {
+        $sessionId = $this->uuidGenerator->generate();
+
+        $play = Play::create(
+            $sessionId,
+            $this->userId,
+            'Game night',
+            new DateTime('2024-06-15 20:00:00'),
+            $this->players,
+        );
+        $this->plays->add($play);
+        $this->em->flush();
+        $this->em->clear();
+
+        $result = ($this->handler)(new Envelope(
+            message: new Command(
+                sessionId: $sessionId,
+                userId: $this->userId,
+                name: 'Game night',
+                notes: 'Great session, everyone had fun!',
+            ),
+            messageId: 'msg-update-notes',
+        ));
+
+        $i->assertInstanceOf(Result::class, $result);
+        $i->assertSame('Great session, everyone had fun!', $result->notes);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $updated = $this->plays->find((string) $sessionId);
+        $i->assertNotNull($updated);
+        $i->assertSame('Great session, everyone had fun!', $updated->getNotes());
+    }
+
+    public function testUpdateClearsNotes(FunctionalTester $i): void
+    {
+        $sessionId = $this->uuidGenerator->generate();
+
+        $play = Play::create(
+            $sessionId,
+            $this->userId,
+            'Game night',
+            new DateTime('2024-06-15 20:00:00'),
+            $this->players,
+            notes: 'Old notes',
+        );
+        $this->plays->add($play);
+        $this->em->flush();
+        $this->em->clear();
+
+        $result = ($this->handler)(new Envelope(
+            message: new Command(
+                sessionId: $sessionId,
+                userId: $this->userId,
+                name: 'Game night',
+            ),
+            messageId: 'msg-update-clear-notes',
+        ));
+
+        $i->assertInstanceOf(Result::class, $result);
+        $i->assertNull($result->notes);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $updated = $this->plays->find((string) $sessionId);
+        $i->assertNotNull($updated);
+        $i->assertNull($updated->getNotes());
+    }
+
     public function testPlayNotFoundThrowsNotFoundException(FunctionalTester $i): void
     {
         $i->expectThrowable(
