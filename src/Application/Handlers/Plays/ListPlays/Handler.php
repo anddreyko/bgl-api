@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bgl\Application\Handlers\Plays\ListPlays;
 
 use Bgl\Core\Auth\AuthenticationException;
+use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Listing\Field;
 use Bgl\Core\Listing\Filter;
 use Bgl\Core\Listing\Filter\AndX;
@@ -28,6 +29,7 @@ use Bgl\Domain\Plays\Player\Player;
 use Bgl\Domain\Plays\Plays;
 use Bgl\Domain\Plays\PlayStatus;
 use Bgl\Domain\Plays\Visibility;
+use Bgl\Domain\Profile\UserResolver;
 use Bgl\Domain\Profile\Users;
 
 /**
@@ -39,6 +41,7 @@ final readonly class Handler implements MessageHandler
         private Plays $plays,
         private Games $games,
         private Users $users,
+        private UserResolver $userResolver,
     ) {
     }
 
@@ -81,12 +84,15 @@ final readonly class Handler implements MessageHandler
 
     private function buildFilter(Query $query): Filter
     {
-        $targetUserId = $query->authorId ?? $query->userId;
+        $authorId = $query->authorId !== null
+            ? ($this->userResolver->resolveId($query->authorId) ?? throw new NotFoundException('Author not found'))
+            : null;
+        $targetUserId = $authorId ?? $query->userId;
         if ($targetUserId === null) {
             throw new AuthenticationException();
         }
 
-        $isViewingOther = $query->authorId !== null && $query->authorId !== $query->userId;
+        $isViewingOther = $authorId !== null && $authorId !== $query->userId;
 
         /** @var non-empty-list<Filter> $filters */
         $filters = [
@@ -128,9 +134,6 @@ final readonly class Handler implements MessageHandler
         );
     }
 
-    /**
-     * @return array<string, mixed>
-     */
     /**
      * @return array{id: string, name: string}
      */

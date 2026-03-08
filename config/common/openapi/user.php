@@ -22,6 +22,7 @@ return [
                             'name' => 'id',
                             'in' => 'path',
                             'required' => true,
+                            'description' => 'User UUID or name',
                             'schema' => ['type' => 'string'],
                         ],
                     ],

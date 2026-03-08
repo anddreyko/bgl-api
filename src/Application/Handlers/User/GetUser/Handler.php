@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Bgl\Application\Handlers\User\GetUser;
 
+use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
-use Bgl\Domain\Profile\Users;
+use Bgl\Domain\Profile\UserResolver;
 use Bgl\Domain\Profile\UserStatus;
 
 /**
@@ -15,7 +16,7 @@ use Bgl\Domain\Profile\UserStatus;
 final readonly class Handler implements MessageHandler
 {
     public function __construct(
-        private Users $users,
+        private UserResolver $userResolver,
     ) {
     }
 
@@ -25,9 +26,9 @@ final readonly class Handler implements MessageHandler
         /** @var Query $query */
         $query = $envelope->message;
 
-        $user = $this->users->find($query->userId);
+        $user = $this->userResolver->resolve($query->userId);
         if ($user === null) {
-            throw new \Bgl\Core\Exceptions\NotFoundException('User not found');
+            throw new NotFoundException('User not found');
         }
 
         return new Result(

@@ -13,4 +13,6 @@ use Bgl\Core\Listing\Searchable;
 interface Users extends Repository, Searchable
 {
     public function findByEmail(string $email): ?User;
+
+    public function findByName(string $name): ?User;
 }

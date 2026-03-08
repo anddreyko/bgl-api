@@ -75,6 +75,45 @@ final class GetUserCest
         $i->assertTrue($result->isActive);
     }
 
+    public function testSuccessfulUserRetrievalByName(FunctionalTester $i): void
+    {
+        $userId = $this->uuidGenerator->generate();
+        $email = 'user-' . uniqid() . '@test.local';
+        $name = 'anddreyko-' . uniqid();
+
+        $user = new User(
+            id: $userId,
+            email: new Email($email),
+            passwordHash: 'hashed_password',
+            createdAt: new DateTime('2024-01-15 10:30:00'),
+            status: UserStatus::Active,
+            name: $name,
+        );
+        $this->users->add($user);
+        $this->em->flush();
+        $this->em->clear();
+
+        $result = ($this->handler)(new Envelope(
+            message: new Query(userId: $name),
+            messageId: 'msg-3',
+        ));
+
+        $i->assertInstanceOf(Result::class, $result);
+        $i->assertSame((string) $userId, $result->id);
+        $i->assertSame($name, $result->name);
+    }
+
+    public function testUserNotFoundByNameThrowsException(FunctionalTester $i): void
+    {
+        $i->expectThrowable(
+            new NotFoundException('User not found'),
+            fn () => ($this->handler)(new Envelope(
+                message: new Query(userId: 'nonexistent-name-' . uniqid()),
+                messageId: 'msg-4',
+            )),
+        );
+    }
+
     public function testUserNotFoundThrowsDomainException(FunctionalTester $i): void
     {
         $i->expectThrowable(

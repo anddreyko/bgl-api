@@ -23,4 +23,16 @@ final class InMemoryUsers extends InMemoryRepository implements Users
 
         return null;
     }
+
+    #[\Override]
+    public function findByName(string $name): ?User
+    {
+        foreach ($this->getEntities() as $user) {
+            if ($user->getName() === $name) {
+                return $user;
+            }
+        }
+
+        return null;
+    }
 }
