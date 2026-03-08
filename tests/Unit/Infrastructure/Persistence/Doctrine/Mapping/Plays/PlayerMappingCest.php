@@ -115,6 +115,6 @@ final class PlayerMappingCest
         $fieldNames = $metadata->getFieldNames();
         sort($fieldNames);
 
-        $i->assertSame(['color', 'id', 'isWinner', 'mateId', 'score'], $fieldNames);
+        $i->assertSame(['color', 'id', 'isWinner', 'mateId', 'number', 'score', 'teamTag'], $fieldNames);
     }
 }

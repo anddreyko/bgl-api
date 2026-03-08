@@ -27,11 +27,12 @@ final class PlayerMapping implements EntityMapping
             ],
         ]);
 
+        $this->configureIdentity($metadata);
         $this->configureFields($metadata);
         $this->configureAssociations($metadata);
     }
 
-    private function configureFields(ClassMetadata $metadata): void
+    private function configureIdentity(ClassMetadata $metadata): void
     {
         $metadata->mapField([
             'fieldName' => 'id',
@@ -45,7 +46,10 @@ final class PlayerMapping implements EntityMapping
             'type' => 'uuid_vo',
             'columnName' => 'mate_id',
         ]);
+    }
 
+    private function configureFields(ClassMetadata $metadata): void
+    {
         $metadata->mapField([
             'fieldName' => 'score',
             'type' => 'integer',
@@ -64,6 +68,20 @@ final class PlayerMapping implements EntityMapping
             'type' => 'string',
             'nullable' => true,
             'length' => 50,
+        ]);
+
+        $metadata->mapField([
+            'fieldName' => 'teamTag',
+            'type' => 'string',
+            'columnName' => 'team_tag',
+            'nullable' => true,
+            'length' => 50,
+        ]);
+
+        $metadata->mapField([
+            'fieldName' => 'number',
+            'type' => 'integer',
+            'nullable' => true,
         ]);
     }
 
