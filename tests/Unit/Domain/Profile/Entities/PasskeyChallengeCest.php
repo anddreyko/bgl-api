@@ -18,8 +18,8 @@ final class PasskeyChallengeCest
 {
     public function testForRegistrationSetsAllFields(UnitTester $i): void
     {
-        $id = new Uuid('challenge-id-1');
-        $userId = new Uuid('user-id-1');
+        $id = new Uuid('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa');
+        $userId = new Uuid('88888888-8888-4888-8888-888888888881');
         $expiresAt = new DateTime('2026-01-15 10:05:00');
 
         $challenge = PasskeyChallenge::forRegistration(
@@ -38,7 +38,7 @@ final class PasskeyChallengeCest
     public function testForLoginHasNullUserId(UnitTester $i): void
     {
         $challenge = PasskeyChallenge::forLogin(
-            id: new Uuid('challenge-id-2'),
+            id: new Uuid('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa02'),
             challenge: 'login-challenge',
             expiresAt: new DateTime('2026-01-15 10:05:00'),
         );
@@ -49,7 +49,7 @@ final class PasskeyChallengeCest
     public function testIsExpiredReturnsFalseBeforeExpiry(UnitTester $i): void
     {
         $challenge = PasskeyChallenge::forLogin(
-            id: new Uuid('challenge-id-3'),
+            id: new Uuid('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa03'),
             challenge: 'test',
             expiresAt: new DateTime('2026-01-15 10:05:00'),
         );
@@ -64,7 +64,7 @@ final class PasskeyChallengeCest
         $expiresAt = new DateTime('2026-01-15 10:05:00');
 
         $challenge = PasskeyChallenge::forLogin(
-            id: new Uuid('challenge-id-4'),
+            id: new Uuid('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa04'),
             challenge: 'test',
             expiresAt: $expiresAt,
         );
@@ -75,7 +75,7 @@ final class PasskeyChallengeCest
     public function testIsExpiredReturnsTrueAfterExpiry(UnitTester $i): void
     {
         $challenge = PasskeyChallenge::forLogin(
-            id: new Uuid('challenge-id-5'),
+            id: new Uuid('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaa05'),
             challenge: 'test',
             expiresAt: new DateTime('2026-01-15 10:05:00'),
         );

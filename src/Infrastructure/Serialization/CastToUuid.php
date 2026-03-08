@@ -19,6 +19,11 @@ final class CastToUuid implements PropertyCaster
 
         $stringValue = (string)$value;
 
-        return new Uuid($stringValue !== '' ? $stringValue : 'invalid');
+        if (!Uuid::isValid($stringValue)) {
+            return new Uuid();
+        }
+
+        /** @var non-empty-string $stringValue */
+        return new Uuid($stringValue);
     }
 }

@@ -45,7 +45,7 @@ final class GetGameCest
 
     public function testGetGameReturnsResult(FunctionalTester $i): void
     {
-        $gameId = new Uuid('g-get-1');
+        $gameId = new Uuid('aaa44444-4444-4444-8444-444444444444');
         $now = new DateTime();
         $this->games->add(Game::create($gameId, 13, 'Catan', 1995, $now));
 

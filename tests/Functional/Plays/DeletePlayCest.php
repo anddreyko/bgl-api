@@ -54,7 +54,7 @@ final class DeletePlayCest
         /** @var UuidGenerator $uuidGenerator */
         $this->uuidGenerator = $container->get(UuidGenerator::class);
 
-        $this->userId = new Uuid('user-delete-' . uniqid());
+        $this->userId = $this->uuidGenerator->generate();
     }
 
     public function testSuccessfulDelete(FunctionalTester $i): void
@@ -130,7 +130,7 @@ final class DeletePlayCest
             new NotFoundException('Play not found'),
             fn () => ($this->handler)(new Envelope(
                 message: new Command(
-                    sessionId: new Uuid('non-existent-' . uniqid()),
+                    sessionId: $this->uuidGenerator->generate(),
                     userId: $this->userId,
                 ),
                 messageId: 'msg-delete-not-found',
@@ -144,7 +144,7 @@ final class DeletePlayCest
 
         $play = Play::create(
             $sessionId,
-            new Uuid('user-owner'),
+            new Uuid('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee'),
             null,
             new DateTime('2024-06-15 20:00:00'),
             $this->players,
@@ -158,7 +158,7 @@ final class DeletePlayCest
             fn () => ($this->handler)(new Envelope(
                 message: new Command(
                     sessionId: $sessionId,
-                    userId: new Uuid('user-other'),
+                    userId: new Uuid('ffffffff-ffff-4fff-8fff-ffffffffffff'),
                 ),
                 messageId: 'msg-delete-denied',
             )),

@@ -26,9 +26,13 @@ final class InMemoryRepositoryBench
 {
     private Plays $plays;
 
+    /** @var list<string> */
+    private array $playIds = [];
+
     public function setUp(): void
     {
         $this->plays = BenchHelper::get(Plays::class);
+        $this->playIds = [];
         BenchHelper::clearRepositories();
     }
 
@@ -43,8 +47,8 @@ final class InMemoryRepositoryBench
     {
         for ($i = 0; $i < 1000; ++$i) {
             $this->plays->add(Play::create(
-                id: new Uuid("bench-play-{$i}"),
-                userId: new Uuid('bench-user'),
+                id: new Uuid(\Ramsey\Uuid\Uuid::uuid4()->toString()),
+                userId: new Uuid('00000000-0000-4000-8000-000000000050'),
                 name: "Play {$i}",
                 startedAt: new DateTime('2024-06-15 20:00:00'),
                 players: new InMemoryPlayers(),
@@ -60,7 +64,7 @@ final class InMemoryRepositoryBench
     {
         $this->seedPlays(1000);
 
-        $this->plays->find('bench-play-500');
+        $this->plays->find($this->playIds[500]);
 
         BenchHelper::clearRepositories();
     }
@@ -71,7 +75,7 @@ final class InMemoryRepositoryBench
     {
         $this->seedPlays(1000);
 
-        $filter = new Equals(new Field('userId'), 'bench-user');
+        $filter = new Equals(new Field('userId'), '00000000-0000-4000-8000-000000000050');
         $sort = new PageSort(new SortFields(['startedAt' => SortDirection::Desc]));
 
         /** @var iterable<mixed> $results */
@@ -98,9 +102,11 @@ final class InMemoryRepositoryBench
     private function seedPlays(int $count): void
     {
         for ($i = 0; $i < $count; ++$i) {
+            $id = \Ramsey\Uuid\Uuid::uuid4()->toString();
+            $this->playIds[] = $id;
             $this->plays->add(Play::create(
-                id: new Uuid("bench-play-{$i}"),
-                userId: new Uuid('bench-user'),
+                id: new Uuid($id),
+                userId: new Uuid('00000000-0000-4000-8000-000000000050'),
                 name: "Play {$i}",
                 startedAt: new DateTime('2024-06-15 20:00:00'),
                 players: new InMemoryPlayers(),

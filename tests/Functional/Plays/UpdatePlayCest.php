@@ -75,7 +75,7 @@ final class UpdatePlayCest
         /** @var UuidGenerator $uuidGenerator */
         $this->uuidGenerator = $container->get(UuidGenerator::class);
 
-        $this->userId = new Uuid('user-update-' . uniqid());
+        $this->userId = $this->uuidGenerator->generate();
 
         $this->mate1Id = $this->uuidGenerator->generate();
         $this->mate2Id = $this->uuidGenerator->generate();
@@ -143,7 +143,7 @@ final class UpdatePlayCest
             new NotFoundException('Play not found'),
             fn () => ($this->handler)(new Envelope(
                 message: new Command(
-                    sessionId: new Uuid('non-existent-' . uniqid()),
+                    sessionId: $this->uuidGenerator->generate(),
                     userId: $this->userId,
                 ),
                 messageId: 'msg-update-not-found',
@@ -157,7 +157,7 @@ final class UpdatePlayCest
 
         $play = Play::create(
             $sessionId,
-            new Uuid('user-owner'),
+            new Uuid('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee'),
             null,
             new DateTime('2024-06-15 20:00:00'),
             $this->players,
@@ -171,7 +171,7 @@ final class UpdatePlayCest
             fn () => ($this->handler)(new Envelope(
                 message: new Command(
                     sessionId: $sessionId,
-                    userId: new Uuid('user-other'),
+                    userId: new Uuid('ffffffff-ffff-4fff-8fff-ffffffffffff'),
                 ),
                 messageId: 'msg-update-denied',
             )),
@@ -336,7 +336,7 @@ final class UpdatePlayCest
                 message: new Command(
                     sessionId: $sessionId,
                     userId: $this->userId,
-                    gameId: new Uuid('non-existent-game'),
+                    gameId: new Uuid('00000000-0000-4000-8000-000000000001'),
                 ),
                 messageId: 'msg-update-bad-game',
             )),

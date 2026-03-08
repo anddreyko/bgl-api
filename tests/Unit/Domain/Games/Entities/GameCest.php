@@ -18,7 +18,7 @@ final class GameCest
 {
     public function testCreateReturnsGameWithCorrectData(UnitTester $i): void
     {
-        $id = new Uuid('game-id');
+        $id = new Uuid('44444444-4444-4444-8444-444444444444');
         $bggId = 13;
         $name = 'Catan';
         $yearPublished = 1995;
@@ -37,7 +37,7 @@ final class GameCest
     public function testCreateWithNullYearPublished(UnitTester $i): void
     {
         $game = Game::create(
-            new Uuid('game-id'),
+            new Uuid('44444444-4444-4444-8444-444444444444'),
             42,
             'Unknown Game',
             null,
@@ -49,7 +49,7 @@ final class GameCest
 
     public function testCreatePreservesAllFields(UnitTester $i): void
     {
-        $id = new Uuid('game-id');
+        $id = new Uuid('44444444-4444-4444-8444-444444444444');
         $game = Game::create($id, 13, 'Catan', 1995, new DateTime('2026-01-01 00:00:00'));
 
         $i->assertSame(13, $game->getBggId());

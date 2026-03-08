@@ -34,7 +34,7 @@ final class JwtAuthenticatorCest
     private function makeUser(UserStatus $status = UserStatus::Active, int $tokenVersion = 1): User
     {
         $user = new User(
-            id: new Uuid('user-id-123'),
+            id: new Uuid('dddddddd-dddd-4ddd-8ddd-dddddddddddd'),
             email: new Email('test@example.com'),
             passwordHash: 'hashed_password',
             createdAt: new DateTime('2024-01-01 12:00:00'),
@@ -144,7 +144,7 @@ final class JwtAuthenticatorCest
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
-                    'sub' => 'user-id-123',
+                    'sub' => 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
                     'type' => 'refresh',
                     'tokenVersion' => 1,
                 ]),
@@ -188,7 +188,7 @@ final class JwtAuthenticatorCest
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
-                    'sub' => 'user-id-123',
+                    'sub' => 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
                     'type' => 'access',
                 ]),
             ]),
@@ -209,7 +209,7 @@ final class JwtAuthenticatorCest
     {
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
-                'verify' => static fn(): TokenPayload => TokenPayload::fromArray(['sub' => 'user-id-123']),
+                'verify' => static fn(): TokenPayload => TokenPayload::fromArray(['sub' => 'dddddddd-dddd-4ddd-8ddd-dddddddddddd']),
             ]),
             users: Stub::makeEmpty(Users::class),
             passwordHasher: Stub::makeEmpty(Hasher::class),
@@ -254,7 +254,7 @@ final class JwtAuthenticatorCest
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
-                    'sub' => 'user-id-123',
+                    'sub' => 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
                     'type' => 'refresh',
                     'tokenVersion' => 1,
                 ]),
@@ -279,7 +279,7 @@ final class JwtAuthenticatorCest
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
-                    'sub' => 'user-id-123',
+                    'sub' => 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
                     'type' => 'refresh',
                     'tokenVersion' => 5,
                 ]),
@@ -313,7 +313,7 @@ final class JwtAuthenticatorCest
             tokenIssuer: $this->makeTokenIssuer(),
         );
 
-        $authenticator->revoke('user-id-123');
+        $authenticator->revoke('dddddddd-dddd-4ddd-8ddd-dddddddddddd');
 
         $i->assertSame(2, $user->getTokenVersion());
     }
@@ -342,7 +342,7 @@ final class JwtAuthenticatorCest
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
-                    'sub' => 'user-id-123',
+                    'sub' => 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
                     'type' => 'access',
                     'tokenVersion' => 1,
                 ]),
@@ -356,7 +356,7 @@ final class JwtAuthenticatorCest
 
         $result = $authenticator->verify('valid-access-token');
 
-        $i->assertSame('user-id-123', $result->userId);
+        $i->assertSame('dddddddd-dddd-4ddd-8ddd-dddddddddddd', $result->userId);
     }
 
     public function testVerifyInvalidTokenThrows(UnitTester $i): void
@@ -386,7 +386,7 @@ final class JwtAuthenticatorCest
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
-                    'sub' => 'user-id-123',
+                    'sub' => 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
                     'type' => 'refresh',
                 ]),
             ]),
@@ -408,7 +408,7 @@ final class JwtAuthenticatorCest
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
-                    'sub' => 'user-id-123',
+                    'sub' => 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
                     'tokenVersion' => 1,
                 ]),
             ]),
@@ -421,7 +421,7 @@ final class JwtAuthenticatorCest
 
         $result = $authenticator->verify('legacy-token');
 
-        $i->assertSame('user-id-123', $result->userId);
+        $i->assertSame('dddddddd-dddd-4ddd-8ddd-dddddddddddd', $result->userId);
     }
 
     public function testVerifyMissingUserIdThrows(UnitTester $i): void
@@ -473,7 +473,7 @@ final class JwtAuthenticatorCest
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
-                    'sub' => 'user-id-123',
+                    'sub' => 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
                     'type' => 'access',
                     'tokenVersion' => 1,
                 ]),
@@ -498,7 +498,7 @@ final class JwtAuthenticatorCest
         $authenticator = new JwtAuthenticator(
             tokenizer: Stub::makeEmpty(Tokenizer::class, [
                 'verify' => static fn(): TokenPayload => TokenPayload::fromArray([
-                    'sub' => 'user-id-123',
+                    'sub' => 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
                     'type' => 'access',
                     'tokenVersion' => 1,
                 ]),

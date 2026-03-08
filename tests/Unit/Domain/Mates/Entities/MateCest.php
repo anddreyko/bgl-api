@@ -19,8 +19,8 @@ final class MateCest
 {
     public function testCreateReturnsMateWithCorrectData(UnitTester $i): void
     {
-        $id = new Uuid('mate-id');
-        $userId = new Uuid('user-123');
+        $id = new Uuid('77777777-7777-4777-8777-777777777777');
+        $userId = new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e');
         $name = 'Ivan';
         $notes = 'Likes Carcassonne';
         $createdAt = new DateTime('2026-01-15 20:00:00');
@@ -39,8 +39,8 @@ final class MateCest
     public function testCreateWithNullNotes(UnitTester $i): void
     {
         $mate = Mate::create(
-            new Uuid('mate-id'),
-            new Uuid('user-456'),
+            new Uuid('77777777-7777-4777-8777-777777777777'),
+            new Uuid('c3d4e5f6-a7b8-4c9d-8e1f-2a3b4c5d6e7f'),
             'Anna',
             null,
             new DateTime(),
@@ -52,8 +52,8 @@ final class MateCest
     public function testUpdateChangesNameAndNotes(UnitTester $i): void
     {
         $mate = Mate::create(
-            new Uuid('mate-id'),
-            new Uuid('user-123'),
+            new Uuid('77777777-7777-4777-8777-777777777777'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             'Ivan',
             'Old notes',
             new DateTime(),
@@ -68,8 +68,8 @@ final class MateCest
     public function testSoftDeleteSetsDeletedAt(UnitTester $i): void
     {
         $mate = Mate::create(
-            new Uuid('mate-id'),
-            new Uuid('user-123'),
+            new Uuid('77777777-7777-4777-8777-777777777777'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             'Ivan',
             null,
             new DateTime(),
@@ -85,8 +85,8 @@ final class MateCest
     public function testSoftDeleteThrowsWhenAlreadyDeleted(UnitTester $i): void
     {
         $mate = Mate::create(
-            new Uuid('mate-id'),
-            new Uuid('user-123'),
+            new Uuid('77777777-7777-4777-8777-777777777777'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             'Ivan',
             null,
             new DateTime(),

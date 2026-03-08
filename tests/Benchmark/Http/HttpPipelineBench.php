@@ -35,7 +35,7 @@ final class HttpPipelineBench
         for ($i = 0; $i < 50; ++$i) {
             $games->add(
                 Game::create(
-                    new Uuid("bench-game-{$i}"),
+                    new Uuid(\Ramsey\Uuid\Uuid::uuid4()->toString()),
                     bggId: 13,
                     name: "Catan Edition {$i}",
                     yearPublished: 1995,

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Games;
 
+use Bgl\Core\Listing\Field;
+use Bgl\Core\Listing\Filter\Equals;
 use Bgl\Domain\Games\Game;
 use Bgl\Domain\Games\Games as GameRepository;
 use Bgl\Infrastructure\Persistence\Doctrine\DoctrineRepository;
@@ -28,14 +30,6 @@ final class Games extends DoctrineRepository implements GameRepository
     #[\Override]
     public function findByBggId(int $bggId): ?Game
     {
-        /** @var Game|null */
-        return $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select('g')
-            ->from(Game::class, 'g')
-            ->where('g.bggId = :bggId')
-            ->setParameter('bggId', $bggId)
-            ->getQuery()
-            ->getOneOrNullResult();
+        return $this->findOneBy(new Equals(new Field('bggId'), $bggId));
     }
 }

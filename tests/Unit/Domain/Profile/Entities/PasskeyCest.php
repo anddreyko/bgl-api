@@ -18,8 +18,8 @@ final class PasskeyCest
 {
     public function testCreateSetsFieldsCorrectly(UnitTester $i): void
     {
-        $id = new Uuid('passkey-id-1');
-        $userId = new Uuid('user-id-1');
+        $id = new Uuid('99999999-9999-4999-8999-999999999991');
+        $userId = new Uuid('88888888-8888-4888-8888-888888888881');
         $now = new DateTime('2026-01-15 10:00:00');
 
         $passkey = Passkey::create(
@@ -43,8 +43,8 @@ final class PasskeyCest
     public function testCreateWithoutLabelDefaultsToNull(UnitTester $i): void
     {
         $passkey = Passkey::create(
-            id: new Uuid('passkey-id-2'),
-            userId: new Uuid('user-id-1'),
+            id: new Uuid('99999999-9999-4999-8999-999999999992'),
+            userId: new Uuid('88888888-8888-4888-8888-888888888881'),
             credentialId: 'cred-def456',
             credentialData: '{}',
             createdAt: new DateTime('2026-01-15 10:00:00'),
@@ -56,8 +56,8 @@ final class PasskeyCest
     public function testCreateSetsCounterToZero(UnitTester $i): void
     {
         $passkey = Passkey::create(
-            id: new Uuid('passkey-id-3'),
-            userId: new Uuid('user-id-1'),
+            id: new Uuid('99999999-9999-4999-8999-999999999993'),
+            userId: new Uuid('88888888-8888-4888-8888-888888888881'),
             credentialId: 'cred-ghi789',
             credentialData: '{}',
             createdAt: new DateTime('2026-01-15 10:00:00'),
@@ -69,8 +69,8 @@ final class PasskeyCest
     public function testUpdateCounterChangesValue(UnitTester $i): void
     {
         $passkey = Passkey::create(
-            id: new Uuid('passkey-id-4'),
-            userId: new Uuid('user-id-1'),
+            id: new Uuid('99999999-9999-4999-8999-999999999994'),
+            userId: new Uuid('88888888-8888-4888-8888-888888888881'),
             credentialId: 'cred-jkl012',
             credentialData: '{}',
             createdAt: new DateTime('2026-01-15 10:00:00'),

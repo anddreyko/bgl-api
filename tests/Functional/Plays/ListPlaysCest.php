@@ -60,7 +60,7 @@ final class ListPlaysCest
         /** @var UuidGenerator $uuidGenerator */
         $this->uuidGenerator = $container->get(UuidGenerator::class);
 
-        $this->userId = new Uuid('user-list-' . uniqid());
+        $this->userId = $this->uuidGenerator->generate();
 
         $this->mate1Id = $this->uuidGenerator->generate();
         $this->mates->add(Mate::create(
@@ -185,7 +185,7 @@ final class ListPlaysCest
 
     public function testListPlaysDoesNotShowOtherUserSessions(FunctionalTester $i): void
     {
-        $otherUserId = new Uuid('other-user-' . uniqid());
+        $otherUserId = $this->uuidGenerator->generate();
         $otherMateId = $this->uuidGenerator->generate();
         $this->mates->add(Mate::create(
             $otherMateId,
@@ -284,7 +284,7 @@ final class ListPlaysCest
 
     public function testListPlaysByAuthorIdShowsPublicOnly(FunctionalTester $i): void
     {
-        $otherUserId = new Uuid('author-public-' . uniqid());
+        $otherUserId = $this->uuidGenerator->generate();
         $otherMateId = $this->uuidGenerator->generate();
         $this->mates->add(Mate::create($otherMateId, $otherUserId, 'Charlie', null, new DateTime()));
 
@@ -318,7 +318,7 @@ final class ListPlaysCest
 
     public function testListPlaysByAuthorIdHidesDraftAndDeleted(FunctionalTester $i): void
     {
-        $otherUserId = new Uuid('author-draft-' . uniqid());
+        $otherUserId = $this->uuidGenerator->generate();
         $otherMateId = $this->uuidGenerator->generate();
         $this->mates->add(Mate::create($otherMateId, $otherUserId, 'Dave', null, new DateTime()));
 
@@ -369,7 +369,7 @@ final class ListPlaysCest
 
     public function testListPlaysByAuthorIdWithoutAuthShowsPublicAndLinkOnly(FunctionalTester $i): void
     {
-        $otherUserId = new Uuid('author-noauth-' . uniqid());
+        $otherUserId = $this->uuidGenerator->generate();
         $otherMateId = $this->uuidGenerator->generate();
         $this->mates->add(Mate::create($otherMateId, $otherUserId, 'Eve', null, new DateTime()));
 

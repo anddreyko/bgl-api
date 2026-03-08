@@ -23,8 +23,8 @@ final class PlayCest
 {
     public function testOpenCreatesPlayWithDraftStatus(UnitTester $i): void
     {
-        $id = new Uuid('play-id');
-        $userId = new Uuid('user-123');
+        $id = new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d');
+        $userId = new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e');
         $name = 'Friday night game';
         $startedAt = new DateTime('2024-06-15 20:00:00');
 
@@ -40,8 +40,8 @@ final class PlayCest
 
     public function testOpenCreatesPlayWithNullName(UnitTester $i): void
     {
-        $id = new Uuid('play-id');
-        $userId = new Uuid('user-456');
+        $id = new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d');
+        $userId = new Uuid('c3d4e5f6-a7b8-4c9d-8e1f-2a3b4c5d6e7f');
         $startedAt = new DateTime('2024-06-15 20:00:00');
 
         $play = Play::create($id, $userId, null, $startedAt, new InMemoryPlayers());
@@ -52,30 +52,30 @@ final class PlayCest
 
     public function testGetIdReturnsUuid(UnitTester $i): void
     {
-        $id = new Uuid('test-uuid');
-        $play = Play::create($id, new Uuid('user-1'), null, new DateTime('now'), new InMemoryPlayers());
+        $id = new Uuid('d4e5f6a7-b8c9-4d0e-9f2a-3b4c5d6e7f80');
+        $play = Play::create($id, new Uuid('e5f6a7b8-c9d0-4e1f-aa3b-4c5d6e7f8091'), null, new DateTime('now'), new InMemoryPlayers());
 
-        $i->assertSame('test-uuid', $play->getId()->getValue());
+        $i->assertSame('d4e5f6a7-b8c9-4d0e-9f2a-3b4c5d6e7f80', $play->getId()->getValue());
     }
 
     public function testGetUserIdReturnsUserId(UnitTester $i): void
     {
         $play = Play::create(
-            new Uuid('id'),
-            new Uuid('user-abc'),
+            new Uuid('f6a7b8c9-d0e1-4f2a-ab4c-5d6e7f809102'),
+            new Uuid('01234567-89ab-4cde-8012-3456789abcde'),
             null,
             new DateTime('now'),
             new InMemoryPlayers(),
         );
 
-        $i->assertSame('user-abc', $play->getUserId()->getValue());
+        $i->assertSame('01234567-89ab-4cde-8012-3456789abcde', $play->getUserId()->getValue());
     }
 
     public function testFinalizeSetsFinishedAtWithoutChangingStatus(UnitTester $i): void
     {
         $play = Play::create(
-            new Uuid('play-id'),
-            new Uuid('user-123'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             'Game night',
             new DateTime('2024-06-15 20:00:00'),
             new InMemoryPlayers(),
@@ -91,8 +91,8 @@ final class PlayCest
     public function testFinalizeWorksWhenPublished(UnitTester $i): void
     {
         $play = new Play(
-            new Uuid('play-id'),
-            new Uuid('user-123'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
             PlayStatus::Published,
             new DateTime('2024-06-15 20:00:00'),
@@ -109,8 +109,8 @@ final class PlayCest
     public function testFinalizeThrowsWhenDeleted(UnitTester $i): void
     {
         $play = new Play(
-            new Uuid('play-id'),
-            new Uuid('user-123'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
             PlayStatus::Deleted,
             new DateTime('2024-06-15 20:00:00'),
@@ -127,9 +127,9 @@ final class PlayCest
 
     public function testCreateWithAllFields(UnitTester $i): void
     {
-        $id = new Uuid('play-id');
-        $userId = new Uuid('user-123');
-        $gameId = new Uuid('game-456');
+        $id = new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d');
+        $userId = new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e');
+        $gameId = new Uuid('11111111-1111-4111-8111-111111111111');
         $startedAt = new DateTime('2024-06-15 20:00:00');
         $players = new InMemoryPlayers();
 
@@ -144,9 +144,9 @@ final class PlayCest
         );
 
         $player = Player::create(
-            new Uuid('player-1'),
+            new Uuid('55555555-5555-4555-8555-555555555551'),
             $play,
-            new Uuid('mate-1'),
+            new Uuid('66666666-6666-4666-8666-666666666661'),
             10,
             true,
             'blue',
@@ -168,16 +168,16 @@ final class PlayCest
     public function testUpdateChangesFields(UnitTester $i): void
     {
         $play = Play::create(
-            new Uuid('play-id'),
-            new Uuid('user-123'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             'Old name',
             new DateTime('2024-06-15 20:00:00'),
             new InMemoryPlayers(),
-            new Uuid('game-old'),
+            new Uuid('22222222-2222-4222-8222-222222222222'),
             Visibility::Private,
         );
 
-        $newGameId = new Uuid('game-new');
+        $newGameId = new Uuid('33333333-3333-4333-8333-333333333333');
         $play->update('New name', $newGameId, Visibility::Participants);
 
         $i->assertSame('New name', $play->getName());
@@ -188,12 +188,12 @@ final class PlayCest
     public function testUpdateWithNulls(UnitTester $i): void
     {
         $play = Play::create(
-            new Uuid('play-id'),
-            new Uuid('user-123'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             'Some name',
             new DateTime('2024-06-15 20:00:00'),
             new InMemoryPlayers(),
-            new Uuid('game-id'),
+            new Uuid('44444444-4444-4444-8444-444444444444'),
         );
 
         $play->update(null, null, Visibility::Public);
@@ -206,15 +206,15 @@ final class PlayCest
     public function testUpdateWorksWhenPublished(UnitTester $i): void
     {
         $play = new Play(
-            new Uuid('play-id'),
-            new Uuid('user-123'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
             PlayStatus::Published,
             new DateTime('2024-06-15 20:00:00'),
             new DateTime('2024-06-15 23:00:00'),
         );
 
-        $newGameId = new Uuid('game-new');
+        $newGameId = new Uuid('33333333-3333-4333-8333-333333333333');
         $play->update('Updated name', $newGameId, Visibility::Public);
 
         $i->assertSame('Updated name', $play->getName());
@@ -226,8 +226,8 @@ final class PlayCest
     public function testUpdateThrowsWhenDeleted(UnitTester $i): void
     {
         $play = new Play(
-            new Uuid('play-id'),
-            new Uuid('user-123'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
             PlayStatus::Deleted,
             new DateTime('2024-06-15 20:00:00'),
@@ -245,8 +245,8 @@ final class PlayCest
     public function testUpdateStatusDraftToPublished(UnitTester $i): void
     {
         $play = Play::create(
-            new Uuid('play-id'),
-            new Uuid('user-123'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
             new DateTime('2024-06-15 20:00:00'),
             new InMemoryPlayers(),
@@ -260,8 +260,8 @@ final class PlayCest
     public function testUpdateStatusPublishedToDraft(UnitTester $i): void
     {
         $play = new Play(
-            new Uuid('play-id'),
-            new Uuid('user-123'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
             PlayStatus::Published,
             new DateTime('2024-06-15 20:00:00'),
@@ -276,8 +276,8 @@ final class PlayCest
     public function testUpdateStatusToDeletedThrows(UnitTester $i): void
     {
         $play = Play::create(
-            new Uuid('play-id'),
-            new Uuid('user-123'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
             new DateTime('2024-06-15 20:00:00'),
             new InMemoryPlayers(),
@@ -294,8 +294,8 @@ final class PlayCest
     public function testUpdateStatusNullKeepsCurrent(UnitTester $i): void
     {
         $play = Play::create(
-            new Uuid('play-id'),
-            new Uuid('user-123'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
             new DateTime('2024-06-15 20:00:00'),
             new InMemoryPlayers(),
@@ -309,8 +309,8 @@ final class PlayCest
     public function testDeleteFromDraftChangesStatusToDeleted(UnitTester $i): void
     {
         $play = Play::create(
-            new Uuid('play-id'),
-            new Uuid('user-123'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             'Game night',
             new DateTime('2024-06-15 20:00:00'),
             new InMemoryPlayers(),
@@ -324,8 +324,8 @@ final class PlayCest
     public function testDeleteFromPublishedChangesStatusToDeleted(UnitTester $i): void
     {
         $play = new Play(
-            new Uuid('play-id'),
-            new Uuid('user-123'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
             PlayStatus::Published,
             new DateTime('2024-06-15 20:00:00'),
@@ -340,8 +340,8 @@ final class PlayCest
     public function testDeleteAlreadyDeletedThrows(UnitTester $i): void
     {
         $play = new Play(
-            new Uuid('play-id'),
-            new Uuid('user-123'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
             PlayStatus::Deleted,
             new DateTime('2024-06-15 20:00:00'),
@@ -360,20 +360,20 @@ final class PlayCest
     {
         $players = new InMemoryPlayers();
         $play = Play::create(
-            new Uuid('play-id'),
-            new Uuid('user-123'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             'Game night',
             new DateTime('2024-06-15 20:00:00'),
             $players,
         );
 
-        $oldPlayer = Player::create(new Uuid('player-old'), $play, new Uuid('mate-old'), null, false, null);
+        $oldPlayer = Player::create(new Uuid('55555555-5555-4555-8555-555555555500'), $play, new Uuid('66666666-6666-4666-8666-666666666600'), null, false, null);
         $play->addPlayer($oldPlayer);
         $i->assertSame(1, $play->getPlayers()->count());
 
         $newPlayers = new InMemoryPlayers();
-        $newPlayer1 = Player::create(new Uuid('player-new-1'), $play, new Uuid('mate-new-1'), 10, true, 'blue');
-        $newPlayer2 = Player::create(new Uuid('player-new-2'), $play, new Uuid('mate-new-2'), 5, false, 'red');
+        $newPlayer1 = Player::create(new Uuid('55555555-5555-4555-8555-5555555555a1'), $play, new Uuid('66666666-6666-4666-8666-6666666666a1'), 10, true, 'blue');
+        $newPlayer2 = Player::create(new Uuid('55555555-5555-4555-8555-5555555555a2'), $play, new Uuid('66666666-6666-4666-8666-6666666666a2'), 5, false, 'red');
         $newPlayers->add($newPlayer1);
         $newPlayers->add($newPlayer2);
 
@@ -388,8 +388,8 @@ final class PlayCest
     public function testReplacePlayersOnDeletedThrows(UnitTester $i): void
     {
         $play = new Play(
-            new Uuid('play-id'),
-            new Uuid('user-123'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
             PlayStatus::Deleted,
             new DateTime('2024-06-15 20:00:00'),
@@ -407,8 +407,8 @@ final class PlayCest
     public function testCreateWithDefaults(UnitTester $i): void
     {
         $play = Play::create(
-            new Uuid('play-id'),
-            new Uuid('user-123'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
             new DateTime('2024-06-15 20:00:00'),
             new InMemoryPlayers(),

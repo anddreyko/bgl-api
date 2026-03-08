@@ -66,8 +66,8 @@ final class GetPlayCest
         /** @var UuidGenerator $uuidGenerator */
         $this->uuidGenerator = $container->get(UuidGenerator::class);
 
-        $this->ownerUserId = new Uuid('owner-get-' . uniqid());
-        $this->otherUserId = new Uuid('other-get-' . uniqid());
+        $this->ownerUserId = $this->uuidGenerator->generate();
+        $this->otherUserId = $this->uuidGenerator->generate();
 
         $this->ownerMateId = $this->uuidGenerator->generate();
         $this->otherMateId = $this->uuidGenerator->generate();

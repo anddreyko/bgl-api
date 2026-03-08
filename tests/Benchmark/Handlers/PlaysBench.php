@@ -24,7 +24,7 @@ use PhpBench\Attributes as Bench;
 #[Bench\AfterMethods('tearDown')]
 final class PlaysBench
 {
-    private const string USER_ID = 'bench-plays-user';
+    private const string USER_ID = '00000000-0000-4000-8000-000000000060';
 
     private CreatePlay\Handler $createHandler;
     private GetPlay\Handler $getHandler;
@@ -76,8 +76,7 @@ final class PlaysBench
         ++$this->counter;
         $players = [];
         for ($i = 0; $i < 5; ++$i) {
-            $mateId = "bench-mate-{$this->counter}-{$i}";
-            $this->seedMate($mateId);
+            $mateId = $this->seedMate("bench-mate-{$this->counter}-{$i}");
             $players[] = ['mate_id' => $mateId, 'score' => $i * 10, 'is_winner' => $i === 0, 'color' => 'blue'];
         }
 
@@ -160,12 +159,12 @@ final class PlaysBench
         BenchHelper::clearRepositories();
     }
 
-    private function seedPlay(string $id): Play
+    private function seedPlay(string $label): Play
     {
         $play = Play::create(
-            id: new Uuid($id),
+            id: new Uuid(\Ramsey\Uuid\Uuid::uuid4()->toString()),
             userId: new Uuid(self::USER_ID),
-            name: "Bench play {$id}",
+            name: "Bench play {$label}",
             startedAt: new DateTime('2024-06-15 20:00:00'),
             players: new InMemoryPlayers(),
         );
@@ -174,14 +173,17 @@ final class PlaysBench
         return $play;
     }
 
-    private function seedMate(string $id): void
+    private function seedMate(string $label): string
     {
+        $id = \Ramsey\Uuid\Uuid::uuid4()->toString();
         $this->mates->add(Mate::create(
             new Uuid($id),
             new Uuid(self::USER_ID),
-            "Mate {$id}",
+            "Mate {$label}",
             null,
             new DateTime('now'),
         ));
+
+        return $id;
     }
 }

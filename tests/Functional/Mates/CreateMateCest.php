@@ -36,7 +36,7 @@ final class CreateMateCest
 
     public function testSuccessfulMateCreation(FunctionalTester $i): void
     {
-        $uid = 'create-success-' . uniqid();
+        $uid = \Ramsey\Uuid\Uuid::uuid4()->toString();
         $result = ($this->handler)(new Envelope(
             message: new Command(userId: $uid, name: 'Ivan', notes: 'Likes Carcassonne'),
             messageId: 'msg-1',
@@ -52,7 +52,7 @@ final class CreateMateCest
 
     public function testCreateMateWithNullNotes(FunctionalTester $i): void
     {
-        $uid = 'create-null-' . uniqid();
+        $uid = \Ramsey\Uuid\Uuid::uuid4()->toString();
         $result = ($this->handler)(new Envelope(
             message: new Command(userId: $uid, name: 'Anna'),
             messageId: 'msg-2',
@@ -63,7 +63,7 @@ final class CreateMateCest
 
     public function testCreateDuplicateNameThrows(FunctionalTester $i): void
     {
-        $uid = 'create-dup-' . uniqid();
+        $uid = \Ramsey\Uuid\Uuid::uuid4()->toString();
         ($this->handler)(new Envelope(
             message: new Command(userId: $uid, name: 'Duplicate'),
             messageId: 'msg-3',
@@ -82,8 +82,8 @@ final class CreateMateCest
 
     public function testDuplicateNameDifferentUserAllowed(FunctionalTester $i): void
     {
-        $uid1 = 'create-diff1-' . uniqid();
-        $uid2 = 'create-diff2-' . uniqid();
+        $uid1 = \Ramsey\Uuid\Uuid::uuid4()->toString();
+        $uid2 = \Ramsey\Uuid\Uuid::uuid4()->toString();
 
         ($this->handler)(new Envelope(
             message: new Command(userId: $uid1, name: 'SharedName'),

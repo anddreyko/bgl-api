@@ -21,7 +21,7 @@ use PhpBench\Attributes as Bench;
 #[Bench\AfterMethods('tearDown')]
 final class MatesBench
 {
-    private const string USER_ID = 'bench-mates-user';
+    private const string USER_ID = '00000000-0000-4000-8000-000000000070';
 
     private CreateMate\Handler $createHandler;
     private GetMate\Handler $getHandler;
@@ -131,12 +131,12 @@ final class MatesBench
         BenchHelper::clearRepositories();
     }
 
-    private function seedMate(string $id): Mate
+    private function seedMate(string $label): Mate
     {
         $mate = Mate::create(
-            new Uuid($id),
+            new Uuid(\Ramsey\Uuid\Uuid::uuid4()->toString()),
             new Uuid(self::USER_ID),
-            "Mate {$id}",
+            "Mate {$label}",
             null,
             new DateTime('now'),
         );

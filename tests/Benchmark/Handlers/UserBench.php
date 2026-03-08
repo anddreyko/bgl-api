@@ -39,7 +39,7 @@ final class UserBench
     public function benchGetUser(): void
     {
         $user = User::register(
-            id: new Uuid('bench-user-id'),
+            id: new Uuid('00000000-0000-4000-8000-000000000010'),
             email: new Email('bench@example.com'),
             passwordHash: 'hashed',
             createdAt: new DateTime('now'),
@@ -49,7 +49,7 @@ final class UserBench
         $this->users->add($user);
 
         ($this->getHandler)(new Envelope(
-            message: new GetUser\Query(userId: 'bench-user-id'),
+            message: new GetUser\Query(userId: '00000000-0000-4000-8000-000000000010'),
             messageId: 'bench-get-user',
         ));
     }

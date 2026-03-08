@@ -43,12 +43,12 @@ final class DeleteMateCest
     public function testSuccessfulSoftDelete(FunctionalTester $i): void
     {
         $created = ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-del', name: 'Ivan'),
+            message: new CreateCommand(userId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeee0001', name: 'Ivan'),
             messageId: 'msg-1',
         ));
 
         ($this->handler)(new Envelope(
-            message: new Command(userId: 'user-del', mateId: $created->id),
+            message: new Command(userId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeee0001', mateId: $created->id),
             messageId: 'msg-2',
         ));
 
@@ -57,7 +57,7 @@ final class DeleteMateCest
             new NotFoundException('Mate not found'),
             function () use ($created): void {
                 ($this->getHandler)(new Envelope(
-                    message: new Query(userId: 'user-del', mateId: $created->id),
+                    message: new Query(userId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeee0001', mateId: $created->id),
                     messageId: 'msg-3',
                 ));
             },
@@ -67,7 +67,7 @@ final class DeleteMateCest
     public function testDeleteOtherUserMateThrows(FunctionalTester $i): void
     {
         $created = ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-own2', name: 'Ivan'),
+            message: new CreateCommand(userId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeee0002', name: 'Ivan'),
             messageId: 'msg-4',
         ));
 
@@ -75,7 +75,7 @@ final class DeleteMateCest
             new NotFoundException('Mate not found'),
             function () use ($created): void {
                 ($this->handler)(new Envelope(
-                    message: new Command(userId: 'user-other2', mateId: $created->id),
+                    message: new Command(userId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeee0003', mateId: $created->id),
                     messageId: 'msg-5',
                 ));
             },
@@ -88,7 +88,7 @@ final class DeleteMateCest
             new NotFoundException('Mate not found'),
             function (): void {
                 ($this->handler)(new Envelope(
-                    message: new Command(userId: 'user-del', mateId: 'non-existent'),
+                    message: new Command(userId: 'eeeeeeee-eeee-4eee-8eee-eeeeeeee0001', mateId: '00000000-0000-4000-8000-000000000099'),
                     messageId: 'msg-6',
                 ));
             },

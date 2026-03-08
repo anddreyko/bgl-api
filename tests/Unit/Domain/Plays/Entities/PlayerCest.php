@@ -25,8 +25,8 @@ final class PlayerCest
     public function _before(): void
     {
         $this->play = Play::create(
-            new Uuid('play-1'),
-            new Uuid('user-1'),
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c01'),
+            new Uuid('e5f6a7b8-c9d0-4e1f-aa3b-4c5d6e7f8091'),
             null,
             new DateTime('now'),
             new InMemoryPlayers(),
@@ -35,8 +35,8 @@ final class PlayerCest
 
     public function testCreateReturnsPlayerWithAllFields(UnitTester $i): void
     {
-        $id = new Uuid('player-1');
-        $mateId = new Uuid('mate-1');
+        $id = new Uuid('55555555-5555-4555-8555-555555555551');
+        $mateId = new Uuid('66666666-6666-4666-8666-666666666661');
 
         $player = Player::create($id, $this->play, $mateId, 42, true, 'red');
 
@@ -51,9 +51,9 @@ final class PlayerCest
     public function testCreateWithNullableFields(UnitTester $i): void
     {
         $player = Player::create(
-            new Uuid('player-2'),
+            new Uuid('55555555-5555-4555-8555-555555555552'),
             $this->play,
-            new Uuid('mate-2'),
+            new Uuid('66666666-6666-4666-8666-666666666662'),
             null,
             false,
             null,
@@ -69,9 +69,9 @@ final class PlayerCest
         $i->expectThrowable(
             new NegativeScoreException(),
             fn() => Player::create(
-                new Uuid('player-3'),
+                new Uuid('55555555-5555-4555-8555-555555555553'),
                 $this->play,
-                new Uuid('mate-3'),
+                new Uuid('66666666-6666-4666-8666-666666666663'),
                 -1,
                 false,
                 null,
@@ -82,9 +82,9 @@ final class PlayerCest
     public function testCreateAllowsZeroScore(UnitTester $i): void
     {
         $player = Player::create(
-            new Uuid('player-4'),
+            new Uuid('55555555-5555-4555-8555-555555555554'),
             $this->play,
-            new Uuid('mate-4'),
+            new Uuid('66666666-6666-4666-8666-666666666664'),
             0,
             false,
             null,
@@ -100,9 +100,9 @@ final class PlayerCest
         $i->expectThrowable(
             new ColorTooLongException(),
             fn() => Player::create(
-                new Uuid('player-5'),
+                new Uuid('55555555-5555-4555-8555-555555555555'),
                 $this->play,
-                new Uuid('mate-5'),
+                new Uuid('66666666-6666-4666-8666-666666666665'),
                 null,
                 false,
                 $longColor,
@@ -115,9 +115,9 @@ final class PlayerCest
         $color = str_repeat('a', 50);
 
         $player = Player::create(
-            new Uuid('player-6'),
+            new Uuid('55555555-5555-4555-8555-555555555556'),
             $this->play,
-            new Uuid('mate-6'),
+            new Uuid('66666666-6666-4666-8666-666666666666'),
             null,
             false,
             $color,

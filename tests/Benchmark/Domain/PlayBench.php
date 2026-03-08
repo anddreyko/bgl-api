@@ -19,8 +19,8 @@ final class PlayBench
     public function benchCreatePlay(): void
     {
         Play::create(
-            id: new Uuid('bench-play-id'),
-            userId: new Uuid('bench-user-id'),
+            id: new Uuid('00000000-0000-4000-8000-000000000020'),
+            userId: new Uuid('00000000-0000-4000-8000-000000000010'),
             name: 'Bench session',
             startedAt: new DateTime('2024-06-15 20:00:00'),
             players: new InMemoryPlayers(),
@@ -32,17 +32,17 @@ final class PlayBench
     public function benchAddPlayer(): void
     {
         $play = Play::create(
-            id: new Uuid('bench-play-id'),
-            userId: new Uuid('bench-user-id'),
+            id: new Uuid('00000000-0000-4000-8000-000000000020'),
+            userId: new Uuid('00000000-0000-4000-8000-000000000010'),
             name: 'Bench session',
             startedAt: new DateTime('2024-06-15 20:00:00'),
             players: new InMemoryPlayers(),
         );
 
         Player::create(
-            id: new Uuid('bench-player-id'),
+            id: new Uuid('00000000-0000-4000-8000-000000000030'),
             play: $play,
-            mateId: new Uuid('bench-mate-id'),
+            mateId: new Uuid('00000000-0000-4000-8000-000000000040'),
             score: 42,
             isWinner: true,
             color: 'red',
@@ -58,8 +58,8 @@ final class PlayBench
     public function benchAddMultiplePlayers(array $params): void
     {
         $play = Play::create(
-            id: new Uuid('bench-play-id'),
-            userId: new Uuid('bench-user-id'),
+            id: new Uuid('00000000-0000-4000-8000-000000000020'),
+            userId: new Uuid('00000000-0000-4000-8000-000000000010'),
             name: 'Bench session',
             startedAt: new DateTime('2024-06-15 20:00:00'),
             players: new InMemoryPlayers(),
@@ -67,9 +67,9 @@ final class PlayBench
 
         for ($i = 0; $i < $params['count']; ++$i) {
             $play->addPlayer(Player::create(
-                id: new Uuid("player-{$i}"),
+                id: new Uuid(\Ramsey\Uuid\Uuid::uuid4()->toString()),
                 play: $play,
-                mateId: new Uuid("mate-{$i}"),
+                mateId: new Uuid(\Ramsey\Uuid\Uuid::uuid4()->toString()),
                 score: $i * 10,
                 isWinner: $i === 0,
                 color: null,
@@ -92,8 +92,8 @@ final class PlayBench
     public function benchFinalizePlay(): void
     {
         $play = Play::create(
-            id: new Uuid('bench-play-id'),
-            userId: new Uuid('bench-user-id'),
+            id: new Uuid('00000000-0000-4000-8000-000000000020'),
+            userId: new Uuid('00000000-0000-4000-8000-000000000010'),
             name: 'Bench session',
             startedAt: new DateTime('2024-06-15 20:00:00'),
             players: new InMemoryPlayers(),
@@ -107,8 +107,8 @@ final class PlayBench
     public function benchUpdatePlay(): void
     {
         $play = Play::create(
-            id: new Uuid('bench-play-id'),
-            userId: new Uuid('bench-user-id'),
+            id: new Uuid('00000000-0000-4000-8000-000000000020'),
+            userId: new Uuid('00000000-0000-4000-8000-000000000010'),
             name: 'Bench session',
             startedAt: new DateTime('2024-06-15 20:00:00'),
             players: new InMemoryPlayers(),

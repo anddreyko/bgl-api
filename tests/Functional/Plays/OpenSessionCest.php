@@ -61,7 +61,7 @@ final class OpenSessionCest
         /** @var UuidGenerator $uuidGenerator */
         $this->uuidGenerator = $container->get(UuidGenerator::class);
 
-        $this->userId = new Uuid('user-open-' . uniqid());
+        $this->userId = $this->uuidGenerator->generate();
 
         $this->mate1Id = $this->uuidGenerator->generate();
         $this->mate2Id = $this->uuidGenerator->generate();
@@ -194,12 +194,12 @@ final class OpenSessionCest
 
     public function testOpenSessionFailsWithMateBelongingToOtherUser(FunctionalTester $i): void
     {
-        $otherUserId = 'other-user-' . uniqid();
+        $otherUserId = $this->uuidGenerator->generate();
         $otherMateId = $this->uuidGenerator->generate();
 
         $this->mates->add(Mate::create(
             $otherMateId,
-            new Uuid($otherUserId),
+            $otherUserId,
             'Charlie',
             null,
             new DateTime(),
@@ -290,7 +290,7 @@ final class OpenSessionCest
                     players: [
                         ['mate_id' => (string) $this->mate1Id],
                     ],
-                    gameId: new Uuid('non-existent-game-id'),
+                    gameId: new Uuid('00000000-0000-4000-8000-000000000002'),
                 ),
                 messageId: 'msg-open-game-not-found',
             )),

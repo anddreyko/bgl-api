@@ -38,12 +38,12 @@ final class GetMateCest
     public function testGetExistingMate(FunctionalTester $i): void
     {
         $created = ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-get', name: 'Ivan', notes: 'Notes'),
+            message: new CreateCommand(userId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0001', name: 'Ivan', notes: 'Notes'),
             messageId: 'msg-1',
         ));
 
         $result = ($this->handler)(new Envelope(
-            message: new Query(userId: 'user-get', mateId: $created->id),
+            message: new Query(userId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0001', mateId: $created->id),
             messageId: 'msg-2',
         ));
 
@@ -58,7 +58,7 @@ final class GetMateCest
             new NotFoundException('Mate not found'),
             function (): void {
                 ($this->handler)(new Envelope(
-                    message: new Query(userId: 'user-get', mateId: 'non-existent'),
+                    message: new Query(userId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa0001', mateId: '00000000-0000-4000-8000-000000000099'),
                     messageId: 'msg-3',
                 ));
             },
@@ -68,7 +68,7 @@ final class GetMateCest
     public function testGetOtherUserMateThrows(FunctionalTester $i): void
     {
         $created = ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-owner', name: 'Ivan'),
+            message: new CreateCommand(userId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbb0001', name: 'Ivan'),
             messageId: 'msg-4',
         ));
 
@@ -76,7 +76,7 @@ final class GetMateCest
             new NotFoundException('Mate not found'),
             function () use ($created): void {
                 ($this->handler)(new Envelope(
-                    message: new Query(userId: 'user-thief', mateId: $created->id),
+                    message: new Query(userId: 'cccccccc-cccc-4ccc-8ccc-cccccccc0001', mateId: $created->id),
                     messageId: 'msg-5',
                 ));
             },

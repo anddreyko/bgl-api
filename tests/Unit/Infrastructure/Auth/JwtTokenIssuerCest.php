@@ -34,7 +34,7 @@ final class JwtTokenIssuerCest
     private function makeUser(): User
     {
         return new User(
-            id: new Uuid('user-id-123'),
+            id: new Uuid('dddddddd-dddd-4ddd-8ddd-dddddddddddd'),
             email: new Email('test@example.com'),
             passwordHash: 'hashed_password',
             createdAt: new DateTime('2024-01-01 12:00:00'),
@@ -54,7 +54,7 @@ final class JwtTokenIssuerCest
             tokenConfig: $this->tokenConfig,
         );
 
-        $result = $issuer->issue('user-id-123');
+        $result = $issuer->issue('dddddddd-dddd-4ddd-8ddd-dddddddddddd');
 
         $i->assertSame('access-token', $result->accessToken);
         $i->assertSame('refresh-token', $result->refreshToken);

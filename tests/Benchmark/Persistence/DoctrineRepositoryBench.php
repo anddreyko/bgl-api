@@ -31,12 +31,16 @@ final class DoctrineRepositoryBench
     private PlayersFactory $playersFactory;
     private int $counter = 0;
 
+    /** @var list<string> */
+    private array $playIds = [];
+
     public function setUp(): void
     {
         DoctrineBenchHelper::createSchema();
         $this->plays = DoctrineBenchHelper::get(Plays::class);
         $this->playersFactory = DoctrineBenchHelper::get(PlayersFactory::class);
         $this->counter = 0;
+        $this->playIds = [];
         DoctrineBenchHelper::truncateAll();
         $this->seedPlays(100);
     }
@@ -54,8 +58,8 @@ final class DoctrineRepositoryBench
         for ($i = 0; $i < 100; ++$i) {
             $this->plays->add(
                 Play::create(
-                    id: new Uuid("bench-add-{$this->counter}-{$i}"),
-                    userId: new Uuid('bench-user'),
+                    id: new Uuid(\Ramsey\Uuid\Uuid::uuid4()->toString()),
+                    userId: new Uuid('00000000-0000-4000-8000-000000000050'),
                     name: "Add Play {$this->counter}-{$i}",
                     startedAt: new DateTime('2024-06-15 20:00:00'),
                     players: $this->playersFactory->createEmpty(),
@@ -71,7 +75,7 @@ final class DoctrineRepositoryBench
     public function benchFind(): void
     {
         DoctrineBenchHelper::clear();
-        $this->plays->find('bench-play-50');
+        $this->plays->find($this->playIds[50]);
     }
 
     #[Bench\Revs(10)]
@@ -80,7 +84,7 @@ final class DoctrineRepositoryBench
     {
         DoctrineBenchHelper::clear();
 
-        $filter = new Equals(new Field('userId'), 'bench-user');
+        $filter = new Equals(new Field('userId'), '00000000-0000-4000-8000-000000000050');
         $sort = new PageSort(new SortFields(['startedAt' => SortDirection::Desc]));
 
         /** @var iterable<mixed> $results */
@@ -120,7 +124,7 @@ final class DoctrineRepositoryBench
         DoctrineBenchHelper::clear();
 
         $filter = new AndX([
-            new Equals(new Field('userId'), 'bench-user'),
+            new Equals(new Field('userId'), '00000000-0000-4000-8000-000000000050'),
             new OrX([
                 new Contains(new Field('name'), 'Play 1'),
                 new Contains(new Field('name'), 'Play 2'),
@@ -137,10 +141,12 @@ final class DoctrineRepositoryBench
     private function seedPlays(int $count): void
     {
         for ($i = 0; $i < $count; ++$i) {
+            $id = \Ramsey\Uuid\Uuid::uuid4()->toString();
+            $this->playIds[] = $id;
             $this->plays->add(
                 Play::create(
-                    id: new Uuid("bench-play-{$i}"),
-                    userId: new Uuid('bench-user'),
+                    id: new Uuid($id),
+                    userId: new Uuid('00000000-0000-4000-8000-000000000050'),
                     name: "Play {$i}",
                     startedAt: new DateTime('2024-06-15 20:00:00'),
                     players: $this->playersFactory->createEmpty(),

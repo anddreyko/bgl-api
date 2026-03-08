@@ -57,7 +57,7 @@ final class CloseSessionCest
     public function testSuccessfulClose(FunctionalTester $i): void
     {
         $sessionId = $this->uuidGenerator->generate();
-        $userId = new Uuid('user-123');
+        $userId = new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e');
 
         $play = Play::create(
             $sessionId,
@@ -94,7 +94,7 @@ final class CloseSessionCest
         $i->expectThrowable(
             new NotFoundException('Play not found'),
             fn () => ($this->handler)(new Envelope(
-                message: new Command(sessionId: new Uuid('non-existent-' . uniqid()), userId: new Uuid('user-123')),
+                message: new Command(sessionId: $this->uuidGenerator->generate(), userId: new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e')),
                 messageId: 'msg-2',
             )),
         );
@@ -106,7 +106,7 @@ final class CloseSessionCest
 
         $play = Play::create(
             $sessionId,
-            new Uuid('user-owner'),
+            new Uuid('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee'),
             null,
             new DateTime('2024-06-15 20:00:00'),
             $this->players,
@@ -118,7 +118,7 @@ final class CloseSessionCest
         $i->expectThrowable(
             new PlayAccessDeniedException(),
             fn () => ($this->handler)(new Envelope(
-                message: new Command(sessionId: $sessionId, userId: new Uuid('user-other')),
+                message: new Command(sessionId: $sessionId, userId: new Uuid('ffffffff-ffff-4fff-8fff-ffffffffffff')),
                 messageId: 'msg-3',
             )),
         );

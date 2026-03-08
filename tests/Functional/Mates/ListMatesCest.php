@@ -37,7 +37,7 @@ final class ListMatesCest
     public function testEmptyList(FunctionalTester $i): void
     {
         $result = ($this->handler)(new Envelope(
-            message: new Query(userId: 'user-empty'),
+            message: new Query(userId: '11111111-1111-4111-8111-111111111100'),
             messageId: 'msg-1',
         ));
 
@@ -49,20 +49,20 @@ final class ListMatesCest
     public function testListsUsersMatesOnly(FunctionalTester $i): void
     {
         ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-list', name: 'Ivan'),
+            message: new CreateCommand(userId: '22222222-2222-4222-8222-222222222200', name: 'Ivan'),
             messageId: 'msg-2',
         ));
         ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-list', name: 'Anna'),
+            message: new CreateCommand(userId: '22222222-2222-4222-8222-222222222200', name: 'Anna'),
             messageId: 'msg-3',
         ));
         ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-other', name: 'Other'),
+            message: new CreateCommand(userId: '33333333-3333-4333-8333-333333333300', name: 'Other'),
             messageId: 'msg-4',
         ));
 
         $result = ($this->handler)(new Envelope(
-            message: new Query(userId: 'user-list'),
+            message: new Query(userId: '22222222-2222-4222-8222-222222222200'),
             messageId: 'msg-5',
         ));
 
@@ -73,16 +73,16 @@ final class ListMatesCest
     public function testListSortedByNameAsc(FunctionalTester $i): void
     {
         ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-sort', name: 'Zara'),
+            message: new CreateCommand(userId: '44444444-4444-4444-8444-444444444400', name: 'Zara'),
             messageId: 'msg-sort-1',
         ));
         ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-sort', name: 'Anna'),
+            message: new CreateCommand(userId: '44444444-4444-4444-8444-444444444400', name: 'Anna'),
             messageId: 'msg-sort-2',
         ));
 
         $result = ($this->handler)(new Envelope(
-            message: new Query(userId: 'user-sort', sort: 'name', order: 'asc'),
+            message: new Query(userId: '44444444-4444-4444-8444-444444444400', sort: 'name', order: 'asc'),
             messageId: 'msg-sort-3',
         ));
 
@@ -94,16 +94,16 @@ final class ListMatesCest
     public function testListSortedByNameDesc(FunctionalTester $i): void
     {
         ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-sort-desc', name: 'Zara'),
+            message: new CreateCommand(userId: '55555555-5555-4555-8555-555555555500', name: 'Zara'),
             messageId: 'msg-sdesc-1',
         ));
         ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-sort-desc', name: 'Anna'),
+            message: new CreateCommand(userId: '55555555-5555-4555-8555-555555555500', name: 'Anna'),
             messageId: 'msg-sdesc-2',
         ));
 
         $result = ($this->handler)(new Envelope(
-            message: new Query(userId: 'user-sort-desc', sort: 'name', order: 'desc'),
+            message: new Query(userId: '55555555-5555-4555-8555-555555555500', sort: 'name', order: 'desc'),
             messageId: 'msg-sdesc-3',
         ));
 
@@ -115,20 +115,20 @@ final class ListMatesCest
     public function testPagination(FunctionalTester $i): void
     {
         ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-page', name: 'Alice'),
+            message: new CreateCommand(userId: '66666666-6666-4666-8666-666666666600', name: 'Alice'),
             messageId: 'msg-page-1',
         ));
         ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-page', name: 'Bob'),
+            message: new CreateCommand(userId: '66666666-6666-4666-8666-666666666600', name: 'Bob'),
             messageId: 'msg-page-2',
         ));
         ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-page', name: 'Charlie'),
+            message: new CreateCommand(userId: '66666666-6666-4666-8666-666666666600', name: 'Charlie'),
             messageId: 'msg-page-3',
         ));
 
         $result = ($this->handler)(new Envelope(
-            message: new Query(userId: 'user-page', page: 1, size: 2),
+            message: new Query(userId: '66666666-6666-4666-8666-666666666600', page: 1, size: 2),
             messageId: 'msg-page-4',
         ));
 

@@ -22,7 +22,7 @@ final class UserCest
     public function testRegisterCreatesUserWithInactiveStatus(UnitTester $i): void
     {
         $user = User::register(
-            id: new Uuid('user-id-1'),
+            id: new Uuid('88888888-8888-4888-8888-888888888881'),
             email: new Email('test@example.com'),
             passwordHash: 'hashed',
             createdAt: new DateTime('2024-01-01 00:00:00'),
@@ -34,7 +34,7 @@ final class UserCest
     public function testConfirmChangesStatusToActive(UnitTester $i): void
     {
         $user = User::register(
-            id: new Uuid('user-id-1'),
+            id: new Uuid('88888888-8888-4888-8888-888888888881'),
             email: new Email('test@example.com'),
             passwordHash: 'hashed',
             createdAt: new DateTime('2024-01-01 00:00:00'),
@@ -48,7 +48,7 @@ final class UserCest
     public function testConfirmAlreadyActiveThrowsDomainException(UnitTester $i): void
     {
         $user = new User(
-            id: new Uuid('user-id-1'),
+            id: new Uuid('88888888-8888-4888-8888-888888888881'),
             email: new Email('test@example.com'),
             passwordHash: 'hashed',
             createdAt: new DateTime('2024-01-01 00:00:00'),
@@ -63,7 +63,7 @@ final class UserCest
     public function testTokenVersionDefaultIsOne(UnitTester $i): void
     {
         $user = User::register(
-            id: new Uuid('user-id-1'),
+            id: new Uuid('88888888-8888-4888-8888-888888888881'),
             email: new Email('test@example.com'),
             passwordHash: 'hashed',
             createdAt: new DateTime('2024-01-01 00:00:00'),
@@ -75,7 +75,7 @@ final class UserCest
     public function testIncrementTokenVersion(UnitTester $i): void
     {
         $user = User::register(
-            id: new Uuid('user-id-1'),
+            id: new Uuid('88888888-8888-4888-8888-888888888881'),
             email: new Email('test@example.com'),
             passwordHash: 'hashed',
             createdAt: new DateTime('2024-01-01 00:00:00'),
@@ -95,7 +95,7 @@ final class UserCest
     public function testRegisterWithNameUsesProvidedName(UnitTester $i): void
     {
         $user = User::register(
-            id: new Uuid('user-id-1'),
+            id: new Uuid('88888888-8888-4888-8888-888888888881'),
             email: new Email('test@example.com'),
             passwordHash: 'hashed',
             createdAt: new DateTime('2024-01-01 00:00:00'),
@@ -108,7 +108,7 @@ final class UserCest
     public function testRegisterWithoutNameGeneratesDefault(UnitTester $i): void
     {
         $user = User::register(
-            id: new Uuid('user-id-1'),
+            id: new Uuid('88888888-8888-4888-8888-888888888881'),
             email: new Email('test@example.com'),
             passwordHash: 'hashed',
             createdAt: new DateTime('2024-01-01 00:00:00'),

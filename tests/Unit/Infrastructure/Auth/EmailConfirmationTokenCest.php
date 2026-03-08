@@ -22,8 +22,8 @@ final class EmailConfirmationTokenCest
         $now = new DateTime('2024-01-01 12:00:00');
 
         $token = EmailConfirmationToken::create(
-            id: new Uuid('token-id'),
-            userId: new Uuid('user-id'),
+            id: new Uuid('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'),
+            userId: new Uuid('cccccccc-cccc-4ccc-8ccc-cccccccccccc'),
             token: 'some-token',
             expiresAt: $expiresAt,
         );
@@ -37,8 +37,8 @@ final class EmailConfirmationTokenCest
         $now = new DateTime('2024-01-02 12:00:00');
 
         $token = EmailConfirmationToken::create(
-            id: new Uuid('token-id'),
-            userId: new Uuid('user-id'),
+            id: new Uuid('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'),
+            userId: new Uuid('cccccccc-cccc-4ccc-8ccc-cccccccccccc'),
             token: 'some-token',
             expiresAt: $expiresAt,
         );
@@ -52,8 +52,8 @@ final class EmailConfirmationTokenCest
         $now = new DateTime('2024-01-01 12:00:00');
 
         $token = EmailConfirmationToken::create(
-            id: new Uuid('token-id'),
-            userId: new Uuid('user-id'),
+            id: new Uuid('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb'),
+            userId: new Uuid('cccccccc-cccc-4ccc-8ccc-cccccccccccc'),
             token: 'some-token',
             expiresAt: $expiresAt,
         );

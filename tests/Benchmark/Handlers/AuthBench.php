@@ -67,7 +67,7 @@ final class AuthBench
     public function benchConfirmEmail(): void
     {
         $user = User::register(
-            id: new Uuid('confirm-user-id'),
+            id: new Uuid('00000000-0000-4000-8000-000000000003'),
             email: new Email('confirm@example.com'),
             passwordHash: 'hashed',
             createdAt: new DateTime('now'),

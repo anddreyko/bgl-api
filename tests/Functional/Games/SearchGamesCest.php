@@ -108,8 +108,8 @@ final class SearchGamesCest
     private function seedGames(): void
     {
         $now = new DateTime();
-        $this->games()->add(Game::create(new Uuid('g1'), 13, 'Catan', 1995, $now));
-        $this->games()->add(Game::create(new Uuid('g2'), 27710, 'Catan: Cities & Knights', 1998, $now));
-        $this->games()->add(Game::create(new Uuid('g3'), 174430, 'Gloomhaven', 2017, $now));
+        $this->games()->add(Game::create(new Uuid('aaa11111-1111-4111-8111-111111111111'), 13, 'Catan', 1995, $now));
+        $this->games()->add(Game::create(new Uuid('aaa22222-2222-4222-8222-222222222222'), 27710, 'Catan: Cities & Knights', 1998, $now));
+        $this->games()->add(Game::create(new Uuid('aaa33333-3333-4333-8333-333333333333'), 174430, 'Gloomhaven', 2017, $now));
     }
 }

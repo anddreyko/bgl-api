@@ -82,6 +82,25 @@ abstract class DoctrineRepository implements Repository, Searchable
             ->getResult();
     }
 
+    /**
+     * @return TEntity|null
+     */
+    protected function findOneBy(Filter $filter): ?object
+    {
+        $alias = $this->getAlias();
+        $qb = $this->em->createQueryBuilder()
+            ->select($alias)
+            ->from($this->getType(), $alias);
+
+        $condition = $filter->accept(new DoctrineFilter($qb, $alias));
+        if ($condition !== null) {
+            $qb->andWhere($condition);
+        }
+
+        /** @var TEntity|null */
+        return $qb->setMaxResults(1)->getQuery()->getOneOrNullResult();
+    }
+
     #[\Override]
     public function search(
         Filter $filter = None::Filter,

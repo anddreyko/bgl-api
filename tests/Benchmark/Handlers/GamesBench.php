@@ -41,7 +41,7 @@ final class GamesBench
     public function benchSearchGames(): void
     {
         for ($i = 0; $i < 50; ++$i) {
-            $this->seedGame("search-game-{$i}", "Catan Expansion {$i}");
+            $this->seedGame("Catan Expansion {$i}");
         }
 
         ($this->searchHandler)(new Envelope(
@@ -56,16 +56,17 @@ final class GamesBench
     #[Bench\Iterations(5)]
     public function benchGetGame(): void
     {
-        $this->seedGame('bench-get-game', 'Catan');
+        $gameId = $this->seedGame('Catan');
 
         ($this->getHandler)(new Envelope(
-            message: new GetGame\Query(gameId: 'bench-get-game'),
+            message: new GetGame\Query(gameId: $gameId),
             messageId: 'bench-get-game',
         ));
     }
 
-    private function seedGame(string $id, string $name): void
+    private function seedGame(string $name): string
     {
+        $id = \Ramsey\Uuid\Uuid::uuid4()->toString();
         $this->games->add(Game::create(
             new Uuid($id),
             bggId: 13,
@@ -73,5 +74,7 @@ final class GamesBench
             yearPublished: 1995,
             createdAt: new DateTime('now'),
         ));
+
+        return $id;
     }
 }

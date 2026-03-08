@@ -39,12 +39,12 @@ final class UpdateMateCest
     public function testSuccessfulUpdate(FunctionalTester $i): void
     {
         $created = ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-upd', name: 'Ivan', notes: 'Old'),
+            message: new CreateCommand(userId: 'dddddddd-dddd-4ddd-8ddd-dddddddd0001', name: 'Ivan', notes: 'Old'),
             messageId: 'msg-1',
         ));
 
         $result = ($this->handler)(new Envelope(
-            message: new Command(userId: 'user-upd', mateId: $created->id, name: 'Ivan Petrov', notes: 'New'),
+            message: new Command(userId: 'dddddddd-dddd-4ddd-8ddd-dddddddd0001', mateId: $created->id, name: 'Ivan Petrov', notes: 'New'),
             messageId: 'msg-2',
         ));
 
@@ -56,12 +56,12 @@ final class UpdateMateCest
     public function testUpdateToExistingNameThrows(FunctionalTester $i): void
     {
         ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-upd2', name: 'Ivan'),
+            message: new CreateCommand(userId: 'dddddddd-dddd-4ddd-8ddd-dddddddd0002', name: 'Ivan'),
             messageId: 'msg-3',
         ));
 
         $created2 = ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-upd2', name: 'Anna'),
+            message: new CreateCommand(userId: 'dddddddd-dddd-4ddd-8ddd-dddddddd0002', name: 'Anna'),
             messageId: 'msg-4',
         ));
 
@@ -69,7 +69,7 @@ final class UpdateMateCest
             new MateAlreadyExistsException(),
             function () use ($created2): void {
                 ($this->handler)(new Envelope(
-                    message: new Command(userId: 'user-upd2', mateId: $created2->id, name: 'Ivan'),
+                    message: new Command(userId: 'dddddddd-dddd-4ddd-8ddd-dddddddd0002', mateId: $created2->id, name: 'Ivan'),
                     messageId: 'msg-5',
                 ));
             },
@@ -79,7 +79,7 @@ final class UpdateMateCest
     public function testUpdateOtherUserMateThrows(FunctionalTester $i): void
     {
         $created = ($this->createHandler)(new Envelope(
-            message: new CreateCommand(userId: 'user-own', name: 'Ivan'),
+            message: new CreateCommand(userId: 'dddddddd-dddd-4ddd-8ddd-dddddddd0003', name: 'Ivan'),
             messageId: 'msg-6',
         ));
 
@@ -87,7 +87,7 @@ final class UpdateMateCest
             new NotFoundException('Mate not found'),
             function () use ($created): void {
                 ($this->handler)(new Envelope(
-                    message: new Command(userId: 'user-other', mateId: $created->id, name: 'New Name'),
+                    message: new Command(userId: 'dddddddd-dddd-4ddd-8ddd-dddddddd0004', mateId: $created->id, name: 'New Name'),
                     messageId: 'msg-7',
                 ));
             },
