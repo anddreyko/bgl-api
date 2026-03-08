@@ -101,6 +101,12 @@ return [
                     'x-message' => CreatePlay\Command::class,
                     'x-interceptors' => [AuthInterceptor::class],
                     'x-auth' => ['userId'],
+                    'x-map' => [
+                        'game_id' => 'gameId',
+                        'location_id' => 'locationId',
+                        'started_at' => 'startedAt',
+                        'finished_at' => 'finishedAt',
+                    ],
                     'requestBody' => [
                         'required' => false,
                         'content' => [
@@ -183,7 +189,11 @@ return [
                     'security' => [['BearerAuth' => []]],
                     'x-message' => UpdatePlay\Command::class,
                     'x-interceptors' => [AuthInterceptor::class],
-                    'x-map' => ['id' => 'sessionId'],
+                    'x-map' => [
+                        'id' => 'sessionId',
+                        'game_id' => 'gameId',
+                        'location_id' => 'locationId',
+                    ],
                     'x-auth' => ['userId'],
                     'parameters' => [
                         [
@@ -250,7 +260,10 @@ return [
                     'security' => [['BearerAuth' => []]],
                     'x-message' => FinalizePlay\Command::class,
                     'x-interceptors' => [AuthInterceptor::class],
-                    'x-map' => ['id' => 'sessionId'],
+                    'x-map' => [
+                        'id' => 'sessionId',
+                        'finished_at' => 'finishedAt',
+                    ],
                     'x-auth' => ['userId'],
                     'parameters' => [
                         [
