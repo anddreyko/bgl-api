@@ -23,6 +23,7 @@ return [
                     'x-message' => ListPlays\Query::class,
                     'x-interceptors' => [OptionalAuthInterceptor::class],
                     'x-auth' => ['userId'],
+                    'x-map' => ['author_id' => 'authorId', 'game_id' => 'gameId'],
                     'parameters' => [
                         [
                             'name' => 'author_id',
