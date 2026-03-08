@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\EmailConfirmationTokenMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Games\GameMapping;
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Locations\LocationMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Mates\MateMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\PhpMappingDriver;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\PlayerMapping;
@@ -81,6 +82,7 @@ return [
                     new PlayMapping(),
                     new PlayerMapping(),
                     new MateMapping(),
+                    new LocationMapping(),
                     new GameMapping(),
                 ]),
                 'Bgl\\Domain'

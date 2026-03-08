@@ -7,6 +7,7 @@ use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Persistence\Transactor;
 use Bgl\Core\Serialization\Deserializer;
 use Bgl\Domain\Games\Games;
+use Bgl\Domain\Locations\Locations;
 use Bgl\Domain\Mates\Mates;
 use Bgl\Domain\Plays\Player\PlayersFactory;
 use Bgl\Domain\Plays\Plays;
@@ -20,6 +21,7 @@ use Bgl\Infrastructure\Persistence\Bgg\BggGames;
 use Bgl\Infrastructure\Persistence\CompositeGames;
 use Bgl\Infrastructure\Persistence\Doctrine\DoctrineTransactor;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Games\Games as DoctrineGames;
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Locations\Locations as DoctrineLocations;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Mates\Mates as DoctrineMates;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\DoctrinePlayersFactory;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays\Plays as DoctrinePlays;
@@ -41,6 +43,7 @@ return [
     Passkeys::class => static fn(EntityManagerInterface $em): Passkeys => new DoctrinePasskeys($em),
     PasskeyChallenges::class => static fn(EntityManagerInterface $em): PasskeyChallenges => new DoctrineChallenges($em),
     Mates::class => static fn(EntityManagerInterface $em): Mates => new DoctrineMates($em),
+    Locations::class => static fn(EntityManagerInterface $em): Locations => new DoctrineLocations($em),
     Games::class => static function (ContainerInterface $c): Games {
         /** @var array{base_url: string, search: array{endpoint: string, params: array<string, string>, timeout: int, mapping: array<string, string>, required: list<string>}} $bgg */
         $bgg = $c->get('bgg');
