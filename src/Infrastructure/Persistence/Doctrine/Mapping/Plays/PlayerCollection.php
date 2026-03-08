@@ -21,6 +21,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 final class PlayerCollection extends ArrayCollection implements Players
 {
     #[\Override]
+    public function clear(): void
+    {
+        parent::clear();
+    }
+
+    #[\Override]
     public function add(mixed $element): void
     {
         /** @var Player $element */

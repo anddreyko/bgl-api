@@ -21,6 +21,11 @@ final class EmptyPlayers implements Players
     }
 
     #[\Override]
+    public function clear(): void
+    {
+    }
+
+    #[\Override]
     public function find(string $id): ?object
     {
         return null;

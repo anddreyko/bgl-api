@@ -131,9 +131,7 @@ final class Play
             throw new PlayDeletedException('Deleted play cannot have players replaced.');
         }
 
-        foreach ($this->players as $player) {
-            $this->players->remove($player);
-        }
+        $this->players->clear();
 
         foreach ($newPlayers as $player) {
             $this->players->add($player);

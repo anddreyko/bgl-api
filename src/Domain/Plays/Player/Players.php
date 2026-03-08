@@ -12,4 +12,5 @@ use Bgl\Core\Collections\Repository;
  */
 interface Players extends Repository, \IteratorAggregate
 {
+    public function clear(): void;
 }
