@@ -71,6 +71,21 @@ final class Mates extends DoctrineRepository implements MateRepository
     }
 
     #[\Override]
+    public function findSystemMates(): array
+    {
+        /** @var list<Mate> */
+        return $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select('m')
+            ->from(Mate::class, 'm')
+            ->where('m.userId IS NULL')
+            ->andWhere('m.deletedAt IS NULL')
+            ->orderBy('m.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    #[\Override]
     public function countByUser(Uuid $userId): int
     {
         /** @var int */

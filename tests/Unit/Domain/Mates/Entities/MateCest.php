@@ -65,6 +65,37 @@ final class MateCest
         $i->assertSame('New notes', $mate->getNotes());
     }
 
+    public function testCreateSystemReturnsMateWithNullUserId(UnitTester $i): void
+    {
+        $id = new Uuid('00000000-0000-4000-a000-000000000001');
+        $name = 'Anonymous';
+        $createdAt = new DateTime('2026-01-15 20:00:00');
+
+        $mate = Mate::createSystem($id, $name, $createdAt);
+
+        $i->assertSame($id, $mate->getId());
+        $i->assertNull($mate->getUserId());
+        $i->assertSame($name, $mate->getName());
+        $i->assertNull($mate->getNotes());
+        $i->assertSame($createdAt, $mate->getCreatedAt());
+        $i->assertNull($mate->getDeletedAt());
+        $i->assertFalse($mate->isDeleted());
+        $i->assertTrue($mate->isSystem());
+    }
+
+    public function testRegularMateIsNotSystem(UnitTester $i): void
+    {
+        $mate = Mate::create(
+            new Uuid('77777777-7777-4777-8777-777777777777'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
+            'Ivan',
+            null,
+            new DateTime(),
+        );
+
+        $i->assertFalse($mate->isSystem());
+    }
+
     public function testSoftDeleteSetsDeletedAt(UnitTester $i): void
     {
         $mate = Mate::create(

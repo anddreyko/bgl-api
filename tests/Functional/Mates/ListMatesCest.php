@@ -10,6 +10,10 @@ use Bgl\Application\Handlers\Mates\ListMates\Handler;
 use Bgl\Application\Handlers\Mates\ListMates\Query;
 use Bgl\Application\Handlers\Mates\ListMates\Result;
 use Bgl\Core\Messages\Envelope;
+use Bgl\Core\ValueObjects\DateTime;
+use Bgl\Core\ValueObjects\Uuid;
+use Bgl\Domain\Mates\Mate;
+use Bgl\Domain\Mates\Mates;
 use Bgl\Tests\Support\DiHelper;
 use Bgl\Tests\Support\FunctionalTester;
 use Codeception\Attribute\Group;
@@ -22,6 +26,7 @@ final class ListMatesCest
 {
     private Handler $handler;
     private CreateHandler $createHandler;
+    private Mates $mates;
 
     public function _before(): void
     {
@@ -32,6 +37,9 @@ final class ListMatesCest
 
         /** @var CreateHandler $createHandler */
         $this->createHandler = $container->get(CreateHandler::class);
+
+        /** @var Mates $mates */
+        $this->mates = $container->get(Mates::class);
     }
 
     public function testEmptyList(FunctionalTester $i): void
@@ -136,5 +144,36 @@ final class ListMatesCest
         $i->assertCount(2, $result->data);
         $i->assertSame(1, $result->page);
         $i->assertSame(2, $result->size);
+    }
+
+    public function testListIncludesSystemMates(FunctionalTester $i): void
+    {
+        $systemMateId = new Uuid('00000000-0000-4000-a000-000000000099');
+        $this->mates->add(Mate::createSystem(
+            $systemMateId,
+            'Anonymous',
+            new DateTime('now'),
+        ));
+
+        $userId = '77777777-7777-4777-8777-777777777700';
+        ($this->createHandler)(new Envelope(
+            message: new CreateCommand(userId: $userId, name: 'Regular Mate'),
+            messageId: 'msg-sys-1',
+        ));
+
+        $result = ($this->handler)(new Envelope(
+            message: new Query(userId: $userId),
+            messageId: 'msg-sys-2',
+        ));
+
+        $i->assertSame(2, $result->total);
+        $i->assertCount(2, $result->data);
+
+        $systemItems = array_filter($result->data, static fn(array $item): bool => $item['is_system'] === true);
+        $regularItems = array_filter($result->data, static fn(array $item): bool => $item['is_system'] === false);
+
+        $i->assertCount(1, $systemItems);
+        $i->assertCount(1, $regularItems);
+        $i->assertSame('Anonymous', array_values($systemItems)[0]['name']);
     }
 }

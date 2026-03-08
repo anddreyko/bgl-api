@@ -27,4 +27,9 @@ interface Mates extends Repository, Searchable
     ): array;
 
     public function countByUser(Uuid $userId): int;
+
+    /**
+     * @return list<Mate>
+     */
+    public function findSystemMates(): array;
 }

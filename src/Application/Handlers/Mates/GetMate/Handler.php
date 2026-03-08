@@ -28,7 +28,11 @@ final readonly class Handler implements MessageHandler
         /** @var Mate|null $mate */
         $mate = $this->mates->find($query->mateId);
 
-        if ($mate === null || $mate->isDeleted() || $mate->getUserId()->getValue() !== $query->userId) {
+        if ($mate === null || $mate->isDeleted()) {
+            throw new \Bgl\Core\Exceptions\NotFoundException('Mate not found');
+        }
+
+        if (!$mate->isSystem() && ($mate->getUserId() === null || $mate->getUserId()->getValue() !== $query->userId)) {
             throw new \Bgl\Core\Exceptions\NotFoundException('Mate not found');
         }
 
@@ -36,6 +40,7 @@ final readonly class Handler implements MessageHandler
             id: (string)$mate->getId(),
             name: $mate->getName(),
             notes: $mate->getNotes(),
+            isSystem: $mate->isSystem(),
             createdAt: $mate->getCreatedAt()->getFormattedValue('c'),
         );
     }

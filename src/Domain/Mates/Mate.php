@@ -11,7 +11,7 @@ final class Mate
 {
     private function __construct(
         private readonly Uuid $id,
-        private readonly Uuid $userId,
+        private readonly ?Uuid $userId,
         private string $name,
         private ?string $notes,
         private ?DateTime $deletedAt,
@@ -29,12 +29,25 @@ final class Mate
         return new self($id, $userId, $name, $notes, null, $createdAt);
     }
 
+    public static function createSystem(
+        Uuid $id,
+        string $name,
+        DateTime $createdAt,
+    ): self {
+        return new self($id, null, $name, null, null, $createdAt);
+    }
+
+    public function isSystem(): bool
+    {
+        return $this->userId === null;
+    }
+
     public function getId(): Uuid
     {
         return $this->id;
     }
 
-    public function getUserId(): Uuid
+    public function getUserId(): ?Uuid
     {
         return $this->userId;
     }

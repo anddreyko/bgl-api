@@ -7,7 +7,7 @@ namespace Bgl\Application\Handlers\Mates\ListMates;
 final readonly class Result
 {
     /**
-     * @param list<array{id: string, name: string, notes: ?string, createdAt: string}> $data
+     * @param list<array{id: string, name: string, notes: ?string, is_system: bool, createdAt: string}> $data
      */
     public function __construct(
         public array $data,

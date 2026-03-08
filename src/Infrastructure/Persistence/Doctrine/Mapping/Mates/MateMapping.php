@@ -44,6 +44,7 @@ final class MateMapping implements EntityMapping
             'fieldName' => 'userId',
             'type' => 'uuid_vo',
             'columnName' => 'user_id',
+            'nullable' => true,
         ]);
     }
 
