@@ -102,6 +102,7 @@ return [
         'id' => $model->id,
         'name' => $model->name,
         'notes' => $model->notes,
+        'is_system' => $model->isSystem,
         'created_at' => $model->createdAt,
     ],
     Handlers\Mates\UpdateMate\Result::class => static fn(Handlers\Mates\UpdateMate\Result $model) => [
