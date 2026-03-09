@@ -7,6 +7,7 @@ use Bgl\Application\Handlers\Plays\FinalizePlay;
 use Bgl\Application\Handlers\Plays\GetPlay;
 use Bgl\Application\Handlers\Plays\ListPlays;
 use Bgl\Application\Handlers\Plays\DeletePlay;
+use Bgl\Application\Handlers\Plays\RestorePlay;
 use Bgl\Application\Handlers\Plays\UpdatePlay;
 use Bgl\Presentation\Api\Interceptors\AuthInterceptor;
 use Bgl\Presentation\Api\Interceptors\OptionalAuthInterceptor;
@@ -218,11 +219,6 @@ return [
                                             'enum' => ['private', 'link', 'participants', 'authenticated', 'public'],
                                             'default' => 'private',
                                         ],
-                                        'status' => [
-                                            'type' => 'string',
-                                            'enum' => ['draft', 'published'],
-                                            'nullable' => true,
-                                        ],
                                         'notes' => ['type' => 'string', 'nullable' => true],
                                         'players' => [
                                             'type' => 'array',
@@ -254,14 +250,17 @@ return [
                     ],
                 ],
                 'patch' => [
-                    'summary' => 'Close play session',
-                    'operationId' => 'closeSession',
+                    'summary' => 'Partially update play session',
+                    'description' => 'Updates only provided fields. If finished_at is provided, triggers finalization.',
+                    'operationId' => 'patchSession',
                     'tags' => ['Plays'],
                     'security' => [['BearerAuth' => []]],
                     'x-message' => FinalizePlay\Command::class,
                     'x-interceptors' => [AuthInterceptor::class],
                     'x-map' => [
                         'id' => 'sessionId',
+                        'game_id' => 'gameId',
+                        'location_id' => 'locationId',
                         'finished_at' => 'finishedAt',
                     ],
                     'x-auth' => ['userId'],
@@ -280,9 +279,30 @@ return [
                                 'schema' => [
                                     'type' => 'object',
                                     'properties' => [
-                                        'finished_at' => [
+                                        'name' => ['type' => 'string', 'maxLength' => 255, 'nullable' => true],
+                                        'game_id' => ['type' => 'string', 'format' => 'uuid', 'nullable' => true],
+                                        'location_id' => ['type' => 'string', 'format' => 'uuid', 'nullable' => true],
+                                        'visibility' => [
                                             'type' => 'string',
-                                            'format' => 'date-time',
+                                            'enum' => ['private', 'link', 'participants', 'authenticated', 'public'],
+                                        ],
+                                        'notes' => ['type' => 'string', 'nullable' => true],
+                                        'finished_at' => ['type' => 'string', 'format' => 'date-time'],
+                                        'players' => [
+                                            'type' => 'array',
+                                            'minItems' => 1,
+                                            'items' => [
+                                                'type' => 'object',
+                                                'required' => ['mate_id'],
+                                                'properties' => [
+                                                    'mate_id' => ['type' => 'string', 'format' => 'uuid'],
+                                                    'score' => ['type' => 'integer', 'nullable' => true],
+                                                    'is_winner' => ['type' => 'boolean', 'default' => false],
+                                                    'color' => ['type' => 'string', 'maxLength' => 50, 'nullable' => true],
+                                                    'team_tag' => ['type' => 'string', 'maxLength' => 50, 'nullable' => true],
+                                                    'number' => ['type' => 'integer', 'minimum' => 0, 'nullable' => true],
+                                                ],
+                                            ],
                                         ],
                                     ],
                                 ],
@@ -316,6 +336,30 @@ return [
                     ],
                     'responses' => [
                         '204' => ['description' => 'Play deleted'],
+                        '401' => ['$ref' => '#/components/responses/Unauthorized'],
+                        '404' => ['$ref' => '#/components/responses/NotFound'],
+                        '500' => ['$ref' => '#/components/responses/InternalError'],
+                    ],
+                ],
+            ],
+            '/v1/plays/sessions/{id}/restore' => [
+                'patch' => [
+                    'summary' => 'Restore deleted play session',
+                    'operationId' => 'restoreSession',
+                    'tags' => ['Plays'],
+                    'security' => [['BearerAuth' => []]],
+                    'x-message' => RestorePlay\Command::class,
+                    'x-interceptors' => [AuthInterceptor::class],
+                    'x-auth' => ['userId'],
+                    'x-map' => ['id' => 'sessionId'],
+                    'parameters' => [[
+                        'name' => 'id',
+                        'in' => 'path',
+                        'required' => true,
+                        'schema' => ['type' => 'string'],
+                    ]],
+                    'responses' => [
+                        '200' => ['$ref' => '#/components/responses/Play'],
                         '401' => ['$ref' => '#/components/responses/Unauthorized'],
                         '404' => ['$ref' => '#/components/responses/NotFound'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],

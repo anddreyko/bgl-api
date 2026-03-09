@@ -124,7 +124,6 @@ return [
                             ],
                         ],
                         'name' => ['type' => 'string', 'nullable' => true],
-                        'status' => ['type' => 'string'],
                         'visibility' => ['type' => 'string'],
                         'started_at' => ['type' => 'string', 'format' => 'date-time'],
                         'finished_at' => ['type' => 'string', 'format' => 'date-time', 'nullable' => true],
