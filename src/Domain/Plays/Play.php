@@ -19,7 +19,7 @@ final class Play
         private readonly Uuid $id,
         private readonly Uuid $userId,
         private ?string $name,
-        private PlayStatus $status,
+        private PlayLifecycle $lifecycle,
         private readonly DateTime $startedAt,
         private ?DateTime $finishedAt,
         private ?Uuid $gameId = null,
@@ -45,7 +45,7 @@ final class Play
             $id,
             $userId,
             $name,
-            PlayStatus::Draft,
+            PlayLifecycle::Current,
             $startedAt,
             null,
             $gameId,
@@ -73,9 +73,9 @@ final class Play
         return $this->name;
     }
 
-    public function getStatus(): PlayStatus
+    public function getLifecycle(): PlayLifecycle
     {
-        return $this->status;
+        return $this->lifecycle;
     }
 
     public function getStartedAt(): DateTime
@@ -110,27 +110,31 @@ final class Play
 
     public function delete(): void
     {
-        if ($this->status === PlayStatus::Deleted) {
+        if ($this->lifecycle === PlayLifecycle::Deleted) {
             throw new PlayDeletedException('Play is already deleted.');
         }
 
-        $this->status = PlayStatus::Deleted;
+        $this->lifecycle = PlayLifecycle::Deleted;
+    }
+
+    public function restore(): void
+    {
+        if ($this->lifecycle !== PlayLifecycle::Deleted) {
+            throw new PlayNotDeletedException('Only deleted plays can be restored.');
+        }
+
+        $this->lifecycle = PlayLifecycle::Finished;
     }
 
     public function update(
         ?string $name,
         ?Uuid $gameId,
         Visibility $visibility,
-        ?PlayStatus $status = null,
         ?Uuid $locationId = null,
         ?string $notes = null,
     ): void {
-        if ($this->status === PlayStatus::Deleted) {
+        if ($this->lifecycle === PlayLifecycle::Deleted) {
             throw new PlayDeletedException('Deleted play cannot be updated.');
-        }
-
-        if ($status === PlayStatus::Deleted) {
-            throw new PlayDeletedException('Use delete() to delete a play.');
         }
 
         $this->name = $name;
@@ -138,20 +142,20 @@ final class Play
         $this->visibility = $visibility;
         $this->locationId = $locationId;
         $this->notes = $notes;
-
-        if ($status !== null) {
-            $this->status = $status;
-        }
     }
 
     public function addPlayer(Player $player): void
     {
+        if ($this->lifecycle === PlayLifecycle::Deleted) {
+            throw new PlayDeletedException('Deleted play cannot have players added.');
+        }
+
         $this->players->add($player);
     }
 
     public function replacePlayers(Players $newPlayers): void
     {
-        if ($this->status === PlayStatus::Deleted) {
+        if ($this->lifecycle === PlayLifecycle::Deleted) {
             throw new PlayDeletedException('Deleted play cannot have players replaced.');
         }
 
@@ -168,17 +172,17 @@ final class Play
         return $this->players;
     }
 
-
-    public function finalize(DateTime $finishedAt): void
+    public function finalize(?DateTime $finishedAt = null): void
     {
-        if ($this->status === PlayStatus::Deleted) {
-            throw new PlayDeletedException('Deleted play cannot be finalized.');
+        if ($this->lifecycle !== PlayLifecycle::Current) {
+            throw new PlayNotCurrentException('Only current plays can be finalized.');
         }
 
-        if ($finishedAt->getValue() <= $this->startedAt->getValue()) {
+        if ($finishedAt !== null && $finishedAt->getValue() <= $this->startedAt->getValue()) {
             throw new FinishedAtBeforeStartedAtException();
         }
 
+        $this->lifecycle = PlayLifecycle::Finished;
         $this->finishedAt = $finishedAt;
     }
 }

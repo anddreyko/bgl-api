@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Bgl\Domain\Plays;
 
-enum PlayStatus: string
+enum PlayLifecycle: string
 {
-    case Draft = 'draft';
-    case Published = 'published';
+    case Current = 'current';
+    case Finished = 'finished';
     case Deleted = 'deleted';
 }
