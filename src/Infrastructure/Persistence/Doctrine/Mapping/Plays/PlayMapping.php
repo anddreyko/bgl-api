@@ -6,7 +6,7 @@ namespace Bgl\Infrastructure\Persistence\Doctrine\Mapping\Plays;
 
 use Bgl\Domain\Plays\Play;
 use Bgl\Domain\Plays\Player\Player;
-use Bgl\Domain\Plays\PlayStatus;
+use Bgl\Domain\Plays\PlayLifecycle;
 use Bgl\Domain\Plays\Visibility;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\EntityMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -62,9 +62,10 @@ final class PlayMapping implements EntityMapping
         ]);
 
         $metadata->mapField([
-            'fieldName' => 'status',
+            'fieldName' => 'lifecycle',
             'type' => 'string',
-            'enumType' => PlayStatus::class,
+            'columnName' => 'status',
+            'enumType' => PlayLifecycle::class,
         ]);
 
         $metadata->mapField([
