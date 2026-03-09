@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bgl\Tests\Functional\Plays;
 
 use Bgl\Application\Handlers\Plays\CreatePlay;
+use Bgl\Application\Handlers\Plays\FinalizePlay;
 use Bgl\Application\Handlers\Plays\ListPlays;
 use Bgl\Application\Handlers\Plays\UpdatePlay;
 use Bgl\Core\Auth\AuthenticationException;
@@ -29,6 +30,7 @@ final class ListPlaysCest
     private ListPlays\Handler $handler;
     private CreatePlay\Handler $createHandler;
     private UpdatePlay\Handler $updateHandler;
+    private FinalizePlay\Handler $finalizeHandler;
     private Mates $mates;
     private Games $games;
     private UuidGenerator $uuidGenerator;
@@ -50,6 +52,9 @@ final class ListPlaysCest
 
         /** @var UpdatePlay\Handler $updateHandler */
         $this->updateHandler = $container->get(UpdatePlay\Handler::class);
+
+        /** @var FinalizePlay\Handler $finalizeHandler */
+        $this->finalizeHandler = $container->get(FinalizePlay\Handler::class);
 
         /** @var Mates $mates */
         $this->mates = $container->get(Mates::class);
@@ -316,27 +321,28 @@ final class ListPlaysCest
         $i->assertNotContains('Private session', $names);
     }
 
-    public function testListPlaysByAuthorIdHidesDraftAndDeleted(FunctionalTester $i): void
+    public function testListPlaysByAuthorIdHidesPrivateAndDeleted(FunctionalTester $i): void
     {
         $otherUserId = $this->uuidGenerator->generate();
         $otherMateId = $this->uuidGenerator->generate();
         $this->mates->add(Mate::create($otherMateId, $otherUserId, 'Dave', null, new DateTime()));
 
-        $this->createPlayForUser($otherUserId, 'Draft session');
+        // Private session (default visibility) -- not visible to others
+        $this->createPlayForUser($otherUserId, 'Private session');
 
-        $publishedId = $this->createPlayForUser($otherUserId, 'Published session');
-        $this->publishPlay($publishedId, $otherUserId, 'public', 'Published session');
+        $publicId = $this->createPlayForUser($otherUserId, 'Public session');
+        $this->publishPlay($publicId, $otherUserId, 'public', 'Public session');
 
         $result = ($this->handler)(new Envelope(
             message: new ListPlays\Query(
                 userId: (string)$this->userId,
                 authorId: (string)$otherUserId,
             ),
-            messageId: 'msg-list-author-no-draft',
+            messageId: 'msg-list-author-no-private',
         ));
 
         $i->assertSame(1, $result->total);
-        $i->assertSame('Published session', $result->data[0]['name']);
+        $i->assertSame('Public session', $result->data[0]['name']);
     }
 
     public function testListPlaysByAuthorIdSelfShowsAll(FunctionalTester $i): void
@@ -435,13 +441,20 @@ final class ListPlaysCest
 
     private function publishPlay(Uuid $sessionId, Uuid $userId, string $visibility, string $name = ''): void
     {
+        ($this->finalizeHandler)(new Envelope(
+            message: new FinalizePlay\Command(
+                sessionId: $sessionId,
+                userId: $userId,
+            ),
+            messageId: 'msg-finalize-' . uniqid(),
+        ));
+
         ($this->updateHandler)(new Envelope(
             message: new UpdatePlay\Command(
                 sessionId: $sessionId,
                 userId: $userId,
                 name: $name,
                 visibility: $visibility,
-                status: 'published',
             ),
             messageId: 'msg-update-' . uniqid(),
         ));

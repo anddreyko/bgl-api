@@ -19,8 +19,8 @@ use Bgl\Domain\Games\Game;
 use Bgl\Domain\Games\Games;
 use Bgl\Domain\Mates\Mate;
 use Bgl\Domain\Mates\Mates;
+use Bgl\Domain\Plays\PlayLifecycle;
 use Bgl\Domain\Plays\Plays;
-use Bgl\Domain\Plays\PlayStatus;
 use Bgl\Tests\Support\DiHelper;
 use Bgl\Tests\Support\FunctionalTester;
 use Codeception\Attribute\Group;
@@ -161,7 +161,7 @@ final class OpenSessionCest
 
         $play = $this->plays->find($result->id);
         $i->assertNotNull($play);
-        $i->assertSame(PlayStatus::Draft, $play->getStatus());
+        $i->assertSame(PlayLifecycle::Current, $play->getLifecycle());
     }
 
     public function testOpenSessionWithPlayers(FunctionalTester $i): void
@@ -181,7 +181,7 @@ final class OpenSessionCest
 
         $play = $this->plays->find($result->id);
         $i->assertNotNull($play);
-        $i->assertSame(PlayStatus::Draft, $play->getStatus());
+        $i->assertSame(PlayLifecycle::Current, $play->getLifecycle());
     }
 
     public function testOpenSessionWithFinishedAt(FunctionalTester $i): void
@@ -202,7 +202,7 @@ final class OpenSessionCest
 
         $play = $this->plays->find($result->id);
         $i->assertNotNull($play);
-        $i->assertSame(PlayStatus::Draft, $play->getStatus());
+        $i->assertSame(PlayLifecycle::Finished, $play->getLifecycle());
         $i->assertNotNull($play->getFinishedAt());
     }
 

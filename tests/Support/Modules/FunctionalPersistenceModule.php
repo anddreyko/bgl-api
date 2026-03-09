@@ -57,7 +57,18 @@ final class FunctionalPersistenceModule extends Module
     {
         $container = DiHelper::container();
 
-        foreach ([Users::class, Plays::class, Players::class, Mates::class, Games::class, Locations::class, Passkeys::class, PasskeyChallenges::class] as $repoInterface) {
+        foreach (
+            [
+                Users::class,
+                Plays::class,
+                Players::class,
+                Mates::class,
+                Games::class,
+                Locations::class,
+                Passkeys::class,
+                PasskeyChallenges::class,
+            ] as $repoInterface
+        ) {
             $repo = $container->get($repoInterface);
             if ($repo instanceof InMemoryRepository) {
                 $repo->clear();

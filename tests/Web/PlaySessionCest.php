@@ -51,7 +51,6 @@ final class PlaySessionCest
                     'id' => 'string',
                     'name' => 'string',
                 ],
-                'status' => 'string',
                 'visibility' => 'string',
                 'started_at' => 'string',
             ],
@@ -86,9 +85,22 @@ final class PlaySessionCest
 
         $sessionId = $i->grabDataFromResponseByJsonPath('$.data.id')[0];
 
-        $i->sendPatch('/v1/plays/sessions/' . $sessionId);
+        // Partial update without finalization
+        $i->sendPatch('/v1/plays/sessions/' . $sessionId, ['name' => 'Updated']);
         $i->seeResponseCodeIs(200);
         $i->seeResponseIsJson();
+        $i->seeResponseMatchesJsonType([
+            'data' => [
+                'id' => 'string',
+                'started_at' => 'string',
+            ],
+        ]);
+
+        // Finalize by providing finished_at
+        $i->sendPatch('/v1/plays/sessions/' . $sessionId, [
+            'finished_at' => '2026-03-09T22:00:00+00:00',
+        ]);
+        $i->seeResponseCodeIs(200);
         $i->seeResponseMatchesJsonType([
             'data' => [
                 'id' => 'string',
@@ -130,7 +142,7 @@ final class PlaySessionCest
         $i->seeInDatabase('plays_session', [
             'id' => $sessionId,
             'name' => 'Game night',
-            'status' => 'draft',
+            'status' => 'current',
             'visibility' => 'participants',
         ]);
 
@@ -151,14 +163,16 @@ final class PlaySessionCest
             'color' => 'blue',
         ]);
 
-        // Finalize (close) session
-        $i->sendPatch('/v1/plays/sessions/' . $sessionId);
+        // Finalize (close) session by providing finished_at
+        $i->sendPatch('/v1/plays/sessions/' . $sessionId, [
+            'finished_at' => '2026-03-09T23:00:00+00:00',
+        ]);
         $i->seeResponseCodeIs(200);
 
-        // Verify status changed in DB
+        // Verify lifecycle changed in DB after finalize
         $i->seeInDatabase('plays_session', [
             'id' => $sessionId,
-            'status' => 'draft',
+            'status' => 'finished',
         ]);
     }
 

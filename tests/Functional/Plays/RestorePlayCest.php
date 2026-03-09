@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Bgl\Tests\Functional\Plays;
 
-use Bgl\Application\Handlers\Plays\DeletePlay\Command;
-use Bgl\Application\Handlers\Plays\DeletePlay\Handler;
+use Bgl\Application\Handlers\Plays\RestorePlay\Command;
+use Bgl\Application\Handlers\Plays\RestorePlay\Handler;
+use Bgl\Application\Handlers\Plays\RestorePlay\Result;
 use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
@@ -13,8 +14,9 @@ use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Plays\Play;
 use Bgl\Domain\Plays\PlayAccessDeniedException;
-use Bgl\Domain\Plays\Player\Players;
 use Bgl\Domain\Plays\PlayLifecycle;
+use Bgl\Domain\Plays\PlayNotDeletedException;
+use Bgl\Domain\Plays\Player\Players;
 use Bgl\Domain\Plays\Plays;
 use Bgl\Tests\Support\DiHelper;
 use Bgl\Tests\Support\FunctionalTester;
@@ -22,10 +24,10 @@ use Codeception\Attribute\Group;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * @covers \Bgl\Application\Handlers\Plays\DeletePlay\Handler
+ * @covers \Bgl\Application\Handlers\Plays\RestorePlay\Handler
  */
-#[Group('application', 'handler', 'plays', 'delete-play')]
-final class DeletePlayCest
+#[Group('application', 'handler', 'plays', 'restore-play')]
+final class RestorePlayCest
 {
     private EntityManagerInterface $em;
     private Handler $handler;
@@ -57,17 +59,19 @@ final class DeletePlayCest
         $this->userId = $this->uuidGenerator->generate();
     }
 
-    public function testSuccessfulDelete(FunctionalTester $i): void
+    public function testSuccessfulRestore(FunctionalTester $i): void
     {
         $sessionId = $this->uuidGenerator->generate();
 
         $play = Play::create(
             $sessionId,
             $this->userId,
-            'Game to delete',
+            'Deleted game',
             new DateTime('2024-06-15 20:00:00'),
             $this->players,
         );
+        $play->finalize(new DateTime('2024-06-15 22:00:00'));
+        $play->delete();
         $this->plays->add($play);
         $this->em->flush();
         $this->em->clear();
@@ -77,78 +81,60 @@ final class DeletePlayCest
                 sessionId: $sessionId,
                 userId: $this->userId,
             ),
-            messageId: 'msg-delete-1',
+            messageId: 'msg-restore-1',
         ));
 
-        $i->assertNull($result);
+        $i->assertInstanceOf(Result::class, $result);
+        $i->assertSame((string) $sessionId, $result->id);
 
         $this->em->flush();
         $this->em->clear();
 
-        $deleted = $this->plays->find((string) $sessionId);
-        $i->assertNotNull($deleted);
-        $i->assertSame(PlayLifecycle::Deleted, $deleted->getLifecycle());
+        $restored = $this->plays->find((string) $sessionId);
+        $i->assertNotNull($restored);
+        $i->assertSame(PlayLifecycle::Finished, $restored->getLifecycle());
     }
 
-    public function testDeletePublishedPlay(FunctionalTester $i): void
+    public function testRestoreNonDeletedThrows(FunctionalTester $i): void
     {
         $sessionId = $this->uuidGenerator->generate();
 
         $play = Play::create(
             $sessionId,
             $this->userId,
-            null,
+            'Active game',
             new DateTime('2024-06-15 20:00:00'),
             $this->players,
         );
-        $play->finalize(new DateTime('2024-06-15 23:00:00'));
         $this->plays->add($play);
         $this->em->flush();
         $this->em->clear();
 
-        $result = ($this->handler)(new Envelope(
-            message: new Command(
-                sessionId: $sessionId,
-                userId: $this->userId,
-            ),
-            messageId: 'msg-delete-published',
-        ));
-
-        $i->assertNull($result);
-
-        $this->em->flush();
-        $this->em->clear();
-
-        $deleted = $this->plays->find((string) $sessionId);
-        $i->assertNotNull($deleted);
-        $i->assertSame(PlayLifecycle::Deleted, $deleted->getLifecycle());
-    }
-
-    public function testPlayNotFoundThrowsNotFoundException(FunctionalTester $i): void
-    {
         $i->expectThrowable(
-            new NotFoundException('Play not found'),
+            PlayNotDeletedException::class,
             fn () => ($this->handler)(new Envelope(
                 message: new Command(
-                    sessionId: $this->uuidGenerator->generate(),
+                    sessionId: $sessionId,
                     userId: $this->userId,
                 ),
-                messageId: 'msg-delete-not-found',
+                messageId: 'msg-restore-not-deleted',
             )),
         );
     }
 
-    public function testAccessDeniedThrowsDomainException(FunctionalTester $i): void
+    public function testRestoreOtherUserSessionThrows(FunctionalTester $i): void
     {
         $sessionId = $this->uuidGenerator->generate();
 
         $play = Play::create(
             $sessionId,
             new Uuid('eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee'),
-            null,
+            'Other user game',
             new DateTime('2024-06-15 20:00:00'),
             $this->players,
         );
+        $play->finalize(new DateTime('2024-06-15 22:00:00'));
+        $play->delete();
         $this->plays->add($play);
         $this->em->flush();
         $this->em->clear();
@@ -160,45 +146,21 @@ final class DeletePlayCest
                     sessionId: $sessionId,
                     userId: new Uuid('ffffffff-ffff-4fff-8fff-ffffffffffff'),
                 ),
-                messageId: 'msg-delete-denied',
+                messageId: 'msg-restore-denied',
             )),
         );
     }
 
-    public function testAlreadyDeletedThrowsNotFoundException(FunctionalTester $i): void
+    public function testRestoreNonExistentThrowsNotFound(FunctionalTester $i): void
     {
-        $sessionId = $this->uuidGenerator->generate();
-
-        $play = Play::create(
-            $sessionId,
-            $this->userId,
-            null,
-            new DateTime('2024-06-15 20:00:00'),
-            $this->players,
-        );
-        $this->plays->add($play);
-        $this->em->flush();
-        $this->em->clear();
-
-        ($this->handler)(new Envelope(
-            message: new Command(
-                sessionId: $sessionId,
-                userId: $this->userId,
-            ),
-            messageId: 'msg-delete-first',
-        ));
-
-        $this->em->flush();
-        $this->em->clear();
-
         $i->expectThrowable(
             new NotFoundException('Play not found'),
             fn () => ($this->handler)(new Envelope(
                 message: new Command(
-                    sessionId: $sessionId,
+                    sessionId: $this->uuidGenerator->generate(),
                     userId: $this->userId,
                 ),
-                messageId: 'msg-delete-again',
+                messageId: 'msg-restore-not-found',
             )),
         );
     }

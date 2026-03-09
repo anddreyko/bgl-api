@@ -6,10 +6,13 @@ namespace Bgl\Tests\Unit\Domain\Plays\Entities;
 
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
+use Bgl\Domain\Plays\FinishedAtBeforeStartedAtException;
 use Bgl\Domain\Plays\Play;
 use Bgl\Domain\Plays\Player\Player;
 use Bgl\Domain\Plays\PlayDeletedException;
-use Bgl\Domain\Plays\PlayStatus;
+use Bgl\Domain\Plays\PlayLifecycle;
+use Bgl\Domain\Plays\PlayNotCurrentException;
+use Bgl\Domain\Plays\PlayNotDeletedException;
 use Bgl\Domain\Plays\Visibility;
 use Bgl\Infrastructure\Persistence\InMemory\InMemoryPlayers;
 use Bgl\Tests\Support\UnitTester;
@@ -21,7 +24,7 @@ use Codeception\Attribute\Group;
 #[Group('plays', 'play')]
 final class PlayCest
 {
-    public function testOpenCreatesPlayWithDraftStatus(UnitTester $i): void
+    public function testCreateReturnsCurrentLifecycle(UnitTester $i): void
     {
         $id = new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d');
         $userId = new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e');
@@ -33,21 +36,23 @@ final class PlayCest
         $i->assertSame($id, $play->getId());
         $i->assertSame($userId, $play->getUserId());
         $i->assertSame($name, $play->getName());
-        $i->assertSame(PlayStatus::Draft, $play->getStatus());
+        $i->assertSame(PlayLifecycle::Current, $play->getLifecycle());
         $i->assertSame($startedAt, $play->getStartedAt());
         $i->assertNull($play->getFinishedAt());
     }
 
-    public function testOpenCreatesPlayWithNullName(UnitTester $i): void
+    public function testCreateWithNullName(UnitTester $i): void
     {
-        $id = new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d');
-        $userId = new Uuid('c3d4e5f6-a7b8-4c9d-8e1f-2a3b4c5d6e7f');
-        $startedAt = new DateTime('2024-06-15 20:00:00');
-
-        $play = Play::create($id, $userId, null, $startedAt, new InMemoryPlayers());
+        $play = Play::create(
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('c3d4e5f6-a7b8-4c9d-8e1f-2a3b4c5d6e7f'),
+            null,
+            new DateTime('2024-06-15 20:00:00'),
+            new InMemoryPlayers(),
+        );
 
         $i->assertNull($play->getName());
-        $i->assertSame(PlayStatus::Draft, $play->getStatus());
+        $i->assertSame(PlayLifecycle::Current, $play->getLifecycle());
     }
 
     public function testGetIdReturnsUuid(UnitTester $i): void
@@ -71,7 +76,7 @@ final class PlayCest
         $i->assertSame('01234567-89ab-4cde-8012-3456789abcde', $play->getUserId()->getValue());
     }
 
-    public function testFinalizeSetsFinishedAtWithoutChangingStatus(UnitTester $i): void
+    public function testFinalizeFromCurrentToFinishedWithFinishedAt(UnitTester $i): void
     {
         $play = Play::create(
             new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
@@ -84,43 +89,96 @@ final class PlayCest
         $finishedAt = new DateTime('2024-06-15 23:00:00');
         $play->finalize($finishedAt);
 
-        $i->assertSame(PlayStatus::Draft, $play->getStatus());
+        $i->assertSame(PlayLifecycle::Finished, $play->getLifecycle());
         $i->assertSame($finishedAt, $play->getFinishedAt());
     }
 
-    public function testFinalizeWorksWhenPublished(UnitTester $i): void
+    public function testFinalizeFromCurrentToFinishedWithoutFinishedAt(UnitTester $i): void
     {
-        $play = new Play(
+        $play = Play::create(
             new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
             new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
-            null,
-            PlayStatus::Published,
+            'Game night',
             new DateTime('2024-06-15 20:00:00'),
-            null,
+            new InMemoryPlayers(),
         );
 
-        $finishedAt = new DateTime('2024-06-15 23:00:00');
-        $play->finalize($finishedAt);
+        $play->finalize();
 
-        $i->assertSame(PlayStatus::Published, $play->getStatus());
-        $i->assertSame($finishedAt, $play->getFinishedAt());
+        $i->assertSame(PlayLifecycle::Finished, $play->getLifecycle());
+        $i->assertNull($play->getFinishedAt());
     }
 
-    public function testFinalizeThrowsWhenDeleted(UnitTester $i): void
+    public function testFinalizeFromFinishedThrowsPlayNotCurrentException(UnitTester $i): void
     {
         $play = new Play(
             new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
             new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
-            PlayStatus::Deleted,
+            PlayLifecycle::Finished,
             new DateTime('2024-06-15 20:00:00'),
             null,
         );
 
         $i->expectThrowable(
-            PlayDeletedException::class,
+            PlayNotCurrentException::class,
             static function () use ($play): void {
                 $play->finalize(new DateTime('2024-06-15 23:00:00'));
+            },
+        );
+    }
+
+    public function testFinalizeFromDeletedThrowsPlayDeletedException(UnitTester $i): void
+    {
+        $play = new Play(
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
+            null,
+            PlayLifecycle::Deleted,
+            new DateTime('2024-06-15 20:00:00'),
+            null,
+        );
+
+        $i->expectThrowable(
+            PlayNotCurrentException::class,
+            static function () use ($play): void {
+                $play->finalize(new DateTime('2024-06-15 23:00:00'));
+            },
+        );
+    }
+
+    public function testFinalizeWithFinishedAtBeforeStartedAtThrows(UnitTester $i): void
+    {
+        $play = Play::create(
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
+            'Game night',
+            new DateTime('2024-06-15 20:00:00'),
+            new InMemoryPlayers(),
+        );
+
+        $i->expectThrowable(
+            FinishedAtBeforeStartedAtException::class,
+            static function () use ($play): void {
+                $play->finalize(new DateTime('2024-06-15 19:00:00'));
+            },
+        );
+    }
+
+    public function testFinalizeWithFinishedAtEqualToStartedAtThrows(UnitTester $i): void
+    {
+        $play = Play::create(
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
+            'Game night',
+            new DateTime('2024-06-15 20:00:00'),
+            new InMemoryPlayers(),
+        );
+
+        $i->expectThrowable(
+            FinishedAtBeforeStartedAtException::class,
+            static function () use ($play): void {
+                $play->finalize(new DateTime('2024-06-15 20:00:00'));
             },
         );
     }
@@ -156,7 +214,7 @@ final class PlayCest
         $i->assertSame($id, $play->getId());
         $i->assertSame($userId, $play->getUserId());
         $i->assertSame('Game night', $play->getName());
-        $i->assertSame(PlayStatus::Draft, $play->getStatus());
+        $i->assertSame(PlayLifecycle::Current, $play->getLifecycle());
         $i->assertSame($startedAt, $play->getStartedAt());
         $i->assertNull($play->getFinishedAt());
         $i->assertSame($gameId, $play->getGameId());
@@ -203,13 +261,13 @@ final class PlayCest
         $i->assertSame(Visibility::Public, $play->getVisibility());
     }
 
-    public function testUpdateWorksWhenPublished(UnitTester $i): void
+    public function testUpdateWorksOnFinishedPlay(UnitTester $i): void
     {
         $play = new Play(
             new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
             new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
-            PlayStatus::Published,
+            PlayLifecycle::Finished,
             new DateTime('2024-06-15 20:00:00'),
             new DateTime('2024-06-15 23:00:00'),
         );
@@ -220,7 +278,7 @@ final class PlayCest
         $i->assertSame('Updated name', $play->getName());
         $i->assertSame($newGameId, $play->getGameId());
         $i->assertSame(Visibility::Public, $play->getVisibility());
-        $i->assertSame(PlayStatus::Published, $play->getStatus());
+        $i->assertSame(PlayLifecycle::Finished, $play->getLifecycle());
     }
 
     public function testUpdateThrowsWhenDeleted(UnitTester $i): void
@@ -229,84 +287,20 @@ final class PlayCest
             new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
             new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
-            PlayStatus::Deleted,
+            PlayLifecycle::Deleted,
             new DateTime('2024-06-15 20:00:00'),
             new DateTime('2024-06-15 23:00:00'),
         );
 
         $i->expectThrowable(
-            new PlayDeletedException('Deleted play cannot be updated.'),
+            PlayDeletedException::class,
             static function () use ($play): void {
                 $play->update('name', null, Visibility::Private);
             },
         );
     }
 
-    public function testUpdateStatusDraftToPublished(UnitTester $i): void
-    {
-        $play = Play::create(
-            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
-            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
-            null,
-            new DateTime('2024-06-15 20:00:00'),
-            new InMemoryPlayers(),
-        );
-
-        $play->update(null, null, Visibility::Private, PlayStatus::Published);
-
-        $i->assertSame(PlayStatus::Published, $play->getStatus());
-    }
-
-    public function testUpdateStatusPublishedToDraft(UnitTester $i): void
-    {
-        $play = new Play(
-            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
-            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
-            null,
-            PlayStatus::Published,
-            new DateTime('2024-06-15 20:00:00'),
-            new DateTime('2024-06-15 23:00:00'),
-        );
-
-        $play->update(null, null, Visibility::Private, PlayStatus::Draft);
-
-        $i->assertSame(PlayStatus::Draft, $play->getStatus());
-    }
-
-    public function testUpdateStatusToDeletedThrows(UnitTester $i): void
-    {
-        $play = Play::create(
-            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
-            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
-            null,
-            new DateTime('2024-06-15 20:00:00'),
-            new InMemoryPlayers(),
-        );
-
-        $i->expectThrowable(
-            PlayDeletedException::class,
-            static function () use ($play): void {
-                $play->update(null, null, Visibility::Private, PlayStatus::Deleted);
-            },
-        );
-    }
-
-    public function testUpdateStatusNullKeepsCurrent(UnitTester $i): void
-    {
-        $play = Play::create(
-            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
-            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
-            null,
-            new DateTime('2024-06-15 20:00:00'),
-            new InMemoryPlayers(),
-        );
-
-        $play->update('name', null, Visibility::Private);
-
-        $i->assertSame(PlayStatus::Draft, $play->getStatus());
-    }
-
-    public function testDeleteFromDraftChangesStatusToDeleted(UnitTester $i): void
+    public function testDeleteFromCurrentChangesLifecycleToDeleted(UnitTester $i): void
     {
         $play = Play::create(
             new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
@@ -318,23 +312,23 @@ final class PlayCest
 
         $play->delete();
 
-        $i->assertSame(PlayStatus::Deleted, $play->getStatus());
+        $i->assertSame(PlayLifecycle::Deleted, $play->getLifecycle());
     }
 
-    public function testDeleteFromPublishedChangesStatusToDeleted(UnitTester $i): void
+    public function testDeleteFromFinishedChangesLifecycleToDeleted(UnitTester $i): void
     {
         $play = new Play(
             new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
             new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
-            PlayStatus::Published,
+            PlayLifecycle::Finished,
             new DateTime('2024-06-15 20:00:00'),
             new DateTime('2024-06-15 23:00:00'),
         );
 
         $play->delete();
 
-        $i->assertSame(PlayStatus::Deleted, $play->getStatus());
+        $i->assertSame(PlayLifecycle::Deleted, $play->getLifecycle());
     }
 
     public function testDeleteAlreadyDeletedThrows(UnitTester $i): void
@@ -343,7 +337,7 @@ final class PlayCest
             new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
             new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
-            PlayStatus::Deleted,
+            PlayLifecycle::Deleted,
             new DateTime('2024-06-15 20:00:00'),
             new DateTime('2024-06-15 23:00:00'),
         );
@@ -352,6 +346,59 @@ final class PlayCest
             PlayDeletedException::class,
             static function () use ($play): void {
                 $play->delete();
+            },
+        );
+    }
+
+    public function testRestoreFromDeletedToFinished(UnitTester $i): void
+    {
+        $play = new Play(
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
+            null,
+            PlayLifecycle::Deleted,
+            new DateTime('2024-06-15 20:00:00'),
+            null,
+        );
+
+        $play->restore();
+
+        $i->assertSame(PlayLifecycle::Finished, $play->getLifecycle());
+    }
+
+    public function testRestoreFromCurrentThrowsPlayNotDeletedException(UnitTester $i): void
+    {
+        $play = Play::create(
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
+            null,
+            new DateTime('2024-06-15 20:00:00'),
+            new InMemoryPlayers(),
+        );
+
+        $i->expectThrowable(
+            PlayNotDeletedException::class,
+            static function () use ($play): void {
+                $play->restore();
+            },
+        );
+    }
+
+    public function testRestoreFromFinishedThrowsPlayNotDeletedException(UnitTester $i): void
+    {
+        $play = new Play(
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
+            null,
+            PlayLifecycle::Finished,
+            new DateTime('2024-06-15 20:00:00'),
+            null,
+        );
+
+        $i->expectThrowable(
+            PlayNotDeletedException::class,
+            static function () use ($play): void {
+                $play->restore();
             },
         );
     }
@@ -391,7 +438,7 @@ final class PlayCest
             new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
             new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
             null,
-            PlayStatus::Deleted,
+            PlayLifecycle::Deleted,
             new DateTime('2024-06-15 20:00:00'),
             null,
         );
@@ -400,6 +447,33 @@ final class PlayCest
             PlayDeletedException::class,
             static function () use ($play): void {
                 $play->replacePlayers(new InMemoryPlayers());
+            },
+        );
+    }
+
+    public function testAddPlayerOnDeletedThrows(UnitTester $i): void
+    {
+        $play = new Play(
+            new Uuid('a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'),
+            new Uuid('b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e'),
+            null,
+            PlayLifecycle::Deleted,
+            new DateTime('2024-06-15 20:00:00'),
+            null,
+        );
+
+        $i->expectThrowable(
+            PlayDeletedException::class,
+            static function () use ($play): void {
+                $player = Player::create(
+                    new Uuid('55555555-5555-4555-8555-555555555551'),
+                    $play,
+                    new Uuid('66666666-6666-4666-8666-666666666661'),
+                    10,
+                    true,
+                    'blue',
+                );
+                $play->addPlayer($player);
             },
         );
     }

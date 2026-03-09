@@ -15,8 +15,8 @@ use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Plays\Play;
 use Bgl\Domain\Plays\Player\Players;
+use Bgl\Domain\Plays\PlayLifecycle;
 use Bgl\Domain\Plays\Plays;
-use Bgl\Domain\Plays\PlayStatus;
 use Bgl\Tests\Support\DiHelper;
 use Bgl\Tests\Support\FunctionalTester;
 use Codeception\Attribute\Group;
@@ -70,8 +70,9 @@ final class CloseSessionCest
         $this->em->flush();
         $this->em->clear();
 
+        $finishedAt = new DateTime('2024-06-15 22:00:00');
         $result = ($this->handler)(new Envelope(
-            message: new Command(sessionId: $sessionId, userId: $userId),
+            message: new Command(sessionId: $sessionId, userId: $userId, finishedAt: $finishedAt),
             messageId: 'msg-1',
         ));
 
@@ -86,7 +87,7 @@ final class CloseSessionCest
         $this->em->clear();
         $closedPlay = $this->plays->find((string) $sessionId);
         $i->assertNotNull($closedPlay);
-        $i->assertSame(PlayStatus::Draft, $closedPlay->getStatus());
+        $i->assertSame(PlayLifecycle::Finished, $closedPlay->getLifecycle());
     }
 
     public function testPlayNotFoundThrowsNotFoundException(FunctionalTester $i): void

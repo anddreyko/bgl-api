@@ -11,7 +11,6 @@ use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Domain\Plays\DuplicatePlayerException;
 use Bgl\Domain\Plays\PlayAccessDeniedException;
-use Bgl\Domain\Plays\PlayDeletedException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Uuid;
@@ -22,8 +21,8 @@ use Bgl\Domain\Mates\Mates;
 use Bgl\Domain\Plays\Play;
 use Bgl\Domain\Plays\Player\Player;
 use Bgl\Domain\Plays\Player\Players;
+use Bgl\Domain\Plays\PlayLifecycle;
 use Bgl\Domain\Plays\Plays;
-use Bgl\Domain\Plays\PlayStatus;
 use Bgl\Domain\Plays\Visibility;
 use Bgl\Tests\Support\DiHelper;
 use Bgl\Tests\Support\FunctionalTester;
@@ -134,7 +133,6 @@ final class UpdatePlayCest
         $i->assertSame('New name', $updated->getName());
         $i->assertSame((string) $this->gameId, $updated->getGameId()?->getValue());
         $i->assertSame(Visibility::Participants, $updated->getVisibility());
-        $i->assertSame(PlayStatus::Draft, $updated->getStatus());
     }
 
     public function testUpdateWithNotes(FunctionalTester $i): void
@@ -250,7 +248,7 @@ final class UpdatePlayCest
         );
     }
 
-    public function testUpdateWorksWhenPublished(FunctionalTester $i): void
+    public function testUpdateWorksWhenFinished(FunctionalTester $i): void
     {
         $sessionId = $this->uuidGenerator->generate();
 
@@ -261,7 +259,7 @@ final class UpdatePlayCest
             new DateTime('2024-06-15 20:00:00'),
             $this->players,
         );
-        $play->update(null, null, Visibility::Private, PlayStatus::Published);
+        $play->finalize(new DateTime('2024-06-15 22:00:00'));
         $this->plays->add($play);
         $this->em->flush();
         $this->em->clear();
@@ -274,7 +272,7 @@ final class UpdatePlayCest
                 gameId: $this->gameId,
                 visibility: 'public',
             ),
-            messageId: 'msg-update-published',
+            messageId: 'msg-update-finished',
         ));
 
         $i->assertInstanceOf(Result::class, $result);
@@ -287,104 +285,7 @@ final class UpdatePlayCest
         $i->assertSame('Updated name', $updated->getName());
         $i->assertSame((string) $this->gameId, $updated->getGameId()?->getValue());
         $i->assertSame(Visibility::Public, $updated->getVisibility());
-        $i->assertSame(PlayStatus::Published, $updated->getStatus());
-    }
-
-    public function testStatusChangeDraftToPublished(FunctionalTester $i): void
-    {
-        $sessionId = $this->uuidGenerator->generate();
-
-        $play = Play::create(
-            $sessionId,
-            $this->userId,
-            null,
-            new DateTime('2024-06-15 20:00:00'),
-            $this->players,
-        );
-        $this->plays->add($play);
-        $this->em->flush();
-        $this->em->clear();
-
-        $result = ($this->handler)(new Envelope(
-            message: new Command(
-                sessionId: $sessionId,
-                userId: $this->userId,
-                status: 'published',
-            ),
-            messageId: 'msg-update-publish',
-        ));
-
-        $i->assertInstanceOf(Result::class, $result);
-
-        $this->em->flush();
-        $this->em->clear();
-
-        $updated = $this->plays->find((string) $sessionId);
-        $i->assertNotNull($updated);
-        $i->assertSame(PlayStatus::Published, $updated->getStatus());
-    }
-
-    public function testStatusChangePublishedToDraft(FunctionalTester $i): void
-    {
-        $sessionId = $this->uuidGenerator->generate();
-
-        $play = Play::create(
-            $sessionId,
-            $this->userId,
-            null,
-            new DateTime('2024-06-15 20:00:00'),
-            $this->players,
-        );
-        $play->update(null, null, Visibility::Private, PlayStatus::Published);
-        $this->plays->add($play);
-        $this->em->flush();
-        $this->em->clear();
-
-        $result = ($this->handler)(new Envelope(
-            message: new Command(
-                sessionId: $sessionId,
-                userId: $this->userId,
-                status: 'draft',
-            ),
-            messageId: 'msg-update-unpublish',
-        ));
-
-        $i->assertInstanceOf(Result::class, $result);
-
-        $this->em->flush();
-        $this->em->clear();
-
-        $updated = $this->plays->find((string) $sessionId);
-        $i->assertNotNull($updated);
-        $i->assertSame(PlayStatus::Draft, $updated->getStatus());
-    }
-
-    public function testStatusChangeToDeletedThrows(FunctionalTester $i): void
-    {
-        $sessionId = $this->uuidGenerator->generate();
-
-        $play = Play::create(
-            $sessionId,
-            $this->userId,
-            null,
-            new DateTime('2024-06-15 20:00:00'),
-            $this->players,
-        );
-        $this->plays->add($play);
-        $this->em->flush();
-        $this->em->clear();
-
-        $i->expectThrowable(
-            PlayDeletedException::class,
-            fn () => ($this->handler)(new Envelope(
-                message: new Command(
-                    sessionId: $sessionId,
-                    userId: $this->userId,
-                    status: 'deleted',
-                ),
-                messageId: 'msg-update-delete-status',
-            )),
-        );
+        $i->assertSame(PlayLifecycle::Finished, $updated->getLifecycle());
     }
 
     public function testUpdateFailsWithNonExistentGame(FunctionalTester $i): void

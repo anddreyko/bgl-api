@@ -19,7 +19,6 @@ use Bgl\Domain\Mates\Mate;
 use Bgl\Domain\Mates\Mates;
 use Bgl\Domain\Plays\Play;
 use Bgl\Domain\Plays\Plays;
-use Bgl\Domain\Plays\PlayStatus;
 use Bgl\Domain\Plays\Visibility;
 use Bgl\Tests\Support\DiHelper;
 use Bgl\Tests\Support\FunctionalTester;
@@ -204,25 +203,37 @@ final class GetPlayCest
         );
     }
 
-    public function testDraftSessionOwnerOnly(FunctionalTester $i): void
+    public function testCurrentSessionPublicVisibleToAll(FunctionalTester $i): void
     {
-        // Draft session with public visibility -- non-owner still denied
+        // Current (not finalized) session with public visibility -- visible to everyone
         $sessionId = $this->createSession(visibility: 'public');
 
-        // Owner can view draft
+        // Owner can view
         $result = $this->getPlay($sessionId, (string)$this->ownerUserId);
         $i->assertInstanceOf(Result::class, $result);
-        $i->assertSame('draft', $result->status);
 
-        // Non-owner denied even for public draft
+        // Non-owner can also view (public visibility)
+        $result = $this->getPlay($sessionId, (string)$this->otherUserId);
+        $i->assertInstanceOf(Result::class, $result);
+    }
+
+    public function testCurrentSessionPrivateOwnerOnly(FunctionalTester $i): void
+    {
+        // Current session with private visibility -- owner only
+        $sessionId = $this->createSession(visibility: 'private');
+
+        $result = $this->getPlay($sessionId, (string)$this->ownerUserId);
+        $i->assertInstanceOf(Result::class, $result);
+
         $i->expectThrowable(NotFoundException::class, fn() => $this->getPlay($sessionId, (string)$this->otherUserId));
     }
 
-    public function testAnonymousDeniedDraftSession(FunctionalTester $i): void
+    public function testAnonymousViewsCurrentPublicSession(FunctionalTester $i): void
     {
         $sessionId = $this->createSession(visibility: 'public');
 
-        $i->expectThrowable(NotFoundException::class, fn() => $this->getPlay($sessionId, null));
+        $result = $this->getPlay($sessionId, null);
+        $i->assertInstanceOf(Result::class, $result);
     }
 
     public function testResultContainsPlayerData(FunctionalTester $i): void
@@ -276,7 +287,6 @@ final class GetPlayCest
             return;
         }
         $play->finalize(new DateTime('2024-06-15 22:00:00'));
-        $play->update($play->getName(), $play->getGameId(), $play->getVisibility(), PlayStatus::Published);
         $this->em->flush();
     }
 

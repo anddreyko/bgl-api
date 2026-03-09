@@ -67,14 +67,15 @@ final class PlayMappingCest
         $i->assertTrue($metadata->fieldMappings['name']['nullable']);
     }
 
-    public function testConfigureSetsStatusField(UnitTester $i): void
+    public function testConfigureSetsLifecycleField(UnitTester $i): void
     {
         $mapping = new PlayMapping();
         $metadata = new ClassMetadata(Play::class);
 
         $mapping->configure($metadata);
 
-        $i->assertSame('string', $metadata->getTypeOfField('status'));
+        $i->assertSame('string', $metadata->getTypeOfField('lifecycle'));
+        $i->assertSame('status', $metadata->getColumnName('lifecycle'));
     }
 
     public function testConfigureSetsStartedAtField(UnitTester $i): void
@@ -108,7 +109,7 @@ final class PlayMappingCest
         $fieldNames = $metadata->getFieldNames();
         sort($fieldNames);
 
-        $i->assertSame(['finishedAt', 'gameId', 'id', 'locationId', 'name', 'notes', 'startedAt', 'status', 'userId', 'visibility'], $fieldNames);
+        $i->assertSame(['finishedAt', 'gameId', 'id', 'lifecycle', 'locationId', 'name', 'notes', 'startedAt', 'userId', 'visibility'], $fieldNames);
     }
 
     public function testConfigureSetsGameIdField(UnitTester $i): void
