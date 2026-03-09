@@ -33,9 +33,13 @@ final readonly class JwtTokenIssuer implements TokenIssuer
         }
 
         $accessToken = $this->tokenizer->generate(
-            TokenPayload::fromArray(
-                ['sub' => $userId, 'type' => 'access', 'tokenVersion' => $user->getTokenVersion()]
-            ),
+            TokenPayload::fromArray([
+                'sub' => $userId,
+                'type' => 'access',
+                'tokenVersion' => $user->getTokenVersion(),
+                'name' => $user->getName(),
+                'email' => (string)$user->getEmail(),
+            ]),
             $this->tokenConfig->accessTtl,
         );
 
