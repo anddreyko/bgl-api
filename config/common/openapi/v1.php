@@ -46,16 +46,13 @@ return [
                 'TokenPair' => [
                     'type' => 'object',
                     'description' => 'Both tokens are JWT (HS256). ' .
-                        'Decoded payload claims: ' .
-                        '`sub` (user ID), ' .
-                        '`type` ("access" | "refresh"), ' .
-                        '`tokenVersion` (int, incremented on sign-out to invalidate old tokens), ' .
-                        '`iat` (issued at, Unix timestamp), ' .
-                        '`exp` (expires at, Unix timestamp).',
+                        'Common claims: `sub` (user ID), `type` ("access"|"refresh"), ' .
+                        '`tokenVersion` (int), `iat`, `exp`. ' .
+                        'Access token extra claims: `name` (string), `email` (string).',
                     'properties' => [
                         'access_token' => [
                             'type' => 'string',
-                            'description' => 'Short-lived JWT for API authorization (Bearer header).',
+                            'description' => 'Short-lived JWT with name/email claims for SSR.',
                         ],
                         'refresh_token' => [
                             'type' => 'string',

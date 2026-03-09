@@ -8,6 +8,7 @@ use Bgl\Core\Auth\AuthenticationException;
 use Bgl\Core\Auth\CredentialResult;
 use Bgl\Core\Auth\PasskeyOptions;
 use Bgl\Core\Auth\PasskeyVerifier;
+use lbuchs\WebAuthn\Binary\ByteBuffer;
 use lbuchs\WebAuthn\WebAuthn;
 
 final readonly class WebAuthnPasskeyVerifier implements PasskeyVerifier
@@ -136,6 +137,8 @@ final readonly class WebAuthnPasskeyVerifier implements PasskeyVerifier
 
     private function createWebAuthn(): WebAuthn
     {
+        ByteBuffer::$useBase64UrlEncoding = true;
+
         return new WebAuthn($this->rpName, $this->rpId);
     }
 }
