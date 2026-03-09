@@ -15,7 +15,6 @@ final readonly class Result
         public string $id,
         public array $author,
         public ?string $name,
-        public string $status,
         public string $visibility,
         public ?string $startedAt,
         public ?string $finishedAt,

@@ -17,7 +17,6 @@ use Bgl\Domain\Plays\Play;
 use Bgl\Domain\Plays\Player\Player;
 use Bgl\Domain\Plays\Player\PlayersFactory;
 use Bgl\Domain\Plays\Plays;
-use Bgl\Domain\Plays\PlayStatus;
 use Bgl\Domain\Plays\Visibility;
 
 /**
@@ -64,7 +63,6 @@ final readonly class Handler implements MessageHandler
             $command->name,
             $command->gameId,
             Visibility::from($command->visibility),
-            $command->status !== null ? PlayStatus::from($command->status) : null,
             locationId: $command->locationId,
             notes: $command->notes,
         );
@@ -136,7 +134,6 @@ final readonly class Handler implements MessageHandler
             id: (string)$play->getId(),
             author: $this->resolveAuthor($play),
             name: $play->getName(),
-            status: $play->getStatus()->value,
             visibility: $play->getVisibility()->value,
             startedAt: $play->getStartedAt()->getNullableFormattedValue('c'),
             finishedAt: $play->getFinishedAt()?->getNullableFormattedValue('c'),

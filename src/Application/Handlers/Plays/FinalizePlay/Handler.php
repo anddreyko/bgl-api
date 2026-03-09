@@ -5,16 +5,19 @@ declare(strict_types=1);
 namespace Bgl\Application\Handlers\Plays\FinalizePlay;
 
 use Bgl\Core\Exceptions\NotFoundException;
+use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
-use Bgl\Core\ValueObjects\DateTime;
+use Bgl\Core\ValueObjects\Uuid;
 use Bgl\Domain\Games\Game;
 use Bgl\Domain\Games\Games;
+use Bgl\Domain\Mates\Mates;
 use Bgl\Domain\Plays\Play;
-use Bgl\Domain\Profile\Users;
 use Bgl\Domain\Plays\Player\Player;
+use Bgl\Domain\Plays\Player\PlayersFactory;
 use Bgl\Domain\Plays\Plays;
-use Psr\Clock\ClockInterface;
+use Bgl\Domain\Plays\Visibility;
+use Bgl\Domain\Profile\Users;
 
 /**
  * @implements MessageHandler<Result, Command>
@@ -25,7 +28,9 @@ final readonly class Handler implements MessageHandler
         private Plays $plays,
         private Games $games,
         private Users $users,
-        private ClockInterface $clock,
+        private Mates $mates,
+        private PlayersFactory $playersFactory,
+        private UuidGenerator $uuidGenerator,
     ) {
     }
 
@@ -46,11 +51,35 @@ final readonly class Handler implements MessageHandler
             throw new \Bgl\Domain\Plays\PlayAccessDeniedException();
         }
 
-        $finishedAt = $command->finishedAt ?? new DateTime($this->clock->now());
+        $this->applyPartialUpdate($play, $command);
 
-        $play->finalize($finishedAt);
+        if ($command->finishedAt !== null) {
+            $play->finalize($command->finishedAt);
+        }
 
         return $this->transformPlay($play);
+    }
+
+    private function applyPartialUpdate(Play $play, Command $command): void
+    {
+        $name = $command->name ?? $play->getName();
+        $gameId = $command->gameId ?? $play->getGameId();
+        $visibility = $command->visibility !== null
+            ? Visibility::from($command->visibility)
+            : $play->getVisibility();
+        $locationId = $command->locationId ?? $play->getLocationId();
+        $notes = $command->notes ?? $play->getNotes();
+
+        if ($gameId !== null) {
+            $this->assertGameExists($gameId);
+        }
+
+        $play->update($name, $gameId, $visibility, $locationId, $notes);
+
+        if ($command->players !== []) {
+            $this->validatePlayers($command->players, $command->userId);
+            $this->replacePlayers($play, $command->players);
+        }
     }
 
     /**
@@ -113,13 +142,75 @@ final readonly class Handler implements MessageHandler
             id: (string)$play->getId(),
             author: $this->resolveAuthor($play),
             name: $play->getName(),
-            status: $play->getStatus()->value,
             visibility: $play->getVisibility()->value,
             startedAt: $play->getStartedAt()->getNullableFormattedValue('c'),
             finishedAt: $play->getFinishedAt()?->getNullableFormattedValue('c'),
             game: $this->resolveGame($play),
             players: $this->transformPlayers($play),
             notes: $play->getNotes(),
+            locationId: $play->getLocationId() !== null ? (string)$play->getLocationId() : null,
         );
+    }
+
+    private function assertGameExists(Uuid $gameId): void
+    {
+        if ($this->games->find((string)$gameId) === null) {
+            throw new NotFoundException('Game not found');
+        }
+    }
+
+    /**
+     * @param list<array{mate_id: non-empty-string, score?: ?int, is_winner?: ?bool, color?: ?string, team_tag?: ?string, number?: ?int}> $players
+     */
+    private function replacePlayers(Play $play, array $players): void
+    {
+        $newPlayers = $this->playersFactory->createEmpty();
+        foreach ($players as $playerData) {
+            $newPlayers->add(Player::create(
+                id: $this->uuidGenerator->generate(),
+                play: $play,
+                mateId: new Uuid($playerData['mate_id']),
+                score: $playerData['score'] ?? null,
+                isWinner: $playerData['is_winner'] ?? false,
+                color: $playerData['color'] ?? null,
+                teamTag: $playerData['team_tag'] ?? null,
+                number: $playerData['number'] ?? null,
+            ));
+        }
+        $play->replacePlayers($newPlayers);
+    }
+
+    /**
+     * @param list<array{mate_id: non-empty-string, score?: ?int, is_winner?: ?bool, color?: ?string, team_tag?: ?string, number?: ?int}> $players
+     */
+    private function validatePlayers(array $players, Uuid $userId): void
+    {
+        $mateIds = [];
+        foreach ($players as $playerData) {
+            $mateId = $playerData['mate_id'];
+            if (isset($mateIds[$mateId])) {
+                throw new \Bgl\Domain\Plays\DuplicatePlayerException();
+            }
+            $mateIds[$mateId] = true;
+        }
+
+        /** @var array<string, \Bgl\Domain\Mates\Mate> $matesById */
+        $matesById = [];
+        foreach ($this->mates->findByIds(array_keys($mateIds)) as $mate) {
+            $matesById[(string)$mate->getId()] = $mate;
+        }
+
+        foreach (array_keys($mateIds) as $mateId) {
+            $mate = $matesById[$mateId] ?? null;
+            if ($mate === null) {
+                throw new NotFoundException('Mate not found: ' . $mateId);
+            }
+            if ($mate->getUserId() !== null && (string)$mate->getUserId() !== (string)$userId) {
+                throw new \Bgl\Domain\Plays\MateNotOwnedByUserException();
+            }
+            if ($mate->isDeleted()) {
+                throw new NotFoundException('Mate is deleted: ' . $mateId);
+            }
+        }
     }
 }

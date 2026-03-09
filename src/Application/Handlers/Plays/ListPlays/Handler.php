@@ -27,7 +27,7 @@ use Bgl\Domain\Games\Games;
 use Bgl\Domain\Plays\Play;
 use Bgl\Domain\Plays\Player\Player;
 use Bgl\Domain\Plays\Plays;
-use Bgl\Domain\Plays\PlayStatus;
+use Bgl\Domain\Plays\PlayLifecycle;
 use Bgl\Domain\Plays\Visibility;
 use Bgl\Domain\Profile\UserResolver;
 use Bgl\Domain\Profile\Users;
@@ -97,11 +97,10 @@ final readonly class Handler implements MessageHandler
         /** @var non-empty-list<Filter> $filters */
         $filters = [
             new Equals(new Field('userId'), $targetUserId),
-            new Not(new Equals(new Field('status'), PlayStatus::Deleted->value)),
+            new Not(new Equals(new Field('lifecycle'), PlayLifecycle::Deleted->value)),
         ];
 
         if ($isViewingOther) {
-            $filters[] = new Equals(new Field('status'), PlayStatus::Published->value);
             $filters[] = $this->visibilityFilter($query->userId !== null);
         }
 
@@ -197,7 +196,6 @@ final readonly class Handler implements MessageHandler
             'id' => (string)$play->getId(),
             'author' => $this->resolveAuthor($play),
             'name' => $play->getName(),
-            'status' => $play->getStatus()->value,
             'visibility' => $play->getVisibility()->value,
             'started_at' => $play->getStartedAt()->getNullableFormattedValue('c'),
             'finished_at' => $play->getFinishedAt()?->getNullableFormattedValue('c'),

@@ -2,23 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Application\Handlers\Plays\GetPlay;
+namespace Bgl\Application\Handlers\Plays\RestorePlay;
 
-use Bgl\Core\Auth\AuthenticationException;
 use Bgl\Core\Exceptions\NotFoundException;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Domain\Games\Game;
 use Bgl\Domain\Games\Games;
 use Bgl\Domain\Plays\Play;
-use Bgl\Domain\Profile\Users;
+use Bgl\Domain\Plays\PlayAccessDeniedException;
 use Bgl\Domain\Plays\Player\Player;
 use Bgl\Domain\Plays\Plays;
-use Bgl\Domain\Plays\PlayLifecycle;
-use Bgl\Domain\Plays\Visibility;
+use Bgl\Domain\Profile\Users;
 
 /**
- * @implements MessageHandler<Result, Query>
+ * @implements MessageHandler<Result, Command>
  */
 final readonly class Handler implements MessageHandler
 {
@@ -32,32 +30,23 @@ final readonly class Handler implements MessageHandler
     #[\Override]
     public function __invoke(Envelope $envelope): Result
     {
-        /** @var Query $query */
-        $query = $envelope->message;
+        /** @var Command $command */
+        $command = $envelope->message;
 
         /** @var Play|null $play */
-        $play = $this->plays->find($query->playId);
+        $play = $this->plays->find((string)$command->sessionId);
 
-        if ($play === null || $play->getLifecycle() === PlayLifecycle::Deleted) {
-            throw new NotFoundException('Session not found');
+        if ($play === null) {
+            throw new NotFoundException('Play not found');
         }
 
-        $this->checkAccess($play, $query->userId);
+        if ((string)$play->getUserId() !== (string)$command->userId) {
+            throw new PlayAccessDeniedException();
+        }
+
+        $play->restore();
 
         return $this->transformPlay($play);
-    }
-
-    private function checkAccess(Play $play, ?string $userId): void
-    {
-        $isOwner = $userId !== null && (string)$play->getUserId() === $userId;
-
-        match ($play->getVisibility()) {
-            Visibility::Private => $isOwner ? null : throw new NotFoundException('Session not found'),
-            Visibility::Link, Visibility::Public => null,
-            Visibility::Authenticated => $userId !== null ? null : throw new AuthenticationException('Unauthorized'),
-            // TODO: MATES-002 -- full participants check after mate-to-user linking
-            Visibility::Participants => $isOwner ? null : throw new NotFoundException('Session not found'),
-        };
     }
 
     /**

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bgl\Application\Handlers\Plays\FinalizePlay;
+namespace Bgl\Application\Handlers\Plays\RestorePlay;
 
 final readonly class Result
 {

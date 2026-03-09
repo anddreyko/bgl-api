@@ -10,7 +10,7 @@ use Bgl\Core\Messages\MessageHandler;
 use Bgl\Domain\Plays\Play;
 use Bgl\Domain\Plays\PlayAccessDeniedException;
 use Bgl\Domain\Plays\Plays;
-use Bgl\Domain\Plays\PlayStatus;
+use Bgl\Domain\Plays\PlayLifecycle;
 
 /**
  * @implements MessageHandler<null, Command>
@@ -31,7 +31,7 @@ final readonly class Handler implements MessageHandler
         /** @var Play|null $play */
         $play = $this->plays->find((string)$command->sessionId);
 
-        if ($play === null || $play->getStatus() === PlayStatus::Deleted) {
+        if ($play === null || $play->getLifecycle() === PlayLifecycle::Deleted) {
             throw new NotFoundException('Play not found');
         }
 

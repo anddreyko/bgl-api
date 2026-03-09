@@ -153,7 +153,6 @@ final readonly class Handler implements MessageHandler
             id: (string)$play->getId(),
             author: $this->resolveAuthor($play),
             name: $play->getName(),
-            status: $play->getStatus()->value,
             visibility: $play->getVisibility()->value,
             startedAt: $play->getStartedAt()->getNullableFormattedValue('c'),
             finishedAt: $play->getFinishedAt()?->getNullableFormattedValue('c'),

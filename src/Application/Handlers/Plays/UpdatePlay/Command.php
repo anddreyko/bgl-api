@@ -21,7 +21,6 @@ final readonly class Command implements Message
         public ?string $name = null,
         public ?Uuid $gameId = null,
         public string $visibility = 'private',
-        public ?string $status = null,
         public array $players = [],
         public ?Uuid $locationId = null,
         public ?string $notes = null,
