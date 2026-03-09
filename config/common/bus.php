@@ -6,6 +6,7 @@ use Bgl\Application\Aspects;
 use Bgl\Application\Handlers;
 use Bgl\Application\Handlers\Auth;
 use Bgl\Application\Handlers\Games;
+use Bgl\Application\Handlers\Locations;
 use Bgl\Application\Handlers\Mates;
 use Bgl\Application\Handlers\Plays;
 use Bgl\Application\Handlers\User;
@@ -65,6 +66,11 @@ return [
             [Mates\DeleteMate\Command::class, Mates\DeleteMate\Handler::class],
             [Games\SearchGames\Query::class, Games\SearchGames\Handler::class],
             [Games\GetGame\Query::class, Games\GetGame\Handler::class],
+            [Locations\CreateLocation\Command::class, Locations\CreateLocation\Handler::class],
+            [Locations\ListLocations\Query::class, Locations\ListLocations\Handler::class],
+            [Locations\GetLocation\Query::class, Locations\GetLocation\Handler::class],
+            [Locations\UpdateLocation\Command::class, Locations\UpdateLocation\Handler::class],
+            [Locations\DeleteLocation\Command::class, Locations\DeleteLocation\Handler::class],
         ],
         'middleware' => [
             Aspects\Logging::class,

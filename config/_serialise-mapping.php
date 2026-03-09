@@ -159,4 +159,34 @@ return [
     ) => [
         'options' => $model->options,
     ],
+    Handlers\Locations\CreateLocation\Result::class => static fn(Handlers\Locations\CreateLocation\Result $model) => [
+        'id' => $model->id,
+        'name' => $model->name,
+        'address' => $model->address,
+        'notes' => $model->notes,
+        'url' => $model->url,
+        'created_at' => $model->createdAt,
+    ],
+    Handlers\Locations\GetLocation\Result::class => static fn(Handlers\Locations\GetLocation\Result $model) => [
+        'id' => $model->id,
+        'name' => $model->name,
+        'address' => $model->address,
+        'notes' => $model->notes,
+        'url' => $model->url,
+        'created_at' => $model->createdAt,
+    ],
+    Handlers\Locations\UpdateLocation\Result::class => static fn(Handlers\Locations\UpdateLocation\Result $model) => [
+        'id' => $model->id,
+        'name' => $model->name,
+        'address' => $model->address,
+        'notes' => $model->notes,
+        'url' => $model->url,
+        'created_at' => $model->createdAt,
+    ],
+    Handlers\Locations\ListLocations\Result::class => static fn(Handlers\Locations\ListLocations\Result $model) => [
+        'items' => $model->data,
+        'total' => $model->total,
+        'page' => $model->page,
+        'size' => $model->size,
+    ],
 ];

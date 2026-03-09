@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bgl\Infrastructure\Http;
 
+use Bgl\Core\Auth\AuthenticationException;
 use Bgl\Core\Http\AuthParams;
 use Bgl\Core\Http\ParamMap;
 use Bgl\Core\Http\ParameterConflictException;
@@ -82,15 +83,21 @@ final readonly class HydratorMapper implements SchemaMapper
      */
     private function mergeAuthParams(array &$data, ServerRequestInterface $request, AuthParams $authParams): void
     {
+        $sentinel = new \stdClass();
         foreach ($authParams as $paramName) {
-            /** @var string|null $attrValue */
-            $attrValue = $request->getAttribute('auth.' . $paramName);
-            if ($attrValue !== null) {
-                if (array_key_exists($paramName, $data)) {
-                    throw ParameterConflictException::fromAuth($paramName);
-                }
-                $data[$paramName] = $attrValue;
+            /** @var mixed $attrValue */
+            $attrValue = $request->getAttribute('auth.' . $paramName, $sentinel);
+            if ($attrValue === $sentinel) {
+                throw new AuthenticationException('Unauthorized');
             }
+            if ($attrValue === null) {
+                continue;
+            }
+            if (array_key_exists($paramName, $data)) {
+                throw ParameterConflictException::fromAuth($paramName);
+            }
+            /** @var string */
+            $data[$paramName] = $attrValue;
         }
     }
 }

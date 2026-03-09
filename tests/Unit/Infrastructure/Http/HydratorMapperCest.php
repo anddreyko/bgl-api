@@ -76,9 +76,22 @@ final class HydratorMapperCest
         $i->assertSame('user-abc-123', $result->get('userId'));
     }
 
-    public function testAuthParamsNullNotIncluded(UnitTester $i): void
+    public function testAuthParamsMissingThrowsAuthException(UnitTester $i): void
     {
         $request = new ServerRequest('POST', '/v1/plays/sessions');
+
+        $i->expectThrowable(\Bgl\Core\Auth\AuthenticationException::class, function () use ($request): void {
+            $this->mapper->map(
+                $request,
+                authParams: new AuthParams(['userId']),
+            );
+        });
+    }
+
+    public function testAuthParamsNullSkipped(UnitTester $i): void
+    {
+        $request = new ServerRequest('POST', '/v1/plays/sessions');
+        $request = $request->withAttribute('auth.userId', null);
 
         $result = $this->mapper->map(
             $request,
