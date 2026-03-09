@@ -23,4 +23,15 @@ final class InMemoryPasskeyChallenges extends InMemoryRepository implements Pass
 
         return null;
     }
+
+    #[\Override]
+    public function removeByUserId(string $userId): void
+    {
+        foreach ($this->getEntities() as $entity) {
+            $entityUserId = $entity->getUserId();
+            if ($entityUserId !== null && (string)$entityUserId === $userId) {
+                $this->remove($entity);
+            }
+        }
+    }
 }

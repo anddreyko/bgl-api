@@ -37,4 +37,15 @@ final class PasskeyChallenges extends DoctrineRepository implements PasskeyChall
         /** @var PasskeyChallenge|null */
         return $qb->getQuery()->getOneOrNullResult();
     }
+
+    #[\Override]
+    public function removeByUserId(string $userId): void
+    {
+        $this->getEntityManager()->createQueryBuilder()
+            ->delete(PasskeyChallenge::class, 'pc')
+            ->where('pc.userId = :userId')
+            ->setParameter('userId', $userId)
+            ->getQuery()
+            ->execute();
+    }
 }

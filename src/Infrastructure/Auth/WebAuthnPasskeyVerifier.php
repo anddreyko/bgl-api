@@ -8,7 +8,6 @@ use Bgl\Core\Auth\AuthenticationException;
 use Bgl\Core\Auth\CredentialResult;
 use Bgl\Core\Auth\PasskeyOptions;
 use Bgl\Core\Auth\PasskeyVerifier;
-use lbuchs\WebAuthn\Binary\ByteBuffer;
 use lbuchs\WebAuthn\WebAuthn;
 
 final readonly class WebAuthnPasskeyVerifier implements PasskeyVerifier
@@ -66,12 +65,9 @@ final readonly class WebAuthnPasskeyVerifier implements PasskeyVerifier
                 failIfRootMismatch: false,
             );
 
-            /** @var \lbuchs\WebAuthn\Binary\ByteBuffer $credentialId */
-            $credentialId = $result->credentialId;
-
             return new CredentialResult(
-                credentialId: base64_encode($credentialId->getBinaryString()),
-                credentialData: (string)$result->credentialPublicKey,
+                credentialId: base64_encode((string)$result->credentialId),
+                credentialData: base64_encode((string)$result->credentialPublicKey),
             );
         } catch (AuthenticationException $e) {
             throw $e;
@@ -122,7 +118,7 @@ final readonly class WebAuthnPasskeyVerifier implements PasskeyVerifier
                 self::base64urlDecode($clientDataJSON),
                 self::base64urlDecode($authenticatorData),
                 self::base64urlDecode($signature),
-                $credentialData,
+                base64_decode($credentialData),
                 base64_decode($challenge),
                 requireUserVerification: false,
             );
@@ -142,8 +138,6 @@ final readonly class WebAuthnPasskeyVerifier implements PasskeyVerifier
 
     private function createWebAuthn(): WebAuthn
     {
-        ByteBuffer::$useBase64UrlEncoding = true;
-
-        return new WebAuthn($this->rpName, $this->rpId);
+        return new WebAuthn($this->rpName, $this->rpId, useBase64UrlEncoding: true);
     }
 }

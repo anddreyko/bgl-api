@@ -80,7 +80,8 @@ final readonly class Handler implements MessageHandler
             if ($challengeUserId !== null && (string)$challengeUserId === $userId) {
                 if ($entity->isExpired(new DateTime($this->clock->now()))) {
                     $this->challenges->remove($entity);
-                    throw new AuthenticationException('Challenge expired');
+
+                    continue;
                 }
 
                 return $entity;

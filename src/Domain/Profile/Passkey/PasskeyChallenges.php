@@ -13,4 +13,6 @@ use Bgl\Core\Listing\Searchable;
 interface PasskeyChallenges extends Repository, Searchable
 {
     public function findByChallenge(string $challenge): ?PasskeyChallenge;
+
+    public function removeByUserId(string $userId): void;
 }

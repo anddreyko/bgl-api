@@ -45,6 +45,8 @@ final readonly class Handler implements MessageHandler
             throw new AuthenticationException('Unauthorized');
         }
 
+        $this->challenges->removeByUserId($userId);
+
         $passkeyOptions = $this->passkeyVerifier->registerOptions($userId, $user->getName());
 
         $challenge = PasskeyChallenge::forRegistration(

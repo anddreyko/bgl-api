@@ -33,7 +33,8 @@ final readonly class Handler implements MessageHandler
 
         $decoded = $this->decodeResponse($command->response);
 
-        $passkey = $this->passkeys->findByCredentialId($decoded['id'])
+        $credentialId = self::base64urlToBase64($decoded['id']);
+        $passkey = $this->passkeys->findByCredentialId($credentialId)
             ?? throw new AuthenticationException('Passkey not found');
 
         $challenge = $this->findValidChallenge($decoded);
@@ -78,14 +79,16 @@ final readonly class Handler implements MessageHandler
     {
         // The clientDataJSON contains the challenge -- extract it
         if (isset($decoded['response']['clientDataJSON']) && is_string($decoded['response']['clientDataJSON'])) {
+            $raw = $decoded['response']['clientDataJSON'];
             /** @var mixed $clientData */
             $clientData = json_decode(
-                base64_decode($decoded['response']['clientDataJSON']),
+                base64_decode(strtr($raw, '-_', '+/') . str_repeat('=', 3 - (3 + strlen($raw)) % 4)),
                 true,
             );
 
             if (is_array($clientData) && isset($clientData['challenge']) && is_string($clientData['challenge'])) {
-                $challenge = $this->challenges->findByChallenge($clientData['challenge']);
+                $challengeB64 = self::base64urlToBase64($clientData['challenge']);
+                $challenge = $this->challenges->findByChallenge($challengeB64);
                 if ($challenge !== null) {
                     return $challenge;
                 }
@@ -93,5 +96,12 @@ final readonly class Handler implements MessageHandler
         }
 
         throw new AuthenticationException('Challenge not found or expired');
+    }
+
+    private static function base64urlToBase64(string $data): string
+    {
+        return base64_encode(
+            base64_decode(strtr($data, '-_', '+/') . str_repeat('=', 3 - (3 + strlen($data)) % 4))
+        );
     }
 }
