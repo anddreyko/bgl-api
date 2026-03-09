@@ -90,7 +90,7 @@ src/
 ├── Domain/                  # Business logic by Bounded Context
 │   ├── Games/               # Game catalog (Game, Games)
 │   ├── Mates/               # Co-player directory (Mate, Mates)
-│   ├── Plays/               # Play logging (Play, Plays, PlayStatus, Visibility)
+│   ├── Plays/               # Play logging (Play, Plays, PlayLifecycle, Visibility)
 │   │   └── Player/          # Child entity (Player, Players, PlayersFactory, EmptyPlayers)
 │   ├── Profile/             # User identity & profile (User, Users, UserId, UserStatus)
 │   │   └── Passkey/         # Child entity (Passkey, Passkeys, PasskeyChallenge, PasskeyChallenges)

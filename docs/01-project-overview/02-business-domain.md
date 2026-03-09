@@ -121,43 +121,71 @@ Manages play logging, player tracking, and location directory.
 
 The central entity of the system. Represents one board game play.
 
-| Attribute      | Type              | Required      | Constraint                               |
-|----------------|-------------------|---------------|------------------------------------------|
-| id             | Uuid              | yes           | Unique                                   |
-| userId         | Uuid              | yes           | Owner (Profile context)                  |
-| game           | Uuid              | for Published | Reference to Games context               |
-| gameName       | string            | no            | Custom name when Game not selected       |
-| startedAt      | DateTimeImmutable | yes           |                                          |
-| finishedAt     | DateTimeImmutable | no            | Must be >= startedAt if set              |
-| location       | Uuid              | no            | Reference to user's Location             |
-| visibility     | Visibility        | yes           | Default: Authenticated (or from profile) |
-| includeInStats | bool              | yes           | Default: true                            |
-| status         | PlayStatus        | yes           | See state machine below                  |
-| syncStatus     | SyncStatus        | yes           | Default: not_synced                      |
-| players        | Player[]          | for Published | At least one for Published               |
+| Attribute      | Type              | Required | Constraint                               |
+|----------------|-------------------|----------|------------------------------------------|
+| id             | Uuid              | yes      | Unique                                   |
+| userId         | Uuid              | yes      | Owner (Profile context)                  |
+| game           | Uuid              | no       | Reference to Games context               |
+| gameName       | string            | no       | Custom name when Game not selected       |
+| startedAt      | DateTimeImmutable | yes      |                                          |
+| finishedAt     | DateTimeImmutable | no       | Must be >= startedAt if set              |
+| location       | Uuid              | no       | Reference to user's Location             |
+| visibility     | Visibility        | yes      | Default: Authenticated (or from profile) |
+| includeInStats | bool              | yes      | Default: true                            |
+| lifecycle      | PlayLifecycle     | yes      | See state machine below                  |
+| syncStatus     | SyncStatus        | yes      | Default: not_synced                      |
+| players        | Player[]          | no       |                                          |
 
 **Invariants:**
 
 - Owner (User ID) is required
 - Start date is required
 - End date must be >= start date (if set)
-- Game or gameName must be set for Published status
-- At least one Player required for Published status
+- Deleted lifecycle blocks all mutations except restore
+- Visibility is freely changeable in Current and Finished states
+- Visibility is ignored for Deleted (always hidden, excluded from stats)
 - Visibility default: Authenticated, overridden by profile setting, then per-play setting
 
-**State Machine (PlayStatus):**
+**State Model:**
+
+Play has three orthogonal state axes:
+
+1. **Lifecycle (PlayLifecycle):** `current | finished | deleted` -- where the play is in its lifecycle
+2. **Visibility:** `private | link | participants | authenticated | public` -- who can see it
+3. **finishedAt:** optional date, independent of lifecycle (user may not remember the exact date)
+
+`Private` visibility replaces the old `Draft` semantics (owner-only access).
+There is no separate Draft/Published distinction.
+
+**Lifecycle State Machine (PlayLifecycle):**
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Draft: open
-    Draft --> Published: publish
-    Draft --> Deleted: delete
-    Published --> Draft: reopen for editing
-    Published --> Deleted: delete
-    Deleted --> Draft: restore
+    [*] --> Current: create
+    Current --> Finished: finalize
+    Current --> Deleted: delete
+    Finished --> Deleted: delete
+    Deleted --> Finished: restore
 ```
 
-Forbidden transition: `Deleted -> Published` (must go through Draft first).
+Key rules:
+- `Current` is assigned only at creation; never restored
+- `finalize()`: Current -> Finished; finishedAt is optional (user may not remember the date)
+- `delete()`: from Current or Finished -> Deleted; Current flag is lost
+- `restore()`: Deleted -> Finished (always; game was played, even if interrupted)
+- No transition back to Current after finalize or delete
+
+**Access Matrix (Lifecycle x Visibility):**
+
+| Lifecycle | Visibility    | Owner | Other Auth | Anonymous |
+|-----------|---------------|-------|------------|-----------|
+| Current   | private       | 200   | 404        | 404       |
+| Current   | link          | 200   | 200        | 200       |
+| Current   | participants  | 200   | TODO       | 404       |
+| Current   | authenticated | 200   | 200        | 401       |
+| Current   | public        | 200   | 200        | 200       |
+| Finished  | (same rules)  |       |            |           |
+| Deleted   | (any)         | 404   | 404        | 404       |
 
 **Sync Status (SyncStatus):**
 
@@ -396,13 +424,13 @@ External system integration. Not a bounded context.
 
 | Event                 | Description              | Payload                          |
 |-----------------------|--------------------------|----------------------------------|
-| PlayCreated           | New play created         | playId, userId, startedAt            |
-| PlayUpdated           | Play draft updated       | playId, name, gameId, visibility     |
-| PlayerAdded           | Player added to play     | playId, mateId, score                |
-| PlayClosed            | Play closed/published    | playId, finishedAt                   |
-| PlayVisibilityChanged | Visibility changed       | playId, oldVisibility, newVisibility |
-| PlayDeleted           | Play deleted             | playId, deletedAt                    |
-| PlayRestored          | Play restored            | playId                               |
+| PlayCreated           | New play created (Current)  | playId, userId, startedAt                |
+| PlayUpdated           | Play updated                | playId, name, gameId, visibility         |
+| PlayerAdded           | Player added to play        | playId, mateId, score                    |
+| PlayFinalized         | Play finalized (Finished)   | playId, finishedAt (optional)            |
+| PlayVisibilityChanged | Visibility changed          | playId, oldVisibility, newVisibility     |
+| PlayDeleted           | Play deleted                | playId, deletedAt                        |
+| PlayRestored          | Play restored (-> Finished) | playId                                   |
 
 ### 11.4 Games Events
 
@@ -485,14 +513,20 @@ flowchart TB
         cmd_add_player["Add Player"]:::command --> agg_play
         agg_play --> evt_player_added["PlayerAdded"]:::event
 
-        cmd_close["Close Session"]:::command --> agg_play
-        agg_play --> evt_closed["PlayClosed"]:::event
+        cmd_finalize["Finalize Session"]:::command --> agg_play
+        agg_play --> evt_finalized["PlayFinalized"]:::event
+
+        cmd_delete_play["Delete Session"]:::command --> agg_play
+        agg_play --> evt_play_deleted["PlayDeleted"]:::event
+
+        cmd_restore["Restore Session"]:::command --> agg_play
+        agg_play --> evt_play_restored["PlayRestored"]:::event
 
         cmd_visibility["Change Visibility"]:::command --> agg_play
         agg_play --> evt_visibility["PlayVisibilityChanged"]:::event
 
-        evt_closed -.-> pol_stats["Update Statistics"]:::policy
-        evt_closed -.-> read_play_history["Play History"]:::readmodel
+        evt_finalized -.-> pol_stats["Update Statistics"]:::policy
+        evt_finalized -.-> read_play_history["Play History"]:::readmodel
     end
 
     subgraph sync["Sync (Infrastructure)"]
@@ -512,7 +546,7 @@ flowchart TB
     %% Cross-context flows
     pol_auto_mate -.-> cmd_add_mate
     pol_create_play -.-> cmd_open
-    evt_closed -.-> read_stats
+    evt_finalized -.-> read_stats
     evt_player_added -.-> read_stats
 
     %% Styles
@@ -556,7 +590,7 @@ erDiagram
         uuid location_id FK
         timestamp started_at
         timestamp finished_at
-        enum status
+        enum lifecycle
         enum visibility
         bool include_in_stats
         enum sync_status
@@ -667,3 +701,4 @@ Current code uses names and structures that differ from this model:
 | ~~Missing~~       | `Visibility`           | ~~Create enum~~ DONE      |
 | Missing           | `GameType`             | Create enum               |
 | Missing           | `SyncStatus`           | Create enum               |
+| `PlayStatus`      | `PlayLifecycle`        | Rename + redesign (ADR-016) |

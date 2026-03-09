@@ -125,9 +125,12 @@ architecture.
 **Event Example (domain event, not stored):**
 
 ```
-PlayCreated { playId, userId, date }
-PlayPublished { playId, gameId, players }
+PlayCreated { playId, userId, startedAt }        -- lifecycle: Current
+PlayFinalized { playId, finishedAt? }             -- lifecycle: Finished
 PlayerAdded { playId, mateId }
+PlayVisibilityChanged { playId, old, new }
+PlayDeleted { playId }                            -- lifecycle: Deleted
+PlayRestored { playId }                           -- lifecycle: Finished
 ```
 
 ---
@@ -340,13 +343,16 @@ A precomputed query result stored as a table. Used for optimizing complex analyt
 | `active`   | Confirmed, active account                |
 | `deleted`  | Soft-deleted account                     |
 
-### Play Status
+### Play Lifecycle (PlayLifecycle)
 
-| Status      | Description                  |
-|-------------|------------------------------|
-| `draft`     | In progress, can be edited   |
-| `published` | Finalized play               |
-| `deleted`   | Soft-deleted play            |
+| Status     | Description                                              |
+|------------|----------------------------------------------------------|
+| `current`  | Game in progress right now                               |
+| `finished` | Game completed (finishedAt optional, user may not know)  |
+| `deleted`  | Soft-deleted, hidden everywhere, excluded from stats     |
+
+Transitions: create -> Current, finalize -> Finished, delete -> Deleted, restore -> Finished.
+`Current` is assigned only at creation and never restored. See ADR-016.
 
 ### Sync Status
 
