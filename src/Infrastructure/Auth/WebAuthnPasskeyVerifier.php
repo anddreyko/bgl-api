@@ -59,8 +59,8 @@ final readonly class WebAuthnPasskeyVerifier implements PasskeyVerifier
 
             /** @var \stdClass $result */
             $result = $webAuthn->processCreate(
-                base64_decode($clientDataJSON),
-                base64_decode($attestationObject),
+                self::base64urlDecode($clientDataJSON),
+                self::base64urlDecode($attestationObject),
                 base64_decode($challenge),
                 requireUserVerification: false,
                 failIfRootMismatch: false,
@@ -119,9 +119,9 @@ final readonly class WebAuthnPasskeyVerifier implements PasskeyVerifier
             $webAuthn = $this->createWebAuthn();
 
             $webAuthn->processGet(
-                base64_decode($clientDataJSON),
-                base64_decode($authenticatorData),
-                base64_decode($signature),
+                self::base64urlDecode($clientDataJSON),
+                self::base64urlDecode($authenticatorData),
+                self::base64urlDecode($signature),
                 $credentialData,
                 base64_decode($challenge),
                 requireUserVerification: false,
@@ -133,6 +133,11 @@ final readonly class WebAuthnPasskeyVerifier implements PasskeyVerifier
         } catch (\Throwable $e) {
             throw new AuthenticationException('Login failed: ' . $e->getMessage(), 0, $e);
         }
+    }
+
+    private static function base64urlDecode(string $data): string
+    {
+        return base64_decode(strtr($data, '-_', '+/') . str_repeat('=', 3 - (3 + strlen($data)) % 4));
     }
 
     private function createWebAuthn(): WebAuthn
