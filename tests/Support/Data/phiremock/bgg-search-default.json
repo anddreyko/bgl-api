@@ -1,0 +1,21 @@
+{
+  "version": "2",
+  "on": {
+    "method": {
+      "isSameString": "GET"
+    },
+    "url": {
+      "matches": "~.*/xmlapi2/search.*~"
+    }
+  },
+  "then": {
+    "response": {
+      "statusCode": 200,
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "body": "<?xml version=\"1.0\" encoding=\"utf-8\"?><items total=\"0\"/>"
+    }
+  },
+  "priority": 0
+}
