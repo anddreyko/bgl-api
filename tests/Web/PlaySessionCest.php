@@ -98,7 +98,7 @@ final class PlaySessionCest
 
         // Finalize by providing finished_at
         $i->sendPatch('/v1/plays/' . $sessionId, [
-            'finished_at' => '2026-03-09T22:00:00+00:00',
+            'finished_at' => '2099-12-31T23:59:59+00:00',
         ]);
         $i->seeResponseCodeIs(200);
         $i->seeResponseMatchesJsonType([
@@ -165,7 +165,7 @@ final class PlaySessionCest
 
         // Finalize (close) session by providing finished_at
         $i->sendPatch('/v1/plays/' . $sessionId, [
-            'finished_at' => '2026-03-09T23:00:00+00:00',
+            'finished_at' => '2099-12-31T23:59:59+00:00',
         ]);
         $i->seeResponseCodeIs(200);
 
