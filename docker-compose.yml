@@ -96,7 +96,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
     volumes:
-      - api-postgres:/var/lib/postgresql/data
+      - ./.docker/var/lib/postgres/data:/var/lib/postgresql/data
     ports:
       - "${DB_EXTERNAL_PORT}:5432"
     networks:
@@ -110,7 +110,7 @@ services:
   redis:
     image: redis:7-alpine
     volumes:
-      - api-redis:/data
+      - ./.docker/var/lib/redis/data:/data
     networks:
       - bglapinet
     restart: on-failure
@@ -137,10 +137,6 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-
-volumes:
-  api-postgres:
-  api-redis:
 
 networks:
   bglapinet:
