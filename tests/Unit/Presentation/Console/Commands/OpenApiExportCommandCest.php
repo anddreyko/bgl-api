@@ -77,7 +77,7 @@ final class OpenApiExportCommandCest
                         'x-auth' => ['userId'],
                     ],
                 ],
-                '/v1/plays/sessions/{id}' => [
+                '/v1/plays/{id}' => [
                     'patch' => [
                         'summary' => 'Close play session',
                         'x-message' => 'FinalizePlay\\Command',
@@ -98,7 +98,7 @@ final class OpenApiExportCommandCest
         $i->assertArrayNotHasKey('x-interceptors', $signOut);
         $i->assertArrayNotHasKey('x-auth', $signOut);
 
-        $closeSession = $result['paths']['/v1/plays/sessions/{id}']['patch'];
+        $closeSession = $result['paths']['/v1/plays/{id}']['patch'];
         $i->assertSame('Close play session', $closeSession['summary']);
         $i->assertArrayNotHasKey('x-message', $closeSession);
         $i->assertArrayNotHasKey('x-map', $closeSession);

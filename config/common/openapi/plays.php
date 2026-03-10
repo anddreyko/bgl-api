@@ -15,7 +15,7 @@ use Bgl\Presentation\Api\Interceptors\OptionalAuthInterceptor;
 return [
     'openapi' => [
         'paths' => [
-            '/v1/plays/sessions' => [
+            '/v1/plays' => [
                 'get' => [
                     'summary' => 'List user play sessions',
                     'operationId' => 'listSessions',
@@ -156,7 +156,7 @@ return [
                     ],
                 ],
             ],
-            '/v1/plays/sessions/{id}' => [
+            '/v1/plays/{id}' => [
                 'get' => [
                     'summary' => 'View play session details',
                     'operationId' => 'getSession',
@@ -342,7 +342,7 @@ return [
                     ],
                 ],
             ],
-            '/v1/plays/sessions/{id}/restore' => [
+            '/v1/plays/{id}/restore' => [
                 'patch' => [
                     'summary' => 'Restore deleted play session',
                     'operationId' => 'restoreSession',

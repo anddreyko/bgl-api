@@ -84,7 +84,7 @@ final class CompiledRouteMapCest
     public function testAuthParamsExtracted(UnitTester $i): void
     {
         $map = new CompiledRouteMap([
-            '/v1/plays/sessions' => [
+            '/v1/plays' => [
                 'post' => [
                     'x-message' => Command::class,
                     'x-auth' => ['userId'],
@@ -92,7 +92,7 @@ final class CompiledRouteMapCest
             ],
         ]);
 
-        $result = $map->match('POST', '/v1/plays/sessions');
+        $result = $map->match('POST', '/v1/plays');
 
         $i->assertNotNull($result);
         $i->assertSame(['userId'], $result->operation->authParams->toArray());
@@ -101,7 +101,7 @@ final class CompiledRouteMapCest
     public function testParamMapExtracted(UnitTester $i): void
     {
         $map = new CompiledRouteMap([
-            '/v1/plays/sessions/{id}' => [
+            '/v1/plays/{id}' => [
                 'patch' => [
                     'x-message' => Command::class,
                     'x-map' => ['id' => 'sessionId'],
@@ -109,7 +109,7 @@ final class CompiledRouteMapCest
             ],
         ]);
 
-        $result = $map->match('PATCH', '/v1/plays/sessions/abc');
+        $result = $map->match('PATCH', '/v1/plays/abc');
 
         $i->assertNotNull($result);
         $i->assertSame(['id' => 'sessionId'], $result->operation->paramMap->toArray());

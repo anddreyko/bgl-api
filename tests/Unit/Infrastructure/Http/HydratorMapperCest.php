@@ -39,7 +39,7 @@ final class HydratorMapperCest
 
     public function testPathParamsRenamed(UnitTester $i): void
     {
-        $request = new ServerRequest('PATCH', '/v1/plays/sessions/abc');
+        $request = new ServerRequest('PATCH', '/v1/plays/abc');
 
         $result = $this->mapper->map(
             $request,
@@ -65,7 +65,7 @@ final class HydratorMapperCest
 
     public function testAuthParamsInjected(UnitTester $i): void
     {
-        $request = new ServerRequest('POST', '/v1/plays/sessions');
+        $request = new ServerRequest('POST', '/v1/plays');
         $request = $request->withAttribute('auth.userId', 'user-abc-123');
 
         $result = $this->mapper->map(
@@ -78,7 +78,7 @@ final class HydratorMapperCest
 
     public function testAuthParamsMissingThrowsAuthException(UnitTester $i): void
     {
-        $request = new ServerRequest('POST', '/v1/plays/sessions');
+        $request = new ServerRequest('POST', '/v1/plays');
 
         $i->expectThrowable(\Bgl\Core\Auth\AuthenticationException::class, function () use ($request): void {
             $this->mapper->map(
@@ -90,7 +90,7 @@ final class HydratorMapperCest
 
     public function testAuthParamsNullSkipped(UnitTester $i): void
     {
-        $request = new ServerRequest('POST', '/v1/plays/sessions');
+        $request = new ServerRequest('POST', '/v1/plays');
         $request = $request->withAttribute('auth.userId', null);
 
         $result = $this->mapper->map(
@@ -124,7 +124,7 @@ final class HydratorMapperCest
 
     public function testAllSourcesCombined(UnitTester $i): void
     {
-        $request = new ServerRequest('PATCH', '/v1/plays/sessions/sess-123');
+        $request = new ServerRequest('PATCH', '/v1/plays/sess-123');
         $request = $request
             ->withParsedBody(['finishedAt' => '2025-01-01T12:00:00Z'])
             ->withAttribute('auth.userId', 'user-xyz');

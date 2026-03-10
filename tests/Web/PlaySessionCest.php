@@ -17,7 +17,7 @@ final class PlaySessionCest
 
     public function testOpenSessionWithoutTokenReturns401(WebTester $i): void
     {
-        $i->sendPost('/v1/plays/sessions', [
+        $i->sendPost('/v1/plays', [
             'players' => [
                 ['mate_id' => '00000000-0000-0000-0000-000000000001'],
             ],
@@ -27,7 +27,7 @@ final class PlaySessionCest
 
     public function testOpenSessionWithoutBodyReturns401(WebTester $i): void
     {
-        $i->sendPost('/v1/plays/sessions');
+        $i->sendPost('/v1/plays');
         $i->seeResponseCodeIs(401);
     }
 
@@ -37,11 +37,11 @@ final class PlaySessionCest
         $email = 'plays-get-' . uniqid() . '@test.local';
         $auth->registerAndLogin($email, 'SecurePass1!');
 
-        $i->sendPost('/v1/plays/sessions');
+        $i->sendPost('/v1/plays');
         $i->seeResponseCodeIs(201);
         $sessionId = $i->grabDataFromResponseByJsonPath('$.data.id')[0];
 
-        $i->sendGet('/v1/plays/sessions/' . $sessionId);
+        $i->sendGet('/v1/plays/' . $sessionId);
         $i->seeResponseCodeIs(200);
         $i->seeResponseIsJson();
         $i->seeResponseMatchesJsonType([
@@ -62,7 +62,7 @@ final class PlaySessionCest
         $email = 'plays-get-404-' . uniqid() . '@test.local';
         $auth->registerAndLogin($email, 'SecurePass1!');
 
-        $i->sendGet('/v1/plays/sessions/00000000-0000-0000-0000-000000000000');
+        $i->sendGet('/v1/plays/00000000-0000-0000-0000-000000000000');
         $i->seeResponseCodeIs(404);
     }
 
@@ -74,7 +74,7 @@ final class PlaySessionCest
 
         $auth->registerAndLogin($email, $password);
 
-        $i->sendPost('/v1/plays/sessions');
+        $i->sendPost('/v1/plays');
         $i->seeResponseCodeIs(201);
         $i->seeResponseIsJson();
         $i->seeResponseMatchesJsonType([
@@ -86,7 +86,7 @@ final class PlaySessionCest
         $sessionId = $i->grabDataFromResponseByJsonPath('$.data.id')[0];
 
         // Partial update without finalization
-        $i->sendPatch('/v1/plays/sessions/' . $sessionId, ['name' => 'Updated']);
+        $i->sendPatch('/v1/plays/' . $sessionId, ['name' => 'Updated']);
         $i->seeResponseCodeIs(200);
         $i->seeResponseIsJson();
         $i->seeResponseMatchesJsonType([
@@ -97,7 +97,7 @@ final class PlaySessionCest
         ]);
 
         // Finalize by providing finished_at
-        $i->sendPatch('/v1/plays/sessions/' . $sessionId, [
+        $i->sendPatch('/v1/plays/' . $sessionId, [
             'finished_at' => '2026-03-09T22:00:00+00:00',
         ]);
         $i->seeResponseCodeIs(200);
@@ -126,7 +126,7 @@ final class PlaySessionCest
         $mate2Id = $i->grabDataFromResponseByJsonPath('$.data.id')[0];
 
         // Create play session with players
-        $i->sendPost('/v1/plays/sessions', [
+        $i->sendPost('/v1/plays', [
             'name' => 'Game night',
             'visibility' => 'participants',
             'players' => [
@@ -164,7 +164,7 @@ final class PlaySessionCest
         ]);
 
         // Finalize (close) session by providing finished_at
-        $i->sendPatch('/v1/plays/sessions/' . $sessionId, [
+        $i->sendPatch('/v1/plays/' . $sessionId, [
             'finished_at' => '2026-03-09T23:00:00+00:00',
         ]);
         $i->seeResponseCodeIs(200);
@@ -183,11 +183,11 @@ final class PlaySessionCest
         $auth->registerAndLogin($email, 'SecurePass1!');
 
         // Create a session first
-        $i->sendPost('/v1/plays/sessions');
+        $i->sendPost('/v1/plays');
         $i->seeResponseCodeIs(201);
 
         // List sessions
-        $i->sendGet('/v1/plays/sessions');
+        $i->sendGet('/v1/plays');
         $i->seeResponseCodeIs(200);
         $i->seeResponseIsJson();
         $i->seeResponseMatchesJsonType([
@@ -202,7 +202,7 @@ final class PlaySessionCest
 
     public function testListSessionsWithoutTokenReturns401(WebTester $i): void
     {
-        $i->sendGet('/v1/plays/sessions');
+        $i->sendGet('/v1/plays');
         $i->seeResponseCodeIs(401);
     }
 }
