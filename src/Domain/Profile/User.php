@@ -40,7 +40,7 @@ final class User
 
     private static function generateDefaultName(): string
     {
-        return 'User#' . str_pad((string)random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+        return 'Player' . str_pad((string)random_int(0, 9999), 4, '0', STR_PAD_LEFT);
     }
 
     public function confirm(): void
