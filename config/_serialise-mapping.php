@@ -48,6 +48,13 @@ return [
         'is_active' => $model->isActive,
         'created_at' => $model->createdAt,
     ],
+    Handlers\User\UpdateUser\Result::class => static fn(Handlers\User\UpdateUser\Result $model) => [
+        'id' => $model->id,
+        'email' => $model->email,
+        'name' => $model->name,
+        'is_active' => $model->isActive,
+        'created_at' => $model->createdAt,
+    ],
     Handlers\Plays\CreatePlay\Result::class => static fn(Handlers\Plays\CreatePlay\Result $model) => [
         'id' => $model->id,
         'author' => $model->author,

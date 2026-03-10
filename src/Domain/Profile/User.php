@@ -17,7 +17,7 @@ final class User
         private readonly DateTime $createdAt,
         private UserStatus $status,
         private int $tokenVersion = 1,
-        private readonly ?string $name = null,
+        private ?string $name = null,
     ) {
     }
 
@@ -75,6 +75,15 @@ final class User
     public function getStatus(): UserStatus
     {
         return $this->status;
+    }
+
+    public function rename(string $name): void
+    {
+        if (\preg_match('/^[a-zA-Z0-9]+$/', $name) !== 1) {
+            throw new InvalidNameException($name);
+        }
+
+        $this->name = $name;
     }
 
     public function getName(): string

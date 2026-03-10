@@ -53,6 +53,7 @@ return [
             [Auth\PasskeySignInOptions\Command::class, Auth\PasskeySignInOptions\Handler::class],
             [Auth\PasskeySignInVerify\Command::class, Auth\PasskeySignInVerify\Handler::class],
             [User\GetUser\Query::class, User\GetUser\Handler::class],
+            [User\UpdateUser\Command::class, User\UpdateUser\Handler::class],
             [Plays\CreatePlay\Command::class, Plays\CreatePlay\Handler::class],
             [Plays\FinalizePlay\Command::class, Plays\FinalizePlay\Handler::class],
             [Plays\UpdatePlay\Command::class, Plays\UpdatePlay\Handler::class],

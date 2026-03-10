@@ -114,6 +114,49 @@ final class UserCest
             createdAt: new DateTime('2024-01-01 00:00:00'),
         );
 
-        $i->assertMatchesRegularExpression('/^User#\d{4}$/', $user->getName());
+        $i->assertMatchesRegularExpression('/^Player\d{4}$/', $user->getName());
+    }
+
+    public function testRenameChangesName(UnitTester $i): void
+    {
+        $user = User::register(
+            id: new Uuid('88888888-8888-4888-8888-888888888881'),
+            email: new Email('test@example.com'),
+            passwordHash: 'hashed',
+            createdAt: new DateTime('2024-01-01 00:00:00'),
+            name: 'OldName',
+        );
+
+        $user->rename('NewName');
+
+        $i->assertSame('NewName', $user->getName());
+    }
+
+    public function testRenameWithInvalidNameThrowsException(UnitTester $i): void
+    {
+        $user = User::register(
+            id: new Uuid('88888888-8888-4888-8888-888888888881'),
+            email: new Email('test@example.com'),
+            passwordHash: 'hashed',
+            createdAt: new DateTime('2024-01-01 00:00:00'),
+        );
+
+        $i->expectThrowable(\Bgl\Domain\Profile\InvalidNameException::class, static function () use ($user): void {
+            $user->rename('Invalid Name!');
+        });
+    }
+
+    public function testRenameWithEmptyStringThrowsException(UnitTester $i): void
+    {
+        $user = User::register(
+            id: new Uuid('88888888-8888-4888-8888-888888888881'),
+            email: new Email('test@example.com'),
+            passwordHash: 'hashed',
+            createdAt: new DateTime('2024-01-01 00:00:00'),
+        );
+
+        $i->expectThrowable(\Bgl\Domain\Profile\InvalidNameException::class, static function () use ($user): void {
+            $user->rename('');
+        });
     }
 }
