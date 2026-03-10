@@ -74,7 +74,8 @@ final class ConfirmEmailCest
         ));
 
         $i->assertInstanceOf(Result::class, $result);
-        $i->assertSame('Specified email is confirmed', $result->message);
+        $i->assertNotEmpty($result->accessToken);
+        $i->assertNotEmpty($result->refreshToken);
 
         $confirmed = $this->users->find((string) $userId);
         $i->assertNotNull($confirmed);

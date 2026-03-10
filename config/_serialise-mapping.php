@@ -152,7 +152,8 @@ return [
         'size' => $model->size,
     ],
     Handlers\Auth\ConfirmEmail\Result::class => static fn(Handlers\Auth\ConfirmEmail\Result $model) => [
-        'message' => $model->message,
+        'access_token' => $model->accessToken,
+        'refresh_token' => $model->refreshToken,
     ],
     Handlers\Auth\Register\Result::class => static fn(Handlers\Auth\Register\Result $model) => [
         'message' => $model->message,

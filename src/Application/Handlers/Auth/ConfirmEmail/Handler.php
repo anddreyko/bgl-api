@@ -6,6 +6,7 @@ namespace Bgl\Application\Handlers\Auth\ConfirmEmail;
 
 use Bgl\Core\Auth\Confirmer;
 use Bgl\Core\Auth\InvalidConfirmationTokenException;
+use Bgl\Core\Auth\TokenIssuer;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Domain\Profile\Users;
@@ -18,6 +19,7 @@ final readonly class Handler implements MessageHandler
     public function __construct(
         private Users $users,
         private Confirmer $confirmer,
+        private TokenIssuer $tokenIssuer,
     ) {
     }
 
@@ -38,6 +40,11 @@ final readonly class Handler implements MessageHandler
 
         $user->confirm();
 
-        return new Result(message: 'Specified email is confirmed');
+        $tokenPair = $this->tokenIssuer->issue($userIdValue);
+
+        return new Result(
+            accessToken: $tokenPair->accessToken,
+            refreshToken: $tokenPair->refreshToken,
+        );
     }
 }

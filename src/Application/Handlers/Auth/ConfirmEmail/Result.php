@@ -7,7 +7,8 @@ namespace Bgl\Application\Handlers\Auth\ConfirmEmail;
 final readonly class Result
 {
     public function __construct(
-        public string $message,
+        public string $accessToken,
+        public string $refreshToken,
     ) {
     }
 }

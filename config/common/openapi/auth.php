@@ -91,7 +91,7 @@ return [
                         ],
                     ],
                     'responses' => [
-                        '200' => ['$ref' => '#/components/responses/String'],
+                        '200' => ['$ref' => '#/components/responses/TokenPair'],
                         '400' => ['$ref' => '#/components/responses/BadRequest'],
                         '422' => ['$ref' => '#/components/responses/ValidationError'],
                         '500' => ['$ref' => '#/components/responses/InternalError'],
