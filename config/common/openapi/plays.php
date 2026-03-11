@@ -63,6 +63,13 @@ return [
                             'required' => false,
                             'schema' => ['type' => 'string', 'format' => 'date-time'],
                         ],
+                        [
+                            'name' => 'status',
+                            'in' => 'query',
+                            'required' => false,
+                            'description' => 'Filter by lifecycle status',
+                            'schema' => ['type' => 'string', 'enum' => ['current', 'finished']],
+                        ],
                     ],
                     'responses' => [
                         '200' => [

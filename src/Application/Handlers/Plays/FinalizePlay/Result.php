@@ -20,6 +20,7 @@ final readonly class Result
         public ?string $finishedAt,
         public ?array $game,
         public array $players,
+        public string $status = 'finished',
         public ?string $notes = null,
         public ?string $locationId = null,
     ) {

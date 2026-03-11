@@ -114,6 +114,7 @@ final readonly class Handler implements MessageHandler
             finishedAt: $play->getFinishedAt()?->getNullableFormattedValue('c'),
             game: $this->resolveGame($play),
             players: $this->transformPlayers($play),
+            status: $play->getLifecycle()->value,
             notes: $play->getNotes(),
             locationId: $play->getLocationId() !== null ? (string)$play->getLocationId() : null,
         );

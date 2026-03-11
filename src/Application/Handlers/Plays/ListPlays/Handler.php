@@ -108,6 +108,10 @@ final readonly class Handler implements MessageHandler
             $filters[] = new Equals(new Field('gameId'), $query->gameId);
         }
 
+        if ($query->status !== null && $query->status !== '') {
+            $filters[] = new Equals(new Field('lifecycle'), $query->status);
+        }
+
         if ($query->from !== null) {
             $filters[] = new Greater(new Field('startedAt'), new DateTime($query->from));
         }
@@ -201,6 +205,7 @@ final readonly class Handler implements MessageHandler
             'finished_at' => $play->getFinishedAt()?->getNullableFormattedValue('c'),
             'game' => $this->resolveGame($play),
             'players' => $this->transformPlayers($play),
+            'status' => $play->getLifecycle()->value,
             'notes' => $play->getNotes(),
             'location_id' => $play->getLocationId() !== null ? (string)$play->getLocationId() : null,
         ];

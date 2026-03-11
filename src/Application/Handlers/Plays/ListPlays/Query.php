@@ -23,6 +23,7 @@ final readonly class Query implements Message
         public ?string $from = null,
         public ?string $to = null,
         public ?string $authorId = null,
+        public ?string $status = null,
     ) {
     }
 }

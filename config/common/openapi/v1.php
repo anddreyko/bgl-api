@@ -136,6 +136,11 @@ return [
                             'type' => 'array',
                             'items' => ['$ref' => '#/components/schemas/Player'],
                         ],
+                        'status' => [
+                            'type' => 'string',
+                            'enum' => ['current', 'finished'],
+                            'description' => 'Read-only lifecycle status',
+                        ],
                         'notes' => ['type' => 'string', 'nullable' => true],
                         'location_id' => ['type' => 'string', 'format' => 'uuid', 'nullable' => true],
                     ],
