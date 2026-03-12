@@ -200,9 +200,18 @@ final class PlaySessionCest
         ]);
     }
 
-    public function testListSessionsWithoutTokenReturns401(WebTester $i): void
+    public function testListSessionsWithoutTokenReturnsPublicPlays(WebTester $i): void
     {
         $i->sendGet('/v1/plays');
-        $i->seeResponseCodeIs(401);
+        $i->seeResponseCodeIs(200);
+        $i->seeResponseIsJson();
+        $i->seeResponseMatchesJsonType([
+            'data' => [
+                'items' => 'array',
+                'total' => 'integer',
+                'page' => 'integer',
+                'size' => 'integer',
+            ],
+        ]);
     }
 }

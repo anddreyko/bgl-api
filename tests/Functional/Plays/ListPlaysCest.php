@@ -8,7 +8,6 @@ use Bgl\Application\Handlers\Plays\CreatePlay;
 use Bgl\Application\Handlers\Plays\FinalizePlay;
 use Bgl\Application\Handlers\Plays\ListPlays;
 use Bgl\Application\Handlers\Plays\UpdatePlay;
-use Bgl\Core\Auth\AuthenticationException;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\ValueObjects\DateTime;
@@ -281,7 +280,7 @@ final class ListPlaysCest
 
         $i->assertCount(1, $result->data);
         $i->assertNotEmpty($result->data[0]['players']);
-        $i->assertSame((string)$this->mate1Id, $result->data[0]['players'][0]['mate_id']);
+        $i->assertSame((string)$this->mate1Id, $result->data[0]['players'][0]['mate']['id']);
         $i->assertSame(10, $result->data[0]['players'][0]['score']);
         $i->assertTrue($result->data[0]['players'][0]['is_winner']);
         $i->assertSame('red', $result->data[0]['players'][0]['color']);
@@ -363,14 +362,14 @@ final class ListPlaysCest
         $i->assertSame(2, $result->total);
     }
 
-    public function testListPlaysWithoutAuthAndWithoutAuthorIdThrows(FunctionalTester $i): void
+    public function testListPlaysWithoutAuthAndWithoutAuthorIdReturnsPublic(FunctionalTester $i): void
     {
-        $i->expectThrowable(AuthenticationException::class, function (): void {
-            ($this->handler)(new Envelope(
-                message: new ListPlays\Query(),
-                messageId: 'msg-list-no-auth',
-            ));
-        });
+        $result = ($this->handler)(new Envelope(
+            message: new ListPlays\Query(),
+            messageId: 'msg-list-no-auth',
+        ));
+
+        $i->assertInstanceOf(ListPlays\Result::class, $result);
     }
 
     public function testListPlaysByAuthorIdWithoutAuthShowsPublicAndLinkOnly(FunctionalTester $i): void
