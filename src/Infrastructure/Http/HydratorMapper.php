@@ -83,13 +83,14 @@ final readonly class HydratorMapper implements SchemaMapper
      */
     private function mergeAuthParams(array &$data, ServerRequestInterface $request, AuthParams $authParams): void
     {
-        $sentinel = new \stdClass();
+        $attributes = $request->getAttributes();
         foreach ($authParams as $paramName) {
-            /** @var mixed $attrValue */
-            $attrValue = $request->getAttribute('auth.' . $paramName, $sentinel);
-            if ($attrValue === $sentinel) {
+            $attrKey = 'auth.' . $paramName;
+            if (!array_key_exists($attrKey, $attributes)) {
                 throw new AuthenticationException('Unauthorized');
             }
+            /** @var mixed $attrValue */
+            $attrValue = $attributes[$attrKey];
             if ($attrValue === null) {
                 continue;
             }
