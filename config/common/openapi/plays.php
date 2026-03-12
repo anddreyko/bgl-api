@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Bgl\Application\Handlers\Plays\CreatePlay;
+use Bgl\Application\Handlers\Plays\DeletePlay;
 use Bgl\Application\Handlers\Plays\FinalizePlay;
 use Bgl\Application\Handlers\Plays\GetPlay;
 use Bgl\Application\Handlers\Plays\ListPlays;
-use Bgl\Application\Handlers\Plays\DeletePlay;
 use Bgl\Application\Handlers\Plays\RestorePlay;
 use Bgl\Application\Handlers\Plays\UpdatePlay;
 use Bgl\Presentation\Api\Interceptors\AuthInterceptor;
@@ -143,9 +143,21 @@ return [
                                                     'mate_id' => ['type' => 'string', 'format' => 'uuid'],
                                                     'score' => ['type' => 'integer', 'nullable' => true],
                                                     'is_winner' => ['type' => 'boolean', 'default' => false],
-                                                    'color' => ['type' => 'string', 'maxLength' => 50, 'nullable' => true],
-                                                    'team_tag' => ['type' => 'string', 'maxLength' => 50, 'nullable' => true],
-                                                    'number' => ['type' => 'integer', 'minimum' => 0, 'nullable' => true],
+                                                    'color' => [
+                                                        'type' => 'string',
+                                                        'maxLength' => 50,
+                                                        'nullable' => true,
+                                                    ],
+                                                    'team_tag' => [
+                                                        'type' => 'string',
+                                                        'maxLength' => 50,
+                                                        'nullable' => true,
+                                                    ],
+                                                    'number' => [
+                                                        'type' => 'integer',
+                                                        'minimum' => 0,
+                                                        'nullable' => true,
+                                                    ],
                                                 ],
                                             ],
                                         ],
@@ -237,9 +249,21 @@ return [
                                                     'mate_id' => ['type' => 'string', 'format' => 'uuid'],
                                                     'score' => ['type' => 'integer', 'nullable' => true],
                                                     'is_winner' => ['type' => 'boolean', 'default' => false],
-                                                    'color' => ['type' => 'string', 'maxLength' => 50, 'nullable' => true],
-                                                    'team_tag' => ['type' => 'string', 'maxLength' => 50, 'nullable' => true],
-                                                    'number' => ['type' => 'integer', 'minimum' => 0, 'nullable' => true],
+                                                    'color' => [
+                                                        'type' => 'string',
+                                                        'maxLength' => 50,
+                                                        'nullable' => true,
+                                                    ],
+                                                    'team_tag' => [
+                                                        'type' => 'string',
+                                                        'maxLength' => 50,
+                                                        'nullable' => true,
+                                                    ],
+                                                    'number' => [
+                                                        'type' => 'integer',
+                                                        'minimum' => 0,
+                                                        'nullable' => true,
+                                                    ],
                                                 ],
                                             ],
                                         ],
@@ -305,9 +329,21 @@ return [
                                                     'mate_id' => ['type' => 'string', 'format' => 'uuid'],
                                                     'score' => ['type' => 'integer', 'nullable' => true],
                                                     'is_winner' => ['type' => 'boolean', 'default' => false],
-                                                    'color' => ['type' => 'string', 'maxLength' => 50, 'nullable' => true],
-                                                    'team_tag' => ['type' => 'string', 'maxLength' => 50, 'nullable' => true],
-                                                    'number' => ['type' => 'integer', 'minimum' => 0, 'nullable' => true],
+                                                    'color' => [
+                                                        'type' => 'string',
+                                                        'maxLength' => 50,
+                                                        'nullable' => true,
+                                                    ],
+                                                    'team_tag' => [
+                                                        'type' => 'string',
+                                                        'maxLength' => 50,
+                                                        'nullable' => true,
+                                                    ],
+                                                    'number' => [
+                                                        'type' => 'integer',
+                                                        'minimum' => 0,
+                                                        'nullable' => true,
+                                                    ],
                                                 ],
                                             ],
                                         ],
@@ -359,12 +395,14 @@ return [
                     'x-interceptors' => [AuthInterceptor::class],
                     'x-auth' => ['userId'],
                     'x-map' => ['id' => 'sessionId'],
-                    'parameters' => [[
-                        'name' => 'id',
-                        'in' => 'path',
-                        'required' => true,
-                        'schema' => ['type' => 'string'],
-                    ]],
+                    'parameters' => [
+                        [
+                            'name' => 'id',
+                            'in' => 'path',
+                            'required' => true,
+                            'schema' => ['type' => 'string'],
+                        ],
+                    ],
                     'responses' => [
                         '200' => ['$ref' => '#/components/responses/Play'],
                         '401' => ['$ref' => '#/components/responses/Unauthorized'],

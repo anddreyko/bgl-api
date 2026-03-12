@@ -41,7 +41,11 @@ final class InMemoryMates extends InMemoryRepository implements Mates
     ): array {
         $matches = [];
         foreach ($this->getEntities() as $mate) {
-            if ($mate->getUserId() !== null && $mate->getUserId()->getValue() === $userId->getValue() && !$mate->isDeleted()) {
+            if (
+                $mate->getUserId() !== null &&
+                $mate->getUserId()->getValue() === $userId->getValue() &&
+                !$mate->isDeleted()
+            ) {
                 $matches[] = $mate;
             }
         }
@@ -75,7 +79,11 @@ final class InMemoryMates extends InMemoryRepository implements Mates
     {
         $count = 0;
         foreach ($this->getEntities() as $mate) {
-            if ($mate->getUserId() !== null && $mate->getUserId()->getValue() === $userId->getValue() && !$mate->isDeleted()) {
+            if (
+                $mate->getUserId() !== null &&
+                $mate->getUserId()->getValue() === $userId->getValue() &&
+                !$mate->isDeleted()
+            ) {
                 ++$count;
             }
         }

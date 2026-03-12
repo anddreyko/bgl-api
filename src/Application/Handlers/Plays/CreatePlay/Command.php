@@ -14,7 +14,14 @@ use Bgl\Core\ValueObjects\Uuid;
 final readonly class Command implements Message
 {
     /**
-     * @param list<array{mate_id: non-empty-string, score?: ?int, is_winner?: ?bool, color?: ?string, team_tag?: ?string, number?: ?int}> $players
+     * @param list<array{
+     *     mate_id: non-empty-string,
+     *     score?: ?int,
+     *     is_winner?: ?bool,
+     *     color?: ?string,
+     *     team_tag?: ?string,
+     *     number?: ?int
+     * }> $players
      */
     public function __construct(
         public Uuid $userId,

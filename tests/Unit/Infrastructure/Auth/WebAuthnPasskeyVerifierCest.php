@@ -109,7 +109,7 @@ final class WebAuthnPasskeyVerifierCest
         $jsonChallenge = $json['publicKey']['challenge'];
 
         // Decode base64url from JSON
-        $jsonBinary = base64_decode(strtr($jsonChallenge, '-_', '+/') . str_repeat('=', 3 - (3 + strlen($jsonChallenge)) % 4));
+        $jsonBinary = base64_decode(strtr($jsonChallenge, '-_', '+/') . str_repeat('=', 3 - (3 + strlen((string) $jsonChallenge)) % 4));
         // Decode standard base64 from stored challenge
         $storedBinary = base64_decode($options->challenge);
 

@@ -92,8 +92,11 @@ final readonly class ApiAction
     /**
      * @param class-string<\Bgl\Core\Messages\Message> $messageClass
      */
-    private function dispatchAndRespond(string $messageClass, SerializedData $data, HttpCode $successCode): ResponseInterface
-    {
+    private function dispatchAndRespond(
+        string $messageClass,
+        SerializedData $data,
+        HttpCode $successCode
+    ): ResponseInterface {
         /** @var \Bgl\Core\Messages\Message $message */
         $message = $this->hydrator->hydrateObject($messageClass, $data->toArray());
         /** @var mixed $result */
