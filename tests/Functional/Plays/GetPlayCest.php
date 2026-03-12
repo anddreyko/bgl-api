@@ -249,14 +249,14 @@ final class GetPlayCest
 
         $i->assertInstanceOf(Result::class, $result);
         $i->assertCount(1, $result->players);
-        $i->assertSame((string)$this->ownerMateId, $result->players[0]['mate_id']);
+        $i->assertSame((string)$this->ownerMateId, $result->players[0]['mate']['id']);
         $i->assertSame(10, $result->players[0]['score']);
         $i->assertTrue($result->players[0]['is_winner']);
         $i->assertSame('red', $result->players[0]['color']);
     }
 
     /**
-     * @param list<array{mate_id: string, score?: int, is_winner?: bool, color?: string}> $players
+     * @param list<array{mate_id: string, score?: int, is_winner?: bool, color?: string}> $players Input format (mate_id used for creation)
      */
     private function createSession(
         string $visibility = 'private',

@@ -66,7 +66,7 @@ return [
         'players' => $model->players,
         'status' => $model->status,
         'notes' => $model->notes,
-        'location_id' => $model->locationId,
+        'location' => $model->location,
     ],
     Handlers\Plays\UpdatePlay\Result::class => static fn(Handlers\Plays\UpdatePlay\Result $model) => [
         'id' => $model->id,
@@ -79,7 +79,7 @@ return [
         'players' => $model->players,
         'status' => $model->status,
         'notes' => $model->notes,
-        'location_id' => $model->locationId,
+        'location' => $model->location,
     ],
     Handlers\Plays\FinalizePlay\Result::class => static fn(Handlers\Plays\FinalizePlay\Result $model) => [
         'id' => $model->id,
@@ -92,7 +92,7 @@ return [
         'players' => $model->players,
         'status' => $model->status,
         'notes' => $model->notes,
-        'location_id' => $model->locationId,
+        'location' => $model->location,
     ],
     Handlers\Plays\GetPlay\Result::class => static fn(Handlers\Plays\GetPlay\Result $model) => [
         'id' => $model->id,
@@ -105,7 +105,7 @@ return [
         'players' => $model->players,
         'status' => $model->status,
         'notes' => $model->notes,
-        'location_id' => $model->locationId,
+        'location' => $model->location,
     ],
     Handlers\Plays\RestorePlay\Result::class => static fn(Handlers\Plays\RestorePlay\Result $model) => [
         'id' => $model->id,
@@ -118,7 +118,7 @@ return [
         'players' => $model->players,
         'status' => $model->status,
         'notes' => $model->notes,
-        'location_id' => $model->locationId,
+        'location' => $model->location,
     ],
     Handlers\Mates\CreateMate\Result::class => static fn(Handlers\Mates\CreateMate\Result $model) => [
         'id' => $model->id,

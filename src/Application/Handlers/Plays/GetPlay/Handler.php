@@ -10,6 +10,10 @@ use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Domain\Games\Game;
 use Bgl\Domain\Games\Games;
+use Bgl\Domain\Locations\Location;
+use Bgl\Domain\Locations\Locations;
+use Bgl\Domain\Mates\Mate;
+use Bgl\Domain\Mates\Mates;
 use Bgl\Domain\Plays\Play;
 use Bgl\Domain\Profile\Users;
 use Bgl\Domain\Plays\Player\Player;
@@ -26,6 +30,8 @@ final readonly class Handler implements MessageHandler
         private Plays $plays,
         private Games $games,
         private Users $users,
+        private Mates $mates,
+        private Locations $locations,
     ) {
     }
 
@@ -93,16 +99,28 @@ final readonly class Handler implements MessageHandler
     }
 
     /**
-     * @return list<array{id: string, mate_id: string, score: ?int, is_winner: bool, color: ?string, team_tag: ?string, number: ?int}>
+     * @return list<array{
+     *     id: string,
+     *     mate: array{id: string, name: string},
+     *     score: ?int,
+     *     is_winner: bool,
+     *     color: ?string,
+     *     team_tag: ?string,
+     *     number: ?int
+     * }>
      */
     private function transformPlayers(Play $play): array
     {
         $players = [];
         /** @var Player $player */
         foreach ($play->getPlayers() as $player) {
+            $mateId = (string)$player->getMateId();
+            /** @var Mate|null $mate */
+            $mate = $this->mates->find($mateId);
+
             $players[] = [
                 'id' => (string)$player->getId(),
-                'mate_id' => (string)$player->getMateId(),
+                'mate' => ['id' => $mateId, 'name' => $mate !== null ? $mate->getName() : ''],
                 'score' => $player->getScore(),
                 'is_winner' => $player->isWinner(),
                 'color' => $player->getColor(),
@@ -112,6 +130,24 @@ final readonly class Handler implements MessageHandler
         }
 
         return $players;
+    }
+
+    /**
+     * @return ?array{id: string, name: string}
+     */
+    private function resolveLocation(Play $play): ?array
+    {
+        $locationId = $play->getLocationId();
+        if ($locationId === null) {
+            return null;
+        }
+
+        /** @var Location|null $location */
+        $location = $this->locations->find((string)$locationId);
+
+        return $location !== null
+            ? ['id' => (string)$location->getId(), 'name' => $location->getName()]
+            : null;
     }
 
     private function transformPlay(Play $play): Result
@@ -127,7 +163,7 @@ final readonly class Handler implements MessageHandler
             players: $this->transformPlayers($play),
             status: $play->getLifecycle()->value,
             notes: $play->getNotes(),
-            locationId: $play->getLocationId() !== null ? (string)$play->getLocationId() : null,
+            location: $this->resolveLocation($play),
         );
     }
 }
