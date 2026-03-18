@@ -101,7 +101,13 @@ return [
                     'type' => 'object',
                     'properties' => [
                         'id' => ['type' => 'string'],
-                        'mate_id' => ['type' => 'string'],
+                        'mate' => [
+                            'type' => 'object',
+                            'properties' => [
+                                'id' => ['type' => 'string'],
+                                'name' => ['type' => 'string'],
+                            ],
+                        ],
                         'score' => ['type' => 'integer', 'nullable' => true],
                         'is_winner' => ['type' => 'boolean'],
                         'color' => ['type' => 'string', 'nullable' => true],
@@ -142,7 +148,14 @@ return [
                             'description' => 'Read-only lifecycle status',
                         ],
                         'notes' => ['type' => 'string', 'nullable' => true],
-                        'location_id' => ['type' => 'string', 'format' => 'uuid', 'nullable' => true],
+                        'location' => [
+                            'type' => 'object',
+                            'nullable' => true,
+                            'properties' => [
+                                'id' => ['type' => 'string'],
+                                'name' => ['type' => 'string'],
+                            ],
+                        ],
                     ],
                 ],
                 'Game' => [
