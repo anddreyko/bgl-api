@@ -163,6 +163,9 @@ return [
         'page' => $model->page,
         'size' => $model->size,
     ],
+    Handlers\Auth\SendVerification\Result::class => static fn(Handlers\Auth\SendVerification\Result $model) => [
+        'message' => $model->message,
+    ],
     Handlers\Auth\ConfirmEmail\Result::class => static fn(Handlers\Auth\ConfirmEmail\Result $model) => [
         'access_token' => $model->accessToken,
         'refresh_token' => $model->refreshToken,

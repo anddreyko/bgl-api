@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Bgl\Application\Handlers\Auth\Register;
 
-use Bgl\Core\Auth\Confirmer;
+use Bgl\Application\Handlers\Auth\SendVerification;
 use Bgl\Core\Identity\UuidGenerator;
+use Bgl\Core\Messages\Dispatcher;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Core\Security\Hasher;
+use Bgl\Core\ValueObjects\DateTime;
 use Bgl\Core\ValueObjects\Email;
 use Bgl\Domain\Profile\User;
 use Bgl\Domain\Profile\UserAlreadyExistsException;
 use Bgl\Domain\Profile\Users;
-use Bgl\Core\ValueObjects\DateTime;
 use Psr\Clock\ClockInterface;
 
 /**
@@ -23,7 +24,7 @@ final readonly class Handler implements MessageHandler
 {
     public function __construct(
         private Users $users,
-        private Confirmer $confirmer,
+        private Dispatcher $dispatcher,
         private Hasher $passwordHasher,
         private UuidGenerator $uuidGenerator,
         private ClockInterface $clock,
@@ -54,7 +55,10 @@ final readonly class Handler implements MessageHandler
 
         $this->users->add($user);
 
-        $this->confirmer->request($user->getId());
+        $this->dispatcher->dispatch(
+            new SendVerification\Command($command->email),
+            $envelope,
+        );
 
         return new Result(message: 'Confirm the specified email');
     }

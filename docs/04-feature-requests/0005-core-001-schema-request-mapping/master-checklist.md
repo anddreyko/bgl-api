@@ -27,7 +27,7 @@
 
 - [x] Create `src/Presentation/Api/MatchedOperation.php` -- VO with messageClass, interceptors, pathParams, schema
 - [x] Create `src/Presentation/Api/RouteMap.php` -- reads OpenAPI config, matches method+path to operation
-- [x] Support path params via regex (e.g. `/v1/auth/confirm/{token}`)
+- [x] Support path params via regex (e.g. `/v1/auth/email/verify`)
 - [x] Read `x-message`, `x-interceptors`, `x-target` from OpenAPI config
 - [x] Return `null` when no route matches
 - [x] Verify: `composer lp:run && composer ps:run`

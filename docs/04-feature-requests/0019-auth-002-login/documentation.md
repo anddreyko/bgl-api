@@ -15,12 +15,12 @@ Implemented email and password login endpoint returning JWT access/refresh token
 | `src/Application/Handlers/Auth/LoginByCredentials/Handler.php` | Rewritten with full authentication logic |
 | `src/Application/Handlers/Auth/LoginByCredentials/Result.php` | Result with access/refresh tokens and TTL |
 | `tests/Unit/Application/Handlers/Auth/LoginByCredentials/HandlerCest.php` | Unit tests |
-| `config/common/openapi/auth.php` | POST /v1/auth/sign-in endpoint definition |
+| `config/common/openapi/auth.php` | POST /v1/auth/password/sign-in endpoint definition |
 
 ## How It Works
 
 Login flow:
-1. Client sends POST /v1/auth/sign-in with email and password
+1. Client sends POST /v1/auth/password/sign-in with email and password
 2. Handler finds User by email (401 if not found)
 3. Handler verifies password using PasswordHasher (401 if wrong)
 4. Handler checks User status is Active (403 if Inactive)

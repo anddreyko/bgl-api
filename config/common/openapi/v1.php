@@ -209,6 +209,14 @@ return [
                         ],
                     ],
                 ],
+                'TooManyRequests' => [
+                    'description' => 'Too many requests',
+                    'content' => [
+                        'application/json' => [
+                            'schema' => ['$ref' => '#/components/schemas/ErrorResponse'],
+                        ],
+                    ],
+                ],
                 'String' => $successResponse('Successful operation', ['type' => 'string']),
                 'Null' => $successResponse('Successful operation', ['type' => 'string', 'nullable' => true]),
                 'TokenPair' => $successResponse(

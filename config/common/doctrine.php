@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\EmailConfirmationTokenMapping;
+use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Auth\VerificationTokenMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Games\GameMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Locations\LocationMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Mates\MateMapping;
@@ -90,6 +91,7 @@ return [
             $chain->addDriver(
                 new PhpMappingDriver([
                     new EmailConfirmationTokenMapping(),
+                    new VerificationTokenMapping(),
                 ]),
                 'Bgl\\Infrastructure\\Auth'
             );

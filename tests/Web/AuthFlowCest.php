@@ -20,7 +20,7 @@ final class AuthFlowCest
         $email = 'auth-flow-' . uniqid() . '@test.local';
         $password = 'SecurePass1!';
 
-        $i->sendPost('/v1/auth/sign-up', [
+        $i->sendPost('/v1/auth/password/sign-up', [
             'email' => $email,
             'password' => $password,
         ]);
@@ -29,7 +29,7 @@ final class AuthFlowCest
 
         $i->updateInDatabase('auth_user', ['status' => 'active'], ['email' => $email]);
 
-        $i->sendPost('/v1/auth/sign-in', [
+        $i->sendPost('/v1/auth/password/sign-in', [
             'email' => $email,
             'password' => $password,
         ]);
@@ -58,7 +58,7 @@ final class AuthFlowCest
         $email = 'refresh-' . uniqid() . '@test.local';
         $password = 'SecurePass1!';
 
-        $i->sendPost('/v1/auth/sign-up', [
+        $i->sendPost('/v1/auth/password/sign-up', [
             'email' => $email,
             'password' => $password,
         ]);
@@ -66,7 +66,7 @@ final class AuthFlowCest
 
         $i->updateInDatabase('auth_user', ['status' => 'active'], ['email' => $email]);
 
-        $i->sendPost('/v1/auth/sign-in', [
+        $i->sendPost('/v1/auth/password/sign-in', [
             'email' => $email,
             'password' => $password,
         ]);
@@ -93,7 +93,7 @@ final class AuthFlowCest
         $email = 'userinfo-' . uniqid() . '@test.local';
         $password = 'SecurePass1!';
 
-        $i->sendPost('/v1/auth/sign-up', [
+        $i->sendPost('/v1/auth/password/sign-up', [
             'email' => $email,
             'password' => $password,
         ]);
@@ -101,7 +101,7 @@ final class AuthFlowCest
 
         $i->updateInDatabase('auth_user', ['status' => 'active'], ['email' => $email]);
 
-        $i->sendPost('/v1/auth/sign-in', [
+        $i->sendPost('/v1/auth/password/sign-in', [
             'email' => $email,
             'password' => $password,
         ]);

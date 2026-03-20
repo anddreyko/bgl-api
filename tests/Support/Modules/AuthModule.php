@@ -19,7 +19,7 @@ final class AuthModule extends Module
     {
         $rest = $this->getRest();
 
-        $rest->sendPost('/v1/auth/sign-up', [
+        $rest->sendPost('/v1/auth/password/sign-up', [
             'email' => $email,
             'password' => $password,
         ]);
@@ -31,7 +31,7 @@ final class AuthModule extends Module
             ['email' => $email],
         );
 
-        $rest->sendPost('/v1/auth/sign-in', [
+        $rest->sendPost('/v1/auth/password/sign-in', [
             'email' => $email,
             'password' => $password,
         ]);

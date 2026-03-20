@@ -17,7 +17,7 @@ Email+password login returning JWT access/refresh token pair. Refactor existing 
 
 | Method | Path | Auth | Response |
 |--------|------|------|----------|
-| POST | /v1/auth/sign-in | No | `{"code": 0, "data": {"access_token": "...", "refresh_token": "...", "expires_in": 7200}}` |
+| POST | /v1/auth/password/sign-in | No | `{"code": 0, "data": {"access_token": "...", "refresh_token": "...", "expires_in": 7200}}` |
 
 ### Errors
 

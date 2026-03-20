@@ -11,7 +11,7 @@
 
 ### Description
 
-User registration via email+password with email confirmation flow. POST /v1/auth/sign-up creates inactive user and confirmation token. GET /v1/auth/confirm/{token} activates account.
+User registration via email+password with email confirmation flow. POST /v1/auth/password/sign-up creates inactive user and confirmation token. GET /v1/auth/email/verify activates account.
 
 ### Business Value
 
@@ -34,8 +34,8 @@ User registration via email+password with email confirmation flow. POST /v1/auth
 
 | Method | Path | Auth | Response |
 |--------|------|------|----------|
-| POST | /v1/auth/sign-up | No | `{"code": 0, "data": "Confirm the specified email"}` |
-| GET | /v1/auth/confirm/{token} | No | `{"code": 0, "data": "Specified email is confirmed"}` |
+| POST | /v1/auth/password/sign-up | No | `{"code": 0, "data": "Confirm the specified email"}` |
+| GET | /v1/auth/email/verify | No | `{"code": 0, "data": "Specified email is confirmed"}` |
 
 ### Errors
 

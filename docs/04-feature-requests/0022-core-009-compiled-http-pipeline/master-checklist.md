@@ -49,7 +49,7 @@
   - `CompiledOperation $operation`
   - `array $pathParams`
 - [x] Write unit tests for CompiledRouteMap:
-  - Static route match (GET /v1/auth/sign-up)
+  - Static route match (GET /v1/auth/password/sign-up)
   - Dynamic route match (GET /v1/user/{id})
   - No match returns null
   - Method mismatch returns null

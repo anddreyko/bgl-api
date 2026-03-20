@@ -60,7 +60,7 @@ Currently there is no unified entry point for API requests. Each route would nee
 
 - [ ] ApiAction handles incoming requests, matches route, creates messages, dispatches, serializes result
 - [ ] RouteMap reads OpenAPI config and matches HTTP method + path
-- [ ] Path parameters extracted correctly (e.g. /v1/auth/confirm/{token})
+- [ ] Path parameters extracted correctly (e.g. /v1/auth/email/verify)
 - [ ] InterceptorPipeline runs interceptors from config before dispatch
 - [ ] SchemaMapper maps request body/query/path data to named array for messages constructor
 - [ ] Domain exceptions (DuplicateEmailException, InvalidTokenException) mapped to appropriate HTTP status codes

@@ -120,6 +120,22 @@ services:
       timeout: 5s
       retries: 3
 
+  mailer:
+    image: axllent/mailpit:v1.29.3
+    ports:
+      - "${MAILER_EXTERNAL_PORT}:8025"
+    networks:
+      bglapinet:
+        ipv4_address: "${MAILER_NETWORK_IP}"
+        aliases:
+          - mailer
+    restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 -O /dev/null http://127.0.0.1:8025/api/v1/info || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
   bgg-mock:
     build:
       context: .docker/dev/phiremock

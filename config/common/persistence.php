@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Bgl\Core\Auth\Confirmer;
+use Bgl\Core\Auth\Verifier;
 use Bgl\Core\Identity\UuidGenerator;
 use Bgl\Core\Persistence\Transactor;
 use Bgl\Core\Serialization\Deserializer;
@@ -15,6 +16,7 @@ use Bgl\Domain\Profile\Passkey\PasskeyChallenges;
 use Bgl\Domain\Profile\Passkey\Passkeys;
 use Bgl\Domain\Profile\Users;
 use Bgl\Infrastructure\Auth\DoctrineConfirmer;
+use Bgl\Infrastructure\Auth\DoctrineVerifier;
 use Bgl\Infrastructure\Clients\Bgg\XmlFieldExtractor;
 use Bgl\Infrastructure\Identity\RamseyUuidGenerator;
 use Bgl\Infrastructure\Persistence\Bgg\BggGames;
@@ -38,6 +40,18 @@ return [
     Transactor::class => static fn(DoctrineTransactor $t): Transactor => $t,
     Users::class => static fn(EntityManagerInterface $em): Users => new DoctrineUsers($em),
     Confirmer::class => static fn(DoctrineConfirmer $c): Confirmer => $c,
+    Verifier::class => static function (ContainerInterface $c): Verifier {
+        /** @var EntityManagerInterface $em */
+        $em = $c->get(EntityManagerInterface::class);
+        /** @var UuidGenerator $uuidGenerator */
+        $uuidGenerator = $c->get(UuidGenerator::class);
+        /** @var ClockInterface $clock */
+        $clock = $c->get(ClockInterface::class);
+        $pepperEnv = getenv('VERIFICATION_PEPPER');
+        $pepper = $pepperEnv !== false ? $pepperEnv : 'default-pepper-change-me';
+
+        return new DoctrineVerifier($em, $uuidGenerator, $clock, $pepper);
+    },
     Plays::class => static fn(EntityManagerInterface $em): Plays => new DoctrinePlays($em),
     PlayersFactory::class => static fn(DoctrinePlayersFactory $f): PlayersFactory => $f,
     Passkeys::class => static fn(EntityManagerInterface $em): Passkeys => new DoctrinePasskeys($em),

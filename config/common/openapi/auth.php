@@ -10,13 +10,14 @@ use Bgl\Application\Handlers\Auth\RefreshToken;
 use Bgl\Application\Handlers\Auth\Register;
 use Bgl\Application\Handlers\Auth\RegisterPasskeyOptions;
 use Bgl\Application\Handlers\Auth\RegisterPasskeyVerify;
+use Bgl\Application\Handlers\Auth\SendVerification;
 use Bgl\Application\Handlers\Auth\SignOut;
 use Bgl\Presentation\Api\Interceptors\AuthInterceptor;
 
 return [
     'openapi' => [
         'paths' => [
-            '/v1/auth/sign-up' => [
+            '/v1/auth/password/sign-up' => [
                 'post' => [
                     'summary' => 'Register new user',
                     'operationId' => 'registerUser',
@@ -46,7 +47,7 @@ return [
                     ],
                 ],
             ],
-            '/v1/auth/sign-in' => [
+            '/v1/auth/password/sign-in' => [
                 'post' => [
                     'summary' => 'Login with credentials',
                     'operationId' => 'loginByCredentials',
@@ -76,25 +77,71 @@ return [
                     ],
                 ],
             ],
-            '/v1/auth/confirm/{token}' => [
-                'get' => [
-                    'summary' => 'Confirm email',
-                    'operationId' => 'confirmEmail',
+            '/v1/auth/email' => [
+                'post' => [
+                    'summary' => 'Send verification code',
+                    'operationId' => 'sendVerification',
+                    'tags' => ['Auth'],
+                    'x-message' => SendVerification\Command::class,
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'required' => ['email'],
+                                    'properties' => [
+                                        'email' => ['type' => 'string', 'format' => 'email'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'responses' => [
+                        '202' => [
+                            'description' => 'Verification request accepted',
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'code' => ['type' => 'integer', 'example' => 0],
+                                            'data' => ['type' => 'string'],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        '422' => ['$ref' => '#/components/responses/ValidationError'],
+                        '429' => ['$ref' => '#/components/responses/TooManyRequests'],
+                    ],
+                ],
+            ],
+            '/v1/auth/email/verify' => [
+                'post' => [
+                    'summary' => 'Verify email credential',
+                    'operationId' => 'verifyEmail',
                     'tags' => ['Auth'],
                     'x-message' => ConfirmEmail\Command::class,
-                    'parameters' => [
-                        [
-                            'name' => 'token',
-                            'in' => 'path',
-                            'required' => true,
-                            'schema' => ['type' => 'string'],
+                    'requestBody' => [
+                        'required' => true,
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'required' => ['credential', 'type'],
+                                    'properties' => [
+                                        'credential' => ['type' => 'string'],
+                                        'type' => ['type' => 'string', 'enum' => ['code', 'token']],
+                                    ],
+                                ],
+                            ],
                         ],
                     ],
                     'responses' => [
                         '200' => ['$ref' => '#/components/responses/TokenPair'],
                         '400' => ['$ref' => '#/components/responses/BadRequest'],
                         '422' => ['$ref' => '#/components/responses/ValidationError'],
-                        '500' => ['$ref' => '#/components/responses/InternalError'],
                     ],
                 ],
             ],

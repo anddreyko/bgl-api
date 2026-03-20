@@ -44,6 +44,7 @@ return [
         'handlers' => [
             [Handlers\Ping\Command::class, Handlers\Ping\Handler::class],
             [Auth\Register\Command::class, Auth\Register\Handler::class],
+            [Auth\SendVerification\Command::class, Auth\SendVerification\Handler::class],
             [Auth\ConfirmEmail\Command::class, Auth\ConfirmEmail\Handler::class],
             [Auth\LoginByCredentials\Command::class, Auth\LoginByCredentials\Handler::class],
             [Auth\RefreshToken\Command::class, Auth\RefreshToken\Handler::class],

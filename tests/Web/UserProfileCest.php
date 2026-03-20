@@ -29,7 +29,7 @@ final class UserProfileCest
         $email = 'update-profile-' . uniqid() . '@test.local';
         $password = 'SecurePass1!';
 
-        $i->sendPost('/v1/auth/sign-up', [
+        $i->sendPost('/v1/auth/password/sign-up', [
             'email' => $email,
             'password' => $password,
         ]);
@@ -37,7 +37,7 @@ final class UserProfileCest
 
         $i->updateInDatabase('auth_user', ['status' => 'active'], ['email' => $email]);
 
-        $i->sendPost('/v1/auth/sign-in', [
+        $i->sendPost('/v1/auth/password/sign-in', [
             'email' => $email,
             'password' => $password,
         ]);

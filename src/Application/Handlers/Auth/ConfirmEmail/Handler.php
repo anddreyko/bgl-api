@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Bgl\Application\Handlers\Auth\ConfirmEmail;
 
-use Bgl\Core\Auth\Confirmer;
+use Bgl\Core\Auth\CredentialType;
 use Bgl\Core\Auth\InvalidConfirmationTokenException;
 use Bgl\Core\Auth\TokenIssuer;
+use Bgl\Core\Auth\Verifier;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
 use Bgl\Domain\Profile\Users;
@@ -18,7 +19,7 @@ final readonly class Handler implements MessageHandler
 {
     public function __construct(
         private Users $users,
-        private Confirmer $confirmer,
+        private Verifier $verifier,
         private TokenIssuer $tokenIssuer,
     ) {
     }
@@ -29,7 +30,8 @@ final readonly class Handler implements MessageHandler
         /** @var Command $command */
         $command = $envelope->message;
 
-        $userId = $this->confirmer->confirm($command->token);
+        $credentialType = CredentialType::from($command->type);
+        $userId = $this->verifier->confirm($command->credential, $credentialType);
 
         /** @var string $userIdValue */
         $userIdValue = $userId->getValue();

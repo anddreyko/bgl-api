@@ -13,5 +13,6 @@
       "statusCode": 503,
       "body": "Service Unavailable"
     }
-  }
+  },
+  "priority": 1
 }

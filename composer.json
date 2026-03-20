@@ -47,6 +47,7 @@
         "league/tactician": "^1.1",
         "monolog/monolog": "^3.9",
         "php-di/php-di": "^7.1",
+        "phpmailer/phpmailer": "^7.0",
         "psr/clock": "^1.0",
         "psr/container": "^2.0",
         "psr/http-factory": "^1.1",

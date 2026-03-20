@@ -9,10 +9,14 @@ use Bgl\Core\Messages\Message;
 /**
  * @implements Message<Result>
  */
-final class Command implements Message
+final readonly class Command implements Message
 {
+    /**
+     * @param non-empty-string $credential
+     */
     public function __construct(
-        public string $token,
+        public string $credential,
+        public string $type,
     ) {
     }
 }

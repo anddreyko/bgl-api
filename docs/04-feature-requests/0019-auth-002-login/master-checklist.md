@@ -36,7 +36,7 @@
 **Dependencies:** Stage 1
 
 - [x] Add to `config/common/openapi/auth.php`:
-  - POST /v1/auth/sign-in -> LoginByCredentials\Command (email, password in body)
+  - POST /v1/auth/password/sign-in -> LoginByCredentials\Command (email, password in body)
 - [x] Create unit tests for Handler
 - [x] Verify: `composer test:unit`
 

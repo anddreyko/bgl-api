@@ -79,8 +79,8 @@
 **Dependencies:** Stage 3
 
 - [x] Create `config/common/openapi/auth.php` with routes:
-  - POST /v1/auth/sign-up -> Register\Command (email, password in body)
-  - GET /v1/auth/confirm/{token} -> ConfirmEmail\Command (token from path)
+  - POST /v1/auth/password/sign-up -> Register\Command (email, password in body)
+  - GET /v1/auth/email/verify -> ConfirmEmail\Command (token from path)
 - [x] Create unit tests for Register Handler
 - [x] Create unit tests for ConfirmEmail Handler
 - [x] Create unit test for EmailConfirmationToken entity

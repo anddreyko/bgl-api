@@ -49,7 +49,7 @@ final class OpenApiExportCest
 
         $i->assertArrayHasKey('paths', $spec);
         $i->assertArrayHasKey('/ping', $spec['paths']);
-        $i->assertArrayHasKey('/v1/auth/sign-up', $spec['paths']);
+        $i->assertArrayHasKey('/v1/auth/password/sign-up', $spec['paths']);
     }
 
     public function testOutputDoesNotContainInternalExtensions(CliTester $i): void

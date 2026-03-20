@@ -400,8 +400,8 @@ POST   /v1/mates          -- create mate
 PUT    /v1/mates/{id}     -- update mate
 DELETE /v1/mates/{id}     -- delete mate
 
-POST   /v1/auth/sign-in   -- login (exception: auth actions use verbs)
-POST   /v1/auth/sign-up   -- register
+POST   /v1/auth/password/sign-in   -- login (exception: auth actions use verbs)
+POST   /v1/auth/password/sign-up   -- register
 POST   /v1/auth/sign-out  -- logout
 
 // DON'T

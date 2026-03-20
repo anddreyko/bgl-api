@@ -5,7 +5,7 @@
 
 ## Summary
 
-Implemented user registration via email and password with email confirmation flow. POST /v1/auth/sign-up creates inactive user and confirmation token. GET /v1/auth/confirm/{token} activates account. MVP logs confirmation URL instead of sending email.
+Implemented user registration via email and password with email confirmation flow. POST /v1/auth/password/sign-up creates inactive user and confirmation token. GET /v1/auth/email/verify activates account. MVP logs confirmation URL instead of sending email.
 
 ## Key Files
 
@@ -27,12 +27,12 @@ Implemented user registration via email and password with email confirmation flo
 | `src/Application/Handlers/Auth/ConfirmEmail/Command.php` | Confirmation command |
 | `src/Application/Handlers/Auth/ConfirmEmail/Handler.php` | Confirmation handler via Confirmer service |
 | `tests/Unit/Application/Handlers/Auth/Register/HandlerCest.php` | Registration tests |
-| `config/common/openapi/auth.php` | POST /v1/auth/sign-up and GET /v1/auth/confirm/{token} endpoints |
+| `config/common/openapi/auth.php` | POST /v1/auth/password/sign-up and GET /v1/auth/email/verify endpoints |
 
 ## How It Works
 
 Registration flow:
-1. Client sends POST /v1/auth/sign-up with email and password
+1. Client sends POST /v1/auth/password/sign-up with email and password
 2. Handler validates email uniqueness (409 if duplicate)
 3. Handler hashes password using PasswordHasher
 4. Handler creates User entity with Inactive status
@@ -41,7 +41,7 @@ Registration flow:
 7. MVP: Confirmation URL logged (future: send email)
 
 Confirmation flow:
-1. Client sends GET /v1/auth/confirm/{token}
+1. Client sends GET /v1/auth/email/verify
 2. Handler calls Confirmer::confirm() which validates and returns userId
 3. Handler loads User and calls confirm() method
 4. confirm() sets User status to Active
