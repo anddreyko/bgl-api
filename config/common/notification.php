@@ -6,9 +6,11 @@ use Bgl\Application\Handlers\Auth\SendVerification;
 use Bgl\Core\Auth\Verifier;
 use Bgl\Core\Notification\Notifier;
 use Bgl\Domain\Profile\Users;
-use Bgl\Infrastructure\Notification\PhpMailerNotifier;
+use Bgl\Infrastructure\Notification\SymfonyMailerNotifier;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Transport;
 
 return [
     SendVerification\Handler::class => static function (ContainerInterface $c): SendVerification\Handler {
@@ -29,14 +31,9 @@ return [
         $mailerDsn = getenv('MAILER_DSN');
         $dsn = $mailerDsn !== false ? $mailerDsn : 'smtp://localhost:1025';
 
-        /** @var array{host?: string, port?: int} $parts */
-        $parts = parse_url($dsn);
-        $host = $parts['host'] ?? 'localhost';
-        $port = $parts['port'] ?? 1025;
-
         $mailFrom = getenv('MAIL_NOREPLY');
         $from = $mailFrom !== false ? $mailFrom : 'noreply@example.com';
 
-        return new PhpMailerNotifier($host, $port, $from);
+        return new SymfonyMailerNotifier(new Mailer(Transport::fromDsn($dsn)), $from);
     },
 ];
