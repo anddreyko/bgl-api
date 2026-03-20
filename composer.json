@@ -175,11 +175,11 @@
         "bm:base": "@bm run --tag=baseline --report=aggregate",
         "bm:check": "@bm run --ref=baseline --report=aggregate",
         "vi": "vendor-bin/semver/vendor/bin/vs-version-increment",
-        "vi:major": "@semver major",
-        "vi:minor": "@semver minor",
-        "vi:patch": "@semver patch",
-        "vi:list": "@semver --list",
-        "vi:debug": "@semver --debug"
+        "vi:major": "@vi major",
+        "vi:minor": "@vi minor",
+        "vi:patch": "@vi patch",
+        "vi:list": "@vi --list",
+        "vi:debug": "@vi --debug"
     },
     "scripts-descriptions": {
         "scan:php": "Running all scripts with PHP code validation tools",

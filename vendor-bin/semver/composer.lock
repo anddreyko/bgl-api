@@ -9,16 +9,16 @@
     "packages-dev": [
         {
             "name": "voral/version-increment",
-            "version": "3.1.0",
+            "version": "3.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Voral/vs-version-incrementor.git",
-                "reference": "f250ce89e9522dcff15c3261a54416a212c03e1b"
+                "reference": "914e209e5f0f7deedd7575d834328db6a6cf657f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Voral/vs-version-incrementor/zipball/f250ce89e9522dcff15c3261a54416a212c03e1b",
-                "reference": "f250ce89e9522dcff15c3261a54416a212c03e1b",
+                "url": "https://api.github.com/repos/Voral/vs-version-incrementor/zipball/914e209e5f0f7deedd7575d834328db6a6cf657f",
+                "reference": "914e209e5f0f7deedd7575d834328db6a6cf657f",
                 "shasum": ""
             },
             "require": {
@@ -76,7 +76,7 @@
                 "issues": "https://github.com/Voral/vs-version-incrementor/issues",
                 "source": "https://github.com/Voral/vs-version-incrementor"
             },
-            "time": "2025-10-17T07:07:17+00:00"
+            "time": "2025-11-21T07:05:41+00:00"
         }
     ],
     "aliases": [],
@@ -86,5 +86,5 @@
     "prefer-lowest": false,
     "platform": {},
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
