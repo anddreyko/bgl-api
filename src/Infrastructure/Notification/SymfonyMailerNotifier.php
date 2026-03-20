@@ -20,7 +20,7 @@ final readonly class SymfonyMailerNotifier implements Notifier
     #[\Override]
     public function send(Notification $notification): void
     {
-        $email = (new Email())
+        $email = new Email()
             ->from($notification->from ?? $this->defaultFrom)
             ->to($notification->to)
             ->subject($notification->subject)
