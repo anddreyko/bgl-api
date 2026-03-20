@@ -17,6 +17,7 @@ use Bgl\Infrastructure\Persistence\Doctrine\Type\DateTimeType;
 use Bgl\Infrastructure\Persistence\Doctrine\Type\EmailType;
 use Bgl\Infrastructure\Persistence\Doctrine\Type\UuidType;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
@@ -40,9 +41,7 @@ return [
         $config = $container->get('doctrine');
 
         $dbalConfig = new \Doctrine\DBAL\Configuration();
-        $dbalConfig->setSchemaAssetsFilter(
-            static fn(string $assetName): bool => $assetName !== 'migration',
-        );
+        $dbalConfig->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         /** @psalm-suppress ArgumentTypeCoercion */
         $connection = DriverManager::getConnection($config['db'], $dbalConfig);
