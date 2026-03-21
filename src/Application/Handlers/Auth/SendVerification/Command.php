@@ -17,6 +17,7 @@ final readonly class Command implements Message
 
     public function __construct(
         string $email,
+        public ?string $userId = null,
     ) {
         new Email($email);
 

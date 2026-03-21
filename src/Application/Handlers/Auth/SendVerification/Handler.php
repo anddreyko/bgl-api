@@ -34,7 +34,10 @@ final readonly class Handler implements MessageHandler
         /** @var Command $command */
         $command = $envelope->message;
 
-        $user = $this->users->findByEmail($command->email);
+        $user = $command->userId !== null
+            ? $this->users->find($command->userId)
+            : $this->users->findByEmail($command->email);
+
         if ($user === null) {
             return new Result(message: 'Verification request accepted');
         }

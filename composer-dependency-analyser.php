@@ -16,6 +16,7 @@ return $config
     ->setFileExtensions(['php']) // applies only to directory scanning, not directly listed files
 
     //// Ignoring errors
+    ->ignoreErrorsOnPackage('symfony/google-mailer', [ErrorType::UNUSED_DEPENDENCY])
     #->ignoreErrors([ErrorType::DEV_DEPENDENCY_IN_PROD])
     # ->ignoreErrorsOnPackage('roave/security-advisories', [ErrorType::UNUSED_DEPENDENCY])
     # ->ignoreErrorsOnPath(__DIR__ . '/cache/DIC.php', [ErrorType::SHADOW_DEPENDENCY])

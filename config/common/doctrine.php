@@ -71,7 +71,7 @@ return [
             'password' => getenv('DB_PASS'),
             'dbname' => getenv('DB_NAME'),
             'charset' => 'utf-8',
-            'sslmode' => getenv('DB_SSLMODE') ?: 'prefer',
+            'sslmode' => getenv('DB_SSLMODE') !== false ? getenv('DB_SSLMODE') : 'prefer',
         ],
         'mapping' => (static function (): MappingDriverChain {
             $chain = new MappingDriverChain();

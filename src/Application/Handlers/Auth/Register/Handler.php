@@ -56,7 +56,7 @@ final readonly class Handler implements MessageHandler
         $this->users->add($user);
 
         $this->dispatcher->dispatch(
-            new SendVerification\Command($command->email),
+            new SendVerification\Command($command->email, (string)$user->getId()),
             $envelope,
         );
 
