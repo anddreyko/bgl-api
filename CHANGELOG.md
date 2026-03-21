@@ -1,3 +1,8 @@
+# 2.13.6 (2026-03-21)
+
+### Fixes
+- resolve missing verification token on registration
+
 # 2.13.5 (2026-03-21)
 
 ### Fixes
