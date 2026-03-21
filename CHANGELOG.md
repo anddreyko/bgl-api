@@ -1,3 +1,8 @@
+# 2.13.4 (2026-03-21)
+
+### Refactoring
+- simplify verification pepper env retrieval
+
 # 2.13.3 (2026-03-20)
 
 ### New features
