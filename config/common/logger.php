@@ -6,6 +6,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use Sentry\Monolog\Handler as SentryHandler;
 
 return [
     LoggerInterface::class => static function (ContainerInterface $container): LoggerInterface {
@@ -14,6 +15,14 @@ return [
 
         $logger = new Logger('application');
         $logger->pushHandler(new StreamHandler($config['file']));
+
+        /** @var bool $sentryInitialized */
+        $sentryInitialized = $container->get('sentry.initialized');
+        if ($sentryInitialized) {
+            /** @var SentryHandler $sentryHandler */
+            $sentryHandler = $container->get(SentryHandler::class);
+            $logger->pushHandler($sentryHandler);
+        }
 
         return $logger;
     },

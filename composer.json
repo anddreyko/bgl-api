@@ -55,6 +55,7 @@
         "psr/http-server-middleware": "^1.0",
         "psr/log": "^3.0",
         "ramsey/uuid": "^4.9",
+        "sentry/sentry": "^4.22",
         "slim/slim": "^4.15",
         "symfony/console": "^8.0",
         "symfony/mailer": "^8.0",
