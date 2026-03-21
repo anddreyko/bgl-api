@@ -71,6 +71,7 @@ return [
             'password' => getenv('DB_PASS'),
             'dbname' => getenv('DB_NAME'),
             'charset' => 'utf-8',
+            'persistent' => true,
         ],
         'mapping' => (static function (): MappingDriverChain {
             $chain = new MappingDriverChain();

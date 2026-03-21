@@ -11,6 +11,7 @@ RUN --mount=type=cache,target=/var/cache/apk \
 
 COPY .docker/base/php-fpm/conf.d /usr/local/etc/php/conf.d
 COPY .docker/prod/php/conf.d     /usr/local/etc/php/conf.d
+COPY .docker/prod/php-fpm.d/     /usr/local/etc/php-fpm.d/
 
 RUN rm -f /etc/nginx/http.d/default.conf
 COPY .docker/base/nginx/conf.d/default.conf /etc/nginx/http.d/default.conf
