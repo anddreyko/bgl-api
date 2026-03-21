@@ -1,3 +1,8 @@
+# 2.13.5 (2026-03-21)
+
+### Fixes
+- limit fpm workers and enable persistent db connections
+
 # 2.13.4 (2026-03-21)
 
 ### Refactoring
