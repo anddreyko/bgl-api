@@ -17,6 +17,7 @@ return $config
 
     //// Ignoring errors
     ->ignoreErrorsOnPackage('symfony/resend-mailer', [ErrorType::UNUSED_DEPENDENCY])
+    ->ignoreErrorsOnPackage('symfony/http-client', [ErrorType::UNUSED_DEPENDENCY])
     #->ignoreErrors([ErrorType::DEV_DEPENDENCY_IN_PROD])
     # ->ignoreErrorsOnPackage('roave/security-advisories', [ErrorType::UNUSED_DEPENDENCY])
     # ->ignoreErrorsOnPath(__DIR__ . '/cache/DIC.php', [ErrorType::SHADOW_DEPENDENCY])
