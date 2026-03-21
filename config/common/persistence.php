@@ -47,8 +47,7 @@ return [
         $uuidGenerator = $c->get(UuidGenerator::class);
         /** @var ClockInterface $clock */
         $clock = $c->get(ClockInterface::class);
-        $pepperEnv = getenv('VERIFICATION_PEPPER');
-        $pepper = $pepperEnv !== false ? $pepperEnv : 'default-pepper-change-me';
+        $pepper = (string)getenv('VERIFICATION_PEPPER') ?: 'default-pepper-change-me';
 
         return new DoctrineVerifier($em, $uuidGenerator, $clock, $pepper);
     },
