@@ -16,6 +16,7 @@ use Bgl\Infrastructure\Persistence\Doctrine\Mapping\Profile\UserMapping;
 use Bgl\Infrastructure\Persistence\Doctrine\Type\DateTimeType;
 use Bgl\Infrastructure\Persistence\Doctrine\Type\EmailType;
 use Bgl\Infrastructure\Persistence\Doctrine\Type\UuidType;
+use Doctrine\DBAL\Configuration as DbalConfiguration;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Types\Type;
@@ -40,7 +41,7 @@ return [
         /** @var array{db: array{driver: string}, mapping: MappingDriver, proxy_dir: string} $config */
         $config = $container->get('doctrine');
 
-        $dbalConfig = new \Doctrine\DBAL\Configuration();
+        $dbalConfig = new DbalConfiguration();
         $dbalConfig->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         /** @psalm-suppress ArgumentTypeCoercion */

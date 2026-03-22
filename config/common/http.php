@@ -7,7 +7,9 @@ use Bgl\Core\Http\SchemaMapper;
 use Bgl\Infrastructure\Http\HydratorMapper;
 use Bgl\Infrastructure\Http\LeagueRequestValidator;
 
+use function DI\get;
+
 return [
-    SchemaMapper::class => DI\get(HydratorMapper::class),
-    RequestValidator::class => DI\get(LeagueRequestValidator::class),
+    SchemaMapper::class => get(HydratorMapper::class),
+    RequestValidator::class => get(LeagueRequestValidator::class),
 ];

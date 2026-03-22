@@ -9,6 +9,8 @@ use Sentry\Monolog\Handler as SentryHandler;
 use Sentry\SentrySdk;
 use Sentry\State\HubInterface;
 
+use function Sentry\init;
+
 return [
     'sentry.initialized' => static function (ContainerInterface $container): bool {
         $dsn = getenv('SENTRY_DSN');
@@ -21,7 +23,7 @@ return [
         /** @var AppVersion $appVersion */
         $appVersion = $container->get(AppVersion::class);
 
-        \Sentry\init([
+        init([
             'dsn' => $dsn,
             'environment' => $environment !== false ? $environment : 'prod',
             'release' => $appVersion->getVersion(),

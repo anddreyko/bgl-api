@@ -11,6 +11,8 @@ use League\Fractal\Manager;
 use League\Fractal\Serializer\DataArraySerializer;
 use Psr\Container\ContainerInterface;
 
+use function DI\get;
+
 return [
     FractalSerializer::class => static function (ContainerInterface $container): FractalSerializer {
         /** @var Manager $manager */
@@ -19,12 +21,12 @@ return [
 
         return new FractalSerializer($manager, require __DIR__ . '/../_serialise-mapping.php');
     },
-    Serializer::class => DI\get(FractalSerializer::class),
+    Serializer::class => get(FractalSerializer::class),
     MappedDeserializer::class => static function (ContainerInterface $container): MappedDeserializer {
         /** @var ObjectMapper $hydrator */
         $hydrator = $container->get(ObjectMapper::class);
 
         return new MappedDeserializer($hydrator, require __DIR__ . '/../_deserialise-mapping.php');
     },
-    Deserializer::class => DI\get(MappedDeserializer::class),
+    Deserializer::class => get(MappedDeserializer::class),
 ];
