@@ -42,14 +42,14 @@ final readonly class CompositeGames implements Games
                     $this->local->add($game);
                 }
             }
-        } catch (\Throwable) {
-            $bggFailed = true;
+        } catch (\Throwable $e) {
+            $bggFailed = $e;
         }
 
         $results = $this->local->search($filter, $size, $number, $sort);
 
-        if ($bggFailed && $results === [] && $this->local->count($filter) === 0) {
-            throw new \RuntimeException('Service temporarily unavailable');
+        if ($bggFailed !== false && $results === [] && $this->local->count($filter) === 0) {
+            throw new \RuntimeException('Service temporarily unavailable', 0, $bggFailed);
         }
 
         return $results;

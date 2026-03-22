@@ -25,7 +25,7 @@ use Bgl\Infrastructure\Persistence\InMemory\InMemoryGames;
 use GuzzleHttp\ClientInterface;
 use Psr\Clock\ClockInterface;
 
-final class BggGames implements Games
+final readonly class BggGames implements Games
 {
     private InMemoryGames $cache;
 
@@ -39,12 +39,12 @@ final class BggGames implements Games
      * } $searchConfig
      */
     public function __construct(
-        private readonly ClientInterface $client,
-        private readonly Denormalizer $denormalizer,
-        private readonly Deserializer $deserializer,
-        private readonly UuidGenerator $uuidGenerator,
-        private readonly ClockInterface $clock,
-        private readonly array $searchConfig,
+        private ClientInterface $client,
+        private Denormalizer $denormalizer,
+        private Deserializer $deserializer,
+        private UuidGenerator $uuidGenerator,
+        private ClockInterface $clock,
+        private array $searchConfig,
     ) {
         $this->cache = new InMemoryGames();
     }
@@ -61,7 +61,6 @@ final class BggGames implements Games
             return [];
         }
 
-        $this->cache = new InMemoryGames();
         foreach ($this->fetchFromBgg($query) as $game) {
             $this->cache->add($game);
         }
