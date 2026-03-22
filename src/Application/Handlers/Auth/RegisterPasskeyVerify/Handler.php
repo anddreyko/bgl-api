@@ -16,6 +16,7 @@ use Bgl\Domain\Profile\Passkey\Passkey;
 use Bgl\Domain\Profile\Passkey\PasskeyChallenges;
 use Bgl\Domain\Profile\Passkey\Passkeys;
 use Psr\Clock\ClockInterface;
+use Bgl\Domain\Profile\Passkey\PasskeyChallenge;
 
 /**
  * @implements MessageHandler<Result, Command>
@@ -61,7 +62,7 @@ final readonly class Handler implements MessageHandler
         return new Result(message: 'ok');
     }
 
-    private function findChallengeForUser(string $userId): \Bgl\Domain\Profile\Passkey\PasskeyChallenge
+    private function findChallengeForUser(string $userId): PasskeyChallenge
     {
         $challenges = $this->challenges;
         /** @var iterable<array<string, mixed>> $results */

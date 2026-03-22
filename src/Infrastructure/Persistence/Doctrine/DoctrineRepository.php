@@ -14,6 +14,7 @@ use Bgl\Core\Listing\Page\PageSort;
 use Bgl\Core\Listing\Page\SortDirection;
 use Bgl\Core\Listing\Searchable;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * @template TEntity of object
@@ -123,7 +124,7 @@ abstract class DoctrineRepository implements Repository, Searchable
         return $qb->getQuery()->getArrayResult();
     }
 
-    private function buildSearchQuery(string $alias, Filter $filter): \Doctrine\ORM\QueryBuilder
+    private function buildSearchQuery(string $alias, Filter $filter): QueryBuilder
     {
         $select = implode(', ', array_map(fn(string $key): string => "{$alias}.{$key}", $this->getKeys()));
 
@@ -137,14 +138,14 @@ abstract class DoctrineRepository implements Repository, Searchable
         return $qb;
     }
 
-    private function applySorting(\Doctrine\ORM\QueryBuilder $qb, string $alias, PageSort $sort): void
+    private function applySorting(QueryBuilder $qb, string $alias, PageSort $sort): void
     {
         foreach ($sort->fields as $field => $direction) {
             $qb->addOrderBy("{$alias}.{$field}", $direction === SortDirection::Asc ? 'ASC' : 'DESC');
         }
     }
 
-    private function applyPagination(\Doctrine\ORM\QueryBuilder $qb, ?int $limit, PageNumber $number): void
+    private function applyPagination(QueryBuilder $qb, ?int $limit, PageNumber $number): void
     {
         if ($limit !== null) {
             $qb->setFirstResult(($number->getValue() - 1) * $limit)->setMaxResults($limit);

@@ -9,6 +9,7 @@ use Bgl\Core\Auth\PasskeyVerifier;
 use Bgl\Core\Auth\TokenIssuer;
 use Bgl\Core\Messages\Envelope;
 use Bgl\Core\Messages\MessageHandler;
+use Bgl\Domain\Profile\Passkey\PasskeyChallenge;
 use Bgl\Domain\Profile\Passkey\PasskeyChallenges;
 use Bgl\Domain\Profile\Passkey\Passkeys;
 
@@ -75,7 +76,7 @@ final readonly class Handler implements MessageHandler
     /**
      * @param array<array-key, mixed> $decoded
      */
-    private function findValidChallenge(array $decoded): \Bgl\Domain\Profile\Passkey\PasskeyChallenge
+    private function findValidChallenge(array $decoded): PasskeyChallenge
     {
         // The clientDataJSON contains the challenge -- extract it
         if (isset($decoded['response']['clientDataJSON']) && is_string($decoded['response']['clientDataJSON'])) {
@@ -84,6 +85,8 @@ final readonly class Handler implements MessageHandler
             $clientData = json_decode(
                 base64_decode(strtr($raw, '-_', '+/') . str_repeat('=', 3 - (3 + strlen($raw)) % 4)),
                 true,
+                512,
+                JSON_THROW_ON_ERROR
             );
 
             if (is_array($clientData) && isset($clientData['challenge']) && is_string($clientData['challenge'])) {
