@@ -38,22 +38,28 @@ final readonly class Handler implements MessageHandler
         $command = $envelope->message;
 
         $existing = $this->users->findByEmail($command->email);
-        if ($existing !== null) {
+        if ($existing !== null && !$existing->getStatus()->isInactive()) {
             throw new UserAlreadyExistsException();
         }
 
         $passwordHash = $this->passwordHasher->hash($command->password);
-        $now = new DateTime($this->clock->now());
 
-        $user = User::register(
-            id: $this->uuidGenerator->generate(),
-            email: new Email($command->email),
-            passwordHash: $passwordHash,
-            createdAt: $now,
-            name: $command->name,
-        );
-
-        $this->users->add($user);
+        if ($existing !== null) {
+            $existing->resetPassword($passwordHash);
+            if ($command->name !== null && $command->name !== '') {
+                $existing->rename($command->name);
+            }
+            $user = $existing;
+        } else {
+            $user = User::register(
+                id: $this->uuidGenerator->generate(),
+                email: new Email($command->email),
+                passwordHash: $passwordHash,
+                createdAt: new DateTime($this->clock->now()),
+                name: $command->name,
+            );
+            $this->users->add($user);
+        }
 
         $this->dispatcher->dispatch(
             new SendVerification\Command($command->email, (string)$user->getId()),

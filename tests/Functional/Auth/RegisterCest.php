@@ -63,9 +63,30 @@ final class RegisterCest
         $i->assertNotNull($this->users->findByEmail($email));
     }
 
-    public function testDuplicateEmailThrowsException(FunctionalTester $i): void
+    public function testDuplicateActiveEmailThrowsException(FunctionalTester $i): void
     {
         $email = 'existing-' . uniqid() . '@test.local';
+
+        $user = User::register(
+            id: $this->uuidGenerator->generate(),
+            email: new Email($email),
+            passwordHash: 'hashed',
+            createdAt: new DateTime(),
+        );
+        $user->confirm();
+        $this->users->add($user);
+        $this->em->flush();
+        $this->em->clear();
+
+        $i->expectThrowable(UserAlreadyExistsException::class, fn () => ($this->handler)(new Envelope(
+            message: new Command(email: $email, password: 'secret123'),
+            messageId: 'msg-2',
+        )));
+    }
+
+    public function testResendsVerificationForInactiveUser(FunctionalTester $i): void
+    {
+        $email = 'inactive-' . uniqid() . '@test.local';
 
         $user = User::register(
             id: $this->uuidGenerator->generate(),
@@ -77,9 +98,12 @@ final class RegisterCest
         $this->em->flush();
         $this->em->clear();
 
-        $i->expectThrowable(UserAlreadyExistsException::class, fn () => ($this->handler)(new Envelope(
-            message: new Command(email: $email, password: 'secret123'),
-            messageId: 'msg-2',
-        )));
+        $result = ($this->handler)(new Envelope(
+            message: new Command(email: $email, password: 'newpassword123'),
+            messageId: 'msg-3',
+        ));
+
+        $i->assertInstanceOf(Result::class, $result);
+        $i->assertSame('Confirm the specified email', $result->message);
     }
 }

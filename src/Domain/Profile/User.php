@@ -13,7 +13,7 @@ final class User
     public function __construct(
         public Uuid $id,
         private readonly Email $email,
-        private readonly string $passwordHash,
+        private string $passwordHash,
         private readonly DateTime $createdAt,
         private UserStatus $status,
         private int $tokenVersion = 1,
@@ -65,6 +65,11 @@ final class User
     public function getPasswordHash(): string
     {
         return $this->passwordHash;
+    }
+
+    public function resetPassword(string $passwordHash): void
+    {
+        $this->passwordHash = $passwordHash;
     }
 
     public function getCreatedAt(): DateTime
