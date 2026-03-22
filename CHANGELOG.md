@@ -1,3 +1,13 @@
+# 2.13.7 (2026-03-22)
+
+### Fixes
+- inherit AuthenticationException from DomainException
+- propagate original BGG error as previous exception
+- allow re-registration for inactive users with password reset
+
+### Documentation
+- add performance rules
+
 # 2.13.6 (2026-03-21)
 
 ### Fixes
